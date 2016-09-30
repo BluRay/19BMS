@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<struts>
+	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
+	<package name="qualityModel" extends="json-default">
+		<!-- 检验记录模板 -->
+		<action name="testTpl" class="testTplAction">
+			<result name="index">/jsp/quality/test_tpl_list.jsp</result>
+			<result name="showTestTpl">/jsp/quality/test_tpl_detail.jsp</result>
+			<result name="showTestTplCopy">/jsp/quality/test_tpl_detail_copy.jsp</result>
+			<result name="showTestTplEdit">/jsp/quality/test_tpl_detail_edit.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 检验流程卡模板 -->
+		<action name="testFlowTpl" class="testFlowTplAction">
+			<result name="index">/jsp/quality/test_flow_tpl_list.jsp</result>
+			<result name="showTplDetail">/jsp/quality/test_flow_tpl_detail.jsp</result>
+			<result name="showTplCopy">/jsp/quality/test_flow_tpl_detail_copy.jsp</result>
+			<result name="showTplEdit">/jsp/quality/test_flow_tpl_detail_edit.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 产品追踪卡模板 -->
+		<action name="trackTpl" class="trackTplAction">
+			<result name="index">/jsp/quality/track_tpl_list.jsp</result>
+			<result name="showTplDetail">/jsp/quality/track_tpl_detail.jsp</result>
+			<result name="showTplCopy">/jsp/quality/track_tpl_detail_copy.jsp</result>
+			<result name="showTplEdit">/jsp/quality/track_tpl_detail_edit.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 订单配置与一致性记录表模板 -->
+		<action name="ocTpl" class="orderConfigTplAction">
+			<result name="index">/jsp/quality/oc_tpl_list.jsp</result>
+			<result name="showTplDetail">/jsp/quality/oc_tpl_detail.jsp</result>
+			<result name="showTplCopy">/jsp/quality/oc_tpl_detail_copy.jsp</result>
+			<result name="showTplEdit">/jsp/quality/oc_tpl_detail_edit.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 品质标准更新记录 -->
+		<action name="qcStd" class="qcStdRecordAction">
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			<interceptor-ref name="defaultStack" />
+			<result name="index">/jsp/quality/qc_std_record.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 质量目标参数维护-->
+		<action name="qaTargert" class="qualityTargetAction">
+			<result name="index">/jsp/quality/quality_target.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 标准故障库维护 -->
+		<action name="stdFaultlib" class="stdFaultLibAction">
+			<result name="index">/jsp/quality/standard_faultlib.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 物料异常 -->
+		<action name="materialAbnormal" class="materialAbnormalAction">
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			<interceptor-ref name="defaultStack" />
+			<result name="index">/jsp/quality/material_abnormal.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 检验记录录入 -->
+		<action name="testRecordIn" class="testRecordInAction">
+			<result name="qualityIndex">/jsp/quality/index.jsp</result>
+			<result name="index">/jsp/quality/test_record_in.jsp</result>
+			<result name="detail">/jsp/quality/test_record_detail.jsp</result>
+			<result name="editPage">/jsp/quality/test_record_edit.jsp</result>
+			<result name="recordin">/jsp/quality/test_record_add.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 产品流程卡录入 -->
+		<action name="prodTrackIn" class="prodTrackInAction">
+			<result name="index">/jsp/quality/prod_track_list.jsp</result>
+			<result name="detailPage">/jsp/quality/prod_track_detail.jsp</result>
+			<result name="editPage">/jsp/quality/prod_track_edit.jsp</result>
+			<result name="addPage">/jsp/quality/prod_track_add.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 产品流程卡录入 -->
+		<action name="ocIn" class="orderConfigInAction">
+			<result name="index">/jsp/quality/oc_record_list.jsp</result>
+			<result name="detailPage">/jsp/quality/oc_record_detail.jsp</result>
+			<result name="editPage">/jsp/quality/oc_record_edit.jsp</result>
+			<result name="addPage">/jsp/quality/oc_record_add.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 检验流程卡录入 -->
+		<action name="testFlowCardIn" class="testFlowCardInAction">
+			<result name="index">/jsp/quality/test_flow_card_list.jsp</result>
+			<result name="detailPage">/jsp/quality/test_flow_card_detail.jsp</result>
+			<result name="editPage">/jsp/quality/test_flow_card_edit.jsp</result>
+			<result name="addPage">/jsp/quality/test_flow_card_add.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+	</package>
+</struts>

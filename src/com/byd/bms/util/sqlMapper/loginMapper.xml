@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.util.dao.ILoginDao">
+
+	<resultMap type="userinfo" id="userMap">
+		<id property="id" column="id" />
+		<result property="username" column="username" />
+		<result property="password" column="password" />
+		<result property="role_id" column="role_id" />
+		<result property="card_number" column="card_number" />
+		<result property="email" column="email" />
+		<result property="telephone" column="telephone" />
+		<result property="cellphone" column="cellphone" />
+		<result property="display_name" column="display_name" />
+		<result property="admin" column="admin" />
+		<result property="factory" column="factory_name" />
+		<result property="factory_id" column="factory_id" />
+		<result property="department" column="department" />
+		<result property="department_id" column="department_id" />
+		<result property="workshop_org" column="workshop_org" />
+		<result property="workgroup_org" column="workgroup_org" />
+		<result property="team_org" column="team_org" />
+		<result property="pwd_modified" column="pwd_modified" />
+	</resultMap>
+
+	<select id="getUser" parameterType="String" resultMap="userMap">
+		select u.*,d.department,f.factory_name,s.workshop_org,s.workgroup_org,s.team_org
+		from BMS_BASE_USER u left join
+		BMS_BASE_DEPARTMENT d on u.department_id=d.id
+		left join BMS_BASE_FACTORY f on u.factory_id=f.id 
+		left join BMS_HR_STAFF s on s.staff_number=u.card_number
+		where u.card_number=#{userName} and u.isdelete='0'
+	</select>
+	
+</mapper>

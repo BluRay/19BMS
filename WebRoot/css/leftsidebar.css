@@ -1,0 +1,307 @@
+/* main menu */
+/* line 34, ../../sass/partials/_navigation.scss */
+ul.main-menu {
+  padding-left: 0;
+  list-style-type: none;
+}
+/* line 39, ../../sass/partials/_navigation.scss */
+ul.main-menu > li a {
+  display: block;
+  position: relative;
+  padding: 5px 0 10px 15px;
+  color: #555;
+  /* background-color: #f1f6fb; */
+  border-top: 1px solid #d0e0ec;
+  text-decoration: none;
+}
+/* line 48, ../../sass/partials/_navigation.scss */
+ul.main-menu > li a:hover {
+  text-decoration: none;
+  background-color: #b8dff8;
+}
+/* line 55, ../../sass/partials/_navigation.scss */
+ul.main-menu > li.active > a {
+  font-weight: 700;
+  background-color: #ccebf8;
+}
+/* line 62, ../../sass/partials/_navigation.scss */
+ul.main-menu > li:first-child > a {
+  border-top: none;
+}
+/* line 67, ../../sass/partials/_navigation.scss */
+ul.main-menu > li i {
+  width: 14px;
+  text-align: center;
+}
+/* line 72, ../../sass/partials/_navigation.scss */
+ul.main-menu > li .text {
+  padding-left: 8px;
+  font-size: 0.9em;
+}
+/* line 77, ../../sass/partials/_navigation.scss */
+ul.main-menu > li .toggle-icon {
+  font-size: 14px;
+  width: 10px;
+  position: absolute;
+  right: 10px;
+  top: 13px;
+  text-shadow: none;
+}
+/* line 87, ../../sass/partials/_navigation.scss */
+ul.main-menu .sub-menu {
+  position: relative;
+  display: none;
+  padding-left: 0;
+}
+/* line 93, ../../sass/partials/_navigation.scss */
+ul.main-menu .sub-menu li a {
+  padding-left: 33px;
+}
+/* line 98, ../../sass/partials/_navigation.scss */
+ul.main-menu .sub-menu li.active > a {
+  font-weight: 700;
+}
+/* line 104, ../../sass/partials/_navigation.scss */
+ul.main-menu .sub-menu.open {
+  overflow: hidden;
+  display: block;
+}
+/* line 109, ../../sass/partials/_navigation.scss */
+ul.main-menu .sub-menu .sub-menu li a {
+  padding-left: 50px;
+}
+
+/* line 115, ../../sass/partials/_navigation.scss */
+ul.main-menu > li > a,
+.content-wrapper {
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  -webkit-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+/* line 120, ../../sass/partials/_navigation.scss */
+.left-sidebar {
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  -webkit-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  padding-right: 0;
+  padding-left: 0;
+  width: 200px;
+  float: left;
+  font-size: 14px;
+  height: 500px;
+  margin-top: -1.52px;
+}
+/* line 126, ../../sass/partials/_navigation.scss */
+.left-sidebar.minified {
+  width: 40px;
+  margin-right: -40px;
+  z-index: 9;
+  height: 500px;
+  border: 1px solid #d0e0ec;
+}
+/* line 131, ../../sass/partials/_navigation.scss */
+.left-sidebar.minified .main-menu > li {
+  position: relative;
+}
+/* line 134, ../../sass/partials/_navigation.scss */
+.left-sidebar.minified .main-menu > li i {
+  width: 20px;
+}
+/* line 138, ../../sass/partials/_navigation.scss */
+.left-sidebar.minified .main-menu > li .toggle-icon {
+  display: none;
+}
+/* line 142, ../../sass/partials/_navigation.scss */
+.left-sidebar.minified .main-menu > li > a {
+  padding-left: 0;
+}
+/* line 145, ../../sass/partials/_navigation.scss */
+.left-sidebar.minified .main-menu > li > a > .text {
+  position: absolute;
+}
+/* line 150, ../../sass/partials/_navigation.scss */
+.left-sidebar.minified .main-menu > li:hover > a > .text {
+  position: absolute;
+  display: block;
+  left: 40px;
+  top: 0;
+  min-width: 200px;
+  z-index: 9999;
+  padding: 10px;
+  border: 1px solid #d0e0ec;
+  line-height: 1.5;
+  background: #f1f6fb;
+  font-weight: 700;
+  opacity: 1 !important;
+}
+/* line 165, ../../sass/partials/_navigation.scss */
+.left-sidebar.minified .main-menu > li:hover > ul.sub-menu {
+  display: block !important;
+  min-width: 200px;
+  position: absolute;
+  margin-left: 40px;
+  z-index: 9999;
+  border: 1px solid #E4E4E4;
+  border-top: none;
+}
+/* line 174, ../../sass/partials/_navigation.scss */
+.left-sidebar.minified .main-menu > li:hover > ul.sub-menu > li > a {
+  padding-left: 10px;
+}
+@media screen and (max-width: 992px) {
+  /* line 120, ../../sass/partials/_navigation.scss */
+  .left-sidebar {
+    display: none;
+  }
+}
+@media screen and (min-width: 992px) {
+  /* line 120, ../../sass/partials/_navigation.scss */
+  .left-sidebar {
+    display: block !important;
+    overflow: visible !important;
+  }
+}
+
+/* line 191, ../../sass/partials/_navigation.scss */
+.sidebar-minified {
+  text-align: center;
+  position: relative;
+  margin-bottom: 15px;
+}
+@media screen and (max-width: 992px) {
+  /* line 191, ../../sass/partials/_navigation.scss */
+  .sidebar-minified {
+    display: none;
+  }
+}
+/* line 200, ../../sass/partials/_navigation.scss */
+.sidebar-minified:before {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  content: "";
+  height: 0;
+  border-top: 1px solid #d0e0ec;
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 13px;
+}
+/* line 212, ../../sass/partials/_navigation.scss */
+.sidebar-minified i {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  -moz-border-radius: 25px;
+  -webkit-border-radius: 25px;
+  border-radius: 25px;
+  width: 25px;
+  height: 25px;
+  position: relative;
+  border: 1px solid #93b0d0;
+  color: #d0e0ec;
+  padding: 4px;
+  background-color: #f1f6fb;
+  cursor: pointer;
+}
+/* line 225, ../../sass/partials/_navigation.scss */
+.sidebar-minified i:hover {
+  background-color: #f6f6f6;
+}
+
+/* main content navigation */
+/* line 233, ../../sass/partials/_navigation.scss */
+.main-content-nav ul {
+  line-height: 34px;
+}
+/* line 237, ../../sass/partials/_navigation.scss */
+.main-content-nav li {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+/* line 241, ../../sass/partials/_navigation.scss */
+.main-content-nav li a {
+  color: #888888;
+  text-decoration: none;
+}
+/* line 245, ../../sass/partials/_navigation.scss */
+.main-content-nav li a:hover, .main-content-nav li a:focus {
+  color: #555;
+}
+@media screen and (max-width: 768px) {
+  /* line 232, ../../sass/partials/_navigation.scss */
+  .main-content-nav {
+    float: none !important;
+    margin-top: 15px;
+  }
+}
+
+/*------------------------------------------------*/
+/*	Main Content
+/*------------------------------------------------*/
+/* line 5, ../../sass/partials/_main-content.scss */
+.content-wrapper {
+  padding: 5px 20px;
+  margin-top:45px;
+  max-width: 100%;
+  margin-left: 180px;
+}
+/* line 8, ../../sass/partials/_main-content.scss */
+.content-wrapper.expanded {
+  max-width: 100%;
+  margin-left: 20px;
+}
+@media screen and (max-width: 480px) {
+  /* line 5, ../../sass/partials/_main-content.scss */
+  .content-wrapper {
+    padding: 15px;
+  }
+}
+@media screen and (min-width: 768px) {
+  /* line 46, ../../sass/partials/_general.scss */
+  .container {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+.pull-right {
+  float: right !important;
+}
+
+/* line 5534, ../../sass/vendors/_summernote-bs3.scss */
+.pull-left {
+  float: left !important;
+}
+.pull-right{
+	float:right;
+	text-align:center;
+	margin-right:5px;
+	margin-top:5px;
+	margin-bottom:5px;
+}
+.main-menu>li>a>.text {
+	opacity: 0
+}
+
+ul.collapse {
+	padding: 0px;
+	margin: 0px 0px 0px 0px;
+}
+
+ul.collapse>li {
+	background-color: white;
+}
+
+ul.collapse>li a {
+	margin-left: 30px;
+}
+
+ul.main-menu>li {
+	background-color: #f1f6fb;
+}

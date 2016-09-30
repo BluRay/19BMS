@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>    
+
+<bean id="SendPlanEmailJob" class="com.byd.bms.email.quartzjob.SendPlanEmailJob">
+	<property name="planDao" ref="planDao"></property>
+	<property name="commDao" ref="commDao"></property>
+	<property name="emailDao" ref="emailDao"></property>
+</bean>
+ 
+ <bean name="StaffHoursUnloading" class="com.byd.bms.util.quartzjob.StaffHoursUnloading">
+ 	<property name="commDao" ref="commDao"></property>
+ </bean>
+  <bean id="methodInvokingJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+       <property name="targetObject">
+           <ref bean="SendPlanEmailJob" />
+       </property>
+       <property name="targetMethod">
+           <value>work</value>
+       </property>
+     </bean>
+    
+     <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <!-- 这里不可以直接在属性jobDetail中引用taskJob，因为他要求的是一个jobDetail类型的对象，所以我们得通过MethodInvokingJobDetailFactoryBean来转一下 -->
+       <property name="jobDetail">
+           <ref bean="methodInvokingJobDetail" />
+       </property>
+       <!-- 0 15 10 L * ? 每月最后一天的23点15分触发  -->
+       <!-- 0 15 10 * * ? * 每天10点15分触发                -->
+       <property name="cronExpression">
+           <value>0 10 17 * * ?</value>
+       </property>
+     </bean>
+    
+  <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+       <!-- 添加触发器 -->
+       <property name="triggers">
+           <list>
+              <ref local="cronTrigger" />
+           </list>
+       </property>
+    </bean>
+</beans> 

@@ -1,0 +1,964 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.techtrans.dao.IEcnTaskDao">
+	<resultMap type="bmsecntask" id="ecnTaskMap">
+		<id property="id" column="id" />
+		<result property="ecn_id" column="ecn_id" />
+		<result property="task_content" column="task_content" />
+		<result property="Switch_Mode" column="Switch_Mode" />
+		<result property="total_hours" column="total_hours" />
+		<result property="old_photo" column="old_photo" />
+		<result property="new_photo" column="new_photo" />
+		<result property="status" column="status" />
+		<result property="creat_date" column="creat_date" />
+	</resultMap>
+	<resultMap type="bmstaskdetailconfig" id="bmstaskdetailconfigMap">
+		<result property="busnum" column="busnum" />
+		<result property="contentName" column="contentName" />
+		<result property="orderno" column="orderno" />
+		<result property="ecnNum" column="ecnNum" />
+		<result property="switch_mode" column="switch_mode" />
+		<result property="factory_code" column="factory_code" />
+		<result property="factory_name" column="factory_name" />
+		<result property="total_hours" column="total_hours" />
+		<result property="status" column="status" />
+		<result property="taskid" column="taskid" />
+		<result property="factoryid" column="factoryid" />
+		<result property="isConfig" column="isConfig" />
+	</resultMap>
+	<resultMap type="bmsecntime" id="bmsecntimeMap">
+		<id property="id" column="id" />
+		<result property="ecn_task_id" column="ecn_task_id" />
+		<result property="factoryid" column="factoryid" />
+		<result property="workshopid" column="workshopid" />
+		<result property="workshop_name" column="workshop_name" />
+		<result property="unit_time" column="unit_time" />
+		<result property="unit" column="unit" />
+	</resultMap>
+	<resultMap type="bmsecndetailtime" id="bmsecndetailtimeMap">
+		<id property="id" column="id" />
+		<result property="ecn_task_id" column="ecn_task_id" />
+		<result property="bus_number" column="bus_number" />
+		<result property="order_id" column="order_id" />
+		<result property="factoryID" column="factoryID" />
+		<result property="status" column="status" />
+		<result property="confirmor_id" column="confirmor_id" />
+		<result property="confirmor_date" column="confirmor_date" />
+	</resultMap>
+	<resultMap type="bmssingleTasklist" id="bmssingleTasklistMap">
+		<result property="ecn_task_id" column="ecn_task_id" />
+		<result property="task_content" column="task_content" />
+		<result property="ecn_document_number" column="ecn_document_number" />
+		<result property="taskstatus" column="taskstatus" />
+		<result property="photo" column="photo" />
+		<result property="already" column="already" />
+		<result property="noalready" column="noalready" />
+	</resultMap>
+
+	<resultMap type="bmssingletaskorderlist" id="bmssingletaskorderlistMap">
+		<result property="dphsum" column="dphsum" />
+		<result property="order_id" column="order_id" />
+		<result property="order_no" column="order_no" />
+		<result property="order_name" column="order_name" />
+		<result property="bus_type_code" column="bus_type_code" />
+		<result property="factory_id" column="factory_id" />
+		<result property="factory_name" column="factory_name" />
+		<result property="ecn_task_id" column="ecn_task_id" />
+	</resultMap>
+
+	<resultMap type="bmssinglebusdetaillist" id="bmssinglebusdetaillistMap">
+		<result property="id" column="id" />
+		<result property="bus_number" column="bus_number" />
+		<result property="order_id" column="order_id" />
+		<result property="process_name" column="process_name" />
+		<result property="status" column="status" />
+		<result property="username" column="username" />
+		<result property="confirmor_date" column="confirmor_date" />
+	</resultMap>
+
+	<!-- 技改任务分配首页查询 -->
+	<select id="getEcnTaskList" parameterType="Map" resultType="Map">
+		<![CDATA[ SELECT b.task_content,b.ecn_order_id order_id,c.ECN_Document_Number,c.ecn_document_date,c.id ecn_id,b.switch_mode,d.factory_code,d.factory_name,b.total_hours,b.status,
+		 b.id as taskid,b.ecn_factory_id  as factoryid, CONCAT(o.order_no,' ',o.order_name,bt.bus_type_code,o.order_qty+'') order_desc,
+		 case b.switch_mode when '0' then b.ecn_number else COUNT(a.bus_number) end as countbusnum,
+		b.ecn_number ecn_number,b.task_number task_number,f.production_qty,k.key_name
+		from  BMS_ECN_TASK b
+		left join BMS_ECN_TASK_DETAIL a on b.id = a.ecn_task_id
+		left join BMS_ECN_DOCUMENT c on b.ecn_id = c.id 
+		left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id
+		left join BMS_ORDER o on b.ecn_order_id = o.id
+		left join BMS_FACTORY_ORDER f on f.order_id=o.id and f.factory_id=b.ecn_factory_id
+		left join BMS_BASE_BUS_TYPE bt on o.bus_type_id = bt.id 
+		
+		left join BMS_ECN_TIME t on t.ecn_task_id =b.id
+		left JOIN BMS_BASE_KEY k on k.id = t.workshop_id
+		
+		where b.status!='2' and c.status !='2' and t.unit_time is not null ]]>
+		<if test="ecn_document_number!=null">
+			<if test="ecn_document_number!=''">
+				<![CDATA[ and c.ecn_document_number like CONCAT('%',#{ecn_document_number},'%')]]>
+			</if>
+		</if>
+		<if test="order_no!=null">
+			<if test="order_no!=''">
+				<![CDATA[ and (o.order_no like CONCAT('%',#{order_no},'%') or o.order_name like CONCAT('%',#{order_no},'%') ) ]]>
+			</if>
+		</if>
+		<if test="search_factory!=null">
+			<if test="search_factory!=''">
+				 <![CDATA[	and FIND_IN_SET(b.ecn_factory_id,#{search_factory})>0 ]]>
+			</if>
+		</if>
+		<if test="search_workshop!=null">
+			<if test="search_workshop!=''">
+				 <![CDATA[	and FIND_IN_SET(k.key_name,#{search_workshop})>0 =]]>
+			</if>
+		</if>
+		<if test="status!=null">
+			<if test="status!=''">
+				 <![CDATA[	and b.status =#{status}]]>
+			</if>
+		</if>
+		<![CDATA[ GROUP BY c.ECN_Document_Number,b.ecn_id,b.task_number,b.id,b.task_content,b.ecn_number ]]>
+		ORDER BY c.status asc,c.ecn_document_date desc,c.ecn_document_number
+		desc,b.status asc,b.task_number asc,b.id asc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<!-- 技改任务分配首页查询 -->
+	<select id="getEcnTaskListCount" parameterType="Map" resultType="int">
+		<![CDATA[ select count(id)  from
+		( SELECT b.id
+		from  BMS_ECN_TASK b
+		left join BMS_ECN_TASK_DETAIL a on b.id = a.ecn_task_id
+		left join BMS_ECN_DOCUMENT c on b.ecn_id = c.id 
+		left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id
+		left join BMS_ORDER o on b.ecn_order_id = o.id
+		left join BMS_BASE_BUS_TYPE bt on o.bus_type_id = bt.id 
+		
+		left join BMS_ECN_TIME t on t.ecn_task_id =b.id
+		left JOIN BMS_BASE_KEY k on k.id = t.workshop_id
+		
+		where b.status!='2' and c.status !='2'  and t.unit_time is not null  ]]>
+
+		<if test="ecn_document_number!=null">
+			<if test="ecn_document_number!=''">
+				<![CDATA[ and c.ecn_document_number like CONCAT('%',#{ecn_document_number},'%')]]>
+			</if>
+		</if>
+		<if test="order_no!=null">
+			<if test="order_no!=''">
+				<![CDATA[ and a.order_id like CONCAT('%',#{order_no},'%')]]>
+			</if>
+		</if>
+		<if test="search_factory!=null">
+			<if test="search_factory!=''">
+				 <![CDATA[	and FIND_IN_SET(b.ecn_factory_id,#{search_factory})>0 ]]>
+			</if>
+		</if>
+		<if test="search_workshop!=null  and search_workshop!='全部'">
+			<if test="search_workshop!=''">
+				 <![CDATA[	and k.key_name =#{search_workshop}]]>
+			</if>
+		</if>
+		<if test="status!=null">
+			<if test="status!=''">
+				 <![CDATA[	and b.status =#{status}]]>
+			</if>
+		</if>
+		<![CDATA[ GROUP BY c.ECN_Document_Number,b.ecn_id,b.task_number,b.id,b.task_content,b.ecn_number
+		ORDER BY c.status asc,c.ecn_document_date desc,c.ecn_document_number desc,b.status asc,b.task_number asc,b.id asc
+		 ) t]]>
+
+	</select>
+
+	<select id="getTaskDepartmentCount" parameterType="Map"
+		resultType="int">
+	<![CDATA[	select count(id) from BMS_ECN_TIME where 1=1 ]]>
+		<if test="factory_id!=null">
+			<if test="factory_id!=''">
+				 <![CDATA[	and factory_id =#{factory_id}]]>
+			</if>
+		</if>
+		<if test="taskid!=null">
+			<if test="taskid!=''">
+				 <![CDATA[	and ecn_task_id =#{taskid}]]>
+			</if>
+		</if>
+	</select>
+
+	<!-- 根据工厂id,任务id 查询车间的技改工时配置信息 -->
+	<!-- <select id="workshoptimeinfo" parameterType="Map" resultType="com.byd.bms.techtrans.entity.BmsEcnTime"> 
+		select b.factory_name,c.workshop_name,a.* ,c.id workshopid from BMS_BASE_WORKSHOP 
+		c left join BMS_ECN_TIME a on c.id = a.workshop_id <if test="taskid!=null"> 
+		<if test="taskid!=''"> and a.ecn_task_id =#{taskid} </if> </if> left join 
+		BMS_BASE_FACTORY b on c.factory_id = b.id where 1=1 <if test="factoryId!=null"> 
+		<if test="factoryId!=''"> and b.id =#{factoryId} </if> </if> </select> -->
+	<select id="workshoptimeinfo" parameterType="Map"
+		resultType="com.byd.bms.techtrans.entity.BmsEcnTime">
+		select f.factory_name,k.key_name workshop_name,t.* ,k.id
+		workshopid
+		from BMS_BASE_KEY k
+		left join BMS_ECN_TIME t on k.id =
+		t.workshop_id and
+		t.ecn_task_id =#{taskid}
+		left join BMS_ECN_TASK e on
+		e.id=t.ecn_task_id
+		left join BMS_BASE_FACTORY f on
+		e.ecn_factory_id=f.id
+		where
+		k.key_code='WORKSHOP'
+	</select>
+
+	<insert id="insertEcnTaskTime" parameterType="bmsecntime"
+		useGeneratedKeys="true" keyProperty="id">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_ECN_TIME (ecn_task_id,workshop_id,unit_time,unit)
+		values
+		(#{ecn_task_id},#{workshopid},#{unit_time},'H')
+	</insert>
+	<update id="editEcnTaskTime" parameterType="bmsecntime">
+		update BMS_ECN_TIME
+		set
+		ecn_task_id = #{ecn_task_id},workshop_id = #{workshopid},unit_time
+		=
+		#{unit_time},unit='H'
+		where id = #{id}
+	</update>
+	<delete id="deleteEcnTaskTime" parameterType="List">
+		DELETE FROM BMS_ECN_TIME WHERE id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- 根据技改任务查询已分配车号信息 -->
+	<select id="queryEcnTaskDetailList" parameterType="Map"
+		resultMap="bmsecndetailtimeMap">
+		select
+		b.bus_number,b.latest_process_id,p.process_name,f.factory_name,u.username
+		user_name,d.status,d.confirmor_date
+		from BMS_ECN_TASK_DETAIL d
+		LEFT
+		OUTER JOIN BMS_PLAN_BUS b ON d.bus_number = b.bus_number
+		LEFT OUTER
+		JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id
+		LEFT OUTER JOIN
+		BMS_BASE_PROCESS p ON b.latest_process_id = p.id
+		LEFT OUTER JOIN
+		BMS_ORDER o ON d.order_id = o.id
+		LEFT OUTER JOIN BMS_BASE_BUS_TYPE t ON
+		o.bus_type_id = t.id
+		LEFT JOIN BMS_BASE_USER u ON d.confirmor_id = u.id
+		where 1=1
+		<if test="factory_id!=null">
+			<if test="factory_id!=''">
+				and b.factory_id =#{factory_id}
+			</if>
+		</if>
+		<if test="ecn_task_id!=null">
+			<if test="ecn_task_id!=''">
+				and d.ecn_task_id =#{ecn_task_id}
+			</if>
+		</if>
+		<if test="status!=null and status!=''">
+			and d.status =#{status}
+		</if>
+		<if test="order_id!=null">
+			<if test="order_id!=''">
+				and b.order_id =#{order_id}
+			</if>
+		</if>
+		<if test="bus_num_start!=null and  bus_num_start!=''">
+			<![CDATA[ and b.bus_number >= CONCAT(t.bus_type_code,"-",o.order_code,"-",o.productive_year,"-",#{bus_num_start}) ]]>
+		</if>
+		<if test="bus_num_end!=null and  bus_num_end!=''">
+			<![CDATA[ and b.bus_number <= CONCAT(t.bus_type_code,"-",o.order_code,"-",o.productive_year,"-",#{bus_num_end})]]>
+		</if>
+		order by d.status,b.bus_number
+	</select>
+
+	<select id="getSingleTaskList" parameterType="Map" resultType="map">
+		<!-- select t1.*,t2.photo,t2.noalready,case when t2.already is null then 
+			0 else t2.already end as already from (select b.id as ecn_task_id,b.task_content,b.ecn_number,b.task_number,b.switch_mode,c.ecn_document_number,c.id 
+			ecn_id,d.factory_name,d.id factory_id,b.new_photo,b.status as taskstatus,b.total_hours,c.ecn_document_date, 
+			CONCAT(o.order_no," ",o.order_name,t.bus_type_code,o.order_qty+'') order_desc,o.id 
+			order_id , case b.switch_mode when '0' then b.ecn_number else count(a1.bus_number) 
+			end as dispatch_number,k.key_name from BMS_ECN_TASK b left join BMS_ECN_TASK_DETAIL 
+			a1 on b.id=a1.ecn_task_id left join BMS_ECN_DOCUMENT c on b.ecn_id = c.id 
+			left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id left join BMS_ORDER 
+			o on b.ecn_order_id = o.id left join BMS_BASE_BUS_TYPE t on o.bus_type_id 
+			= t.id left join BMS_ECN_TIME tt on tt.ecn_task_id =b.id left JOIN BMS_BASE_KEY 
+			k on k.id = tt.workshop_id where b.status!='2' and tt.unit_time is not null 
+			<if test="task_content!=null and task_content!='' "> <![CDATA[ and b.task_content 
+			like CONCAT('%',#{task_content},'%')]]> </if> <if test="ecnnumber!=null"> 
+			<if test="ecnnumber!=''"> <![CDATA[ and c.ecn_document_number like CONCAT('%',#{ecnnumber},'%')]]> 
+			</if> </if> <if test="order_no!=null"> <if test="order_no!=''"> <![CDATA[ 
+			and (o.order_no like CONCAT('%',#{order_no},'%') or o.order_name like CONCAT('%',#{order_no},'%') 
+			)]]> </if> </if> <if test="search_factory!=null"> <if test="search_factory!=''"> 
+			<![CDATA[ and FIND_IN_SET(d.id,#{search_factory})>0 ]]> </if> </if> <if test="search_workshop!=null"> 
+			<if test="search_workshop!=''"> <![CDATA[ and tt.workshop_id =#{search_workshop}]]> 
+			</if> </if> <if test="taskstatus!=null"> <if test="taskstatus!=''"> <![CDATA[ 
+			and b.status =#{taskstatus}]]> </if> </if> group by b.ecn_id,b.task_number,b.task_content,b.id 
+			ORDER BY c.status asc,c.ecn_document_date desc,c.ecn_document_number desc,b.status 
+			asc,b.task_number asc,b.id asc) t1 left join ( select b.id as ecn_task_id,b.task_content,b.ecn_number,b.switch_mode,b.task_number,c.ecn_document_number,c.ecn_document_date,d.factory_name,d.id 
+			factory_id,case when b. new_photo is not null then '1' else '0' end as photo,b.status 
+			as taskstatus,b.total_hours, (b.ecn_number-count(a.status)) noalready,count(a.status) 
+			already,CONCAT(o.order_no," ",o.order_name,t.bus_type_code,o.order_qty+'') 
+			order_desc,o.id order_id from BMS_ECN_TASK b left join BMS_ECN_TASK_DETAIL 
+			a on b.id = a.ecn_task_id and a.status = '1' left join BMS_ECN_DOCUMENT c 
+			on b.ecn_id = c.id left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id 
+			left join BMS_ORDER o on b.ecn_order_id = o.id left join BMS_BASE_BUS_TYPE 
+			t on o.bus_type_id = t.id where b.status!='2' <if test="task_content!=null 
+			and task_content!='' "> <![CDATA[ and b.task_content like CONCAT('%',#{task_content},'%')]]> 
+			</if> <if test="ecnnumber!=null"> <if test="ecnnumber!=''"> <![CDATA[ and 
+			c.ecn_document_number like CONCAT('%',#{ecnnumber},'%')]]> </if> </if> <if 
+			test="order_no!=null"> <if test="order_no!=''"> <![CDATA[ and (o.order_no 
+			like CONCAT('%',#{order_no},'%') or o.order_name like CONCAT('%',#{order_no},'%') 
+			)]]> </if> </if> <if test="search_factory!=null"> <if test="search_factory!=''"> 
+			<![CDATA[ and d.id =#{search_factory}]]> </if> </if> <if test="taskstatus!=null"> 
+			<if test="taskstatus!=''"> <![CDATA[ and b.status =#{taskstatus}]]> </if> 
+			</if> group by b.ecn_id,b.task_number,b.id ORDER BY c.status asc,c.ecn_document_date 
+			desc,c.ecn_document_number desc,b.status asc,b.task_number asc,b.id asc ) 
+			t2 on t1.ecn_task_id=t2.ecn_task_id -->
+
+		select b.id as
+		ecn_task_id,b.task_content,b.ecn_number,b.switch_mode,b.task_number,c.ecn_document_number,c.ecn_document_date,d.factory_name,d.id
+		factory_id,c.id ecn_id,
+		case when b. new_photo is not null then '1' else '0' end as
+		photo,b.status as taskstatus,b.total_hours,
+		CONCAT(o.order_no,"
+		",o.order_name,y.bus_type_code,o.order_qty+'') order_desc,o.id
+		order_id,k.key_name,t.unit_time,
+		(select count(d.bus_number) from
+		BMS_ECN_TASK_DETAIL d where d.ecn_task_id=b.id and d.status='1') as
+		already,
+		b.ecn_number-(select count(d.bus_number) from
+		BMS_ECN_TASK_DETAIL d where d.ecn_task_id=b.id and d.status='1') as
+		noalready,h.total_work_hour,ifnull(h1.ready_hour_total,0) ready_hour_total
+		from BMS_ECN_TIME t
+		left join BMS_ECN_TASK b on b.id=t.ecn_task_id
+		left join BMS_ECN_DOCUMENT c on b.ecn_id = c.id
+		left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id
+		left join BMS_ORDER o on b.ecn_order_id = o.id
+		left join BMS_BASE_BUS_TYPE y on o.bus_type_id = y.id
+		left join BMS_BASE_KEY k on k.id = t.workshop_id
+		left join (
+		select h.ecn_task_id,h.factory,h.workshop,ifnull(sum(h.work_hour),0)
+		total_work_hour
+		from BMS_HR_STAFF_HOURS h
+		left join BMS_ECN_TASK b on b.id=h.ecn_task_id
+		left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id
+		left join BMS_ORDER o on b.ecn_order_id = o.id
+		left join BMS_BASE_KEY k on k.key_name = h.workshop
+		where h.hour_type='3' and h.status in('0','2')
+		<if test="task_content!=null and task_content!='' ">
+				<![CDATA[ and b.task_content like CONCAT('%',#{task_content},'%')]]>
+		</if>
+		<if test="order_no!=null">
+			<if test="order_no!=''">
+					<![CDATA[ and (o.order_no like CONCAT('%',#{order_no},'%') or o.order_name like CONCAT('%',#{order_no},'%') )]]>
+			</if>
+		</if>
+		<if test="search_factory!=null">
+			<if test="search_factory!=''">
+				 	<![CDATA[	and FIND_IN_SET(d.id,#{search_factory})>0 ]]>
+			</if>
+		</if>
+		<if test="search_workshop!=null ">
+			<if test="search_workshop!=''">
+				 	<![CDATA[	and FIND_IN_SET(k.key_name,#{search_workshop})>0]]>
+			</if>
+		</if>
+		group by h.ecn_task_id,h.factory,h.workshop
+		) h on h.ecn_task_id=b.id and h.workshop=k.key_name and
+		h.factory=d.factory_name
+		left join (
+		select h.ecn_task_id,h.factory,h.workshop,ifnull(sum(h.work_hour),0)ready_hour_total
+		from BMS_HR_STAFF_HOURS h
+		left join BMS_ECN_TASK b on b.id=h.ecn_task_id
+		left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id
+		left join BMS_ORDER o on b.ecn_order_id = o.id
+		left join BMS_BASE_KEY k on k.key_name = h.workshop
+		where h.hour_type='3' 
+		<if test="task_content!=null and task_content!='' ">
+				<![CDATA[ and b.task_content like CONCAT('%',#{task_content},'%')]]>
+		</if>
+		<if test="order_no!=null">
+			<if test="order_no!=''">
+					<![CDATA[ and (o.order_no like CONCAT('%',#{order_no},'%') or o.order_name like CONCAT('%',#{order_no},'%') )]]>
+			</if>
+		</if>
+		<if test="search_factory!=null">
+			<if test="search_factory!=''">
+				 	<![CDATA[	and FIND_IN_SET(d.id,#{search_factory})>0 ]]>
+			</if>
+		</if>
+		<if test="search_workshop!=null ">
+			<if test="search_workshop!=''">
+				 	<![CDATA[	and FIND_IN_SET(k.key_name,#{search_workshop})>0]]>
+			</if>
+		</if>
+		group by h.ecn_task_id,h.factory,h.workshop
+		) h1 on h1.ecn_task_id=b.id and h1.workshop=k.key_name and
+		h1.factory=d.factory_name
+		where b.status !='2' and t.unit_time is not null
+		<if test="task_content!=null and task_content!='' ">
+				<![CDATA[ and b.task_content like CONCAT('%',#{task_content},'%')]]>
+		</if>
+		<if test="ecnnumber!=null">
+			<if test="ecnnumber!=''">
+					<![CDATA[ and c.ecn_document_number like CONCAT('%',#{ecnnumber},'%')]]>
+			</if>
+		</if>
+		<if test="order_no!=null">
+			<if test="order_no!=''">
+					<![CDATA[ and (o.order_no like CONCAT('%',#{order_no},'%') or o.order_name like CONCAT('%',#{order_no},'%') )]]>
+			</if>
+		</if>
+		<if test="search_factory!=null">
+			<if test="search_factory!=''">
+				 	<![CDATA[	and FIND_IN_SET(d.id,#{search_factory})>0 ]]>
+			</if>
+		</if>
+		<if test="search_workshop!=null">
+			<if test="search_workshop!=''">
+				 	<![CDATA[	and FIND_IN_SET(k.key_name,#{search_workshop})>0]]>
+			</if>
+		</if>
+		<if test="taskstatus!=null">
+			<if test="taskstatus!=''">
+					 <![CDATA[	and b.status =#{taskstatus}]]>
+			</if>
+		</if>
+		<if test="actionType=='verify'">
+			<if test="hourstatus=='未审批'">
+				and h.total_work_hour>0
+			</if>
+			<if test="hourstatus=='已审批'">
+				and (h.total_work_hour is null or h.total_work_hour=0)
+			</if>
+			
+		</if>
+		ORDER BY c.status asc,c.ecn_document_date desc,c.ecn_document_number
+		desc,b.status asc,b.task_number asc,b.id asc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+
+	<select id="getSingleTaskListCount" parameterType="Map"
+		resultType="int">
+		<!-- <![CDATA[ select count(ecn_task_id) from (SELECT ecn_task_id,ecn_id,task_number,task_content 
+			from (select b.id as ecn_task_id,b.task_content,b.ecn_number,b.task_number,c.ecn_document_number,c.id 
+			ecn_id,d.factory_name,b.new_photo,b.status as taskstatus, (b.ecn_number-count(a.status)) 
+			noalready,count(a.status) already,CONCAT(o.order_no," ",o.order_name,t.bus_type_code,o.order_qty+'') 
+			order_desc from BMS_ECN_TASK b left join BMS_ECN_TASK_DETAIL a on b.id = 
+			a.ecn_task_id and a.status = '1' left join BMS_ECN_DOCUMENT c on b.ecn_id 
+			= c.id left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id left join 
+			BMS_ORDER o on b.ecn_order_id = o.id left join BMS_BASE_BUS_TYPE t on o.bus_type_id 
+			= t.id left join BMS_ECN_TIME tt on tt.ecn_task_id =b.id left JOIN BMS_BASE_KEY 
+			k on k.id = tt.workshop_id where b.status!='2' and tt.unit_time is not null 
+			]]> <if test="task_content!=null and task_content!='' "> <![CDATA[ and b.task_content 
+			like CONCAT('%',#{task_content},'%')]]> </if> <if test="ecnnumber!=null"> 
+			<if test="ecnnumber!=''"> <![CDATA[ and c.ecn_document_number like CONCAT('%',#{ecnnumber},'%')]]> 
+			</if> </if> <if test="order_no!=null"> <if test="order_no!=''"> <![CDATA[ 
+			and (o.order_no like CONCAT('%',#{order_no},'%') or o.order_name like CONCAT('%',#{order_no},'%') 
+			)]]> </if> </if> <if test="search_factory!=null"> <if test="search_factory!=''"> 
+			<![CDATA[ and FIND_IN_SET(d.id,#{search_factory})>0 ]]> </if> </if> <if test="search_workshop!=null"> 
+			<if test="search_workshop!=''"> <![CDATA[ and tt.workshop_id =#{search_workshop}]]> 
+			</if> </if> <if test="taskstatus!=null"> <if test="taskstatus!=''"> <![CDATA[ 
+			and b.status =#{taskstatus}]]> </if> </if> <![CDATA[ group by b.ecn_id,b.task_number,b.task_content,b.id 
+			ORDER BY c.status asc,c.ecn_document_date desc,c.ecn_document_number desc,b.status 
+			asc,b.task_number asc,b.id asc )n group by ecn_id,ecn_task_id,task_number,task_content 
+			order by ecn_id desc,task_number asc,ecn_task_id asc) t ]]> -->
+		select count(t.id)
+		from BMS_ECN_TIME t
+		left join BMS_ECN_TASK b on
+		b.id=t.ecn_task_id
+		left join BMS_ECN_DOCUMENT c on b.ecn_id = c.id
+		left
+		join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id
+		left join BMS_ORDER
+		o on b.ecn_order_id = o.id
+		left join BMS_BASE_BUS_TYPE y on
+		o.bus_type_id = y.id
+		left join BMS_BASE_KEY k on k.id = t.workshop_id
+		left join (
+		select h.ecn_task_id,h.factory,h.workshop,ifnull(sum(h.work_hour),0)
+		total_work_hour
+		from BMS_HR_STAFF_HOURS h
+		left join BMS_ECN_TASK b on b.id=h.ecn_task_id
+		left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id
+		left join BMS_ORDER o on b.ecn_order_id = o.id
+		left join BMS_BASE_KEY k on k.key_name = h.workshop
+		where h.hour_type='3' and h.status in('0','2')
+		<if test="task_content!=null and task_content!='' ">
+				<![CDATA[ and b.task_content like CONCAT('%',#{task_content},'%')]]>
+		</if>
+	<!-- 	<if test="ecnnumber!=null">
+			<if test="ecnnumber!=''">
+					<![CDATA[ and c.ecn_document_number like CONCAT('%',#{ecnnumber},'%')]]>
+			</if>
+		</if> -->
+		<if test="order_no!=null">
+			<if test="order_no!=''">
+					<![CDATA[ and (o.order_no like CONCAT('%',#{order_no},'%') or o.order_name like CONCAT('%',#{order_no},'%') )]]>
+			</if>
+		</if>
+		<if test="search_factory!=null">
+			<if test="search_factory!=''">
+				 	<![CDATA[	and FIND_IN_SET(d.id,#{search_factory})>0 ]]>
+			</if>
+		</if>
+		<if test="search_workshop!=null">
+			<if test="search_workshop!=''">
+				 	<![CDATA[	and FIND_IN_SET(k.key_name,#{search_workshop})>0]]>
+			</if>
+		</if>
+		group by h.ecn_task_id,h.factory,h.workshop
+		) h on h.ecn_task_id=b.id and h.workshop=k.key_name and
+		h.factory=d.factory_name
+		where b.status !='2' and t.unit_time is not null
+		<if test="task_content!=null and task_content!='' ">
+				<![CDATA[ and b.task_content like CONCAT('%',#{task_content},'%')]]>
+		</if>
+		<if test="ecnnumber!=null">
+			<if test="ecnnumber!=''">
+					<![CDATA[ and c.ecn_document_number like CONCAT('%',#{ecnnumber},'%')]]>
+			</if>
+		</if>
+		<if test="order_no!=null">
+			<if test="order_no!=''">
+					<![CDATA[ and (o.order_no like CONCAT('%',#{order_no},'%') or o.order_name like CONCAT('%',#{order_no},'%') )]]>
+			</if>
+		</if>
+		<if test="search_factory!=null">
+			<if test="search_factory!=''">
+				 	<![CDATA[	and FIND_IN_SET(d.id,#{search_factory})>0 ]]>
+			</if>
+		</if>
+		<if test="search_workshop!=null">
+			<if test="search_workshop!=''">
+				 	<![CDATA[	and FIND_IN_SET(k.key_name,#{search_workshop})>0]]>
+			</if>
+		</if>
+
+		<if test="taskstatus!=null">
+			<if test="taskstatus!=''">
+					 <![CDATA[	and b.status =#{taskstatus}]]>
+			</if>
+		</if>
+		<if test="actionType=='verify'">
+			<if test="hourstatus=='未审批'">
+				and h.total_work_hour>0
+			</if>
+			<if test="hourstatus=='已审批'">
+				and (h.total_work_hour is null or h.total_work_hour=0)
+			</if>
+		</if>
+	</select>
+	<!-- 删除 -->
+	<select id="getSingleTaskOrderList" parameterType="String"
+		resultMap="bmssingletaskorderlistMap">
+		select count(*) as
+		dphsum,a.order_id,b.order_no,b.order_name,c.bus_type_code,a.factory_id,d.factory_name,a.ecn_task_id
+		from BMS_ECN_TASK_DETAIL a
+		join BMS_ORDER b on a.order_id=b.id
+		join
+		BMS_BASE_BUS_TYPE c on b.bus_type_id=c.id
+		join BMS_BASE_FACTORY d on
+		a.factory_id=d.id
+		where a.ecn_task_id=#{taskid}
+		GROUP BY
+		a.order_id,b.order_no,b.order_name,c.bus_type_code,a.factory_id,d.factory_name,a.ecn_task_id
+	</select>
+
+	<select id="getBusDetaillist" resultMap="bmssinglebusdetaillistMap">
+		SELECT
+		a.id,a.bus_number,a.order_id,c.process_name,a.`status`
+		from
+		BMS_ECN_TASK_DETAIL a
+		left join BMS_PLAN_BUS b on a.order_id=b.order_id
+		and
+		a.bus_number=b.bus_number
+		left join BMS_BASE_PROCESS c on
+		b.latest_process_id=c.id
+		where a.`status`='0'and a.order_id=#{1} and
+		a.factory_id=#{2} and
+		a.ecn_task_id=#{0}
+	</select>
+	<select id="queryBusDetaillist" resultMap="bmssinglebusdetaillistMap">
+		SELECT
+		a.id,a.bus_number,a.order_id,c.process_name,a.`status`,d.username,a.confirmor_date
+		from BMS_ECN_TASK_DETAIL a
+		left join BMS_PLAN_BUS b on
+		a.order_id=b.order_id and
+		a.bus_number=b.bus_number
+		left join
+		BMS_BASE_PROCESS c on b.latest_process_id=c.id
+		left join BMS_BASE_USER
+		d on a.confirmor_id=d.id
+		where a.order_id=#{1} and a.factory_id=#{2}
+		and a.ecn_task_id=#{0}
+	</select>
+	<update id="updatetaskdetailstate" parameterType="String">
+		update
+		BMS_ECN_TASK_DETAIL set
+		status=#{1},confirmor_id=#{2},confirmor_date=#{3} where id=#{0}
+	</update>
+	<select id="queryTaskCompleteIsOK" parameterType="String"
+		resultMap="bmsecndetailtimeMap">
+		select * from BMS_ECN_TASK_DETAIL where
+		ecn_task_id=#{taskid} and status='1'
+	</select>
+	<update id="updateTaskState" parameterType="String">
+		update BMS_ECN_TASK
+		set status='1' where id=#{taskid}
+	</update>
+	<update id="updateEcnTaskPicSrc" parameterType="String">
+		update
+		BMS_ECN_TASK set old_photo=#{1},new_photo=#{2}
+		where id=#{0}
+	</update>
+	<select id="getTaskDetail" resultType="com.byd.bms.techtrans.entity.BmsEcnTask"
+		parameterType="String">
+		SELECT * from BMS_ECN_TASK where id=#{taskid}
+	</select>
+
+	<select id="getsinglecartaskdetail" resultMap="bmssingleTasklistMap"
+		parameterType="String">
+		select ecn_task_id ,
+		task_content,
+		ecn_document_number,
+		case when
+		new_photo is not null then '1' else '0' end as photo ,
+		case when
+		sum(already) is null then '0' else sum(already) end as already,
+		case
+		when sum(noalready) is null then '0' else sum(noalready) end as
+		noalready
+		from (
+		select a.ecn_task_id
+		,b.task_content,c.ecn_document_number,a.status as
+		detailstatus,b.new_photo,
+		(case when a.status='0' then count(a.status)
+		end )as noalready,
+		(case when a.status='1' then count(a.status) end )as
+		already
+		from BMS_ECN_TASK_DETAIL a
+		join BMS_ECN_TASK b on
+		a.ecn_task_id=b.id
+		join BMS_ECN_DOCUMENT c on c.id=b.ecn_id
+		where
+		a.ecn_task_id in (
+		select ecn_task_id
+		from BMS_ECN_TASK_DETAIL
+		where
+		status='0' and bus_number=#{busno}
+		)
+		group by a.ecn_task_id ,
+		b.task_content,c.ecn_document_number,a.status,b.new_photo
+		)n
+		group by
+		ecn_task_id,task_content,ecn_document_number,new_photo
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+
+	<update id="updatetaskdetailstateForSingleFollow" parameterType="String">
+		update BMS_ECN_TASK_DETAIL set
+		status='1',confirmor_id=#{2},confirmor_date=#{3} where
+		ecn_task_id=#{0} and bus_number=#{1}
+	</update>
+
+	<insert id="addEcnTaskDetail" parameterType="List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			INSERT INTO
+			BMS_ECN_TASK_DETAIL(ecn_task_id,bus_number,order_id,factory_id
+			<if test="item.status!=null">
+				,status
+			</if>
+			<if test="item.confirmor_id!=null">
+				,confirmor_id
+			</if>
+			<if test="item.confirmor_date!=null">
+				,confirmor_date
+			</if>
+			)
+			VALUES(#{item.ecn_task_id},#{item.bus_number},#{item.order_id},#{item.factoryID}
+			<if test="item.status!=null">
+				,#{item.status}
+			</if>
+			<if test="item.confirmor_id!=null">
+				,#{item.confirmor_id}
+			</if>
+			<if test="item.confirmor_date!=null">
+				,#{item.confirmor_date}
+			</if>
+			)
+		</foreach>
+
+	</insert>
+	<update id="updateEcnTaskDetail" parameterType="com.byd.bms.techtrans.entity.BmsEcnTaskDetail">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_ECN_TASK_DETAIL
+			SET ecn_task_id =
+			#{item.ecn_task_id},bus_number =
+			#{item.bus_number},order_id =
+			#{item.order_id},factory_id =
+			#{item.factoryID},status =
+			#{item.status},
+			confirmor_id =
+			#{item.confirmor_id},confirmor_date =
+			#{item.confirmor_date}
+			WHERE id
+			= #{item.id}
+		</foreach>
+	</update>
+
+	<delete id="deleteEcnTaskDetail" parameterType="List">
+		DELETE FROM BMS_ECN_TASK_DETAIL WHERE id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="getBusNumberByOrder" parameterType="Map" resultType="Map">
+		SELECT
+		b.id,b.factory_id,f.factory_name,b.order_id,b.bus_number,b.vin,b.latest_process_id,p.process_name,d.status
+		ecn_task_status,d.confirmor_date,u.username user_name,
+		o.order_no,o.order_name,o.order_qty,d.status FROM BMS_PLAN_BUS b
+		LEFT
+		JOIN BMS_ECN_TASK_DETAIL d on b.bus_number = d.bus_number and
+		d.ecn_task_id = #{ecn_task_id}
+		LEFT JOIN BMS_BASE_USER u on
+		d.confirmor_id = u.id
+		LEFT JOIN
+		BMS_BASE_FACTORY f ON b.factory_id =
+		f.id
+		LEFT JOIN BMS_ORDER o ON
+		b.order_id = o.id
+		LEFT JOIN
+		BMS_BASE_PROCESS p ON b.latest_process_id =
+		p.id
+		LEFT JOIN
+		BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id
+		WHERE
+		b.order_id =
+		#{order_id} and b.factory_id=#{factory_id}
+		<if test="bus_num_start!=null and  bus_num_start!=''">
+			<![CDATA[ and b.bus_number >= CONCAT(t.bus_type_code,"-",o.order_code,"-",o.productive_year,"-",#{bus_num_start}) ]]>
+		</if>
+		<if test="bus_num_end!=null and  bus_num_end!=''">
+			<![CDATA[ and b.bus_number <= CONCAT(t.bus_type_code,"-",o.order_code,"-",o.productive_year,"-",#{bus_num_end})]]>
+		</if>
+		<!-- 加上剔除已跟进车号条件 -->
+		<!-- <if test="task_detail_status!=null and task_detail_status!=''"> and 
+			b.bus_number not IN ( SELECT d.bus_number from BMS_ECN_TASK_DETAIL d WHERE 
+			d.order_id = #{order_id} and d.status != #{task_detail_status} and d.ecn_task_id 
+			= #{ecn_task_id} ) </if> -->
+		order by d.status,b.bus_number
+	</select>
+
+	<!-- 根据车号查询此车号下所有技改任务信息 -->
+	<select id="getEcnTasksByBusNumber" parameterType="Map"
+		resultType="Map">
+		<if test="flag == null">
+			select t.*,d.status bus_status,d.id
+			task_detail_id,x.ecn_document_number,f.factory_name,p.process_name,d.confirmor_date,u.username,
+			(case when d.status='1' then count(d.status) end )as already
+			from
+			BMS_ECN_TASK t
+			LEFT JOIN BMS_PLAN_BUS b on t.ecn_order_id = b.order_id
+			and
+			t.ecn_factory_id = b.factory_id
+			LEFT JOIN BMS_ECN_TASK_DETAIL d on
+			t.id = d.ecn_task_id and d.bus_number
+			= b.bus_number and d.status
+			!='2'
+			LEFT JOIN BMS_BASE_USER u on d.confirmor_id = u.id
+			LEFT JOIN
+			BMS_ECN_DOCUMENT x on t.ecn_id = x.id
+			LEFT JOIN BMS_BASE_PROCESS p ON
+			b.latest_process_id = p.id
+			LEFT JOIN BMS_BASE_FACTORY f on
+			t.ecn_factory_id = f.id
+			WHERE b.bus_number = #{bus_number}
+			and t.status
+			!='2'
+			GROUP BY t.id
+			order by d.status
+		</if>
+		<if test="flag == 1">
+			select t.*,d.status bus_status,d.id
+			task_detail_id,x.ecn_document_number,f.factory_name,p.process_name,d.confirmor_date,u.username,
+			(case when d.status='1' then count(d.status) end )as already
+			from
+			BMS_ECN_TASK_DETAIL d
+			LEFT JOIN BMS_PLAN_BUS b on d.bus_number =
+			b.bus_number and d.factory_id
+			= b.factory_id and d.order_id =
+			b.order_id
+			LEFT JOIN BMS_ECN_TASK t on d.ecn_task_id = t.id and
+			t.status !='2'
+			LEFT JOIN BMS_ECN_DOCUMENT x on t.ecn_id = x.id
+			LEFT
+			JOIN BMS_BASE_PROCESS p ON b.latest_process_id = p.id
+			LEFT JOIN
+			BMS_BASE_FACTORY f on d.factory_id = f.id
+			LEFT JOIN BMS_BASE_USER u on
+			d.confirmor_id = u.id
+			WHERE d.bus_number = #{bus_number}
+			<!-- and t.switch_mode = '1' and d.status!='2' -->
+			group by t.id
+		</if>
+	</select>
+
+	<update id="updateEcnDocument" parameterType="String">
+		update
+		BMS_ECN_DOCUMENT dd set dd.status = (
+		SELECT CASE WHEN
+		(t1.allNum-t2.finishNum =0) then '1' ELSE '0' END status
+		from (select
+		count(t.ecn_id) allNum from BMS_ECN_DOCUMENT d
+		left join BMS_ECN_TASK t
+		on d.id = t.ecn_id
+		where d.id = #{ecn_id}
+		GROUP BY t.ecn_id) t1,
+		(select
+		count(t.ecn_id) finishNum from BMS_ECN_DOCUMENT d
+		left join
+		BMS_ECN_TASK t on d.id = t.ecn_id and t.status = '1'
+		where d.id =
+		#{ecn_id}
+		GROUP BY t.ecn_id) t2
+		) where dd.id = #{ecn_id}
+	</update>
+
+	<update id="updateEcnNumber" parameterType="String">
+		update BMS_ECN_TASK
+		set ecn_number=#{1} where id=#{0}
+	</update>
+
+	<!-- 技改员工工时信息查询 -->
+	<select id="queryStaffWorkHours" parameterType="Map" resultType="Map">
+		select h.id,h.work_hour,o.name work_org,s.staff_number,s.name
+		staff_name,s.plant_org,s.workshop_org,s.workgroup_org,s.team_org,s.job,h.work_date,
+		case h.status when '0' then '已维护' when '1' then '已审批' when '2' then
+		'已驳回' else '已锁定' end as status,u.username
+		editor,h.edit_date,u1.username approver,h.approve_date
+		from
+		BMS_HR_STAFF_HOURS h
+		left join BMS_BASE_ORG o on h.org_id=o.id
+		left join
+		BMS_HR_STAFF s on h.staff_id=s.id
+		left join BMS_BASE_USER u on
+		u.id=h.editor_id
+		left join BMS_BASE_USER u1 on u1.id=h.approver_id
+		where h.hour_type='3'
+		<if test="orgId !=null and orgId !=''">
+			and h.org_id=#{orgId}
+		</if>
+		<if test="staffNum !=null and staffNum !=''">
+			and find_in_set(s.staff_number,#{staffNum})>0
+		</if>
+		<if test="workDate !=null and workDate !=''">
+			and h.work_date=#{workDate}
+		</if>
+		<if test="workMonth!=null and workMonth !=''">
+			and h.work_date like concat(#{workMonth},'%')
+		</if>
+		<if test="ecnTaskId !=null and ecnTaskId !=''">
+			and h.ecn_task_id=#{ecnTaskId}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+		</if>
+		order by h.status
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+
+	<insert id="saveWorkHourInfo" parameterType="list">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			insert into BMS_HR_STAFF_HOURS
+			(org_id,hour_type,ecn_task_id,work_date,staff_id,work_hour,editor_id,edit_date,skill_parameter,factory,dept,workshop,workgroup,team)
+			values
+			(#{detail.subgroupId},'3',#{detail.ecnTaskId},#{detail.workDate},#{detail.staffId},#{detail.workHour},#{detail.editorId},#{detail.editDate},
+			#{detail.skillParameter},#{detail.factory},#{detail.dept},#{detail.workshop},#{detail.workgroup},#{detail.team})
+		</foreach>
+	</insert>
+
+	<update id="batchUpdateWorkHour" parameterType="List">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_HR_STAFF_HOURS
+			<trim prefix="SET" suffixOverrides=",">
+				<if test="detail.status!=null">
+					status=#{detail.status},
+				</if>
+				<if test="detail.workHour !=null">
+					work_hour=#{detail.workHour},
+				</if>
+				<if test="detail.editorId !=null">
+					editor_id=#{detail.editorId},
+				</if>
+				<if test="detail.editDate !=null">
+					edit_date=#{detail.editDate}
+				</if>
+			</trim>
+			where id=#{detail.id}
+			<if test="detail.actionType!=null">
+				and status !='3'
+			</if>
+		</foreach>
+	</update>
+	
+	<update id="deleteWorkHourInfo" parameterType="Map">
+		delete
+		from
+		BMS_HR_STAFF_HOURS where 
+		<if test="ids !=null and ids !=''">
+			find_in_set(id,#{ids})>0
+		</if>		
+	</update>
+
+	<select id="queryAssignList" parameterType="String" resultType="Map">
+		select sum(h.work_hour) total_hour,o.name
+		work_org,s.staff_number,s.name
+		staff_name,s.plant_org,s.workshop_org,s.workgroup_org,s.team_org,s.job,s.skill_parameter
+		from BMS_HR_STAFF_HOURS h
+		left join BMS_BASE_ORG o on h.org_id=o.id
+		left join BMS_HR_STAFF s on h.staff_id=s.id
+		where h.hour_type='3' and
+		h.ecn_task_id=#{taskid}
+		group by s.staff_number
+	</select>
+	
+	<select id="caculateEcnSalary" parameterType="Map" resultType="String"> 
+		call P_CACULATE_ECN_SALLARY(#{factory},#{workshop},'','',#{workMonth});
+	</select>
+</mapper>

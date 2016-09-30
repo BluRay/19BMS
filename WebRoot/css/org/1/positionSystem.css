@@ -1,0 +1,239 @@
+#panelPositionPyramid {
+    overflow: auto;
+}
+
+#channelLabels h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+#channelLabels .label {
+    display: block;
+}
+
+#PyramidSelection {
+    height: 570px;
+}
+
+#positionLevel {
+    margin-top: 15px;
+}
+
+#positionPyramid {
+    width: 670px;
+    height: 510px;
+    background: url('../../../img/hr/positionPyramid.png');
+}
+
+.pyramid-grade {
+    position: absolute;
+    background: none;
+    font-size: 14px;
+    color: #999;
+    display: block;
+    height: 56px;
+
+}.pyramid-grade:hover, .pyramid-grade.active {
+    text-decoration: none;
+    color: #fff;
+}
+
+.pyramid-grade-text {
+    margin-top: 25px;
+    line-height: 14px;
+    text-align: center;
+    display: block;
+}
+
+.pyramid-triangle {
+    line-height: 20px;
+}
+
+.grade-mg {
+    left: 327px;
+    top: 24px;
+    width: 72px;
+}.grade-mg:hover, .grade-mg.active {
+    background: url('../../../img/hr/1.png') 0 0;
+}
+
+.pyramid-triangle .pyramid-grade-text {
+     margin-top: 40px;
+}
+
+.grade-chief {
+    left: 326px;
+    top: 81px;
+    width: 111px;
+}.grade-chief:hover, .grade-chief.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/22.png") repeat scroll 0 0;
+}
+
+.grade-high-engineer {
+    left: 289px;
+    top: 81px;
+    width: 72px;
+}.grade-high-engineer:hover, .grade-high-engineer.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/1.png") repeat scroll 0 0;
+}
+
+.grade-high-engineer .pyramid-grade-text {
+    line-height: 18px;
+}
+
+.grade-coach .pyramid-grade-text {
+    line-height: 18px;
+    margin-top: 23px;
+    margin-left: 7px;
+}
+
+.grade-coach-3 {
+    left: 363px;
+    top: 138px;
+    width: 112px;
+}.grade-coach-3:hover, .grade-coach-3.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/22.png") repeat scroll 0 0;
+}
+
+.grade-engineer {
+    left: 249px;
+    top: 138px;
+    width: 151px;
+}.grade-engineer:hover, .grade-engineer.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/3.png") repeat scroll 0 0;
+}
+
+.grade-engineer-as {
+    left: 211px;
+    top: 196px;
+    width: 226px;
+}.grade-engineer-as:hover, .grade-engineer-as.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/4.png") repeat scroll 0 0;
+}
+
+.grade-coach-2 {
+    left: 402px;
+    top: 197px;
+    width: 113px;
+}.grade-coach-2:hover, .grade-coach-2.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/2.png") repeat scroll 0 0;
+}
+
+.grade-technician {
+    left: 173px;
+    top: 255px;
+    width: 301px;
+}.grade-technician:hover, .grade-technician.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/5.png") repeat scroll 0 0;
+}
+
+.grade-mechanic {
+    left: 441px;
+    top: 255px;
+    width: 112px;
+}.grade-mechanic:hover, .grade-mechanic.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/2.png") repeat scroll 0 0;
+}
+
+.grade-mechanic .pyramid-grade-text {
+    line-height: 18px;
+    margin-top: 25px;
+}
+
+.grade-coach-1 {
+    left: 135px;
+    top: 313px;
+    width: 380px;
+}.grade-coach-1:hover, .grade-coach-1.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/6.png") repeat scroll 0 0;
+}
+
+.grade-worker {
+    left: 479px;
+    top: 313px;
+    width: 112px;
+}.grade-worker:hover, .grade-worker.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/2.png") repeat scroll 0 0;
+}
+
+.grade-last1 {
+    left: 96px;
+    top: 372px;
+    width: 456px;
+}.grade-last1:hover, .grade-last1.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/7.png") repeat scroll 0 0;
+}
+
+.grade-last2 {
+    left: 517px;
+    top: 372px;
+    width: 112px;
+}.grade-last2:hover, .grade-last2.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/2.png") repeat scroll 0 0;
+}
+
+.grade-last3 {
+    left: 56px;
+    top: 430px;
+    width: 612px;
+}.grade-last3:hover, .grade-last3.active {
+    background: rgba(0, 0, 0, 0) url("../../../img/hr/8.png") repeat scroll 0 0;
+}
+
+.position-level {
+    height: 58px;
+    line-height: 79px;
+    border-bottom: 2px solid #fff;
+    color: #fff;
+    text-align: center;
+    background-color: #ccc
+}.position-level.active {
+    background-color: #d9534f;
+}
+
+.sub-level {
+    height: 28px;
+    line-height: 28px;
+}
+
+.list-group-item .btn-link, .list-group-item a {
+    color: #777;
+}
+
+.list-group-item .btn-group {
+    display: none;
+}
+.list-group-item:hover .btn-group,  .list-group .active .btn-group {
+    display: block;
+}
+
+.list-group-item .btn-link:hover, .list-group-item a:hover {
+    color: #fff;
+}
+
+.list-group-item .fa-edit:hover {
+    color: #5cb85c;
+}
+
+.list-group-item .fa-trash-o:hover {
+    color: #d9534f;
+}
+
+li.list-group-item:hover {
+    text-decoration: none;
+    color: #fff;
+    background-color: #428bca;
+    border-color: #428bca;
+}
+li.list-group-item:hover a, li.list-group-item:hover .btn-link {
+    color: #fff;
+}
+
+#currentPositionBtnGroup {
+    float: right;
+}
+
+.current-position-description dd {
+    margin-left: 30px;
+    margin-bottom: 10px
+}

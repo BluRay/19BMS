@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd"> 
+<configuration>
+	<typeAliases>
+		<typeAlias alias="factory" type="com.byd.bms.setting.entity.FactoryBean"/>
+		<typeAlias alias="workshop" type="com.byd.bms.setting.entity.WorkshopBean"/>
+		<typeAlias alias="line" type="com.byd.bms.setting.entity.LineBean"/>
+		<typeAlias alias="process" type="com.byd.bms.setting.entity.ProcessBean"/>
+		<typeAlias alias="workgroup" type="com.byd.bms.setting.entity.WorkgroupBean"/>
+		<typeAlias alias="busType" type="com.byd.bms.setting.entity.BusTypeBean"/>
+		<typeAlias alias="keys" type="com.byd.bms.setting.entity.KeysBean"/>
+		<typeAlias alias="hz" type="com.byd.bms.setting.entity.HZBean"/>
+		<typeAlias alias="parts" type="com.byd.bms.setting.entity.PartsBean"/>
+	</typeAliases>
+
+	<mappers>
+		<mapper resource="com/byd/bms/setting/sqlMapper/baseDataMapper.xml"/>
+	</mappers>
+</configuration>

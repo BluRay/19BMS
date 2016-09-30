@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd"> 
+<configuration>
+	<typeAliases>
+		<typeAlias alias="testTplHeader" type="com.byd.bms.quality.entity.TestTplHeaderBean"/>
+		<typeAlias alias="testTplDetail" type="com.byd.bms.quality.entity.TestTplDetailBean"/>
+		<typeAlias alias="testFlowTplHeader" type="com.byd.bms.quality.entity.TestFlowTplHeaderBean"/>
+		<typeAlias alias="testFlowTplDetail" type="com.byd.bms.quality.entity.TestFlowTplDetailBean"/>
+		<typeAlias alias="trackTplHeader" type="com.byd.bms.quality.entity.TrackTplHeaderBean"/>
+		<typeAlias alias="trackTplDetail" type="com.byd.bms.quality.entity.TrackTplDetailBean"/>
+		<typeAlias alias="orderConfigTplHeader" type="com.byd.bms.quality.entity.OrderConfigTplHeaderBean"/>
+		<typeAlias alias="orderConfigTplDetail" type="com.byd.bms.quality.entity.OrderConfigTplDetailBean"/>
+		<typeAlias alias="stdRecord" type="com.byd.bms.quality.entity.QCStdRecordBean"/>
+		<typeAlias alias="qualityTarget" type="com.byd.bms.quality.entity.QualityTargetBean" />
+		<typeAlias alias="stdFaultLib" type="com.byd.bms.quality.entity.StdFaultLibBean" />
+		<typeAlias alias="materialAbnormal" type="com.byd.bms.quality.entity.MaterialAbnormalBean" />
+		<typeAlias alias="testRecordDetail" type="com.byd.bms.quality.entity.TestRecordDetailBean" />
+		<typeAlias alias="testRecordHeader" type="com.byd.bms.quality.entity.TestRecordHeaderBean" />
+		<typeAlias alias="prodTrackHeader" type="com.byd.bms.quality.entity.ProdTrackHeaderBean" />
+		<typeAlias alias="prodTrackDetail" type="com.byd.bms.quality.entity.ProdTrackBean" />
+		<typeAlias alias="ocHeader" type="com.byd.bms.quality.entity.OrderConfigHeaderBean" />
+		<typeAlias alias="ocDetail" type="com.byd.bms.quality.entity.OrderConfigBean" />
+	</typeAliases>
+	<mappers>
+		<mapper resource="com/byd/bms/quality/sqlMapper/qualityMapper.xml"/>
+	</mappers>
+</configuration>

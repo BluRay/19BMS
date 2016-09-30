@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//WebRoot/WEB-INF/configs/log4j.properties=UTF-8
+encoding//WebRoot/jsp/index.jsp=UTF-8
+encoding//src/com/byd/erpit/tools/email/emailTemplet.html=UTF-8
+encoding/<project>=UTF-8

@@ -1,0 +1,1599 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.plan.dao.IPlanDao">
+	
+	<insert id="insertMasterPlan" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.byd.bms.plan.entity.PlanMasterPlan">
+		<![CDATA[
+		insert into BMS_PLAN_MASTER_PLAN (
+		version,order_id,factory_id,plan_code_id,plan_month,flag,D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11,D12,D13,D14,D15,D16,D17,
+		D18,D19,D20,D21,D22,D23,D24,D25,D26,D27,D28,D29,D30,D31,creator_id,create_date)
+		values(
+		#{version},(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}),(SELECT id FROM BMS_BASE_FACTORY WHERE factory_name=#{factory_name}),
+		(SELECT id FROM BMS_BASE_KEY WHERE key_code = 'PLAN_CODE' AND key_name = #{plan_code_keyname}),#{plan_month},#{flag},#{D1},#{D2},#{D3},#{D4},#{D5},#{D6},#{D7},
+		#{D8},#{D9},#{D10},#{D11},#{D12},#{D13},#{D14},#{D15},#{D16},#{D17},#{D18},#{D19},#{D20},#{D21},#{D22},#{D23},#{D24},
+		#{D25},#{D26},#{D27},#{D28},#{D29},#{D30},#{D31},#{creator_id},#{create_date})
+		]]>
+	</insert>
+
+	<select id="getplanMasterIndex" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.planMasterIndex">
+		SELECT DISTINCT
+		m.version,o.order_no,f.factory_name,u.display_name,create_date FROM
+		BMS_PLAN_MASTER_PLAN m
+		LEFT JOIN BMS_ORDER o ON m.order_id = o.id
+		LEFT
+		JOIN BMS_BASE_FACTORY f ON m.factory_id = f.id
+		LEFT JOIN BMS_BASE_USER
+		u ON m.creator_id = u.id where 1=1
+		<if test="factory_id!=''">
+			and m.factory_id = #{factory_id}
+		</if>
+		<if test="order_no!=''">
+			and o.order_no like CONCAT('%',#{order_no},'%')
+		</if>
+		
+		<!-- <if test="plan_month!=''">
+			and m.plan_month = #{plan_month}
+		</if> -->
+		AND flag = '0'
+		ORDER BY m.version DESC
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+		
+
+	</select>
+	<select id="getplanMasterIndexCount" parameterType="Map"
+		resultType="int">
+		SELECT count(DISTINCT m.version) FROM BMS_PLAN_MASTER_PLAN m
+		LEFT JOIN
+		BMS_ORDER o ON m.order_id = o.id
+		LEFT JOIN BMS_BASE_FACTORY f ON
+		m.factory_id = f.id
+		LEFT JOIN BMS_BASE_USER u ON m.creator_id = u.id
+		where 1=1
+		<if test="factory_id!=''">
+			and m.factory_id = #{factory_id}
+		</if>
+		<if test="order_no!=''">
+			and o.order_no like CONCAT('%',#{order_no},'%')
+		</if>
+	</select>
+
+	<select id="getPlanMasterList" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.PlanMasterPlan">
+		SELECT
+		m.D1+m.D2+m.D3+m.D4+m.D5+m.D6+m.D7+m.D8+m.D9+m.D10+m.D11+m.D12+m.D13+m.D14+m.D15+m.D16+m.D17+m.D18+m.D19+m.D20+
+		m.D21+m.D22+m.D23+m.D24+m.D25+m.D26+m.D27+m.D28+m.D29+m.D30+m.D31 AS
+		sumQty, k.key_name AS plan_code_keyname, m.*,o.order_no,f.factory_name
+		FROM BMS_PLAN_MASTER_PLAN m
+		LEFT JOIN BMS_ORDER o ON m.order_id = o.id
+		LEFT JOIN BMS_BASE_FACTORY f ON
+		m.factory_id = f.id
+		LEFT JOIN
+		BMS_BASE_KEY k ON m.plan_code_id=k.id
+		where 1=1
+		<if test="version!=''">
+			AND version = #{version}
+			AND flag = (SELECT MAX(flag+0)
+			FROM
+			BMS_PLAN_MASTER_PLAN WHERE version = #{version})
+		</if>
+		<if test="order_no!=''">
+			and order_id = (SELECT id FROM BMS_ORDER WHERE
+			order_no=#{order_no})
+			AND factory_id = #{factory_id}
+			AND version =
+			(SELECT MAX(version) FROM BMS_PLAN_MASTER_PLAN WHERE
+			order_id =
+			(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}) AND
+			factory_id =
+			#{factory_id} AND plan_month=#{plan_month})
+			AND flag =
+			(SELECT
+			MAX(flag+0) FROM BMS_PLAN_MASTER_PLAN WHERE version =(SELECT
+			MAX(version) FROM BMS_PLAN_MASTER_PLAN WHERE order_id = (SELECT id
+			FROM BMS_ORDER WHERE order_no=#{order_no}) AND factory_id =
+			#{factory_id} AND plan_month=#{plan_month}) AND
+			plan_month=#{plan_month})
+			AND plan_month=#{plan_month}
+			ORDER BY version
+			DESC,flag
+			DESC,plan_month,plan_code_id
+		</if>
+	</select>
+
+	<update id="updatePlanMasterInfo" parameterType="com.byd.bms.plan.entity.PlanMasterPlan">
+		<![CDATA[
+		UPDATE BMS_PLAN_MASTER_PLAN SET version=#{version},order_id=#{order_id},factory_id=#{factory_id},plan_code_id=#{plan_code_id},plan_month=#{plan_month},
+		flag=#{flag},D1=#{D1},D2=#{D2},D3=#{D3},D4=#{D4},D5=#{D5},D6=#{D6},D7=#{D7},D8=#{D8},D9=#{D9},D10=#{D10},D11=#{D11},
+		D12=#{D12},D13=#{D13},D14=#{D14},D15=#{D15},D16=#{D16},D17=#{D17},D18=#{D18},D19=#{D19},D20=#{D20},D21=#{D21},D22=#{D22},
+		D23=#{D23},D24=#{D24},D25=#{D25},D26=#{D26},D27=#{D27},D28=#{D28},D29=#{D29},D30=#{D30},D31=#{D31}
+		WHERE id=#{id}
+		]]>
+	</update>
+
+	<insert id="insertOperateChangeLog" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.byd.bms.util.entity.BmsBaseOperateChangeLog">
+		<![CDATA[
+		insert into BMS_BASE_OPERATE_CHANGE_LOG (
+		operate_change_type_id,table_name,field_id,field_name,old_value,new_value,changer_id,change_date)
+		VALUES(
+		#{operate_change_type_id},#{table_name},#{field_id},#{field_name},#{old_value},#{new_value},#{changer_id},#{change_date})
+		]]>
+	</insert>
+	
+	<select id="checkPlanIssuanceList" parameterType="Map" resultType="Map">
+	SELECT a.*,o.order_no,c.product_qty FROM (SELECT pp.factory_id,pp.order_id,COUNT(pp.D#{day}) AS count_num 
+	FROM BMS_PLAN_MASTER_PLAN pp WHERE pp.factory_id = #{factory_id} 
+		AND pp.plan_month =#{issuance_month} GROUP BY pp.order_id ORDER BY order_id) a
+		LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG c ON a.order_id = c.order_id AND a.factory_id = c.factory_id
+		LEFT JOIN BMS_ORDER o ON a.order_id = o.id
+	</select>
+
+	<select id="getPlanIssuanceList" parameterType="Map" resultType="com.byd.bms.plan.entity.PlanIssuance">
+		SELECT
+		f.order_config_name,a.order_id,a.order_config_id,a.product_qty,a.sequence,sum(IFNULL(p.plan_qty,0))
+		AS issed_qty,  concat(o.order_no,' ',o.order_name,t.internal_name,' ',ifnull(fo.production_qty,0),'台') as order_no 
+		FROM BMS_ALLOT_FACTORY_ORDER_CONFIG a
+		LEFT JOIN
+		BMS_ORDER_CONFIG f ON a.order_config_id = f.id
+		LEFT JOIN
+		BMS_PLAN_PRODUCTION_PLAN p ON a.order_config_id = p.order_config_id
+		LEFT JOIN BMS_ORDER o ON a.order_id = o.id
+	 	LEFT JOIN BMS_FACTORY_ORDER fo on fo.order_id=o.id and fo.factory_id=a.factory_id
+		LEFT JOIN BMS_BASE_BUS_TYPE t ON t.id = o.bus_type_id 
+		WHERE a.factory_id = #{factory_id}
+		<if test="order_no!=''">
+		AND a.order_id = (SELECT id FROM BMS_ORDER WHERE
+		order_no=#{order_no})  
+		</if>
+		<if test="order_no==''">
+		AND a.order_id IN
+		(SELECT a.order_id FROM (
+		SELECT pp.order_id,COUNT(pp.D#{day}) AS count_num FROM BMS_PLAN_MASTER_PLAN pp WHERE pp.factory_id = #{factory_id} AND pp.plan_month =#{issuance_month} GROUP BY pp.order_id) a
+		WHERE a.count_num >0)
+		</if>
+		
+		GROUP BY
+		order_config_name,order_id
+		ORDER BY a.order_id,a.sequence 
+	</select>
+
+	<select id="getPlanIssuanceTotal" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.PlanIssuanceTotal">
+		SELECT k.id, k.key_name, d#{day} AS num from
+		BMS_PLAN_MASTER_PLAN m
+		LEFT JOIN BMS_BASE_KEY k ON m.plan_code_id =
+		k.id
+		WHERE m.plan_month = #{month} AND m.order_id = #{order_id}
+		AND m.factory_id = #{factory_id}
+		AND m.flag = (SELECT MAX(flag+0) FROM BMS_PLAN_MASTER_PLAN n WHERE
+		n.plan_month = #{month}
+		AND n.order_id = #{order_id}
+		AND n.factory_id = #{factory_id})
+		
+		AND version = (SELECT max(version) FROM BMS_PLAN_MASTER_PLAN WHERE factory_id = #{factory_id} 
+		and order_id =#{order_id}
+		and plan_month = #{month})
+	</select>
+
+	<select id="getPlanIssuanceCount" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.PlanIssuanceCount">
+		SELECT k.id AS plan_code_id,
+		p.order_id,p.factory_id,p.order_config_id,sum(IFNULL(p.plan_qty,0)) AS
+		issed_qty FROM BMS_BASE_KEY k
+		LEFT JOIN BMS_PLAN_PRODUCTION_PLAN p ON
+		p.plan_code_id = k.id
+		WHERE k.key_code = 'PLAN_CODE' AND
+		k.delete_flag='0'
+		AND (p.order_id = #{order_id} OR ISNULL(p.order_id))
+		AND (p.factory_id = #{factory_id} OR ISNULL(p.factory_id))
+		AND
+		p.order_config_id = #{order_config_id} AND p.plan_date = #{plan_date}
+		GROUP BY k.id
+	</select>
+	<select id="getPlanConfigIssedQty" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.PlanConfigIssedQty">
+		SELECT plan_code_id,SUM(plan_qty) AS sum_plan_qty FROM
+		BMS_PLAN_PRODUCTION_PLAN
+		WHERE factory_id = #{factory_id} AND order_id = #{order_id} AND
+		order_config_id = #{order_config_id}
+		GROUP BY plan_code_id
+	</select>
+	<select id="getPlanConfigIssedQtyByOrderno" parameterType="Map" resultType="com.byd.bms.plan.entity.PlanConfigIssedQty">
+		SELECT plan_code_id,SUM(plan_qty) AS sum_plan_qty FROM BMS_PLAN_PRODUCTION_PLAN 
+		WHERE factory_id = #{factory_id} AND order_id = (SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}) AND order_config_id = #{order_config_id}
+		GROUP BY plan_code_id ORDER BY plan_code_id
+	</select>
+	<select id="getPlanConfigQty" parameterType="int" resultType="int">
+		SELECT config_qty FROM BMS_ORDER_CONFIG WHERE id = #{order_config_id}
+	</select>
+
+	<insert id="insertPlanIssuance" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.byd.bms.plan.entity.PlanProductionPlan">
+		<![CDATA[
+		insert into BMS_PLAN_PRODUCTION_PLAN (
+		order_id,factory_id,plan_code_id,plan_date,order_config_id,plan_qty,plan_status,creator_id,creat_date,releaser_id,release_date)
+		VALUES(
+		(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}),#{factory_id},#{plan_code_id},#{plan_date},#{order_config_id},#{plan_qty},#{plan_status},#{creator_id},
+		#{creat_date},#{releaser_id},#{release_date})
+		]]>
+	</insert>
+
+	<select id="getProductionPlanIssuanceList" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.PlanProductionPlan">
+		SELECT * FROM BMS_PLAN_PRODUCTION_PLAN WHERE factory_id =
+		#{factory_id} AND
+		plan_date = #{plan_date} AND order_id = #{order_id}
+	</select>
+
+	<select id="checkImportPlanFactory" parameterType="Map"
+		resultType="String">
+		SELECT id FROM BMS_FACTORY_ORDER WHERE order_id = (SELECT
+		id FROM BMS_ORDER WHERE order_no=#{order_no})
+		AND factory_id = (SELECT
+		id FROM BMS_BASE_FACTORY WHERE factory_name = #{factory_name})
+	</select>
+
+	<insert id="insertPlanBusNumber" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.byd.bms.plan.entity.PlanBusNumber">
+		<![CDATA[
+		insert into BMS_PLAN_BUS_NUMBER (bus_serial_number,bus_number,creator_id,creat_date,print_sign,printer_id,print_date,print_times)
+		VALUES(
+		(select a.sn from (SELECT IFNULL(max(bus_serial_number) +1,CONCAT(#{year},'0001')) AS sn FROM BMS_PLAN_BUS_NUMBER WHERE left(bus_serial_number,4) = #{year}) a),
+		(CONCAT(#{bus_code},'-',#{order_code},'-',#{year},'-',LPAD(#{num},4,'0'))),
+		#{creator_id},#{creat_date},#{print_sign},#{printer_id},#{print_date},#{print_times}
+		)
+		]]>
+	</insert>
+
+	<insert id="insertPlanBus" useGeneratedKeys="true" keyProperty="id"
+		parameterType="com.byd.bms.plan.entity.PlanBus">
+		<![CDATA[
+		insert into BMS_PLAN_BUS (
+		factory_id,production_plan_id,bus_number,status,order_id,order_cofig_id,sequence,vin,customer_number,left_motor_number,right_motor_number,
+		bus_color,bus_seats)
+		VALUES(#{factory_id},#{production_plan_id},(SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE id=#{bus_number_id}),#{status},(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}),#{order_cofig_id},#{sequence},#{vin},#{customer_number},
+		#{left_motor_number},#{right_motor_number},#{bus_color},#{bus_seats})
+		]]>
+	</insert>
+
+	<select id="getFactoryOrderInfo" parameterType="Map"
+		resultType="com.byd.bms.order.entity.BmsFactoryOrder">
+		SELECT * FROM BMS_FACTORY_ORDER WHERE
+		order_id = (SELECT id
+		FROM BMS_ORDER WHERE order_no=#{order_no})
+		AND factory_id =
+		#{factory_id}
+	</select>
+	
+	<select id="getFactoryOrderDetail" parameterType="Map" resultType="Map">
+		SELECT o.id,d.id AS detail_id,o.factory_id,o.order_id,o.production_qty,d.busnum_start,d.busnum_end,d.bus_number_start,(d.busnum_end - d.busnum_start + 1) AS qty, d.bus_number_count 
+		FROM BMS_FACTORY_ORDER o 
+		LEFT JOIN BMS_FACTORY_ORDER_DETAIL d ON d.factory_order_id = o.id
+		WHERE o.order_id = (SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
+		AND o.factory_id =#{factory_id}
+	</select>
+
+	<select id="checkBusNumber" parameterType="map"
+		resultType="com.byd.bms.plan.entity.PlanBusNumber">
+		SELECT * FROM BMS_PLAN_BUS_NUMBER WHERE
+		bus_number =
+		CONCAT(LEFT((SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE
+		bus_serial_number = (SELECT max(bus_serial_number) FROM
+		BMS_PLAN_BUS_NUMBER)),
+		INSTR((SELECT bus_number FROM
+		BMS_PLAN_BUS_NUMBER WHERE bus_serial_number = (SELECT
+		max(bus_serial_number) FROM BMS_PLAN_BUS_NUMBER)),
+		(SELECT
+		productive_year FROM BMS_ORDER WHERE order_no = #{order_no})+'-')+4),
+		LPAD((#{num}),4,'0'))
+	</select>
+
+	<select id="getMaxNumByOrderNo" parameterType="String"
+		resultType="int">
+		SELECT IFNULL(SUM(bus_number_start + production_qty - 1),0)
+		AS maxnum FROM BMS_FACTORY_ORDER
+		WHERE id = (SELECT MAX(id) FROM
+		BMS_FACTORY_ORDER
+		WHERE order_id = (SELECT id FROM BMS_ORDER WHERE
+		order_no=#{order_no}))
+	</select>
+
+	<update id="updateFactoryOrderBusCount" parameterType="map">
+		<![CDATA[
+		UPDATE BMS_FACTORY_ORDER SET bus_number_count=#{bus_number_count}
+		WHERE order_id=(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}) AND factory_id=#{factory_id}
+		]]>
+	</update>
+	
+	<update id="updateFactoryOrderDetail" parameterType="int">
+		<![CDATA[
+		UPDATE BMS_FACTORY_ORDER_DETAIL SET bus_number_count = bus_number_count + 1 WHERE id = #{detail_id}
+		]]>
+	</update>
+
+	<select id="getOrderInfoByOrderNo" parameterType="Map" resultType="com.byd.bms.order.entity.BmsOrder">
+		SELECT o.*,t.bus_type_code AS 'bus_type' FROM BMS_ORDER o
+		LEFT OUTER JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id
+		WHERE
+		o.order_no = #{order_no}
+	</select>
+	<select id="getOrderInfoByOrderID" parameterType="Map" resultType="com.byd.bms.order.entity.BmsOrder">
+		SELECT o.*,t.bus_type_code AS 'bus_type' FROM BMS_ORDER o
+		LEFT OUTER JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id
+		WHERE
+		o.id = #{order_id}
+	</select>
+	<select id="getOrderIdByConfigId" parameterType="String" resultType="String">
+		SELECT order_id FROM BMS_ORDER_CONFIG WHERE id = #{config_id}
+	</select>
+
+	<update id="updateExceptionInfo" parameterType="com.byd.bms.plan.entity.BmsPDException">
+		<![CDATA[
+		UPDATE BMS_PD_PRODUCTION_EXCEPTION SET 
+		factory_id=#{factory_id},workshop_id=#{workshop_id},line_id=#{line_id},process_id=#{process_id},bus_number=#{bus_number},
+		exception_type=#{exception_type},reason_type_id=#{reason_type_id},detailed_reasons=#{detailed_reasons},
+		edit_date=#{edit_date},start_time=#{start_time},pfinish_time=#{pfinish_time},finish_time=#{finish_time},severity_level=#{severity_level},
+		measures=#{measures},duty_department_id=#{duty_department_id},temporary_measures=#{temporary_measures},status=#{status},
+		processor=#{processor},process_date=#{process_date},closer_id=#{closer_id},order_list=#{order},pause_time=#{pause_time},capacity_loss=#{capacityLoss}
+		email_id=#{email_id} WHERE id=#{id}
+		]]>
+	</update>
+	<update id="manageExceptionInfo" parameterType="com.byd.bms.plan.entity.BmsPDException">
+		<![CDATA[
+		UPDATE BMS_PD_PRODUCTION_EXCEPTION SET  status = '1',exception_type=#{exception_type},
+		duty_department_id=#{duty_department_id},solution=#{solution},closer_id=#{closer_id},close_date=#{close_date},
+		start_time=#{start_time},pfinish_time=#{pfinish_time},finish_time=#{finish_time},
+		memo=#{memo},email_id=#{email_id},email_send=#{email_send},bus_type_id=#{bus_type_id},waste_num=#{waste_num},
+		pause_time=#{pause_time},capacity_loss=#{capacityLoss}	
+		WHERE id=#{id}
+		]]>
+	</update>
+
+	<insert id="addException" useGeneratedKeys="true" keyProperty="id"
+		parameterType="com.byd.bms.plan.entity.BmsPDException">
+		<![CDATA[
+		insert into BMS_PD_PRODUCTION_EXCEPTION (
+		factory_id,workshop_id,line_id,process_id,order_list,order_desc,bus_number,exception_type,reason_type_id,detailed_reasons,
+		editor_id,edit_date,start_time,pfinish_time,finish_time,severity_level,measures,duty_department_id,
+		temporary_measures,status,processor,process_date,solution,closer_id,close_date,email_id,email_send,
+		bus_type_id,waste_num,memo,p_pause_time)
+		VALUES(
+		#{factory_id},#{workshop_id},#{line_id},#{process_id},#{order},#{orderDesc},#{bus_number},#{exception_type},#{reason_type_id},#{detailed_reasons},
+		#{editor_id},#{edit_date},#{start_time},#{pfinish_time},#{finish_time},#{severity_level},#{measures},#{duty_department_id},
+		#{temporary_measures},#{status},#{processor},#{process_date},#{solution},#{closer_id},#{close_date},#{email_id},
+		#{email_send},#{bus_type_id},#{waste_num},#{memo},#{p_pause_time})
+		]]>
+	</insert>
+
+	<select id="getExceptionList" parameterType="Map" resultType="Map">
+		SELECT f.factory_name,w.workshop_name,p.process_code,q.process_code AS
+		'cur_process_code',d.key_name AS 'department',
+		k.key_name AS 'reson_type',b.detailed_reasons,l.line,u.display_name, b.* 
+		FROM BMS_PD_PRODUCTION_EXCEPTION b
+		LEFT OUTER JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id
+		LEFT OUTER JOIN BMS_BASE_WORKSHOP w ON b.workshop_id = w.id
+		LEFT OUTER JOIN BMS_PLAN_BUS s on s.bus_number=b.bus_number
+		LEFT OUTER JOIN BMS_BASE_PROCESS p ON b.process_id = p.id
+		LEFT OUTER JOIN BMS_BASE_PROCESS q ON s.latest_process_id = q.id
+		LEFT OUTER JOIN BMS_BASE_KEY k ON b.reason_type_id = k.id
+		LEFT OUTER JOIN BMS_BASE_KEY d ON b.duty_department_id = d.id
+		LEFT OUTER JOIN BMS_BASE_USER u ON b.editor_id = u.id
+		LEFT OUTER JOIN BMS_BASE_LINE l ON b.line_id = l.id WHERE 1=1
+
+		<if test="bus_number!='' and bus_number!=null">
+			AND b.bus_number LIKE CONCAT('%',#{bus_number},'%')
+		</if>
+		<if test="factory_id!='' and factory_id!=null">
+			AND b.factory_id = #{factory_id}
+		</if>
+		<if test="factory_name!='' and factory_name!=null">
+			AND f.factory_name = #{factory_name}
+		</if>
+		<if test="workshop_id!='' and workshop_id!=null">
+			AND b.workshop_id = #{workshop_id}
+		</if>
+		<if test="workshop_name!='' and workshop_name!=null">
+			AND w.workshop_name = #{workshop_name}
+		</if>
+		<if test="line_id!='' and line_id!=null">
+			AND b.line_id = #{line_id}
+		</if>
+		<if test="severity_level!='' and severity_level!=null">
+			AND b.severity_level = #{severity_level}
+		</if>
+		<if test="measures!='' and measures!=null">
+			AND b.measures= #{measures}
+		</if>
+		<if test="status!='' and status!=null">
+			AND b.status= #{status}
+		</if>
+		<if test="exception_type!='' and exception_type!=null">
+			and b.exception_type = #{exception_type}
+		</if>
+		<if test="reason_type_id !='' and reason_type_id!=null">
+			and b.reason_type_id >= #{reason_type_id}
+		</if>
+		<if test="order_no !='' and order_no!=null">
+			and find_in_set(b.order_list,#{order_no})>0
+		</if>
+		<if test="date_start !='' and date_start!=null">
+			and date_add(b.start_time, interval +410 MINUTE) >= CONCAT(#{date_start},' 00:00:00')
+		</if>
+		<if test="date_end !='' and date_end!=null">
+			and date_add(b.start_time, interval +410 MINUTE) &lt;= CONCAT(#{date_end},' 23:59:59')
+		</if>
+		<if test="date_start2 !='' and date_start2!=null">
+			and b.pfinish_time >= #{date_start2}
+		</if>
+		<if test="date_end2 !='' and date_end2!=null">
+			and b.pfinish_time &lt;= #{date_end2}
+		</if>
+		<if test="exception_id!=null">
+			AND b.id= #{exception_id}
+		</if>
+		order by b.id DESC
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getExceptionListCount" parameterType="Map"
+		resultType="int">
+		SELECT COUNT(b.id) FROM BMS_PD_PRODUCTION_EXCEPTION b
+		<!-- LEFT OUTER JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id
+		LEFT OUTER JOIN
+		BMS_BASE_WORKSHOP w ON b.workshop_id = w.id
+		LEFT OUTER JOIN BMS_BASE_PROCESS p ON b.process_id = p.id
+		LEFT OUTER JOIN
+		BMS_PLAN_BUS s ON b.bus_number = s.bus_number
+		LEFT OUTER JOIN
+		BMS_BASE_PROCESS q ON s.latest_process_id = q.id
+		LEFT OUTER JOIN
+		BMS_BASE_DEPARTMENT d ON b.duty_department_id = d.id
+		LEFT OUTER JOIN
+		BMS_BASE_KEY k ON b.reason_type_id = k.id
+		LEFT OUTER JOIN BMS_ORDER o ON s.order_id = o.id --> 
+		WHERE 1=1
+
+		<if test="bus_number!=''">
+			AND b.bus_number LIKE CONCAT('%',#{bus_number},'%')
+		</if>
+		<if test="factory_id!=''">
+			AND b.factory_id = #{factory_id}
+		</if>
+		<if test="workshop_id!=''">
+			AND b.workshop_id = #{workshop_id}
+		</if>
+		<if test="line_id!=''">
+			AND b.line_id = #{line_id}
+		</if>
+		<if test="severity_level!=''">
+			AND b.severity_level = #{severity_level}
+		</if>
+		<if test="measures!=''">
+			AND b.measures= #{measures}
+		</if>
+		<if test="status!=''">
+			AND b.status= #{status}
+		</if>
+		<if test="exception_type!=''">
+			and b.exception_type >= #{exception_type}
+		</if>
+		<if test="reason_type_id !=''">
+			and b.reason_type_id >= #{reason_type_id}
+		</if>
+		<if test="order_no !='' and order_no!=null">
+			and find_in_set(b.order_list,#{order_no})>0
+		</if>
+		<if test="date_start !=''">
+			and date_add(b.start_time, interval +410 MINUTE) >= CONCAT(#{date_start},' 00:00:00')
+		</if>
+		<if test="date_end !=''">
+			and date_add(b.start_time, interval +410 MINUTE) &lt;= CONCAT(#{date_end},' 23:59:59')
+		</if>
+		<if test="date_start2 !=''">
+			and b.pfinish_time >= #{date_start2}
+		</if>
+		<if test="date_end2 !=''">
+			and b.pfinish_time &lt;= #{date_end2}
+		</if>
+		<if test="exception_id!=null">
+			AND b.id= #{exception_id}
+		</if>
+	</select>
+
+	<select id="getBusNumber" parameterType="Map" resultType="Map">
+		SELECT CONCAT(o.order_no,' ',o.order_name,t.internal_name,' ',o.order_qty) as order_no,
+		n.id,n.bus_number,b.left_motor_number,b.right_motor_number,b.vin,b.zc_production_date as production_date,u.display_name,
+		(SELECT BMS_BASE_USER.display_name from BMS_BASE_USER where n.printer_id = BMS_BASE_USER.id) as
+		'printer_name',n.creat_date,n.print_sign,n.print_date,n.printer_id
+		FROM
+		BMS_PLAN_BUS_NUMBER n
+		LEFT OUTER JOIN BMS_BASE_USER u ON
+		n.creator_id = u.id
+		LEFT OUTER JOIN BMS_BASE_USER s ON n.printer_id =
+		s.id
+		LEFT OUTER JOIN BMS_PLAN_BUS b ON n.bus_number = b.bus_number
+		LEFT OUTER JOIN BMS_ORDER o ON b.order_id = o.id
+		LEFT OUTER JOIN BMS_BASE_BUS_TYPE t ON t.id = o.bus_type_id
+		where 1=1
+		<if test="factory_id!=null">
+			and b.factory_id = #{factory_id}
+		</if>
+		<if test="order_no!=null">
+			and b.order_id = (SELECT id FROM BMS_ORDER WHERE
+			order_no=#{order_no})
+		</if>
+		<if test="bus_vin!=null">
+			and b.vin = #{bus_vin}
+		</if>
+		<if test="bus_number!=null">
+			and b.bus_number = #{bus_number}
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getBusNumberCount" parameterType="Map" resultType="int">
+		SELECT count(n.id) FROM BMS_PLAN_BUS_NUMBER n
+		LEFT OUTER JOIN
+		BMS_BASE_USER u ON n.creator_id = u.id
+		LEFT OUTER JOIN BMS_PLAN_BUS b
+		ON n.bus_number = b.bus_number where 1=1
+		<if test="factory_id!=null">
+			and b.factory_id = #{factory_id}
+		</if>
+		<if test="order_no!=null">
+			and b.order_id = (SELECT id FROM BMS_ORDER WHERE
+			order_no=#{order_no})
+		</if>
+		<if test="bus_vin!=null">
+			and b.vin = #{bus_vin}
+		</if>
+		<if test="bus_number!=null">
+			and b.bus_number = #{bus_number}
+		</if>
+	</select>
+
+	<select id="getPlanVin" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.PlanVIN">
+		SELECT v.*,b.bus_number,b.productive_date,u.display_name AS
+		creator_name, u1.display_name as print_name,
+		o.order_code,t.bus_type_code,o.order_qty,o.order_name,o.order_no,f.factory_name
+		FROM BMS_PD_VIN v
+		left join BMS_BASE_FACTORY f on f.id=v.factory_id
+		LEFT OUTER JOIN BMS_BASE_USER u ON v.creator_id = u.id
+		left join BMS_BASE_USER u1 on v.printer_id=u1.id
+		LEFT OUTER JOIN BMS_PLAN_BUS b ON v.vin = b.vin
+		left join BMS_ORDER o on v.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		where 1=1
+		<if test="factory_id!=null and factory_id !=''">
+			and v.factory_id = #{factory_id}
+		</if>
+		<if test="order_no!=null and order_no!=''">
+			and v.order_id = (SELECT id FROM BMS_ORDER WHERE
+			order_no=#{order_no})
+		</if>
+		<if test="bus_vin!=null and bus_vin!=''">
+			and v.vin = #{bus_vin}
+		</if>
+		<if test="bus_number!=null and bus_number!=''">
+			and b.bus_number = #{bus_number}
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getPlanVinCount" parameterType="Map" resultType="int">
+		SELECT count(v.vin) FROM BMS_PD_VIN v
+		LEFT OUTER JOIN BMS_PLAN_BUS b ON
+		v.vin = b.vin where 1=1
+		<if test="factory_id!=null and factory_id !=''">
+			and v.factory_id = #{factory_id}
+		</if>
+		<if test="order_no!=null and order_no!=''">
+			and v.order_id = (SELECT id FROM BMS_ORDER WHERE
+			order_no=#{order_no})
+		</if>
+		<if test="bus_vin!=null and bus_vin!=''">
+			and v.vin = #{bus_vin}
+		</if>
+		<if test="bus_number!=null and bus_number!=''">
+			and b.bus_number = #{bus_number}
+		</if>
+	</select>
+
+	<select id="getVinPrefixByOrderNo" parameterType="String"
+		resultType="String">
+		SELECT t.vin_prefix FROM BMS_ORDER o
+		LEFT OUTER JOIN
+		BMS_BASE_BUS_TYPE t ON o.bus_type_id=t.id
+		WHERE o.order_no
+		= #{order_no}
+	</select>
+	<select id="GetFactoryVinPrefix" parameterType="int" resultType="String">
+		SELECT vin_assembly_code FROM BMS_BASE_FACTORY WHERE id =
+		#{factory_id}
+	</select>
+	<select id="getVinCountByYear" parameterType="String"
+		resultType="int">
+		SELECT IFNULL(max(RIGHT(vin,6)),0) AS max_vin_count FROM
+		BMS_PD_VIN WHERE SUBSTRING(vin,10,1) = #{year_code}
+	</select>
+
+	<insert id="insertPlanVin" useGeneratedKeys="true" keyProperty="id"
+		parameterType="com.byd.bms.plan.entity.PlanVIN">
+		<![CDATA[
+		insert into BMS_PD_VIN (vin,factory_id,order_id)
+		VALUES(#{vin},#{factory_id},(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}))
+		]]>
+	</insert>
+	<update id="updatePlanVin" parameterType="com.byd.bms.plan.entity.PlanVIN">
+		<![CDATA[
+		UPDATE BMS_PD_VIN SET left_motor_number=#{left_motor_number},right_motor_number=#{right_motor_number},
+		creator_id = #{creator_id},creat_date=#{creat_date} 
+		WHERE vin=#{vin}
+		]]>
+	</update>
+	<update id="updatePlanBus" parameterType="com.byd.bms.plan.entity.PlanVIN">
+		<![CDATA[
+		UPDATE BMS_PLAN_BUS SET left_motor_number=#{left_motor_number},right_motor_number=#{right_motor_number},
+		vin=#{vin}
+		WHERE bus_number=#{bus_number}
+		]]>
+	</update>
+	<update id="updatePlanBusStatus" parameterType="map">
+		<![CDATA[
+		UPDATE BMS_PLAN_BUS SET status=#{status} 
+		WHERE bus_number=#{bus_number}
+		]]>
+	</update>
+	<update id="updatePlanBusTranIn" parameterType="map">
+		<![CDATA[
+		UPDATE BMS_PLAN_BUS SET status=#{status},factory_id=#{factory_id}
+		WHERE bus_number=#{bus_number}
+		]]>
+	</update>
+	<update id="updateBusTransferLog" parameterType="map">
+		<![CDATA[
+		UPDATE BMS_PLAN_BUS_TRANSFER_LOG SET tto_date=#{tto_date},tto_people_id=#{tto_people_id}
+		WHERE bus_number=#{bus_number}
+		]]>
+	</update>
+	<insert id="insertBusTransferLog" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.byd.bms.plan.entity.PlanBusTransfer">
+		<![CDATA[
+		insert into BMS_PLAN_BUS_TRANSFER_LOG (bus_number,tfrom_factory_id,current_workshop_id,current_process_id,tfrom_date,tfrom_people_id,
+		tto_factory_id,tto_date,tto_people_id)
+		VALUES(#{bus_number},#{tfrom_factory_id},#{current_workshop_id},#{current_process_id},#{tfrom_date},
+		#{tfrom_people_id},#{tto_factory_id},#{tto_date},#{tto_people_id})
+		]]>
+	</insert>
+	<select id="getBusInfo" parameterType="String" resultType="Map">
+		SELECT b.factory_id,b.status FROM BMS_PLAN_BUS b WHERE b.bus_number =
+		#{bus_number}
+	</select>
+
+	<select id="getBusTransferOutList" parameterType="Map"
+		resultType="Map">
+		SELECT
+		b.bus_number,b.vin,b.status,o.order_name,c.order_config_name,c.customer,f.factory_name
+		FROM BMS_PLAN_BUS b
+		LEFT OUTER JOIN BMS_ORDER o ON b.order_id = o.id
+		LEFT OUTER JOIN BMS_ORDER_CONFIG c ON b.order_cofig_id = c.id
+		LEFT
+		OUTER
+		JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id
+		WHERE b.bus_number
+		IN
+		<foreach item="item" index="index" collection="busNumbers"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<select id="getBusTransferInList" parameterType="Map"
+		resultType="Map">
+		SELECT
+		t.bus_number,t.tfrom_factory_id,b.vin,b.status,o.order_name,c.order_config_name,c.customer,f.factory_name
+		FROM BMS_PLAN_BUS_TRANSFER_LOG t
+		LEFT OUTER JOIN BMS_PLAN_BUS b ON
+		t.bus_number = b.bus_number
+		LEFT OUTER JOIN BMS_ORDER o ON b.order_id =
+		o.id LEFT OUTER JOIN BMS_ORDER_CONFIG c ON b.order_cofig_id = c.id
+		LEFT OUTER JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id
+		WHERE
+		tto_factory_id = #{factory_id_in} AND b.status = 1
+		<if test="busNumbers!=''">
+			AND t.bus_number IN
+			<foreach item="item" index="index" collection="busNumbers"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="tfrom_factory_id!=''">
+			AND t.tfrom_factory_id = #{tfrom_factory_id}
+		</if>
+	</select>
+	<select id="getBusTransferHisList" parameterType="Map"
+		resultType="Map">
+		SELECT
+		t.bus_number,b.vin,o.order_name,c.order_config_name,c.customer,f.factory_name
+		AS factory_name_out,
+		y.factory_name AS
+		factory_name_in,t.tfrom_date,t.tto_date,u.display_name AS
+		name_out,r.display_name AS name_in
+		FROM BMS_PLAN_BUS_TRANSFER_LOG t
+		LEFT OUTER JOIN BMS_PLAN_BUS b ON
+		t.bus_number = b.bus_number
+		LEFT OUTER
+		JOIN BMS_ORDER o ON b.order_id =
+		o.id LEFT OUTER JOIN BMS_ORDER_CONFIG
+		c ON b.order_cofig_id = c.id
+		LEFT OUTER JOIN BMS_BASE_FACTORY f ON
+		t.tfrom_factory_id = f.id LEFT
+		OUTER JOIN BMS_BASE_FACTORY y ON
+		t.tto_factory_id = y.id
+		LEFT OUTER
+		JOIN BMS_BASE_USER u ON
+		t.tfrom_people_id = u.id
+		LEFT OUTER JOIN
+		BMS_BASE_USER r ON
+		t.tto_people_id = r.id
+		WHERE 1=1
+		<if test="transfer_his_busnumber !=''">
+			AND t.bus_number LIKE
+			CONCAT('%',#{transfer_his_busnumber},'%')
+		</if>
+		<if test="transfer_his_vin !=''">
+			AND b.vin LIKE CONCAT('%',#{transfer_his_vin},'%')
+		</if>
+		<if test="transfer_his_orderno !=''">
+			AND o.order_no LIKE
+			CONCAT('%',#{transfer_his_orderno},'%')
+		</if>
+		<if test="transfer_his_out_factory !=''">
+			AND t.tfrom_factory_id = #{transfer_his_out_factory}
+		</if>
+		<if test="transfer_his_out_date_start !=''">
+			AND t.tfrom_date >= #{transfer_his_out_date_start}
+		</if>
+		<if test="transfer_his_out_date_end !=''">
+			AND t.tfrom_date &lt;= #{transfer_his_out_date_end}
+		</if>
+		<if test="transfer_his_in_factory !=''">
+			AND t.tto_factory_id = #{transfer_his_in_factory}
+		</if>
+		<if test="transfer_his_in_date_start !=''">
+			AND t.tto_date >= #{transfer_his_in_date_start}
+		</if>
+		<if test="transfer_his_in_date_end !=''">
+			AND t.tto_date &lt;= #{transfer_his_in_date_end}
+		</if>
+
+	</select>
+
+	<select id="getPlanAmendList" parameterType="Map" resultType="Map">
+		SELECT p.*,k.key_name,o.order_no,a.amend_qty,'0' AS
+		real_qty,a.amend_reason,u.display_name,a.revise_date FROM
+		BMS_PLAN_PRODUCTION_PLAN p
+		LEFT OUTER JOIN BMS_ORDER o ON p.order_id =
+		o.id
+		LEFT OUTER JOIN BMS_BASE_KEY k ON p.plan_code_id = k.id
+		LEFT OUTER
+		JOIN BMS_PD_PLAN_AMEND a ON p.id = a.plan_id
+		LEFT OUTER JOIN
+		BMS_BASE_USER u ON a.reviser_id = u.id
+		WHERE 1=1
+		<if test="order_no !=''">
+			AND p.order_id = (SELECT id FROM BMS_ORDER WHERE
+			order_no=#{order_no})
+		</if>
+		<if test="factory_id !=''">
+			AND p.factory_id = #{factory_id}
+		</if>
+		<if test="amend_date !=''">
+			AND p.plan_date = #{amend_date}
+		</if>
+		<if test="workshop_name !=''">
+			AND k.key_name LIKE CONCAT('%',#{workshop_name},'%')
+		</if>
+	</select>
+	<select id="getPlanSerach" parameterType="Map" resultType="Map">
+		select record.order_desc,record.key_name,record.production_qty,record.order_id,ifnull(record.real_qty,0) real_qty,ifnull(record.total_qty,0) total_qty,ifnull(p.total_plan_qty,0) total_plan_qty 
+		from
+		(
+		select '自制件下线' key_name,fo.order_id,sum(tmp.quantity1) real_qty,sum(tmp.quantity) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join 
+		(
+		select s.supply_workshop workshop_name,s.order_id,s1.quantity quantity1,s.quantity quantity
+		from BMS_PD_WORKSHOP_SUPPLY s 
+		left join BMS_PD_WORKSHOP_SUPPLY s1 on s1.id=s.id 
+		<if test="start_date !=null and start_date !=''">
+			and s1.supply_date>=#{start_date} 
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and s1.supply_date &lt;=#{end_date} 
+		</if>					
+		and s1.factory_id=#{factory_id}
+		where s.supply_workshop='自制件' and s.receive_workshop='部件' and s.factory_id=#{factory_id} ) tmp on tmp.order_id=fo.order_id
+		where fo.order_id is not null and fo.factory_id=#{factory_id} and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		union all
+		select '部件上线' key_name,fo.order_id,sum(f1.online_real_qty) real_qty,sum(f.online_real_qty) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PD_PARTS_PLAN_FINISH f on f.order_id=fo.order_id and f.factory_id=#{factory_id} 
+		left join BMS_BASE_PARTS p1 on p1.id=f.parts_id 
+		left join BMS_PD_PARTS_PLAN_FINISH f1 on f.id=f1.id   
+		<if test="start_date !=null and start_date !=''">
+			and f1.date>=replace(#{start_date},'-','')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and  f1.date&lt;=replace(#{end_date},'-','')
+		</if>		 
+		where fo.factory_id=#{factory_id} and p1.parts_name='中段车架总成' and p1.workshop_name='部件'  
+		and fo.order_id is not null and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id 
+		union all
+		select '部件下线' key_name,fo.order_id,sum(f1.offline_real_qty) real_qty,sum(f.offline_real_qty) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PD_PARTS_PLAN_FINISH f on f.order_id=fo.order_id and f.factory_id=#{factory_id}
+		left join BMS_BASE_PARTS p1 on p1.id=f.parts_id 
+		left join BMS_PD_PARTS_PLAN_FINISH f1 on f.id=f1.id 
+		<if test="start_date !=null and start_date !=''">
+			and f1.date>=replace(#{start_date},'-','')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and  f1.date&lt;=replace(#{end_date},'-','')
+		</if>
+		where fo.factory_id=#{factory_id} and p1.parts_name='喷砂' and p1.workshop_name='部件'
+		and fo.order_id is not null and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id 
+		union all
+		select '焊装上线' key_name,fo.order_id,count(b1.bus_number) real_qty,count(b.bus_number) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PLAN_BUS b on b.welding_online_date is not null and b.factory_id=#{factory_id} and b.order_id=fo.order_id
+		left join BMS_PLAN_BUS b1 on b.id=b1.id 
+		<if test="start_date !=null and start_date !=''">
+			and b1.welding_online_date > CONCAT(date_sub(#{start_date},interval 1 day),' 17:10:00')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and b1.welding_online_date &lt;=concat(#{end_date},' 17:10:00')
+		</if>
+		where fo.factory_id=#{factory_id}
+		and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		union all
+		select '焊装下线' key_name,fo.order_id,count(b1.bus_number) real_qty,count(b.bus_number) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PLAN_BUS b on b.welding_offline_date is not null and b.factory_id=#{factory_id} and b.order_id=fo.order_id
+		left join BMS_PLAN_BUS b1 on b.id=b1.id 
+		<if test="start_date !=null and start_date !=''">
+			and b1.welding_offline_date > CONCAT(date_sub(#{start_date},interval 1 day),' 17:10:00')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and b1.welding_offline_date &lt;=concat(#{end_date},' 17:10:00')
+		</if>
+		where fo.factory_id=#{factory_id}
+		and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		union all
+		select '涂装上线' key_name,fo.order_id,count(b1.bus_number) real_qty,count(b.bus_number) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PLAN_BUS b on b.painting_online_date is not null and b.factory_id=#{factory_id} and b.order_id=fo.order_id
+		left join BMS_PLAN_BUS b1 on b.id=b1.id 
+		<if test="start_date !=null and start_date !=''">
+			and b1.painting_online_date > CONCAT(date_sub(#{start_date},interval 1 day),' 17:10:00')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and b1.painting_online_date &lt;=concat(#{end_date},' 17:10:00')
+		</if>
+		where fo.factory_id=#{factory_id}
+		and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		union all
+		select '涂装下线' key_name,fo.order_id,count(b1.bus_number) real_qty,count(b.bus_number) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PLAN_BUS b on b.painting_offline_date is not null and b.factory_id=#{factory_id} and b.order_id=fo.order_id
+		left join BMS_PLAN_BUS b1 on b.id=b1.id 
+		<if test="start_date !=null and start_date !=''">
+			and b1.painting_offline_date > CONCAT(date_sub(#{start_date},interval 1 day),' 17:10:00')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and b1.painting_offline_date &lt;=concat(#{end_date},' 17:10:00')
+		</if>
+		where  fo.factory_id=#{factory_id}
+		and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		union all
+		select '底盘上线' key_name,fo.order_id,count(b1.bus_number) real_qty,count(b.bus_number) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PLAN_BUS b on b.order_id=fo.order_id and b.chassis_online_date is not null and b.factory_id=#{factory_id}
+		left join BMS_PLAN_BUS b1 on b.id=b1.id 
+		<if test="start_date !=null and start_date !=''">
+			and b1.chassis_online_date > CONCAT(date_sub(#{start_date},interval 1 day),' 17:10:00')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and b1.chassis_online_date &lt;=concat(#{end_date},' 17:10:00')
+		</if>
+		where fo.factory_id=#{factory_id}
+		and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		union all
+		select '底盘下线' key_name,fo.order_id,count(b1.bus_number) real_qty,count(b.bus_number) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PLAN_BUS b on b.order_id=fo.order_id and b.chassis_offline_date is not null and b.factory_id=#{factory_id}
+		left join BMS_PLAN_BUS b1 on b.id=b1.id 
+		<if test="start_date !=null and start_date !=''">
+			and b1.chassis_offline_date > CONCAT(date_sub(#{start_date},interval 1 day),' 17:10:00')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and b1.chassis_offline_date &lt;=concat(#{end_date},' 17:10:00')
+		</if>
+		where fo.factory_id=#{factory_id}
+		and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		union all
+		select '总装上线' key_name,fo.order_id,count(b1.bus_number) real_qty,count(b.bus_number) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PLAN_BUS b on b.order_id=fo.order_id and b.assembly_online_date is not null and b.factory_id=#{factory_id}
+		left join BMS_PLAN_BUS b1 on b.id=b1.id 
+		<if test="start_date !=null and start_date !=''">
+			and b1.assembly_online_date > CONCAT(date_sub(#{start_date},interval 1 day),' 17:10:00')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and b1.assembly_online_date &lt;=concat(#{end_date},' 17:10:00')
+		</if>
+		where fo.factory_id=#{factory_id}
+		and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		union all
+		select '总装下线' key_name,fo.order_id,count(b1.bus_number) real_qty,count(b.bus_number) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PLAN_BUS b on b.order_id=fo.order_id and b.assembly_offline_date is not null and b.factory_id=#{factory_id}
+		left join BMS_PLAN_BUS b1 on b.id=b1.id 
+		<if test="start_date !=null and start_date !=''">
+			and b1.assembly_offline_date > CONCAT(date_sub(#{start_date},interval 1 day),' 17:10:00')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and b1.assembly_offline_date &lt;=concat(#{end_date},' 17:10:00')
+		</if>
+		where fo.factory_id=#{factory_id}
+		and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		union all
+		select '入库' key_name,fo.order_id,count(b1.bus_number) real_qty,count(b.bus_number) total_qty,fo.production_qty,concat(o.order_no,' ',o.order_name,t.internal_name,' ',fo.production_qty,'台') order_desc
+		from BMS_FACTORY_ORDER fo
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE  t on o.bus_type_id=t.id
+		left join BMS_PLAN_BUS b on b.order_id=fo.order_id and b.warehousing_date is not null and b.factory_id=#{factory_id}
+		left join BMS_PLAN_BUS b1 on b.id=b1.id 
+		<if test="start_date !=null and start_date !=''">
+			and b1.warehousing_date > CONCAT(date_sub(#{start_date},interval 1 day),' 17:10:00')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and b1.warehousing_date &lt;=concat(#{end_date},' 17:10:00')
+		</if>
+		where  fo.factory_id=#{factory_id}
+		and fo.status='0'
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no like concat(#{order_no},'%')
+		</if>
+		group by fo.order_id
+		) record  
+		left join 
+		(
+		select k.key_name,sum(p1.plan_qty) total_plan_qty,p1.order_id
+		from BMS_PLAN_PRODUCTION_PLAN p1
+		left join BMS_BASE_KEY k on p1.plan_code_id=k.id
+		where  p1.factory_id=#{factory_id}
+		<if test="start_date !=null and start_date !=''">
+			and p1.plan_date >=replace(#{start_date},'-','')
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and p1.plan_date &lt;=replace(#{end_date},'-','')
+		</if>
+		group by p1.order_id,k.key_name
+		) p on p.key_name=record.key_name and p.order_id=record.order_id
+		left join BMS_BASE_KEY k on record.key_name=k.key_name
+		where ifnull(record.total_qty,0) !=record.production_qty 
+		<if test="workshop !=null and workshop !=''">
+			and record.key_name like concat(#{workshop},'%')
+		</if>		
+		order by record.order_id,k.id
+	
+		<!-- SELECT o.order_no,p.order_config_id,sum(p.plan_qty) AS
+		sum_plan_qty,k.key_name,o.order_name,t.bus_type_code,o.order_qty,f.production_qty,
+		sum(IFNULL(a.amend_qty,0)) AS
+		sum_amend_qty,'0' AS real_qty FROM BMS_PLAN_PRODUCTION_PLAN p
+		LEFT
+		OUTER JOIN BMS_ORDER o ON p.order_id = o.id
+		
+		left OUTER join BMS_FACTORY_ORDER f on f.order_id=o.id AND p.factory_id=f.factory_id
+		
+		LEFT OUTER JOIN
+		BMS_BASE_KEY k ON p.plan_code_id = k.id
+		LEFT OUTER JOIN
+		BMS_PD_PLAN_AMEND a ON p.id = a.plan_id
+		LEFT OUTER JOIN BMS_BASE_USER u
+		ON a.reviser_id = u.id
+		LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id 
+		WHERE 1=1
+		<if test="factory_id !=''">
+			AND p.factory_id = #{factory_id}
+		</if>
+		<if test="workshop !=''">
+			AND k.key_name LIKE CONCAT('%',#{workshop},'%')
+		</if>
+		<if test="order_no !=''">
+			AND p.order_id = (SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
+		</if>
+		<if test="start_date !=''">
+			AND p.plan_date >= #{start_date}
+		</if>
+		<if test="end_date !=''">
+			AND p.plan_date &lt;= #{end_date}
+		</if>
+		GROUP BY key_name,order_no ORDER BY order_no,p.plan_code_id -->
+	</select>
+
+	<insert id="insertPlanAmend" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.byd.bms.plan.entity.PlanAmend">
+		<![CDATA[
+		insert into BMS_PD_PLAN_AMEND (plan_id,real_qty,amend_qty,reviser_id,amend_reason,revise_date,
+		verifier_id,verify_date)
+		VALUES(#{plan_id},#{real_qty},#{amend_qty},#{reviser_id},#{amend_reason},#{revise_date},
+		#{verifier_id},#{verify_date})
+		]]>
+	</insert>
+
+	<update id="deletePlanAmend" parameterType="map">
+		<![CDATA[
+			delete from BMS_PD_PLAN_AMEND where plan_id = #{plan_id}
+		]]>
+	</update>
+
+	<select id="getPlanRealCount" parameterType="Map" resultType="int">
+		SELECT COUNT(id) AS count FROM BMS_PLAN_BUS b
+		WHERE b.order_id =
+		#{order_id} AND b.factory_id = #{factory_id}
+		<if test="workshop !=''">
+			AND ${workshop} like CONCAT('%',#{plan_date},'%')
+		</if>
+	</select>
+	<select id="checkVinBusnumber" parameterType="List" resultType="map">
+		<foreach collection="list" index="index" item="item" separator="UNION ALL" >
+			SELECT v.vin,CONCAT(b.bus_type_code,'-',o.order_code,'-',o.productive_year) AS bus_number_str FROM BMS_PD_VIN v
+			LEFT JOIN BMS_ORDER o ON v.order_id = o.id
+			LEFT JOIN BMS_BASE_BUS_TYPE b ON o.bus_type_id = b.id
+			WHERE v.vin = #{item.vin}  AND CONCAT(b.bus_type_code,'-',o.order_code,'-',o.productive_year) != #{item.bus_number}
+		</foreach>
+	</select>	
+	<select id="getPlanSearchRealCount" parameterType="List" resultType="map">
+		<foreach collection="list" index="index" item="item" separator="UNION ALL" >
+			SELECT IFNULL(COUNT(id),0) AS count FROM BMS_PLAN_BUS b
+			WHERE b.order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{item.order_no}) AND b.factory_id = #{item.factory_id}
+			<if test="workshop !=''">
+				AND date_add(${item.workshop}, interval +410 MINUTE) >= CONCAT(#{item.start_date},' 00:00:00') AND date_add(${item.workshop}, interval +410 MINUTE) &lt;= CONCAT(#{item.end_date},' 23:59:59')
+			</if>
+		</foreach>
+	</select>	
+	<select id="getPlanPartsRealCount" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(${workshop}),0) AS count FROM BMS_PD_PARTS_PLAN_FINISH b
+		WHERE b.order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) AND b.factory_id = #{factory_id}
+		AND b.parts_id = '194'
+		<if test="workshop !=''">
+			AND date >= #{start_date} AND date &lt;= #{end_date}
+		</if>
+	</select>
+	<select id="getPlanSearchAllRealCount" parameterType="list" resultType="map">
+		<foreach collection="list" index="index" item="item" separator="UNION ALL" >		
+		SELECT IFNULL(COUNT(id),0) AS count FROM BMS_PLAN_BUS b
+		WHERE b.order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{item.order_no}) AND b.factory_id = #{item.factory_id}
+		<if test="workshop !=''">
+			AND ${item.workshop} IS NOT NULL
+		</if>
+		</foreach>
+	</select>
+	<select id="getPlanPartsAllRealCount" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(${workshop}),0) AS count FROM BMS_PD_PARTS_PLAN_FINISH b
+		WHERE b.order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) AND b.factory_id = #{factory_id}
+		AND b.parts_id = '194'
+	</select>
+
+	<select id="getPlanIssed" parameterType="Map" resultType="Map">
+		SELECT
+		plan_code_id,plan_date FROM BMS_PLAN_PRODUCTION_PLAN
+		WHERE order_id =
+		(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
+		AND factory_id =
+		#{factory_id}
+	</select>
+
+	<select id="checkProductionPlan" parameterType="Map" resultType="Map">
+		SELECT * FROM BMS_PLAN_PRODUCTION_PLAN WHERE
+		order_id = (SELECT id FROM
+		BMS_ORDER WHERE order_no=#{order_no})
+		AND factory_id = (SELECT id FROM
+		BMS_BASE_FACTORY WHERE factory_name =
+		#{factory_name})
+		AND plan_date
+		LIKE CONCAT('%',#{plan_date},'%')
+	</select>
+
+	<!-- 发车模块 start -->
+	<select id="getDispatchPlanList" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.PlanDispatch">
+		select p.*,sum(qtys)
+		plan_done_qty,o.order_no,o.order_name,o.order_qty,f.factory_name,o.bus_type_id,b.internal_name
+		bus_type,o.order_type
+		from BMS_PLAN_BUS_DISPATCH_PLAN p
+		left join
+		BMS_PLAN_BUS_DISPATCH d on p.id=d.dispatch_plan_id
+		left join
+		BMS_ORDER o
+		on p.order_id=o.id
+		left join BMS_BASE_BUS_TYPE b on
+		o.bus_type_id= b.id
+		left join BMS_BASE_FACTORY f on p.factory_id=f.id
+		where 1=1
+		<if test="factoryId !=null and factoryId !=0">
+			and p.factory_id = #{factoryId}
+		</if>
+		<if test="busTypeId !=null and busTypeId !=0">
+			and o.bus_type_id = #{busTypeId}
+		</if>
+		<if test="order !=null and order !=''">
+			and (o.order_name like CONCAT('%',#{order},'%') or
+			o.order_no like CONCAT('%',#{order},'%'))
+		</if>
+		<if test="diapatchDateStart !=null and  diapatchDateStart !=''">
+			<![CDATA[and p.dispatch_date>=#{diapatchDateStart}]]>
+		</if>
+		<if test="diapatchDateEnd !=null and  diapatchDateEnd !=''">
+			<![CDATA[and p.dispatch_date <= #{diapatchDateEnd}]]>
+		</if>
+		<if test="status =='未完成'">
+			and p.status in ('0','1')
+		</if>
+		group by p.id
+		order by p.status,str_to_date(p.dispatch_date,'%Y-%m-%d') asc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getDispatchPlanCount" parameterType="Map"
+		resultType="int">
+		select count(id) from (
+		select p.id
+		from BMS_PLAN_BUS_DISPATCH_PLAN p
+		left join
+		BMS_PLAN_BUS_DISPATCH d on p.id=d.dispatch_plan_id
+		left join
+		BMS_ORDER o
+		on p.order_id=o.id
+		left join BMS_BASE_BUS_TYPE b on
+		o.bus_type_id= b.id
+		left join BMS_BASE_FACTORY f on p.factory_id=f.id
+		where 1=1
+		<if test="factoryId !=null and factoryId !=0">
+			and p.factory_id = #{factoryId}
+		</if>
+		<if test="busTypeId !=null and busTypeId !=0">
+			and o.bus_type_id = #{busTypeId}
+		</if>
+		<if test="order !=null and order !=''">
+			and (o.order_name like CONCAT('%',#{order},'%') or
+			o.order_no like CONCAT('%',#{order},'%'))
+		</if>
+		<if test="diapatchDateStart !=null and  diapatchDateStart !=''">
+			<![CDATA[and p.dispatch_date>=#{diapatchDateStart}]]>
+		</if>
+		<if test="diapatchDateEnd !=null and  diapatchDateEnd !=''">
+			<![CDATA[and p.dispatch_date <= #{diapatchDateEnd}]]>
+		</if>
+		<if test="status =='未完成'">
+			and p.status in ('0','1')
+		</if>
+		group by p.id) tmp
+	</select>
+	<select id="getOrderDispatchQty" parameterType="int" resultType="int">
+		select case when sum(p.plan_dispatch_qty) is null then 0 else
+		sum(p.plan_dispatch_qty) end as order_dispacthed_qty
+		from
+		BMS_PLAN_BUS_DISPATCH_PLAN p left join BMS_ORDER o on p.order_id=o.id
+		where p.order_id=#{orderId}
+	</select>
+	<insert id="insertDispatchPlan" parameterType="com.byd.bms.plan.entity.PlanDispatch">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_PLAN_BUS_DISPATCH_PLAN
+		(factory_id,order_id,plan_dispatch_qty,dispatch_date,customer_number_flag,status,email_addrs,creater_id,creatdate)
+		values(
+		#{factory_id},#{order_id},#{plan_dispatch_qty},#{dispatch_date},#{customer_number_flag},#{status},#{email_addrs},#{creater_id},#{creatdate}
+		)
+	</insert>
+	<update id="updateDispatchPlan" parameterType="com.byd.bms.plan.entity.PlanDispatch">
+		update BMS_PLAN_BUS_DISPATCH_PLAN
+		<set>
+			plan_dispatch_qty=#{plan_dispatch_qty},dispatch_date=#{dispatch_date},status=#{status},customer_number_flag=#{customer_number_flag},email_addrs=#{email_addrs}
+		</set>
+		where id=#{id}
+	</update>
+	<select id="getBusInfoByBusNo" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.PlanBus">
+		select * from BMS_PLAN_BUS where bus_number=#{busNo} and
+		order_id=#{orderId}
+	</select>
+	<select id="getBusToolList" resultType="Map">
+		select name,quantity,unit
+		from BMS_PLAN_BUS_TOOLS
+	</select>
+	<insert id="insertDispatchRecord" useGeneratedKeys="true"
+		parameterType="java.util.List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_PLAN_BUS_DISPATCH
+		(dispatch_plan_id,bus_number,dispatch_date,dispatcher_id,receiver,workcardid,department,batch_desc,flag_3c,3c_number,qtys)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.dispatch_plan_id},#{detail.bus_number},#{detail.dispatch_date},#{detail.dispatcher_id},#{detail.receiver},#{detail.workcardid},#{detail.department},#{detail.batch_desc},#{detail.flag_3c},#{detail.number_3c},#{detail.qtys})
+		</foreach>
+	</insert>
+	<update id="updateDispatchPlanStatus" parameterType="com.byd.bms.plan.entity.PlanDispatch">
+		update BMS_PLAN_BUS_DISPATCH_PLAN
+		<set>
+			status=#{status}
+		</set>
+		where id=#{id}
+	</update>
+	<select id="getOrderDispatchList" parameterType="Map"
+		resultType="com.byd.bms.plan.entity.OrderDispatchRecord">
+		select d.*,d.single_use_qty*o.order_qty order_total,u.display_name AS editor
+		from
+		BMS_PLAN_ORDER_TOOLS_DISPATCH d left join BMS_ORDER o on d.order_no =
+		o.order_no
+		LEFT JOIN BMS_BASE_USER u ON d.editor_id = u.id
+		where d.order_no=#{orderNo}
+		AND d.tool_name like CONCAT('%',#{dis_name},'%')
+		AND d.receiver like CONCAT('%',#{dis_receiver},'%')
+		<if test="dis_date_start!=''">
+			and d.edit_date >= CONCAT(#{dis_date_start},' 00:00:00')
+		</if>
+		<if test="dis_date_end!=''">
+			and d.edit_date &lt;= CONCAT(#{dis_date_end},' 23:59:59')
+		</if>
+		order by d.tool_name
+	</select>
+	<insert id="insertOrderDispatchRecord" useGeneratedKeys="true"
+		parameterType="java.util.List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_PLAN_ORDER_TOOLS_DISPATCH
+		(order_no,quantity,factory_id,receiver,workcardid,department,editor_id,edit_date,tool_name,unit,single_use_qty)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.order_no},#{detail.quantity},#{detail.factory_id},#{detail.receiver},#{detail.workcardid},#{detail.department},#{detail.editor_id},#{detail.edit_date},#{detail.tool_name},#{detail.unit},#{detail.single_use_qty})
+		</foreach>
+	</insert>
+	<select id="getBusDispatchTotalList" parameterType="Map"
+		resultType="Map">
+		select order_no,CONCAT(order_name,'',bus_type,'',order_qty,'辆')
+		order_desc,order_qty,sum(plan_done_qty)
+		order_done_qty,order_qty-sum(plan_dispatch_qty)
+		order_left,sum(plan_dispatch_qty) order_dispatch
+		from(
+		select p.*,sum(qtys)
+		plan_done_qty,o.order_no,o.order_name,o.order_qty,f.factory_name,o.bus_type_id,b.internal_name
+		bus_type
+		from BMS_PLAN_BUS_DISPATCH_PLAN p
+		left join
+		BMS_PLAN_BUS_DISPATCH d on p.id=d.dispatch_plan_id
+		left join
+		BMS_ORDER o
+		on p.order_id=o.id
+		left join BMS_BASE_BUS_TYPE b on
+		o.bus_type_id= b.id
+		left join BMS_BASE_FACTORY f on p.factory_id=f.id
+		group by p.id
+		) tmp
+		where 1=1
+		<if test="order !=null and order !=''">
+			and (tmp.order_no like CONCAT('%',#{order},'%') or
+			tmp.order_name like CONCAT('%',#{order},'%'))
+		</if>
+		<if test="dispatchStart !=null and dispatchStart !=''">
+		 <![CDATA[  
+		 	and tmp.dispatch_date>=#{dispatchStart}
+		 ]]>
+		</if>
+		<if test="dispatchEnd !=null and dispatchEnd !=''">
+		 <![CDATA[  
+		 	and tmp.dispatch_date<#{dispatchEnd}
+		 ]]>
+		</if>
+		group by tmp.order_no
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+
+	</select>
+	<select id="getBusDispatchTotalCount" parameterType="Map"
+		resultType="int">
+		select count(id) from (
+		select p.id
+		from BMS_PLAN_BUS_DISPATCH_PLAN p
+		left join BMS_ORDER o on p.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t
+		on o.bus_type_id=t.id
+		where 1=1
+		<if test="order !=null and order !=''">
+			and (o.order_no like CONCAT('%',#{order},'%') or
+			o.order_name like CONCAT('%',#{order},'%'))
+		</if>
+		<if test="dispatchStart !=null and dispatchStart !=''">
+		 <![CDATA[  
+		 	and p.dispatch_date>=#{dispatchStart}
+		 ]]>
+		</if>
+		<if test="dispatchEnd !=null and dispatchEnd !=''">
+		 <![CDATA[  
+		 	and p.dispatch_date<#{dispatchEnd}
+		 ]]>
+		</if>
+		group by p.order_id
+		) tmp
+	</select>
+	<select id="getBusDispatchDetailList" parameterType="Map"
+		resultType="Map">
+		select
+		d.bus_number,IFNULL(b.vin,'')
+		vin,IFNULL(CONCAT(b.left_motor_number,'/',b.right_motor_number),'')
+		motor_number,
+		case d.flag_3c when '0' then '无' else '有' end as
+		flag_3c,IFNULL(d.batch_desc,'')
+		batch_desc,IFNULL(b.customer_number,'') customer_number,
+		IFNULL(d.dispatch_date,'') dispatch_date,IFNULL(d.receiver,'')
+		receiver,<!-- IFNULL(u.username,'') -->
+		u.username dispatcher
+		from BMS_PLAN_BUS_DISPATCH d
+		left join
+		BMS_PLAN_BUS_DISPATCH_PLAN p on d.dispatch_plan_id=p.id
+		left join
+		BMS_PLAN_BUS b on d.bus_number = b.bus_number
+		left join BMS_BASE_USER u
+		on d.dispatcher_id=u.id
+		left join BMS_ORDER o on p.order_id=o.id
+		where
+		1=1
+		<if test="orderNo !=null and orderNo !=''">
+			and o.order_no=#{orderNo}
+		</if>
+		<if test="busNoVin !=null and busNoVin !=''">
+			and (d.bus_number like CONCAT('%',#{busNoVin},'%') or
+			b.vin like CONCAT('%',#{busNoVin},'%'))
+		</if>
+		<if test="dispatchStart !=null and dispatchStart !=''">
+		 <![CDATA[  
+		 	and d.dispatch_date>=#{dispatchStart}
+		 ]]>
+		</if>
+		<if test="dispatchEnd !=null and dispatchEnd !=''">
+		 <![CDATA[  
+		 	and d.dispatch_date<#{dispatchEnd}
+		 ]]>
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+
+	</select>
+	<select id="getBusDispatchDetailCount" parameterType="Map"
+		resultType="int">
+		select count(d.bus_number)
+		from BMS_PLAN_BUS_DISPATCH d
+		left join
+		BMS_PLAN_BUS_DISPATCH_PLAN p on d.dispatch_plan_id=p.id
+		left join
+		BMS_PLAN_BUS b on d.bus_number = b.bus_number
+		left join BMS_BASE_USER u
+		on d.dispatcher_id=u.id
+		left join BMS_ORDER o on p.order_id=o.id
+		where
+		1=1
+		<if test="orderNo !=null and orderNo !=''">
+			and o.order_no=#{orderNo}
+		</if>
+		<if test="busNoVin !=null and busNoVin !=''">
+			and (d.bus_number like CONCAT('%',#{busNoVin},'%') or
+			b.vin like CONCAT('%',#{busNoVin},'%'))
+		</if>
+		<if test="dispatchStart !=null and dispatchStart !=''">
+		 <![CDATA[  
+		 	and d.dispatch_date>=#{dispatchStart}
+		 ]]>
+		</if>
+		<if test="dispatchEnd !=null and dispatchEnd !=''">
+		 <![CDATA[  
+		 	and d.dispatch_date<#{dispatchEnd}
+		 ]]>
+		</if>
+	</select>
+	<update id="updateBusDispatchDate" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+                update BMS_PLAN_BUS 
+                <set>
+                  dispatch_date =#{item.dispatch_date}
+                </set>
+                where bus_number = #{item.bus_number}
+         </foreach>
+		
+	</update>
+	<!-- 发车模块 end -->
+	
+	<select id="getPlanSearchPlanQty" parameterType="Map" resultType="Map">
+		<!-- SELECT p.order_id,p.plan_code_id,SUM(p.plan_qty) AS sum_plan_qty ,'0' AS sum_real_qty, '0' AS rate,k.key_name_en,k.key_name
+		FROM BMS_PLAN_PRODUCTION_PLAN p LEFT OUTER JOIN BMS_BASE_KEY k ON p.plan_code_id = k.id
+		WHERE p.factory_id = #{factory_id} 
+		AND p.order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) AND p.plan_date = #{plan_date}
+		<if test="workshop !=''">
+			AND k.key_name LIKE CONCAT('%',#{workshop},'%')
+		</if>		
+		GROUP BY plan_code_id
+		ORDER BY plan_code_id  -->
+		SELECT k.key_name,p.order_id,k.id AS plan_code_id,IFNULL(p.plan_qty,0) AS sum_plan_qty ,'0' AS sum_real_qty, '0' AS rate,k.id,k.key_name_en FROM BMS_BASE_KEY k 
+		left JOIN BMS_PLAN_PRODUCTION_PLAN p ON k.id = p.plan_code_id and 
+		p.order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) AND p.plan_date = #{plan_date}	
+		WHERE k.key_code = 'PLAN_CODE' AND k.delete_flag = '0' AND k.key_name_en != ''		
+		<if test="workshop !=''">
+			AND k.key_name LIKE CONCAT('%',#{workshop},'%')
+		</if>
+		GROUP BY k.id
+		ORDER BY k.id 
+	</select>
+	<select id="getPlanSearchRealQty" parameterType="Map" resultType="int">
+		SELECT COUNT(b.id) AS real_qty FROM BMS_PLAN_BUS b WHERE b.factory_id = #{factory_id} 
+		AND b.order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no})
+		AND date_add(${workshop}, interval +410 MINUTE)  LIKE CONCAT('%',#{plan_date},'%')
+	</select>
+	<select id="getPlanSearchRealPartsQty" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(${parts}),'0') AS real_qty FROM BMS_PD_PARTS_PLAN_FINISH WHERE 
+		factory_id = #{factory_id} AND order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) 
+		AND date = #{plan_date}
+		AND parts_id = '194'
+	</select>
+	<select id="getPlanSearchRealZzjQty" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(quantity),'0') AS real_qty FROM BMS_PD_WORKSHOP_SUPPLY WHERE
+		factory_id = #{factory_id}
+		AND supply_workshop = '自制件'
+		AND receive_workshop = '部件'
+		<if test="order_no !=''">
+		AND order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) 
+		</if>
+		<if test="month !=''">
+		AND supply_date = #{plan_date}
+		</if>
+	</select>
+	<select id="getPlanZzjRealCount" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(quantity),'0') AS real_qty FROM BMS_PD_WORKSHOP_SUPPLY 
+		WHERE order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) AND factory_id = #{factory_id}
+		AND supply_workshop = '自制件'
+		AND receive_workshop ='部件'		
+		AND supply_date >= #{start_date} AND supply_date &lt;= #{end_date}
+	</select>
+	<select id="getPlanZzjAllRealCount" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(quantity),'0') AS real_qty FROM BMS_PD_WORKSHOP_SUPPLY 
+		WHERE order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) AND factory_id = #{factory_id}
+		AND supply_workshop ='自制件' 
+		AND receive_workshop ='部件'
+	</select>
+	<select id="getPlanSearchTotalMonthPlanQty" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(plan_qty),'0') AS total_month_plan_qty FROM BMS_PLAN_PRODUCTION_PLAN p WHERE 
+		p.factory_id = #{factory_id} AND 
+		p.order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) 
+		AND p.plan_code_id = #{plan_code_id} 
+		<if test="month !=''">
+			AND p.plan_date LIKE CONCAT('%',#{month},'%')
+		</if>
+	</select>
+	<select id="getPlanSearchTotalRealQty" parameterType="Map" resultType="int">
+		SELECT IFNULL(COUNT(b.id),'0') AS total_month_real_qty FROM BMS_PLAN_BUS b WHERE b.factory_id = #{factory_id}
+		AND b.order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) 
+		<if test="month !=''">
+			AND ${workshop} LIKE CONCAT('%',#{month},'%')
+		</if>
+		<if test="month ==''">
+			AND ${workshop} IS NOT NULL
+		</if>
+	</select>
+	<select id="getPlanSearchTotalRealPartsQty" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(${parts}),'0') AS real_qty FROM BMS_PD_PARTS_PLAN_FINISH WHERE 
+		factory_id = #{factory_id} AND order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) 
+		<if test="month !=''">
+			AND date LIKE CONCAT('%',#{month},'%') 
+		</if>
+		  AND  parts_id = '194' 
+	</select>
+	
+	<select id="getPlanSearchTotalRealZzjQty" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(quantity),'0') AS real_qty FROM BMS_PD_WORKSHOP_SUPPLY 
+		WHERE order_id = (SELECT id FROM BMS_ORDER WHERE order_no = #{order_no}) AND factory_id = #{factory_id}
+		AND supply_workshop = '自制件' 
+		AND receive_workshop = '部件'
+		<if test="month !=''">
+			AND supply_date LIKE CONCAT('%',#{month},'%') 
+		</if>
+	</select>
+	<select id="getPlanOrderList" parameterType="Map" resultType="Map">
+		SELECT DISTINCT o.order_no FROM BMS_PLAN_PRODUCTION_PLAN p
+		LEFT OUTER JOIN BMS_ORDER o ON p.order_id = o.id
+		WHERE p.factory_id = #{factory_id} AND p.plan_date >= #{start_date} AND p.plan_date &lt;= #{end_date}
+	</select>
+</mapper>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.selfcost.dao.ISelfcostDao">
+	<select id="getCostDeptList" parameterType="Map" resultType="Map">
+		SELECT id,key_name,value FROM BMS_BASE_KEY WHERE 
+		key_code = 'COST_DEPARTMENT' AND delete_flag = '0'
+	</select>
+	
+	<insert id="insertSchedule" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.selfcost.entity.BmsCostSchedule">
+		<![CDATA[
+		insert into BMS_COST_SCHEDULE(
+		factory_id,cost_month,cost_detail_file,creator_id,create_date)
+		VALUES(#{factory_id},#{cost_month},#{cost_detail_file},#{creator_id},#{create_date})
+		]]>
+	</insert>
+	<update id="deleteSchedule" parameterType="map">
+		<![CDATA[
+			delete from BMS_COST_SCHEDULE where factory_id=#{factory_id} AND cost_month=#{cost_month}
+		]]>
+	</update>
+	<update id="deleteScheduleById" parameterType="int">
+		<![CDATA[
+			delete from BMS_COST_SCHEDULE where id=#{schedule_id}
+		]]>
+	</update>
+	<select id="querySchedule" parameterType="Map" resultType="com.byd.bms.selfcost.entity.BmsCostSchedule">
+		SELECT f.factory_name,s.* FROM BMS_COST_SCHEDULE s 
+		LEFT OUTER JOIN BMS_BASE_FACTORY f ON s.factory_id = f.id
+		WHERE s.factory_id=#{factory_id}
+		ORDER BY s.cost_month DESC 
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	
+	<select id="queryScheduleCount" parameterType="Map" resultType="int">
+		SELECT count(s.id) FROM BMS_COST_SCHEDULE s 
+		LEFT OUTER JOIN BMS_BASE_FACTORY f ON s.factory_id = f.id
+		WHERE s.factory_id=#{factory_id}
+	</select>
+	
+	<insert id="insertClassification" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.selfcost.entity.BmsCostClassification">
+		<![CDATA[
+		insert into BMS_COST_CLASSIFICATION(
+		factory_id,cost_department_id,cost_month,machine_cost,tooling_cost,other_materials_cost,other_cost,
+		fuel_power_cost,labor_cost,total_cost,creator_id,create_date)
+		VALUES((SELECT id FROM BMS_BASE_FACTORY WHERE factory_name = #{factory_name}),
+		(SELECT id FROM BMS_BASE_KEY WHERE key_code = 'COST_DEPARTMENT' AND key_name = #{cost_department_name}),
+		#{cost_month},#{machine_cost},#{tooling_cost},#{other_materials_cost},
+		#{other_cost},#{fuel_power_cost},#{labor_cost},#{total_cost},#{creator_id},#{create_date})
+		]]>
+	</insert>
+	<update id="deleteClassification" parameterType="map">
+		<![CDATA[
+			delete from BMS_COST_CLASSIFICATION where factory_id = 
+			(SELECT id FROM BMS_BASE_FACTORY WHERE factory_name = #{factory_name})
+			AND cost_month = #{cost_month}
+		]]>
+	</update>
+	<select id="queryClassification" parameterType="Map" resultType="com.byd.bms.selfcost.entity.BmsCostClassification">
+		SELECT f.factory_name,k.key_name AS 'cost_department_name',s.* FROM BMS_COST_CLASSIFICATION s 
+		LEFT OUTER JOIN BMS_BASE_FACTORY f ON s.factory_id = f.id 
+		LEFT OUTER JOIN BMS_BASE_KEY k ON s.cost_department_id = k.id 
+		WHERE s.factory_id=#{factory_id} AND s.cost_month=#{cost_month}
+	</select>
+	
+	<insert id="insertSingleBusManufacturing" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.selfcost.entity.BmsCostSinglebusManufacturing">
+		<![CDATA[
+		insert into BMS_COST_SINGLEBUS_MANUFACTURING(
+		factory_id,cost_department_id,cost_month,real_offline_qty,assess_offline_qty,machine_cost,tooling_cost,
+		other_materials_cost,other_cost,fuel_power_cost,labor_cost,total_cost,eliminate_abnormal_total,creator_id,create_date)
+		VALUES((SELECT id FROM BMS_BASE_FACTORY WHERE factory_name = #{factory_name}),
+		(SELECT id FROM BMS_BASE_KEY WHERE key_code = 'COST_DEPARTMENT' AND key_name = #{cost_department_name}),
+		#{cost_month},#{real_offline_qty},#{assess_offline_qty},#{machine_cost},
+		#{tooling_cost},#{other_materials_cost},#{other_cost},#{fuel_power_cost},#{labor_cost},#{total_cost},#{eliminate_abnormal_total},
+		#{creator_id},#{create_date})
+		]]>
+	</insert> 
+	<update id="deleteSingleBusManufacturing" parameterType="map">
+		<![CDATA[
+			delete from BMS_COST_SINGLEBUS_MANUFACTURING where factory_id = 
+			(SELECT id FROM BMS_BASE_FACTORY WHERE factory_name = #{factory_name})
+			AND cost_month = #{cost_month}
+		]]>
+	</update>
+	<select id="querySingleBusManufacturing" parameterType="Map" resultType="com.byd.bms.selfcost.entity.BmsCostSinglebusManufacturing">
+		SELECT f.factory_name,k.key_name AS 'cost_department_name',s.* FROM BMS_COST_SINGLEBUS_MANUFACTURING s 
+		LEFT OUTER JOIN BMS_BASE_FACTORY f ON s.factory_id = f.id 
+		LEFT OUTER JOIN BMS_BASE_KEY k ON s.cost_department_id = k.id 
+		WHERE s.factory_id=#{factory_id} AND s.cost_month=#{cost_month}
+	</select>
+	
+	
+	<select id="getFactory_id" parameterType="String" resultType="int">
+		select id from BMS_BASE_FACTORY where factory_name = #{factory_name}
+	</select>
+	
+</mapper>

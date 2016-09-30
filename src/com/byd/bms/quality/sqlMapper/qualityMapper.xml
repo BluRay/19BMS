@@ -1,0 +1,2033 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.quality.dao.IQualityDao">
+	<resultMap type="testTplHeader" id="testTplHeaderMap">
+		<id property="id" column="id" />
+		<result property="busType" column="busType" />
+		<result property="order" column="orderName" />
+		<result property="config" column="config" />
+		<result property="partsId" column="partsId" />
+		<result property="parts" column="parts" />
+		<result property="version" column="version" />
+		<result property="isDraft" column="isDraft" />
+		<result property="memo" column="memo" />
+		<result property="editor" column="editor" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<resultMap type="testTplDetail" id="testTplDetailMap">
+		<id property="id" column="id" />
+		<result property="tplRecordId" column="template_recode_id" />
+		<result property="processNo" column="process_no" />
+		<result property="processName" column="process_name" />
+		<result property="testItemNo" column="test_item_no" />
+		<result property="testItemName" column="test_item" />
+		<result property="testStdNo" column="test_standard_no" />
+		<result property="testStdName" column="test_standard" />
+		<result property="frequency" column="frequency" />
+		<result property="testTools" column="test_tools" />
+		<result property="frequencyId" column="frequency_id" />
+		<result property="testToolsId" column="test_tools_id" />
+	</resultMap>
+	<resultMap type="testFlowTplHeader" id="testFlowTplHeaderMap">
+		<id property="id" column="id" />
+		<result property="busType" column="bus_type" />
+		<result property="busTypeId" column="bus_type_id" />
+		<result property="order" column="order_name" />
+		<result property="orderId" column="order_Id" />
+		<result property="config" column="config" />
+		<result property="configId" column="order_cofig_id" />
+		<result property="workshopId" column="workshop_id" />
+		<result property="workshop" column="workshop" />
+		<result property="version" column="version" />
+		<result property="isDraft" column="isDraft" />
+		<result property="memo" column="memo" />
+		<result property="editor" column="editor" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<resultMap type="testFlowTplDetail" id="testFlowTplDetailMap">
+		<id property="id" column="id" />
+		<result property="tplRecordId" column="template_recode_id" />
+		<result property="processNo" column="process_no" />
+		<result property="processName" column="process_name" />
+		<result property="testItemNo" column="test_item_no" />
+		<result property="testItemName" column="test_item" />
+		<result property="testStdNo" column="test_standard_no" />
+		<result property="testStdName" column="test_standard" />
+		<result property="frequency" column="frequency" />
+		<result property="testTools" column="test_tools" />
+		<result property="frequencyId" column="frequency_id" />
+		<result property="qualityPointFlag" column="quality_point_flag" />
+		<result property="qualityNode" column="quality_node" />
+	</resultMap>
+	<resultMap type="trackTplHeader" id="trackTplHeaderMap">
+		<id property="id" column="id" />
+		<result property="busType" column="bus_type" />
+		<result property="order" column="order_name" />
+		<result property="config" column="config" />
+		<result property="version" column="version" />
+		<result property="memo" column="memo" />
+		<result property="editor" column="editor" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<resultMap type="trackTplDetail" id="trackTplDetailMap">
+		<id property="id" column="id" />
+		<result property="tplRecordId" column="template_recode_id" />
+		<result property="workshopId" column="workshop_id" />
+		<result property="workshop" column="workshop" />
+		<result property="sequence" column="sequence" />
+		<result property="partsId" column="parts_id" />
+		<result property="parts" column="parts" />
+		<result property="memo" column="memo" />
+		<result property="processNo" column="process_number" />
+		<result property="processName" column="process_name" />
+	</resultMap>
+	<resultMap type="orderConfigTplHeader" id="ocTplHeaderMap">
+		<id property="id" column="id" />
+		<result property="busType" column="bus_type" />
+		<result property="order" column="order_name" />
+		<result property="config" column="config" />
+		<result property="version" column="version" />
+		<result property="memo" column="memo" />
+		<result property="editor" column="editor" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<resultMap type="orderConfigTplDetail" id="ocTplDetailMap">
+		<id property="id" column="id" />
+		<result property="tplRecordId" column="template_recode_id" />
+		<result property="workshopId" column="workshop_id" />
+		<result property="workshop" column="workshop" />
+		<result property="sequence" column="sequence" />
+		<result property="partsId" column="parts_id" />
+		<result property="parts" column="parts" />
+		<result property="partsNo" column="parts_number" />
+		<result property="vendor" column="vendor" />
+		<result property="memo" column="memo" />
+	</resultMap>
+	<resultMap type="stdRecord" id="stdRecordMap">
+		<id property="id" column="id" />
+		<result property="recordNo" column="record_num" />
+		<result property="usynopsis" column="usynopsis" />
+		<result property="ureason" column="ureason" />
+		<result property="standardfile" column="standardfile" />
+		<result property="uchapter" column="uchapter" />
+		<result property="uscope" column="uscope" />
+		<result property="bdescription" column="bdescription" />
+		<result property="bfilePath" column="bfile_path" />
+		<result property="adescription" column="adescription" />
+		<result property="afilePath" column="afile_path" />
+		<result property="memo" column="memo" />
+		<result property="editorId" column="creator_id" />
+		<result property="editDate" column="creat_date" />
+		<result property="editor" column="editor" />
+		<result property="mailAddrs" column="email_addrs" />
+	</resultMap>
+	<resultMap type="qualityTarget" id="qualityTargetMap">
+		<id property="id" column="id" />
+		<result property="factoryId" column="factory_id" />
+		<result property="factory" column="factory_name" />
+		<result property="workshopId" column="workshop_id" />
+		<result property="workshop" column="workshop_name" />
+		<result property="targetTypeId" column="target_type_id" />
+		<result property="targetType" column="target_type" />
+		<result property="targetVal" column="target_value" />
+		<result property="effecDateStart" column="estart_date" />
+		<result property="effecDateEnd" column="eend_date" />
+		<result property="editorId" column="editor_id" />
+		<result property="editor" column="username" />
+		<result property="editDate" column="edit_date" />
+		<result property="status" column="status" />
+	</resultMap>
+	<resultMap type="stdFaultLib" id="faultLibMap">
+		<id property="id" column="id" />
+		<result property="partsId" column="parts_id" />
+		<result property="parts" column="parts" />
+		<result property="bugType" column="bug_type" />
+		<result property="bug" column="bug" />
+		<result property="faultLevel" column="serious_level" />
+		<result property="faultType" column="fault_type" />
+		<result property="workshop" column="workshop_name" />
+		<result property="workgroup" column="workgroup_name" />
+		<result property="editorId" column="editor_id" />
+		<result property="editor" column="username" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<resultMap type="materialAbnormal" id="materialAbnormalMap">
+		<id property="id" column="id" />
+		<result property="factory" column="factory" />
+		<result property="workshop" column="workshop" />
+		<result property="occurDate" column="occur_date" />
+		<result property="busType" column="bus_type" />
+		<result property="order" column="order" />
+		<result property="orderNo" column="order_no" />
+		<result property="orderId" column="order_id" />
+		<result property="material" column="material" />
+		<result property="bugLevel" column="bug_level" />
+		<result property="bugDesc" column="description" />
+		<result property="bugPhotoPath" column="bphoto" />
+		<result property="imPhotoPath" column="fphoto" />
+		<result property="tmpMeasure" column="tmp_measures" />
+		<result property="faultReason" column="fault_reason" />
+		<result property="impMeasure" column="imp_measure" />
+		<result property="respUnit" column="resp_unit" />
+		<result property="respPerson" column="resp_person" />
+		<result property="expcFinishDate" column="expc_finish_date" />
+		<result property="verifier" column="verifier" />
+		<result property="verifyResult" column="verify_result" />
+		<result property="memo" column="memo" />
+		<result property="editorId" column="creater_id" />
+		<result property="editor" column="username" />
+		<result property="editDate" column="creat_date" />
+	</resultMap>
+	<resultMap type="testRecordHeader" id="testRecordHeaderMap">
+		<id property="id" column="id" />
+		<result property="factoryId" column="factory_id" />
+		<result property="factory" column="factory_name" />
+		<result property="partsId" column="parts_id" />
+		<result property="parts" column="parts_name" />
+		<result property="partsChartNo" column="parts_chart_num" />
+		<result property="version" column="version_num" />
+		<result property="partsNo" column="parts_num" />
+		<result property="prodDate" column="product_date" />
+		<result property="tester" column="tester" />
+		<result property="testResult" column="test_result" />
+		<result property="busTypeId" column="bus_type_id" />
+		<result property="busType" column="bus_type" />
+		<result property="orderId" column="order_id" />
+		<result property="order" column="order_name" />
+		<result property="orderNo" column="order_no" />
+		<result property="orderConfigId" column="order_config_id" />
+		<result property="orderConfig" column="order_config_name" />
+		<result property="editorId" column="editor_id" />
+		<result property="editor" column="username" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<resultMap type="testRecordDetail" id="testRecordDetailMap">
+		<id property="id" column="id" />
+		<result property="headerId" column="test_record_id" />
+		<result property="tplDetailId" column="template_recode_detail_id" />
+		<result property="result" column="test_result_name" />
+		<result property="faultIds" column="test_result" />
+		<result property="seriousLevel" column="serious_level" />
+		<result property="resultJudge" column="result_judge" />
+		<result property="reworkResult" column="rework_result" />
+		<result property="workshopId" column="workshop_id" />
+		<result property="workshop" column="workshop_name" />
+		<result property="workgroupId" column="workgroup_id" />
+		<result property="workgroup" column="workgroup" />
+		<result property="memo" column="memo" />
+		<result property="process" column="process_name" />
+		<result property="processNo" column="process_no" />
+		<result property="testItemNo" column="test_item_no" />
+		<result property="testItem" column="test_item" />
+		<result property="standard" column="test_standard" />
+		<result property="frequency" column="frequency" />
+		<result property="testTools" column="test_tools" />
+	</resultMap>
+	<resultMap type="prodTrackDetail" id="prodTrackDetailMap">
+		<id property="id" column="id" />
+		<result property="busNo" column="bus_number" />
+		<result property="factoryId" column="factory_id" />
+		<result property="factory" column="factory_name" />
+		<result property="workshopId" column="workshop_id" />
+		<result property="workshop" column="workshop_name" />
+		<result property="order" column="order_name" />
+		<result property="orderConfig" column="config" />
+		<result property="busType" column="bus_type" />
+		<result property="processNo" column="process_number" />
+		<result property="processName" column="process_name" />
+		<result property="partsId" column="parts_id" />
+		<result property="parts" column="parts_name" />
+		<result property="partsNo" column="parts_num" />
+		<result property="batch" column="batch" />
+		<result property="editorId" column="editor_id" />
+		<result property="editor" column="username" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<resultMap type="prodTrackHeader" id="prodTrackHeaderMap">
+		<result property="factoryId" column="factory_id" />
+		<result property="factory" column="factory_name" />
+		<result property="orderId" column="order_id" />
+		<result property="order" column="order_name" />
+		<result property="busNo" column="bus_number" />
+		<result property="busType" column="bus_type" />
+		<result property="orderConfig" column="config" />
+		<result property="editorId" column="editor_id" />
+		<result property="editor" column="username" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<resultMap type="ocDetail" id="ocDetailMap">
+		<id property="id" column="id" />
+		<result property="busNo" column="bus_number" />
+		<result property="factoryId" column="factory_id" />
+		<result property="factory" column="factory_name" />
+		<result property="workshopId" column="workshop_id" />
+		<result property="workshop" column="workshop_name" />
+		<result property="order" column="order_name" />
+		<result property="orderConfig" column="config" />
+		<result property="busType" column="bus_type" />
+		<result property="partsId" column="parts_id" />
+		<result property="parts" column="parts_name" />
+		<result property="partsNo" column="parts_number" />
+		<result property="vendor" column="vendor" />
+		<result property="matchResult" column="match_result" />
+		<result property="memo" column="memo" />
+		<result property="editorId" column="editor_id" />
+		<result property="editor" column="username" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<resultMap type="ocHeader" id="ocHeaderMap">
+		<result property="factoryId" column="factory_id" />
+		<result property="factory" column="factory_name" />
+		<result property="orderId" column="order_id" />
+		<result property="order" column="order_name" />
+		<result property="busNo" column="bus_number" />
+		<result property="busType" column="bus_type" />
+		<result property="orderConfig" column="config" />
+		<result property="editor_id" column="editor_id" />
+		<result property="editor" column="username" />
+		<result property="edit_date" column="edit_date" />
+	</resultMap>
+	<!-- 检验记录模板 start -->
+	<select id="getTestTplHeader" parameterType="int" resultMap="testTplHeaderMap">
+		select t.id,b.internal_name busType,o.order_name
+		orderName,c.order_config_name config,p.id partsId,p.parts_name
+		parts,t.version,t.isDraft,t.memo,u.username editor,t.creat_date editDate
+		from
+		BMS_QM_TEST_RECORD_TEMPLATE_HEADER t left join BMS_BASE_PARTS p on
+		t.parts_id=p.id
+		left join BMS_ORDER o on t.order_id=o.id
+		left join
+		BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join
+		BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
+		left join BMS_BASE_USER u on
+		t.creator_id=u.id where t.id=#{tplHeaderId}
+	</select>
+	<select id="getTestTplHeaderList" parameterType="Map"
+		resultMap="testTplHeaderMap">
+		select t.id,b.internal_name busType,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		orderName,c.order_config_name config,p.id partsId,p.parts_name
+		parts,t.version,t.isDraft,t.memo,u.username editor,t.creat_date editDate
+		from
+		BMS_QM_TEST_RECORD_TEMPLATE_HEADER t left join BMS_BASE_PARTS p on
+		t.parts_id=p.id
+		left join BMS_ORDER o on t.order_id=o.id
+		left join
+		BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join
+		BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
+		left join BMS_BASE_USER u on
+		t.creator_id=u.id
+		where 1=1
+		<if test="busType!=null and  busType!=''">
+			and t.bus_type_id=#{busType}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="config!=null and  config!=''">
+			and t.order_config_id=#{config}
+		</if>
+		<if test="parts!=null and parts!=''">
+			and p.parts_name=#{parts}
+		</if>
+		order by t.version desc,t.order_config_id desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+
+	</select>
+	<select id="getTestTplHeaderListMatch" parameterType="Map"
+		resultMap="testTplHeaderMap">
+	select * from (
+		(select t.id,b.internal_name busType,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		orderName,o.order_no orderNo,t.order_config_id configId,
+		c.order_config_name config,p.id partsId,p.parts_name
+		parts,t.version,t.isDraft,t.memo,u.username editor,t.creat_date editDate, 1 detail_index
+		from
+		BMS_QM_TEST_RECORD_TEMPLATE_HEADER t left join BMS_BASE_PARTS p on
+		t.parts_id=p.id
+		left join BMS_ORDER o on t.order_id=o.id
+		left join
+		BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join
+		BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
+		left join BMS_BASE_USER u on
+		t.creator_id=u.id
+		where o.order_no=#{orderNo} and t.order_config_id =#{config} 
+		and t.bus_type_id=#{busType} and p.parts_name=#{parts} and t.isDraft='1'
+		)
+		union
+		(
+		select t.id,b.internal_name busType,CONCAT(o.order_no,' ',o.order_name,b.internal_name,o.order_qty)
+		orderName,o.order_no orderNo,t.order_config_id configId,
+		c.order_config_name config,p.id partsId,p.parts_name
+		parts,t.version,t.isDraft,t.memo,u.username editor,t.creat_date editDate,2 detail_index
+		from
+		BMS_QM_TEST_RECORD_TEMPLATE_HEADER t left join BMS_BASE_PARTS p on
+		t.parts_id=p.id
+		left join BMS_ORDER o on t.order_id=o.id
+		left join
+		BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join
+		BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
+		left join BMS_BASE_USER u on
+		t.creator_id=u.id
+		where t.bus_type_id=#{busType} and p.parts_name=#{parts} and t.isDraft='1'
+		)
+	)detail order by detail.detail_index asc, detail.editDate desc
+	</select>
+	<select id="getTestTplHeaderTotalCount" parameterType="Map"
+		resultType="int">
+		select count(t.id)
+		from BMS_QM_TEST_RECORD_TEMPLATE_HEADER t left join
+		BMS_BASE_PARTS p on
+		t.parts_id=p.id
+		left join BMS_ORDER o on
+		t.order_id=o.id
+		left join BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
+		left join
+		BMS_BASE_USER u on t.creator_id=u.id
+		where 1=1
+		<if test="busType!=null and  busType!=''">
+			and t.bus_type_id=#{busType}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="config!=null and  config!=''">
+			and t.order_config_id=#{config}
+		</if>
+		<if test="parts!=null and parts!=''">
+			and p.parts_name=#{parts}
+		</if>
+	</select>
+	<select id="getTestTplDetailList" parameterType="int"
+		resultMap="testTplDetailMap">
+		select
+		t.id,t.template_recode_id,t.process_no,t.process_name,t.test_item_no,t.test_item,t.test_standard_no,t.test_standard,t.frequency
+		frequency_id,k1.key_name frequency,t.test_tools test_tools
+		from
+		BMS_QM_TEST_RECORD_TEMPLATE_DETAILS t left join BMS_BASE_KEY k1 on
+		t.frequency=k1.id
+		where
+		t.template_recode_id=#{tplHeaderId} order by
+		t.process_no+0,t.test_item_no
+	</select>
+	<insert id="insertTestTplDetail" useGeneratedKeys="true"
+		parameterType="java.util.List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_TEST_RECORD_TEMPLATE_DETAILS
+		(template_recode_id,process_no,process_name,test_item_no,test_item,test_standard_no,test_standard,frequency,test_tools)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.tplRecordId},#{detail.processNo},#{detail.processName},#{detail.testItemNo},#{detail.testItemName},#{detail.testStdNo},#{detail.testStdName},#{detail.frequencyId},#{detail.testTools})
+		</foreach>
+	</insert>
+	<update id="deleteTestTplDetail" parameterType="java.util.List">
+		delete from BMS_QM_TEST_RECORD_TEMPLATE_DETAILS where id in
+		<foreach item="detail" collection="list" open="(" separator="," close=")">
+			#{detail.id}
+		</foreach>
+	</update>
+	<insert id="insertTestTplHeader" useGeneratedKeys="true"
+		parameterType="testTplHeader">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_TEST_RECORD_TEMPLATE_HEADER
+		(bus_type_id,order_id,order_config_id,parts_id,version,isDraft,memo,creator_id,creat_date)
+		values
+		(#{busTypeId},#{orderId},#{configId},#{partsId},#{version},#{isDraft},#{memo},#{editorId},#{editDate})
+	</insert>
+	<update id="updateTestTplHeader" parameterType="testTplHeader">
+		update BMS_QM_TEST_RECORD_TEMPLATE_HEADER set isDraft=#{isDraft} where id=#{id}
+	</update>
+	<update id="updateTestTplDetail" parameterType="java.util.List">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_QM_TEST_RECORD_TEMPLATE_DETAILS
+			<set>
+				template_recode_id=#{detail.tplRecordId},process_no=#{detail.processNo},process_name=#{detail.processName},test_item_no=#{detail.testItemNo},
+				test_item=#{detail.testItemName},test_standard_no=#{detail.testStdNo},test_standard=#{detail.testStdName},frequency=#{detail.frequencyId},test_tools=#{detail.testTools}
+			</set>
+			where id=#{detail.id}
+		</foreach>
+	</update>
+	<!-- 检验记录模板 end -->
+	<!-- 检验流程卡模板 start -->
+	<select id="getTestFlowTplHeader" parameterType="int"
+		resultMap="testFlowTplHeaderMap">
+		select t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		order_name,c.order_config_name config,k.id workshop_id,
+		k.key_name
+		workshop, t.version,t.isDraft,t.memo,u.username editor,t.creat_date editDate
+		from BMS_QM_TEST_CARD_TEMPLATE_HEADER t left join BMS_BASE_KEY k on
+		t.workshop=k.id
+		left join BMS_ORDER o on t.order_id=o.id
+		left join
+		BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join
+		BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
+		left join BMS_BASE_USER u on
+		t.creator_id=u.id
+		where t.id=#{tplHeaderId}
+	</select>
+	<select id="getTestFlowTplHeaderList" parameterType="Map"
+		resultMap="testFlowTplHeaderMap">
+		select t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		order_name,c.order_config_name config,k.id workshop_id,
+		k.key_name
+		workshop, t.version,t.isDraft,t.memo,u.username editor,t.creat_date editDate
+		from BMS_QM_TEST_CARD_TEMPLATE_HEADER t left join BMS_BASE_KEY k on
+		t.workshop=k.id
+		left join BMS_ORDER o on t.order_id=o.id
+		left join
+		BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join
+		BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
+		left join BMS_BASE_USER u on
+		t.creator_id=u.id
+		where 1=1
+		<if test="busType!=null and  busType!=''">
+			and t.bus_type_id=#{busType}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="config!=null and  config!=''">
+			and t.order_config_id=#{config}
+		</if>
+		<if test="workshopId!=null and workshopId!=0">
+			and k.id=#{workshopId}
+		</if>
+		order by t.version desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getTestFlowTplHeaderTotalCount" parameterType="Map"
+		resultType="int">
+		select count(t.id)
+		from BMS_QM_TEST_CARD_TEMPLATE_HEADER t left join
+		BMS_BASE_KEY k on t.workshop=k.id
+		left join BMS_ORDER o on
+		t.order_id=o.id
+		left join BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
+		left join
+		BMS_BASE_USER u on t.creator_id=u.id
+		where 1=1
+		<if test="busType!=null and  busType!=''">
+			and t.bus_type_id=#{busType}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="config!=null and  config!=''">
+			and t.order_config_id=#{config}
+		</if>
+		<if test="workshopId!=null and workshopId!=0">
+			and k.id=#{workshopId}
+		</if>
+	</select>
+	<select id="getTestFlowTplDetailList" parameterType="int"
+		resultMap="testFlowTplDetailMap">
+		select t.id,t.test_card_template_id
+		template_recode_id,t.quality_node,t.process_no,t.process_name,
+		t.test_item_no,t.test_item,t.quality_point_flag,t.test_standard_no,t.test_standard,t.frequency
+		frequency_id,
+		k1.key_name frequency,t.test_tools test_tools
+		from
+		BMS_QM_TEST_CARD_TEMPLATE_DETAILS t left join BMS_BASE_KEY k1 on
+		t.frequency=k1.id
+		where
+		t.test_card_template_id=#{tplHeaderId}
+		order by
+		t.quality_node,t.process_no+0,t.test_item_no,t.quality_point_flag
+	</select>
+	<insert id="insertTestFlowTplDetail" useGeneratedKeys="true"
+		parameterType="java.util.List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_TEST_CARD_TEMPLATE_DETAILS
+		(test_card_template_id,quality_node,process_no,process_name,test_item_no,test_item,test_standard_no,test_standard,quality_point_flag,frequency,test_tools)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.tplRecordId},#{detail.qualityNode},#{detail.processNo},#{detail.processName},#{detail.testItemNo},#{detail.testItemName},#{detail.testStdNo},#{detail.testStdName},#{detail.qualityPointFlag},#{detail.frequencyId},#{detail.testTools})
+		</foreach>
+	</insert>
+	<update id="deleteTestFlowTplDetail" parameterType="java.util.List">
+		delete from BMS_QM_TEST_CARD_TEMPLATE_DETAILS where id in
+		<foreach item="detail" collection="list" open="(" separator="," close=")">
+			#{detail.id}
+		</foreach>
+	</update>
+	<insert id="insertTestFlowTplHeader" useGeneratedKeys="true"
+		parameterType="testFlowTplHeader">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_TEST_CARD_TEMPLATE_HEADER
+		(bus_type_id,order_id,order_config_id,workshop,version,isDraft,memo,creator_id,creat_date)
+		values
+		(#{busTypeId},#{orderId},#{configId},#{workshopId},#{version},#{isDraft},#{memo},#{editorId},#{editDate})
+	</insert>
+	<update id="updateTestFlowTplHeader" parameterType="testTplHeader">
+		update BMS_QM_TEST_CARD_TEMPLATE_HEADER set isDraft=#{isDraft} where id=#{id}
+	</update>
+	<update id="updateTestFlowTplDetail" parameterType="java.util.List">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_QM_TEST_CARD_TEMPLATE_DETAILS
+			<set>
+				test_card_template_id=#{detail.tplRecordId},quality_node=#{detail.qualityNode},process_no=#{detail.processNo},process_name=#{detail.processName},
+				test_item_no=#{detail.testItemNo},test_item=#{detail.testItemName},test_standard_no=#{detail.testStdNo},test_standard=#{detail.testStdName},
+				quality_point_flag=#{detail.qualityPointFlag},frequency=#{detail.frequencyId},test_tools=#{detail.testTools}
+			</set>
+			where id=#{detail.id}
+		</foreach>
+	</update>
+	<!-- 检验流程卡模板 end -->
+	<!-- 产品追踪卡模板 start -->
+	<select id="getTrackTplHeader" parameterType="int" resultMap="trackTplHeaderMap">
+		select t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		order_name,c.order_config_name config,t.version,t.memo,u.username
+		editor,t.creat_date edit_date
+		from
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER t
+		left join BMS_ORDER o on
+		t.order_id=o.id
+		left join BMS_ORDER_CONFIG c on
+		t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on
+		t.bus_type_id=b.id
+		left join
+		BMS_BASE_USER u on t.creator_id=u.id
+		where t.id=#{tplHeaderId}
+	</select>
+	<select id="getTrackTplHeaderList" parameterType="Map"
+		resultMap="trackTplHeaderMap">
+		select t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		order_name,c.order_config_name config,t.version,t.memo,u.username
+		editor,t.creat_date edit_date
+		from
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER t
+		left join BMS_ORDER o on
+		t.order_id=o.id
+		left join BMS_ORDER_CONFIG c on
+		t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on
+		t.bus_type_id=b.id
+		left join
+		BMS_BASE_USER u on t.creator_id=u.id
+		where
+		1=1
+		<if test="busType!=null and  busType!=''">
+			and t.bus_type_id=#{busType}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="config!=null and  config!=''">
+			and t.order_config_id=#{config}
+		</if>
+		order by t.version desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getTrackTplHeaderTotalCount" parameterType="Map"
+		resultType="int">
+		select count(t.id)
+		from
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER t
+		left join BMS_ORDER o on t.order_id=o.id
+		left join BMS_ORDER_CONFIG c
+		on t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on
+		t.bus_type_id=b.id
+		left join BMS_BASE_USER u on t.creator_id=u.id
+		where
+		1=1
+		<if test="busType!=null and  busType!=''">
+			and t.bus_type_id=#{busType}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="config!=null and  config!=''">
+			and t.order_config_id=#{config}
+		</if>
+	</select>
+	<select id="getTrackTplDetailList" parameterType="int"
+		resultMap="trackTplDetailMap">
+		select t.id,t.template_tracking_card_id
+		template_recode_id,t.workshop
+		workshop_id,t.process_number,t.process_name,
+		k.key_name
+		workshop,t.sequence,t.parts_id,p.parts_name parts,t.memo
+		from
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS t left join
+		BMS_BASE_PARTS p on t.parts_id=p.id
+		left join BMS_BASE_KEY k ON
+		t.workshop=k.id
+		where t.template_tracking_card_id=#{tplHeaderId}
+		order
+		by t.workshop,t.sequence
+	</select>
+	<update id="updateTrackTplDetail" parameterType="java.util.List">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS
+			<set>
+				template_tracking_card_id=#{detail.tplRecordId},workshop=#{detail.workshopId},sequence=#{detail.sequence},parts_id=#{detail.partsId},
+				process_number=#{detail.processNo},process_name=#{detail.processName}
+			</set>
+			where id=#{detail.id}
+		</foreach>
+	</update>
+	<insert id="insertTrackTplHeader" useGeneratedKeys="true"
+		parameterType="trackTplHeader">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER
+		(bus_type_id,order_id,order_config_id,version,memo,creator_id,creat_date)
+		values
+		(#{busTypeId},#{orderId},#{configId},#{version},#{memo},#{editorId},#{editDate})
+	</insert>
+	<insert id="insertTrackTplDetail" useGeneratedKeys="true"
+		parameterType="java.util.List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS
+		(template_tracking_card_id,workshop,process_number,process_name,sequence,parts_id,memo)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.tplRecordId},#{detail.workshopId},#{detail.processNo},#{detail.processName},#{detail.sequence},#{detail.partsId},#{detail.memo})
+		</foreach>
+	</insert>
+	<!-- 产品追踪卡模板 end -->
+	<!-- 订单配置与一致性记录表模板 start -->
+	<select id="getOrderConfigTplHeader" parameterType="int"
+		resultMap="ocTplHeaderMap">
+		select t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		order_name,c.order_config_name config,t.version,t.memo,u.username
+		editor,t.creat_date edit_date
+		from
+		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER t
+		left join BMS_ORDER o
+		on
+		t.order_id=o.id
+		left join BMS_ORDER_CONFIG c on
+		t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on
+		t.bus_type_id=b.id
+		left join
+		BMS_BASE_USER u on t.creator_id=u.id
+		where
+		t.id=#{tplHeaderId}
+	</select>
+	<select id="getOrderConfigTplHeaderList" parameterType="Map"
+		resultMap="ocTplHeaderMap">
+		select t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		order_name,c.order_config_name config,t.version,t.memo,u.username
+		editor,t.creat_date edit_date
+		from
+		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER t
+		left join BMS_ORDER o
+		on
+		t.order_id=o.id
+		left join BMS_ORDER_CONFIG c on
+		t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on
+		t.bus_type_id=b.id
+		left join
+		BMS_BASE_USER u on t.creator_id=u.id
+		where
+		1=1
+		<if test="busType!=null and  busType!=''">
+			and t.bus_type_id=#{busType}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="config!=null and  config!=''">
+			and t.order_config_id=#{config}
+		</if>
+		order by t.version desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getOrderConfigTplHeaderTotalCount" parameterType="Map"
+		resultType="int">
+		select count(t.id)
+		from
+		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER
+		t
+		left join BMS_ORDER o on t.order_id=o.id
+		left join BMS_ORDER_CONFIG c
+		on t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on
+		t.bus_type_id=b.id
+		left join BMS_BASE_USER u on t.creator_id=u.id
+		where
+		1=1
+		<if test="busType!=null and  busType!=''">
+			and t.bus_type_id=#{busType}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="config!=null and  config!=''">
+			and t.order_config_id=#{config}
+		</if>
+	</select>
+	<select id="getOrderConfigTplDetailList" parameterType="int"
+		resultMap="ocTplDetailMap">
+		select t.id,t.tconfig_id
+		template_recode_id,t.workshop
+		workshop_id,
+		k.key_name
+		workshop,t.sequence,t.parts_id,p.parts_name
+		parts,t.parts_number,t.vendor,t.memo
+		from
+		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_DETAILS t left join
+		BMS_BASE_PARTS p on t.parts_id=p.id
+		left join BMS_BASE_KEY k ON
+		t.workshop=k.id
+		where t.tconfig_id=#{tplHeaderId}
+		order
+		by
+		t.workshop,t.sequence
+	</select>
+	<update id="updateOrderConfigTplDetail" parameterType="java.util.List">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_DETAILS
+			<set>
+				tconfig_id=#{detail.tplRecordId},workshop=#{detail.workshopId},sequence=#{detail.sequence},parts_id=#{detail.partsId},parts_number=#{detail.partsNo},vendor=#{detail.vendor}
+			</set>
+			where id=#{detail.id}
+		</foreach>
+	</update>
+	<insert id="insertOrderConfigTplHeader" useGeneratedKeys="true"
+		parameterType="orderConfigTplHeader">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER
+		(bus_type_id,order_id,order_config_id,version,memo,creator_id,creat_date)
+		values
+		(#{busTypeId},#{orderId},#{configId},#{version},#{memo},#{editorId},#{editDate})
+	</insert>
+	<insert id="insertOrderConfigTplDetail" useGeneratedKeys="true"
+		parameterType="java.util.List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_DETAILS
+		(tconfig_id,workshop,sequence,parts_id,parts_number,vendor,memo)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.tplRecordId},#{detail.workshopId},#{detail.sequence},#{detail.partsId},#{detail.partsNo},#{detail.vendor},#{detail.memo})
+		</foreach>
+	</insert>
+	<!-- 订单配置与一致性记录表模板 end -->
+	<!-- 品质标准更新记录 start -->
+	<insert id="insertStdRecord" parameterType="stdRecord"
+		useGeneratedKeys="true">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_QUALITY_STANDARDS_CHANGE_LOGS
+		(record_num,usynopsis,ureason,standardfile,uchapter,uscope,bdescription,bfile_path,adescription,afile_path,memo,creator_id,creat_date,email_addrs)
+		values(
+		#{recordNo},#{usynopsis},#{ureason},#{standardfile},#{uchapter},#{uscope},#{bdescription},#{bfilePath},#{adescription},#{afilePath},#{memo},#{editorId},#{editDate},#{mailAddrs}
+		)
+	</insert>
+	<select id="selectStdRecord" parameterType="int" resultMap="stdRecordMap">
+		select * from BMS_QM_QUALITY_STANDARDS_CHANGE_LOGS where
+		id=#{recordId}
+	</select>
+	<select id="getStdRecordList" parameterType="Map" resultMap="stdRecordMap">
+		select t.*,u.username editor from BMS_QM_QUALITY_STANDARDS_CHANGE_LOGS
+		t
+		left join BMS_BASE_USER u on t.creator_id=u.id where 1=1
+		<if test="recordNo!=null and recordNo!=0">
+			and t.record_num=#{recordNo}
+		</if>
+		<if test="stdFileName!=null and  stdFileName!=''">
+			and t.standardfile=#{stdFileName}
+		</if>
+		<if test="updateStart!=null and  updateStart!=''">
+			<![CDATA[and t.creat_date>=#{updateStart}]]>
+		</if>
+		<if test="updateEnd!=null and  updateEnd!=''">
+			<![CDATA[and t.creat_date < #{updateEnd}]]>
+		</if>
+		order by t.creat_date desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getStdRecordCount" parameterType="Map" resultType="int">
+		select count(t.id) from BMS_QM_QUALITY_STANDARDS_CHANGE_LOGS t left
+		join BMS_BASE_USER u on t.creator_id=u.id where 1=1
+		<if test="recordNo!=null and recordNo!=0">
+			and record_num=#{recordNo}
+		</if>
+		<if test="stdFileName!=null and  stdFileName!=''">
+			and standardfile=#{stdFileName}
+		</if>
+		<if test="updateStart!=null and  updateStart!=''">
+			<![CDATA[and t.creat_date>=#{updateStart}]]>
+		</if>
+		<if test="updateEnd!=null and  updateEnd!=''">
+			<![CDATA[and t.creat_date < #{updateEnd}]]>
+		</if>
+
+	</select>
+	<!-- 品质标准更新记录 end -->
+	<!-- 质量目标参数 start -->
+	<select id="getQualityTargetList" parameterType="Map"
+		resultMap="qualityTargetMap">
+		select
+		p.id,p.factory_id,f.factory_name,p.workshop_id,w.workshop_name,p.target_type
+		target_type_id,k.key_name target_type,p.target_value,
+		p.estart_date,p.eend_date,p.editor_id,u.username,p.edit_date,p.status
+		from BMS_QM_QUALITY_TARGET_PARAMETER p left join BMS_BASE_USER u on
+		p.editor_id=u.id
+		left join BMS_BASE_FACTORY f on p.factory_id=f.id
+		left
+		join BMS_BASE_WORKSHOP w on p.workshop_id=w.id
+		left join BMS_BASE_KEY k
+		on p.target_type=k.id
+		where p.status='0'
+		<if test="factoryId!=null and factoryId!=0">
+			and p.factory_id=#{factoryId}
+		</if>
+		<if test="workshopId!=null and  workshopId!=0">
+			and p.workshop_id=#{workshopId}
+		</if>
+		<if test="targetTypeId!=null and  targetTypeId!=0">
+			and p.target_type=#{targetTypeId}
+		</if>
+		<if test="effecDateStart!=null and  effecDateStart!=''">
+			<![CDATA[and p.estart_date>=#{effecDateStart}]]>
+		</if>
+		<if test="effecDateEnd!=null and  effecDateEnd!=''">
+			<![CDATA[and p.eend_date <= #{effecDateEnd}]]>
+		</if>
+		order by p.edit_date desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getQualityTargetCount" parameterType="Map"
+		resultType="int">
+		select count(p.id)
+		from BMS_QM_QUALITY_TARGET_PARAMETER p left join
+		BMS_BASE_USER u on p.editor_id=u.id
+		left join BMS_BASE_FACTORY f on
+		p.factory_id=f.id
+		left join BMS_BASE_WORKSHOP w on p.workshop_id=w.id
+		left join BMS_BASE_KEY k on p.target_type=k.id
+		where p.status='0'
+		<if test="factoryId!=null and factoryId!=0">
+			and p.factory_id=#{factoryId}
+		</if>
+		<if test="workshopId!=null and  workshopId!=0">
+			and p.workshop_id=#{workshopId}
+		</if>
+		<if test="targetTypeId!=null and  targetTypeId!=0">
+			and p.target_type=#{targetTypeId}
+		</if>
+		<if test="effecDateStart!=null and  effecDateStart!=''">
+			<![CDATA[and p.estart_date>=#{effecDateStart}]]>
+		</if>
+		<if test="effecDateEnd!=null and  effecDateEnd!=''">
+			<![CDATA[and p.eend_date <= #{effecDateEnd}]]>
+		</if>
+	</select>
+	<insert id="insertQualityTarget" parameterType="qualityTarget"
+		useGeneratedKeys="true">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_QUALITY_TARGET_PARAMETER
+		(factory_id,workshop_id,target_type,target_value,estart_date,eend_date,status,editor_id,edit_date)
+		values(#{factoryId},#{workshopId},#{targetTypeId},#{targetVal},#{effecDateStart},#{effecDateEnd},'0',#{editorId},#{editDate})
+	</insert>
+	<update id="updateQualityTarget" parameterType="qualityTarget">
+		update BMS_QM_QUALITY_TARGET_PARAMETER
+		<set>
+			factory_id=#{factoryId},workshop_id=#{workshopId},target_type=#{targetTypeId},target_value=#{targetVal},estart_date=#{effecDateStart},
+			eend_date=#{effecDateEnd},status=#{status},editor_id=#{editorId},edit_date=#{editDate}
+		</set>
+		where id=#{id}
+	</update>
+	<!-- 质量目标参数 end -->
+	<!-- 标准故障库 start -->
+	<select id="getFaultLibList" parameterType="Map" resultMap="faultLibMap">
+		select f.id,f.parts_id,p.parts_name
+		parts,f.bug_type,f.bug,f.serious_level,f.fault_type,
+		f.workshop_name,f.workgroup_name,f.editor_id,u.username,f.edit_date
+		from BMS_QM_STANDARD_FAULT_LIBRARY f left join BMS_BASE_USER u on
+		f.editor_id=u.id
+		left join BMS_BASE_PARTS p on f.parts_id=p.id
+		where 1=1
+		<if test="parts!=null and parts!=''">
+			and p.parts_name like CONCAT('%',#{parts},'%')
+		</if>
+		<if test="bugType !=null and  bugType !=''">
+			and f.bug_type like CONCAT('%',#{bugType},'%')
+		</if>
+		<if test="bug!=null and  bug!=''">
+			and f.bug like CONCAT('%',#{bug},'%')
+		</if>
+		<if test="workshop!=null and  workshop!=''">
+			and f.workshop_name=#{workshop}
+		</if>
+		<if test="workgroup!=null and  workgroup!=''">
+			and f.workgroup_name=#{workgroup}
+		</if>
+		<if test="faultType!=null and faultType.length!=0">
+			and f.fault_type in
+			<foreach collection="faultType" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="faultLevel!=null  and faultLevel.length!=0">
+			and f.serious_level in
+			<foreach collection="faultLevel" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		order by f.edit_date desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getFaultLibFuzzyList" parameterType="Map" resultMap="faultLibMap">
+		select f.id,f.parts_id,p.parts_name
+		parts,f.bug_type,f.bug,f.serious_level,f.fault_type,
+		f.workshop_name,f.workgroup_name,f.editor_id,u.username,f.edit_date
+		from BMS_QM_STANDARD_FAULT_LIBRARY f left join BMS_BASE_USER u on
+		f.editor_id=u.id
+		left join BMS_BASE_PARTS p on f.parts_id=p.id
+		where 1=1
+		<if test="parts!=null and parts!=''">
+			and p.parts_name = #{parts}
+		</if>
+		<if test="bugType !=null and  bugType !=''">
+			and f.bug_type like CONCAT('%',#{bugType},'%')
+		</if>
+		<if test="bug!=null and  bug!=''">
+			and f.bug like CONCAT('%',#{bug},'%')
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and f.workshop_name = #{workshop}
+		</if>
+		<if test="seriousLevel !=null and seriousLevel !=''">
+			and f.serious_level = #{seriousLevel}
+		</if>
+
+	</select>
+	<select id="getFaultLibCount" parameterType="Map" resultType="int">
+		select count(f.id)
+		from BMS_QM_STANDARD_FAULT_LIBRARY f left join
+		BMS_BASE_USER u on f.editor_id=u.id
+		left join BMS_BASE_PARTS p on
+		f.parts_id=p.id
+		where 1=1
+		<if test="parts!=null and parts!=''">
+			and p.parts_name like CONCAT('%',#{parts},'%')
+		</if>
+		<if test="bugType !=null and  bugType !=''">
+			and f.bug_type like CONCAT('%',#{bugType},'%')
+		</if>
+		<if test="bug!=null and  bug!=''">
+			and f.bug like CONCAT('%',#{bug},'%')
+		</if>
+		<if test="workshop!=null and  workshop!=''">
+			and f.workshop_name=#{workshop}
+		</if>
+		<if test="workgroup!=null and  workgroup!=''">
+			and f.workgroup_name=#{workgroup}
+		</if>
+		<if test="faultType!=null and faultType.length!=0">
+			and f.fault_type in
+			<foreach collection="faultType" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="faultLevel!=null and faultLevel.length!=0">
+			and f.serious_level in
+			<foreach collection="faultLevel" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	<insert id="insertFaultLib" parameterType="stdFaultLib"
+		useGeneratedKeys="true">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_STANDARD_FAULT_LIBRARY
+		(parts_id,bug_type,bug,serious_level,fault_type,workshop_name,workgroup_name,editor_id,edit_date)
+		values(#{partsId},#{bugType},#{bug},#{faultLevel},#{faultType},#{workshop},#{workgroup},#{editorId},#{editDate})
+	</insert>
+	<update id="updateFaultLib" parameterType="stdFaultLib">
+		update BMS_QM_STANDARD_FAULT_LIBRARY
+		<set>
+			parts_id=#{partsId},bug_type=#{bugType},bug=#{bug},serious_level=#{faultLevel},fault_type=#{faultType},workshop_name=#{workshop},
+			workgroup_name=#{workgroup},editor_id=#{editorId},edit_date=#{editDate}
+		</set>
+		where id=#{id}
+	</update>
+	<!-- 标准故障库 end -->
+	<!-- 物料异常记录 start -->
+	<select id="getMaterialAbnormalList" parameterType="Map"
+		resultMap="materialAbnormalMap">
+		select m.*,f.factory_name factory,w.workshop_name
+		workshop,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		`order`,order_no,u.username
+		from BMS_QM_MATERIAL_EXCEPTION_LOGS m left
+		join BMS_BASE_USER u on
+		m.creater_id=u.id
+		left join BMS_BASE_FACTORY f
+		on m.factory_id=f.id
+		left join BMS_BASE_WORKSHOP w on
+		m.workshop_id=w.id
+		left join
+		BMS_BASE_BUS_TYPE b on m.bus_type_id=b.id
+		left join BMS_ORDER o on
+		m.order_id=o.id
+		where 1=1
+		<if test="factoryId!=null and factoryId!=0">
+			and m.factory_id=#{factoryId}
+		</if>
+		<if test="workshopId!=null and workshopId!=0">
+			and m.workshop_id=#{workshopId}
+		</if>
+		<if test="busTypeId!=null and busTypeId!=0">
+			and m.bus_type_id=#{busTypeId}
+		</if>
+		<if test="order!=null and  order!=''">
+			and (o.order_name like CONCAT('%',#{order},'%') or o.order_no like CONCAT('%',#{order},'%'))
+		</if>
+		<if test="material!=null and material!=''">
+			and m.material like CONCAT('%',#{material},'%')
+		</if>
+		<if test="bugLevel!=null  and bugLevel.length!=0">
+			and m.bug_level in
+			<foreach collection="bugLevel" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="occurDateStart!=null and  occurDateStart!=''">
+			<![CDATA[and m.occur_date>=#{occurDateStart}]]>
+		</if>
+		<if test="occurDateEnd !=null and  occurDateEnd !=''">
+			<![CDATA[and m.occur_date <= #{occurDateEnd}]]>
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getMaterialAbnormalCount" parameterType="Map"
+		resultType="int">
+		select count(m.id)
+		from BMS_QM_MATERIAL_EXCEPTION_LOGS m left join
+		BMS_BASE_USER u on m.creater_id=u.id
+		left join BMS_BASE_FACTORY f on
+		m.factory_id=f.id
+		left join BMS_BASE_WORKSHOP w on m.workshop_id=w.id
+		left join BMS_BASE_BUS_TYPE b on m.bus_type_id=b.id
+		left join BMS_ORDER
+		o on m.order_id=o.id
+		where 1=1
+		<if test="factoryId!=null and factoryId!=0">
+			and m.factory_id=#{factoryId}
+		</if>
+		<if test="workshopId!=null and workshopId!=0">
+			and m.workshop_id=#{workshopId}
+		</if>
+		<if test="busTypeId!=null and busTypeId!=0">
+			and m.bus_type_id=#{busTypeId}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="material!=null and material!=''">
+			and m.material like CONCAT('%',#{material},'%')
+		</if>
+		<if test="bugLevel!=null  and bugLevel.length!=0">
+			and m.bug_level in
+			<foreach collection="bugLevel" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="occurDateStart!=null and  occurDateStart!=''">
+			<![CDATA[and m.occur_date>=#{occurDateStart}]]>
+		</if>
+		<if test="occurDateEnd !=null and  occurDateEnd !=''">
+			<![CDATA[and m.occur_date <= #{occurDateEnd}]]>
+		</if>
+	</select>
+	<insert id="insertMaterialAbnormal" parameterType="materialAbnormal"
+		useGeneratedKeys="true">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into
+		BMS_QM_MATERIAL_EXCEPTION_LOGS(occur_date,factory_id,workshop_id,bus_type_id,order_id,material,bug_level
+		,description,bphoto,tmp_measures,fault_reason,imp_measure,resp_unit,resp_person,expc_finish_date,verifier
+		,verify_result,fphoto,memo,creater_id,creat_date)
+		VALUES (
+		#{occurDate},#{factoryId},#{workshopId},#{busTypeId},#{orderId},#{material},#{bugLevel},#{bugDesc},
+		#{bugPhotoPath},#{tmpMeasure},#{faultReason},#{impMeasure},#{respUnit},#{respPerson},#{expcFinishDate},
+		#{verifier},#{verifyResult},#{imPhotoPath},#{memo},#{editorId},#{editDate}
+		)
+	</insert>
+	<update id="updateMaterialAbnormal" parameterType="stdFaultLib">
+		update BMS_QM_MATERIAL_EXCEPTION_LOGS
+		<set>
+			occur_date = #{occurDate},factory_id =#{factoryId},workshop_id
+			=#{workshopId},bus_type_id = #{busTypeId},
+			order_id
+			=#{orderId},material =#{material},bug_level
+			=#{bugLevel},description=#{bugDesc},
+			bphoto =
+			#{bugPhotoPath},tmp_measures =#{tmpMeasure},fault_reason
+			=#{faultReason},imp_measure =#{impMeasure},
+			resp_unit
+			=#{respUnit},resp_person =#{respPerson},expc_finish_date
+			=#{expcFinishDate},
+			verifier =#{verifier},verify_result
+			=#{verifyResult},fphoto
+			=#{imPhotoPath},memo =#{memo},creater_id
+			=#{editorId},creat_date
+			=#{editDate}
+		</set>
+		where id=#{id}
+	</update>
+	<!-- 物料异常记录 end -->
+	<!-- 检验记录录入 start -->
+	<select id="getTestRecordHeaderList" parameterType="Map"
+		resultMap="testRecordHeaderMap">
+		select h.*,p.parts_name,b.internal_name
+		bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char)) order_name,o.order_no,c.order_config_name,u.username,f.factory_name
+		from BMS_QM_TEST_RECORD_HEADER h
+		left join BMS_BASE_PARTS p on
+		h.parts_id=p.id
+		left join BMS_BASE_BUS_TYPE b on h.bus_type_id=b.id
+		left join BMS_ORDER o on h.order_id=o.id
+		left join BMS_ORDER_CONFIG c
+		on h.order_config_id=c.id
+		left join BMS_BASE_USER u on h.editor_id=u.id
+		left join BMS_BASE_FACTORY f on h.factory_id=f.id
+		where 1=1
+		<if test="testResult!=null  and testResult.length!=0">
+			and h.test_result in
+			<foreach collection="testResult" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="parts!=null and parts!=''">
+			and p.parts_name=#{parts}
+		</if>
+		<if test="partsChartNo !=null and partsChartNo !=''">
+			and h.parts_chart_num=#{partsChartNo}
+		</if>
+		<if test="partsNo !=null and partsNo !=''">
+			and h.parts_num=#{partsNo}
+		</if>
+		<if test="prodDateStart!=null and  prodDateStart !=''">
+			<![CDATA[and h.product_date>=#{prodDateStart}]]>
+		</if>
+		<if test="prodDateEnd !=null and  prodDateEnd !=''">
+			<![CDATA[and h.product_date <= #{prodDateEnd}]]>
+		</if>
+		<if test="factory_id !=null and factory_id !=''">
+			and h.factory_id=#{factory_id}
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			and o.order_no=#{order_no}
+		</if>
+		order by h.edit_date desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getTestRecordHeaderCount" parameterType="Map"
+		resultType="int">
+		select count(h.id)
+		from BMS_QM_TEST_RECORD_HEADER h
+		left join
+		BMS_BASE_PARTS p on h.parts_id=p.id
+		left join BMS_BASE_BUS_TYPE b on
+		h.bus_type_id=b.id
+		left join BMS_ORDER o on h.order_id=o.id
+		left join
+		BMS_ORDER_CONFIG c on h.order_config_id=c.id
+		left join BMS_BASE_USER u
+		on h.editor_id=u.id
+		where 1=1
+		<if test="testResult!=null  and testResult.length!=0">
+			and h.test_result in
+			<foreach collection="testResult" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="parts!=null and parts!=''">
+			and p.parts_name=#{parts}
+		</if>
+		<if test="partsChartNo !=null and partsChartNo !=''">
+			and h.parts_chart_num=#{partsChartNo}
+		</if>
+		<if test="partsNo !=null and partsNo !=''">
+			and h.parts_num=#{partsNo}
+		</if>
+		<if test="prodDateStart!=null and  prodDateStart !=''">
+			<![CDATA[and h.product_date>=#{prodDateStart}]]>
+		</if>
+		<if test="prodDateEnd !=null and  prodDateEnd !=''">
+			<![CDATA[and h.product_date <= #{prodDateEnd}]]>
+		</if>
+	</select>
+	<select id="getTestRecordHeader" parameterType="int"
+		resultMap="testRecordHeaderMap">
+		select h.*,p.parts_name,b.internal_name
+		bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char)) order_name,o.order_no,c.order_config_name,u.username,f.factory_name
+		from BMS_QM_TEST_RECORD_HEADER h
+		left join BMS_BASE_PARTS p on
+		h.parts_id=p.id
+		left join BMS_BASE_BUS_TYPE b on h.bus_type_id=b.id
+		left join BMS_ORDER o on h.order_id=o.id
+		left join BMS_ORDER_CONFIG c
+		on h.order_config_id=c.id
+		left join BMS_BASE_USER u on h.editor_id=u.id
+		left join BMS_BASE_FACTORY f on h.factory_id=f.id
+		where
+		h.id=#{headerId}
+	</select>
+	<insert id="insertTestRecordHeader" parameterType="testRecordHeader">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_TEST_RECORD_HEADER
+		(factory_id,parts_id,parts_chart_num,parts_num,version_num,product_date,
+		tester,test_result,bus_type_id,order_id,order_config_id,editor_id,edit_date)
+		values(#{factoryId},#{partsId},#{partsChartNo},#{partsNo},#{version},#{prodDate},
+		#{tester},#{testResult},#{busTypeId},#{orderId},#{orderConfigId},#{editorId},#{editDate})
+	</insert>
+	<update id="updateTestRecordHeader" parameterType="testRecordHeader">
+		update BMS_QM_TEST_RECORD_HEADER
+		<set>
+			parts_chart_num=#{partsChartNo},parts_num=#{partsNo},version_num=#{version},product_date=#{prodDate},tester=#{tester},test_result=#{testResult}
+		</set>
+		where id=#{id}
+	</update>
+	<select id="getTestRecordDetailList" parameterType="int"
+		resultMap="testRecordDetailMap">
+		<![CDATA[
+		select tmp.*,group_concat(l.bug) test_result_name
+		from(
+		select
+		d.*,substring_index(substring_index(d.test_result,',',b.help_topic_id+1),',',-1)
+		fault_id,t.process_name,t.process_no,t.test_item_no,t.test_item,t.test_standard,k1.key_name
+		frequency,t.test_tools test_tools,w.workshop_name,k.key_name workgroup
+		from BMS_QM_TEST_RECORD_DETAIL d join mysql.help_topic b
+		on b.help_topic_id < (length(d.test_result) -
+		length(replace(d.test_result,',',''))+1)
+		left join BMS_QM_TEST_RECORD_HEADER h on d.test_record_id=h.id
+		left join BMS_QM_TEST_RECORD_TEMPLATE_DETAILS t on
+		d.template_recode_detail_id=t.id
+		left join BMS_BASE_WORKSHOP w on d.workshop_id=w.id
+		left join BMS_BASE_WORKGROUP g on d.workgroup_id = g.id
+		left join BMS_BASE_KEY k on g.workgroup_id=k.id
+		left join BMS_BASE_KEY k1 on t.frequency=k1.id and k1.key_code =
+		'TESTING_FREQUENCY'
+		where h.id=#{headerId}) tmp
+		left join BMS_QM_STANDARD_FAULT_LIBRARY l on tmp.fault_id=l.id
+		group by tmp.id
+		]]>
+	</select>
+	<insert id="insertTestRecordDetail" parameterType="testRecordDetail">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_TEST_RECORD_DETAIL
+		(test_record_id,template_recode_detail_id,test_result,serious_level,result_judge,rework_result,workshop_id,workgroup_id,memo)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.headerId},#{detail.tplDetailId},#{detail.result},#{detail.seriousLevel},#{detail.resultJudge},#{detail.reworkResult},#{detail.workshopId},#{detail.workgroupId},#{detail.memo})
+		</foreach>
+
+	</insert>
+	<update id="updateTestRecordDetail" parameterType="java.util.List">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_QM_TEST_RECORD_DETAIL
+			<set>
+				test_result=#{detail.result},serious_level=#{detail.seriousLevel},result_judge=#{detail.resultJudge},
+				rework_result=#{detail.reworkResult},workshop_id=#{detail.workshopId},workgroup_id=#{detail.workgroupId},memo=#{detail.memo}
+			</set>
+			where id=#{detail.id}
+		</foreach>
+	</update>
+	<!-- 检验记录录入 end -->
+	<!-- 产品追踪卡录入 start -->
+	<select id="getTrackTplHeaderByBusNo" parameterType="String"
+		resultMap="trackTplHeaderMap">
+		select * from (
+(select h.id,h.version,tmp.*,1 detail_index from
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER h
+		,(select
+		o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
+		config
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where
+		b.bus_number=#{busNo} ) tmp
+		where
+		h.bus_type_id=tmp.bus_type_id and
+		h.order_id=tmp.order_id and
+		h.order_config_id=tmp.order_cofig_id
+		)
+		union
+		(select h.id,h.version,tmp.*,2 detail_index from
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER h
+		,(select o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
+		config
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where
+		b.bus_number=#{busNo} ) tmp
+		where
+		h.bus_type_id=tmp.bus_type_id and
+		h.order_id=tmp.order_id
+		)
+		union 
+		(select h.id,h.version,tmp.*,3 detail_index from
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER h
+		,(select o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
+		config
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where 
+		b.bus_number=#{busNo}) tmp
+		where
+		h.bus_type_id=tmp.bus_type_id
+		) )detail
+	order by detail.detail_index asc,detail.version desc
+	</select>
+	<select id="getTrackTplDetails" parameterType="Map"
+		resultMap="trackTplDetailMap">
+		select t.id,t.template_tracking_card_id
+		template_recode_id,t.workshop workshop_id,t.process_number,t.process_name,
+		k.key_name workshop,t.sequence,t.parts_id,p.parts_name parts,t.memo
+		from
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS t
+		left join
+		BMS_BASE_PARTS p on t.parts_id=p.id
+		left join 19bms.BMS_BASE_KEY
+		k ON
+		t.workshop=k.id and k.key_code='WORKSHOP'
+		where
+		t.template_tracking_card_id=#{tplHeaderId} and k.key_name=#{workshop}
+		order by t.workshop,t.sequence
+	</select>
+	<select id="getProdTrackList" parameterType="Map" resultMap="prodTrackDetailMap">
+		select
+		c.*,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,f.factory_name,w.workshop_name,g.order_config_name
+		config,t.internal_name bus_type,p.parts_name,u.username
+		from
+		BMS_QM_PRODUCT_TRACKING_CARD c
+		left join BMS_PLAN_BUS b on c.bus_number
+		= b.bus_number
+		left join BMS_ORDER
+		o on b.order_id=o.id
+		left join
+		BMS_ORDER_CONFIG g on
+		b.order_cofig_id=g.id
+		left join BMS_BASE_FACTORY f
+		on c.factory_id=f.id
+		left join BMS_BASE_WORKSHOP w on
+		c.workshop_id=w.id
+		left join
+		BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join BMS_BASE_PARTS p on
+		c.parts_id=p.id
+		left join BMS_BASE_USER u
+		on c.editor_id=u.id
+		where 1=1
+		<if test="factoryId !=null and factoryId !=0 ">
+			and c.factory_id=#{factoryId}
+		</if>
+		<if test="orderId !=null and orderId !=0">
+			and b.order_id=#{orderId}
+		</if>
+		<if test="busNo !=null and busNo !=''">
+			and c.bus_number=#{busNo}
+		</if>
+		<if test="workshopId !=null and workshopId !=''">
+			and c.workshop_id=#{workshopId}
+		</if>
+
+	</select>
+	<select id="getProdTrackHeaderList" parameterType="Map"
+		resultMap="prodTrackHeaderMap">
+		select 
+		c.bus_number,c.factory_id,f.factory_name,b.order_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,t.internal_name
+		bus_type,g.order_config_name config,c.editor_id,c.edit_date,u.username
+		from BMS_QM_PRODUCT_TRACKING_CARD c
+		left join BMS_PLAN_BUS b on c.bus_number = b.bus_number
+		left join
+		BMS_BASE_FACTORY f on c.factory_id=f.id
+		left join BMS_ORDER o on
+		b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join BMS_ORDER_CONFIG g on b.order_cofig_id=g.id
+		left join BMS_BASE_USER u on c.editor_id=u.id
+		where 1=1
+		<if test="factoryId !=null and factoryId !=0 ">
+			and c.factory_id=#{factoryId}
+		</if>
+		<if test="orderName !=null and orderName !=''">
+			and o.order_name like CONCAT('%',#{orderName},'%')
+		</if>
+		<if test="busNo !=null and busNo !=''">
+			and c.bus_number=#{busNo}
+		</if>
+		group by c.bus_number
+		order by c.edit_date desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getProdTrackHeaderCount" parameterType="Map"
+		resultType="int">
+		select count(distinct c.bus_number)
+		from BMS_QM_PRODUCT_TRACKING_CARD c
+		left join BMS_PLAN_BUS b on c.bus_number = b.bus_number
+		left join
+		BMS_BASE_FACTORY f on c.factory_id=f.id
+		left join BMS_ORDER o on
+		b.order_id=o.id
+		where 1=1
+		<if test="factoryId !=null and factoryId !=0 ">
+			and c.factory_id=#{factoryId}
+		</if>
+		<if test="orderName !=null and orderName !=''">
+			and o.order_name like CONCAT('%',#{orderName},'%')
+		</if>
+		<if test="busNo !=null and busNo !=''">
+			and c.bus_number=#{busNo}
+		</if>
+	</select>
+	<insert id="insertProdTrack" parameterType="prodTrackDetail">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_PRODUCT_TRACKING_CARD
+		(bus_number,factory_id,workshop_id,process_number,process_name,parts_id,parts_num,batch,editor_id,edit_date)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.busNo},#{detail.factoryId},#{detail.workshopId},#{detail.processNo},#{detail.processName},#{detail.partsId},#{detail.partsNo},#{detail.batch},#{detail.editorId},#{detail.editDate})
+		</foreach>
+	</insert>
+	<update id="updateProdTrack" parameterType="prodTrackDetail">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_QM_PRODUCT_TRACKING_CARD
+			<set>
+				parts_num=#{detail.partsNo},batch=#{detail.batch},
+				editor_id=#{detail.editorId},edit_date=#{detail.editDate}
+			</set>
+			where id=#{detail.id}
+		</foreach>
+	</update>
+	<select id="getFactoryByBusNo" parameterType="String" resultType="Map">
+		select b.factory_id from BMS_PLAN_BUS b where b.bus_number=#{busNo}
+	</select>
+	<!-- 产品追踪卡录入 end -->
+	<!-- 订单配置与一致性录入 start -->
+	<select id="getOcTplHeaderByBusNo" parameterType="String"
+		resultMap="ocTplHeaderMap">
+	select * from (	
+(select h.id,h.version,tmp.*,1 detail_index from
+		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER h
+		,(select
+		o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
+		config
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where b.bus_number=#{busNo}
+		) tmp
+		where h.bus_type_id=tmp.bus_type_id and
+		h.order_id=tmp.order_id
+		and h.order_config_id=tmp.order_cofig_id
+    )union 
+    (
+    select h.id,h.version,tmp.*,2 detail_index from
+		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER h
+		,(select
+		o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
+		config
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where b.bus_number=#{busNo}
+		) tmp
+		where h.bus_type_id=tmp.bus_type_id and
+		h.order_id=tmp.order_id
+    )
+    union 
+    (
+    select h.id,h.version,tmp.* ,3 detail_index from
+		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER h
+		,(select
+		o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
+		config
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where b.bus_number=#{busNo}
+		) tmp
+		where h.bus_type_id=tmp.bus_type_id
+    )
+)  detail order by detail.detail_index asc, detail.version desc
+    
+	</select>
+	<select id="getOcTplDetails" parameterType="Map" resultMap="ocTplDetailMap">
+		select t.id,t.tconfig_id
+		template_recode_id,t.workshop workshop_id,
+		k.key_name
+		workshop,t.sequence,t.parts_id,p.parts_name
+		parts,t.parts_number,t.memo,t.vendor
+		from
+		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_DETAILS t
+		left join
+		BMS_BASE_PARTS p on t.parts_id=p.id
+		left join 19bms.BMS_BASE_KEY
+		k ON
+		t.workshop=k.id and k.key_code='WORKSHOP'
+		where
+		t.tconfig_id=#{tplHeaderId} and k.key_name=#{workshop}
+		order by
+		t.workshop,t.sequence
+	</select>
+	<select id="getOrderConfigList" parameterType="Map" resultMap="ocDetailMap">
+		select
+		c.*,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,f.factory_name,w.workshop_name,g.order_config_name
+		config,t.internal_name bus_type,p.parts_name,u.username
+		from
+		BMS_QM_CONFIG_CONFORMITY_RECORD c
+		left join BMS_PLAN_BUS b on
+		c.bus_number = b.bus_number
+		left join BMS_ORDER
+		o on b.order_id=o.id
+		left join BMS_ORDER_CONFIG g on
+		b.order_cofig_id=g.id
+		left join
+		BMS_BASE_FACTORY f on c.factory_id=f.id
+		left join BMS_BASE_WORKSHOP w
+		on c.workshop_id=w.id
+		left join
+		BMS_BASE_BUS_TYPE t on
+		o.bus_type_id=t.id
+		left join BMS_BASE_PARTS p on
+		c.parts_id=p.id
+		left
+		join BMS_BASE_USER u on c.editor_id=u.id
+		where 1=1
+		<if test="factoryId !=null and factoryId !=0 ">
+			and c.factory_id=#{factoryId}
+		</if>
+		<if test="orderId !=null and orderId !=0">
+			and b.order_id=#{orderId}
+		</if>
+		<if test="busNo !=null and busNo !=''">
+			and c.bus_number=#{busNo}
+		</if>
+		<if test="workshopId !=null and workshopId !=''">
+			and c.workshop_id=#{workshopId}
+		</if>
+	</select>
+
+	<select id="getOrderConfigHeaderList" parameterType="Map"
+		resultMap="ocHeaderMap">
+		select distinct
+		c.bus_number,c.factory_id,f.factory_name,b.order_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,t.internal_name
+		bus_type,g.order_config_name config,c.editor_id,c.edit_date,u.username
+		from
+		BMS_QM_CONFIG_CONFORMITY_RECORD c
+		left join BMS_PLAN_BUS b on
+		c.bus_number = b.bus_number
+		left join
+		BMS_BASE_FACTORY f on
+		c.factory_id=f.id
+		left join BMS_ORDER o on
+		b.order_id=o.id
+		left join
+		BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join BMS_ORDER_CONFIG g
+		on b.order_cofig_id=g.id
+		left join BMS_BASE_USER u on c.editor_id=u.id
+		where 1=1
+		<if test="factoryId !=null and factoryId !=0 ">
+			and c.factory_id=#{factoryId}
+		</if>
+		<if test="orderName !=null and orderName !=''">
+			and o.order_name like CONCAT('%',#{orderName},'%')
+		</if>
+		<if test="busNo !=null and busNo !=''">
+			and c.bus_number=#{busNo}
+		</if>
+		order by c.edit_date desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getOrderConfigHeaderCount" parameterType="Map"
+		resultType="int">
+		select count(distinct c.bus_number)
+		from
+		BMS_QM_CONFIG_CONFORMITY_RECORD c
+		left join BMS_PLAN_BUS b on
+		c.bus_number = b.bus_number
+		left join
+		BMS_BASE_FACTORY f on
+		c.factory_id=f.id
+		left join BMS_ORDER o on
+		b.order_id=o.id
+		where 1=1
+		<if test="factoryId !=null and factoryId !=0 ">
+			and c.factory_id=#{factoryId}
+		</if>
+		<if test="orderName !=null and orderName !=''">
+			and o.order_name like CONCAT('%',#{orderName},'%')
+		</if>
+		<if test="busNo !=null and busNo !=''">
+			and c.bus_number=#{busNo}
+		</if>
+	</select>
+	<insert id="insertOrderConfig" parameterType="ocDetail">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_CONFIG_CONFORMITY_RECORD
+		(bus_number,factory_id,workshop_id,parts_id,parts_number,vendor,memo,match_result,editor_id,edit_date)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.busNo},#{detail.factoryId},#{detail.workshopId},#{detail.partsId},#{detail.partsNo},#{detail.vendor},#{detail.memo},#{detail.matchResult},#{detail.editorId},#{detail.editDate})
+		</foreach>
+	</insert>
+	<update id="updateOrderConfig" parameterType="ocDetail">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_QM_CONFIG_CONFORMITY_RECORD
+			<set>
+				match_result=#{detail.matchResult},memo=#{detail.memo},
+				editor_id=#{detail.editorId},edit_date=#{detail.editDate}
+			</set>
+			where id=#{detail.id}
+		</foreach>
+	</update>
+	<!-- 订单配置与一致性录入 end -->
+	<!-- 检验流程卡录入 start -->
+	<select id="getTestFlowCardHeaderList" parameterType="Map"
+		resultType="com.byd.bms.quality.entity.TestFlowCardHeaderBean">
+		select h.*,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char)) order_name,o.order_no,u.username
+		editor,f.factory_name factory,c.order_config_name
+		order_config,w.workshop_name workshop
+		from BMS_QM_TEST_CARD_HEADER h
+		left join BMS_BASE_BUS_TYPE b on h.bus_type_id=b.id
+		left join BMS_ORDER
+		o on h.order_id=o.id
+		left join BMS_ORDER_CONFIG c on
+		h.order_config_id=c.id
+		left join BMS_BASE_USER u on h.editor_id=u.id
+		left join BMS_BASE_FACTORY f on h.factory_id=f.id
+		left join BMS_BASE_WORKSHOP w on h.workshop_id=w.id
+		where 1=1
+		<if test="testResult!=null  and testResult.length!=0">
+			and h.test_result in
+			<foreach collection="testResult" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="order !=null and order !=''">
+			and (o.order_name like CONCAT('%',#{order},'%') or
+			o.order_no like CONCAT('%',#{order},'%'))
+		</if>
+		<if test="factoryId !=null and factoryId !=0">
+			and h.factory_id=#{factoryId}
+		</if>
+		<if test="workshopId !=null and workshopId !=0">
+			and h.workshop_id=#{workshopId}
+		</if>
+		<if test="busNo !=null and busNo !=''">
+			and h.bus_number=#{busNo}
+		</if>
+		<if test="tester !=null and tester !=''">
+			and h.tester=#{tester}
+		</if>
+		<if test="qe !=null and qe !=''">
+			and h.qe=#{qe}
+		</if>
+		order by h.edit_date desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getTestFlowCardHeaderCount" parameterType="Map"
+		resultType="int">
+		select count(h.id)
+		from BMS_QM_TEST_CARD_HEADER h
+		left join
+		BMS_BASE_BUS_TYPE b on h.bus_type_id=b.id
+		left join BMS_ORDER o on
+		h.order_id=o.id
+		left join BMS_ORDER_CONFIG c on h.order_config_id=c.id
+		left join BMS_BASE_USER u on h.editor_id=u.id
+		left join
+		BMS_BASE_FACTORY f on h.factory_id=f.id
+		left join BMS_BASE_WORKSHOP w on h.workshop_id=w.id
+		where 1=1
+		<if test="testResult!=null  and testResult.length!=0">
+			and h.test_result in
+			<foreach collection="testResult" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="order !=null and order !=''">
+			and (o.order_name like CONCAT('%',#{order},'%') or
+			o.order_no like CONCAT('%',#{order},'%'))
+		</if>
+		<if test="factoryId !=null and factoryId !=0">
+			and h.factory_id=#{factoryId}
+		</if>
+		<if test="workshopId !=null and workshopId !=0">
+			and h.workshop_id=#{workshopId}
+		</if>
+		<if test="busNo !=null and busNo !=''">
+			and h.bus_number=#{busNo}
+		</if>
+		<if test="tester !=null and tester !=''">
+			and h.tester=#{tester}
+		</if>
+		<if test="qe !=null and qe !=''">
+			and h.qe=#{qe}
+		</if>
+	</select>
+	<select id="getTestFlowCardHeader" parameterType="int"
+		resultType="com.byd.bms.quality.entity.TestFlowCardHeaderBean">
+		select h.*,b.internal_name
+		bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char)) order_name,o.order_no,u.username editor,f.factory_name
+		factory,c.order_config_name order_config,w.workshop_name workshop
+		from
+		BMS_QM_TEST_CARD_HEADER h
+		left join BMS_BASE_BUS_TYPE b on
+		h.bus_type_id=b.id
+		left join BMS_ORDER o on h.order_id=o.id
+		left join
+		BMS_ORDER_CONFIG c on h.order_config_id=c.id
+		left join BMS_BASE_USER u
+		on h.editor_id=u.id
+		left join BMS_BASE_FACTORY f on h.factory_id=f.id
+		left join BMS_BASE_WORKSHOP w on h.workshop_id=w.id
+		where
+		h.id=#{headerId}
+	</select>
+	<insert id="insertTestFlowCardHeader" parameterType="com.byd.bms.quality.entity.TestFlowCardHeaderBean">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_TEST_CARD_HEADER
+		(bus_number,factory_id,workshop_id,bus_type_id,order_id,order_config_id,tester,qe,test_result,editor_id,edit_date)
+		values(#{bus_number},#{factory_id},#{workshop_id},#{bus_type_id},#{order_id},#{order_config_id},
+		#{tester},#{qe},#{test_result},#{editor_id},#{edit_date})
+	</insert>
+	<update id="updateTestFlowCardHeader" parameterType="com.byd.bms.quality.entity.TestFlowCardHeaderBean">
+		update BMS_QM_TEST_CARD_HEADER
+		<set>
+			tester=#{tester},qe=#{qe},test_result=#{test_result}
+		</set>
+		where id=#{id}
+	</update>
+	<select id="getTestFlowCardDetailList" parameterType="int"
+		resultType="com.byd.bms.quality.entity.TestFlowCardDetailBean">
+		<![CDATA[
+		select tmp.*,group_concat(l.bug) test_result_name
+		from(
+		select
+		d.*,substring_index(substring_index(d.test_result,',',b.help_topic_id+1),',',-1) fault_id,t.quality_node,t.quality_point_flag,
+    	t.process_name,t.process_no,t.test_item_no,t.test_item,t.test_standard,k1.key_name
+		frequency,t.test_tools,w.workshop_name workshop,k.key_name workgroup
+		from BMS_QM_TEST_CARD_DETAIL d join mysql.help_topic b
+		on b.help_topic_id < (length(d.test_result) -
+		length(replace(d.test_result,',',''))+1)
+		left join BMS_QM_TEST_CARD_HEADER h on d.test_card_id=h.id
+		left join BMS_QM_TEST_CARD_TEMPLATE_DETAILS t on
+		d.test_card_template_detail_id=t.id
+		left join BMS_BASE_WORKSHOP w on d.workshop_id=w.id
+		left join BMS_BASE_WORKGROUP g on d.workgroup_id = g.id
+		left join BMS_BASE_KEY k on g.workgroup_id=k.id
+		left join BMS_BASE_KEY k1 on t.frequency=k1.id and k1.key_code =
+		'TESTING_FREQUENCY'
+		where h.id=#{headerId}) tmp
+		left join BMS_QM_STANDARD_FAULT_LIBRARY l on tmp.fault_id=l.id
+		group by tmp.id
+		]]>
+	</select>
+	<insert id="insertTestFlowCardDetail" parameterType="com.byd.bms.quality.entity.TestFlowCardDetailBean">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_QM_TEST_CARD_DETAIL
+		(test_card_id,test_card_template_detail_id,test_result,result_judge,rework,workshop_id,workgroup_id,memo)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.test_card_id},#{detail.test_card_template_detail_id},#{detail.test_result},#{detail.result_judge},#{detail.rework},#{detail.workshop_id},#{detail.workgroup_id},#{detail.memo})
+		</foreach>
+	</insert>
+	<update id="updateTestFlowCardDetail" parameterType="java.util.List">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_QM_TEST_CARD_DETAIL
+			<set>
+				test_result=#{detail.test_result},result_judge=#{detail.result_judge},
+				rework=#{detail.rework},workshop_id=#{detail.workshop_id},workgroup_id=#{detail.workgroup_id},memo=#{detail.memo}
+			</set>
+			where id=#{detail.id}
+		</foreach>
+	</update>
+	<select id="getTestFlowTplHeaderByBusNo" parameterType="Map"
+		resultMap="testFlowTplHeaderMap">
+		select * from (
+(select h.id,h.version,h.isDraft,k.key_name,tmp.*, 1 detail_index,h.creat_date  from
+		BMS_QM_TEST_CARD_TEMPLATE_HEADER h
+		,(select o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
+		config
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where b.bus_number=#{busNo}
+		) tmp,BMS_BASE_KEY k
+		where h.bus_type_id=tmp.bus_type_id and
+		h.order_id=tmp.order_id
+		and h.order_config_id=tmp.order_cofig_id
+		and h.workshop=k.id
+		and k.key_name=#{workshop} and h.isDraft ='1'
+		)
+    union 
+    (
+    select h.id,h.version,h.isDraft,k.key_name,tmp.*, 2 detail_index,h.creat_date  from
+		BMS_QM_TEST_CARD_TEMPLATE_HEADER h
+		,(select o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
+		config
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where b.bus_number=#{busNo}
+		) tmp,BMS_BASE_KEY k
+		where h.bus_type_id=tmp.bus_type_id and
+		h.order_id=tmp.order_id
+		and h.workshop=k.id
+		and k.key_name=#{workshop} and h.isDraft ='1'
+		
+    )
+    union 
+    (
+    select h.id,h.version,h.isDraft,k.key_name,tmp.*, 3 detail_index,h.creat_date  from
+		BMS_QM_TEST_CARD_TEMPLATE_HEADER h
+		,(select o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
+		config
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		left join
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where b.bus_number=#{busNo}
+		) tmp,BMS_BASE_KEY k
+		where h.bus_type_id=tmp.bus_type_id 
+		and h.workshop=k.id
+		and k.key_name=#{workshop} and h.isDraft ='1'
+		
+    )
+) detail 
+order by detail.detail_index asc,detail.creat_date desc
+	</select>
+	<!-- 检验流程卡录入 end -->
+	<!-- query bus info by using busNo -->
+	<select id="queryBusInfoByBusNo" parameterType="String" resultType="Map">
+		select bus_number,vin,left_motor_number,right_motor_number from BMS_PLAN_BUS where bus_number=#{busNo}
+	</select>
+</mapper>

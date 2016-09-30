@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.byd.bms.techtrans.dao.IEcnDocumentDao">
+	
+	<resultMap type="bmsecndocument" id="ecnDocumentMap">
+		<id property="ecn_id" column="ecn_id"/>
+		<result property="type" column="type"/>
+		<result property="typeName" column="typeName"/>
+		<result property="ecn_document_number" column="ecn_document_number"/>
+		<result property="ecn_document_date" column="ecn_document_date"/>
+		<result property="subject" column="subject"/>	
+		<result property="ecn_document_file" column="ecn_document_file"/>
+		<result property="tecn_flag" column="tecn_flag"/>
+		<result property="responsible_organization" column="responsible_organization"/>
+		<result property="changed_bom" column="changed_bom"/>
+		<result property="gcy_contacts" column="gcy_contacts"/>
+		<result property="gy_contacts" column="gy_contacts"/>
+		<result property="status" column="status"/>
+		<result property="editor" column="editor"/>
+		<result property="editdate" column="editdate"/>
+	</resultMap>
+	
+	<select id="getEcnDocumentList" parameterType="Map" resultMap="ecnDocumentMap">
+		SELECT o.*,k.key_name typeName from BMS_ECN_DOCUMENT o 
+		LEFT JOIN BMS_BASE_KEY k ON o.ecn_type = k.id   
+		where 1=1 and o.status !='2' 
+		<if test="ecn_id != null and ecn_id !='' ">
+			and o.id = #{ecn_id}
+		</if>
+		<if test="ecn_document_number!=null">
+				 and o.ecn_document_number like CONCAT('%',#{ecn_document_number},'%')
+		</if>
+		<if test="subject!=null">
+				 and o.subject like CONCAT('%',#{subject},'%')
+		</if>
+		<if test="status!=null">
+				<if test="status!=''">
+				 	and o.status =#{status} 
+				 </if>
+		</if>
+		<if test="tecn_flag!=null">
+				<if test="tecn_flag!=''">
+				 	and o.tecn_flag =#{tecn_flag} 
+				 </if>
+		</if>
+		<if test="startDate!=null ">
+			<if test="endDate!=null">
+				 and STR_TO_DATE(o.ecn_document_date,'%Y-%c-%d') between #{startDate} and #{endDate}
+			</if>
+		</if>
+		ORDER BY o.status asc,o.ecn_document_date desc,o.ecn_document_number desc,o.ecn_type
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>	
+	
+	<select id="getEcnDocumentTotalCount" parameterType="Map" resultType="int">
+		SELECT count(o.id) from BMS_ECN_DOCUMENT o where 1=1 and o.status !='2' 
+		<if test="ecn_document_number!=null">
+				 and o.ecn_document_number like CONCAT('%',#{ecn_document_number},'%')
+		</if>
+		<if test="subject!=null">
+				 and o.subject like CONCAT('%',#{subject},'%')
+		</if>
+		<if test="status!=null">
+				<if test="status!=''">
+				 	and o.status =#{status} 
+				 </if>
+		</if>
+		<if test="tecn_flag!=null">
+				<if test="tecn_flag!=''">
+				 	and o.tecn_flag =#{tecn_flag} 
+				 </if>
+		</if>
+		<if test="startDate!=null ">
+			<if test="endDate!=null">
+				 and STR_TO_DATE(o.ecn_document_date,'%Y-%c-%d') between #{startDate} and #{endDate}
+			</if>
+		</if>
+		ORDER BY o.status asc,o.ecn_document_date desc,o.ecn_document_number desc,o.ecn_type
+	</select>
+	
+	<resultMap type="ecnDoc" id="ecnDocMap">
+		<id property="id" column="id"/>
+		<result property="ecn_type" column="ecn_type"/>
+		<result property="ecn_document_number" column="ecn_document_number"/>
+		<result property="ecn_document_date" column="ecn_document_date"/>
+		<result property="subject" column="subject"/>	
+		<result property="ecn_document_file" column="ecn_document_file"/>
+		<result property="tecn_flag" column="tecn_flag"/>
+		<result property="responsible_organization" column="responsible_organization"/>
+		<result property="changed_bom" column="changed_bom"/>
+		<result property="gcy_contacts" column="gcy_contacts"/>
+		<result property="gy_contacts" column="gy_contacts"/>
+		<result property="status" column="status"/>
+		<result property="editor" column="editor"/>
+		<result property="editor_id" column="editor_id"/>
+		<result property="editdate" column="edit_date"/>
+	</resultMap>
+	
+	<resultMap type="ecnTask" id="ecnTaskMap">
+		<id property="id" column="id"/>
+		<result property="ecn_id" column="ecn_id"/>
+		<result property="task_number" column="task_number"/>
+		<result property="task_content" column="task_content"/>	
+		<result property="switch_mode" column="switch_mode"/>
+		<result property="ecn_order_id" column="ecn_order_id"/>
+		<result property="ecn_factory_id" column="ecn_factory_id"/>
+		<result property="ecn_number" column="ecn_number"/>
+		<result property="total_hours" column="total_hours"/>	
+		<result property="old_photo" column="old_photo"/>	
+		<result property="new_photo" column="new_photo"/>	
+		<result property="status" column="status"/>	
+		<result property="creat_date" column="creat_date"/>	
+	</resultMap>
+	
+	<insert id="addEcnDocument"  parameterType="com.byd.bms.techtrans.entity.BmsEcnDocument">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO BMS_ECN_DOCUMENT(ecn_type,ecn_document_number,ecn_document_date,subject,ecn_document_file,
+		tecn_flag,responsible_organization,changed_bom,gcy_contacts,gy_contacts,editor_id,edit_date) 
+		VALUES(#{ecn_type},#{ecn_document_number},#{ecn_document_date},#{subject},#{ecn_document_file},#{tecn_flag},#{responsible_organization},
+		#{changed_bom},#{gcy_contacts},#{gy_contacts},#{editor_id},#{edit_date})
+	</insert>
+	<update id="editEcnDocument"  parameterType="com.byd.bms.techtrans.entity.BmsEcnDocument">
+		UPDATE BMS_ECN_DOCUMENT SET 
+		ecn_type = #{ecn_type},ecn_document_number = #{ecn_document_number},ecn_document_date = #{ecn_document_date},subject = #{subject},tecn_flag=#{tecn_flag}
+		,responsible_organization = #{responsible_organization},gcy_contacts=#{gcy_contacts},gy_contacts=#{gy_contacts},
+		<if test="ecn_document_file!=null">
+			ecn_document_file=#{ecn_document_file},
+		</if> 
+		<if test="changed_bom!=null">
+			changed_bom= #{changed_bom},
+		</if> 
+		editor_id=#{editor_id},edit_date=#{edit_date}
+		WHERE id = #{id}
+	</update>
+	<update id="deleteEcnDocument"  parameterType="List" >
+		UPDATE BMS_ECN_DOCUMENT 
+		set status = '2' 
+		WHERE id IN 
+		<foreach collection="list" index="index" item="item"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<insert id="addEcnTask"  parameterType="com.byd.bms.techtrans.entity.BmsEcnTask">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO BMS_ECN_TASK(ecn_id,task_number,task_content,switch_mode,total_hours,ecn_order_id,ecn_factory_id,ecn_number,creat_date) 
+		VALUES(#{ecn_id},#{task_number},#{task_content},#{switch_mode},#{total_hours},#{ecn_order_id},#{ecn_factory_id},
+		#{ecn_number},#{creat_date})
+	</insert>
+	
+	<!-- 新增ECN_TIME表数据 -->
+	<insert id="addEcnTime" parameterType="Map">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_ECN_TIME(ecn_task_id,workshop_id,unit_time,unit) 
+		values(#{ecn_task_id},#{workshop_id},#{unit_time},#{unit})
+	</insert>
+	<!-- 修改ECN_TIME -->
+	<update id="editEcnTime" parameterType="Map">
+		update BMS_ECN_TIME set
+		unit_time=#{unit_time},unit=#{unit} where id=#{id} 
+	</update>
+	
+	<update id="editEcnTask"  parameterType="com.byd.bms.techtrans.entity.BmsEcnTask">
+		UPDATE BMS_ECN_TASK SET 
+		ecn_id = #{ecn_id},task_number = #{task_number},task_content = #{task_content},switch_mode = #{switch_mode},total_hours = #{total_hours},ecn_order_id = #{ecn_order_id},
+		ecn_factory_id = #{ecn_factory_id},ecn_number = #{ecn_number},creat_date =#{creat_date}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deleteEcnTask"  parameterType="List">
+		UPDATE BMS_ECN_TASK SET 
+		status = '2' 
+		WHERE id in 
+		<foreach collection="list" index="index" item="item"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<select id="getEcnTaskList" parameterType="Map" resultType="com.byd.bms.techtrans.entity.BmsEcnTask">
+		SELECT t.*,o.order_no,f.production_qty order_qty FROM BMS_ECN_DOCUMENT d 
+		LEFT JOIN BMS_ECN_TASK t ON d.id = t.ecn_id 
+		LEFT JOIN BMS_ORDER o ON t.ecn_order_id = o.id 
+		LEFT JOIN BMS_FACTORY_ORDER f ON t.ecn_order_id = f.order_id AND t.ecn_factory_id = f.factory_id
+		where 1=1 and t.status !='2' 
+		<if test="ecn_id!=null and ecn_id !=''">
+			and d.id = #{ecn_id}
+		</if>
+		order by t.task_number 
+	</select>
+	
+	<select id="getFactoryOrderQty" parameterType="Map" resultType="Map">
+		SELECT f.production_qty FROM
+		BMS_FACTORY_ORDER f 
+		WHERE f.order_id = #{order_id}
+		AND f.factory_id = #{factory_id}
+	</select>
+	
+	<update id="deleteEcnTaskDetail"  parameterType="List">
+		UPDATE BMS_ECN_TASK_DETAIL SET 
+		status = '2' 
+		WHERE ecn_task_id in 
+		<foreach collection="list" index="index" item="item"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!--删除BMS_ECN_TIME： 修改BMS_ECN_TIME -->
+	<update id="deleteEcnTime" parameterType="List">
+		delete from BMS_ECN_TIME 
+		where ecn_task_id in 
+		<foreach collection="list" index="index" item="item"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+</mapper>

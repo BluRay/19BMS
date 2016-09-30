@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<struts>
+	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
+	<package name="hrModel" extends="json-default" >
+		<action name="hr" class="hrAction">
+			<result name="index">/jsp/hr/hrIndex.jsp</result>
+			<result name="userrole">/jsp/hr/hrUserRole.jsp</result>
+			<result name="attendance">/jsp/hr/hrAttendance.jsp</result>
+			<result name="rewardspunishment">/jsp/hr/hrRewardsPunishment.jsp</result>
+			<result name="rewardsCollect">/jsp/hr/hrRewardsCollect.jsp</result>
+			<result name="waitmanhourStatistic">/jsp/hr/waitmanhourStatistic.jsp</result>
+			<result name="workTimePrice">/jsp/hr/hrWorkTimePrice.jsp</result>
+		</action>
+		<action name="standardWorkGroup" class="standardWorkGroupAction">
+			<result name="index">/jsp/hr/standardWorkGroup.jsp</result>
+		</action>
+		<action name="standardTimeAndPrice" class="standardTimeAndPriceAction">
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			<interceptor-ref name="defaultStack" />
+			<result name="index">/jsp/hr/standardTimeAndPrice.jsp</result>
+			<result name="queryIndex">/jsp/hr/standardPriceQuery.jsp</result>
+		</action>
+		<!-- 获取组织 -->
+		<action name="orgData" class="orgDataAction">
+			<result name="index">/jsp/hr/org_index.jsp</result>
+			<result name="positionSystem">/jsp/hr/positionSystem.jsp</result>
+			<result name="standardPosition">/jsp/hr/standardPosition.jsp</result>
+			<result name="importStandardPositionSuccess" type="redirect">orgData!standardPosition.action</result>
+			<result name="positionDescription">/jsp/hr/positionDescription.jsp</result>
+			<result name="standardHuman">/jsp/hr/standardHuman.jsp</result>
+			<result name="humanConfiguration">/jsp/hr/humanConfiguration.jsp</result>
+			<result name="factoryCapacity">/jsp/hr/factoryCapacity.jsp</result>
+			<result name="isCustomer">/jsp/hr/isCustomer.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		
+		<action name="staff" class="staffAction">
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			<interceptor-ref name="defaultStack" />
+			<result name="staffSearch">/jsp/hr/staffSearch.jsp</result>
+			<result name="staffManager">/jsp/hr/staffManager.jsp</result>
+			<result name="staffDistribution">/jsp/hr/staffDistribution.jsp</result>
+			<result name="queryStaffSkillParameterIndex">/jsp/hr/staffSkillParameterView.jsp</result>
+		</action>
+		
+		<action name="hrReport" class="hrReportAction">
+			<result name="pieceSalaryPage">/jsp/hr/pieceSalarPage.jsp</result>
+			<result name="pieceSalaryBalancePage">/jsp/hr/pieceSalaryBalancePage.jsp</result>
+			<result name="ecnReport">/jsp/hr/ecnReport.jsp</result>
+			<result name="tmpReport">/jsp/hr/tmpReport.jsp</result>
+			<result name="workTimeReport">/jsp/hr/workTimeReport.jsp</result>
+			<result name="pieceTimeReport">/jsp/hr/pieceTimeReport.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+	</package>
+</struts>

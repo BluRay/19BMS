@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.hr.dao.IOrgDao">
+	<!-- 获得组织结构 -->
+	<select id="getOrgData" parameterType="Map" resultType="Map">
+		SELECT
+              id,
+              parent_id AS parent,
+              name_en as name,
+              name as display_name,
+              org_code as short_name,
+              level,
+              sort_number,
+              manager,
+              org_type,
+              org_kind,
+              responsibilities,
+              deleted
+            FROM
+              BMS_BASE_ORG
+            WHERE
+              deleted = 0 
+              <if test="id!=null">
+              AND id=#{id} 
+              </if>
+              <if test="parent_id!=null">
+              AND parent_id=#{parent_id} 
+              </if>
+            ORDER BY
+              sort_number ASC	
+	</select>
+	<!-- 获得组织结构下拉框 -->
+	<select id="getOrgDeptList" parameterType="Map" resultType="Map">
+		SELECT
+              id,
+              name
+            FROM
+              BMS_BASE_ORG
+            WHERE
+              deleted = 0 
+              <if test="id!=null">
+               <!-- AND id not in (#{id}) --> 
+              </if>
+            ORDER BY
+              sort_number ASC	
+	</select>
+	<!-- 获得班组/小班组下拉框 -->
+	<select id="getWorkGroupList" parameterType="Map" resultType="Map">
+		SELECT
+             g.id,g.parent_id, g.workgroup_name,g1.workgroup_name as parent_name,g.workshop_id,s.key_name
+            FROM
+              BMS_HR_BASE_STANDARD_WORKGROUP g
+LEFT JOIN BMS_BASE_KEY s
+ON g.workshop_id = s.id
+LEFT JOIN BMS_HR_BASE_STANDARD_WORKGROUP g1
+ON g.parent_id=g1.id
+            WHERE
+1=1
+<if test="type!=null">
+and g.type=#{type}
+</if>
+<if test="type==1 and workgroup_name!=null">
+and g1.workgroup_name=#{workgroup_name}
+</if>
+<if test="type==0 and workshop_name!=null">
+and s.key_name=#{workshop_name}
+</if>
+            ORDER BY
+              g.id ASC	
+	</select>
+	<!-- 添加组织结构 -->
+	<insert id="addOrgData" useGeneratedKeys="true">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<![CDATA[
+			insert into BMS_BASE_ORG(parent_id,org_type,org_kind,level,name,name_en,org_code,sort_number,manager,responsibilities,deleted,editor_id,edit_date) 
+			values(#{parent_id},#{org_type},#{org_kind},#{level},#{name},#{name_en},#{org_code},#{sort_number},#{manager},#{responsibilities},#{deleted},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	<!-- 编辑组织结构 -->
+	<update id="editOrgData">
+			update BMS_BASE_ORG set 
+			<if test="parent_id!=''">
+			parent_id=#{parent_id},
+			</if>
+			org_type=#{org_type},org_kind=#{org_kind},level=#{level},name=#{name},name_en=#{name_en},org_code=#{org_code}<!-- ,sort_number=#{sort_number} -->,manager=#{manager},responsibilities=#{responsibilities},deleted=#{deleted},editor_id=#{editor_id},edit_date=#{edit_date}  
+			where id=#{id}
+	</update>
+	<!-- 子节点排序 -->
+	<update id="sortOrgData">
+			update BMS_BASE_ORG set 
+			sort_number=#{sort_number},editor_id=#{editor_id},edit_date=#{edit_date}  
+			where id=#{id}
+	</update>
+	<!--删除组织结构 -->
+	<update id="deleteOrgData">
+		<![CDATA[
+			update BMS_BASE_ORG set deleted='1',editor_id=#{editor_id},edit_date=#{edit_date}  
+			where id=#{id}
+		]]>
+	</update>
+	
+	<!-- 根据工厂、车间、班组、小班组信息查询org信息-->
+	<select id="getOrgInfo" parameterType="Map" resultType="Map">
+		SELECT o1.* FROM BMS_BASE_ORG o1
+			INNER JOIN BMS_BASE_ORG o2 on o1.parent_id = o2.id and o2.name = #{workgroup}
+			INNER JOIN BMS_BASE_ORG o3 on o2.parent_id = o3.id and o3.name = #{workshop}
+			INNER JOIN BMS_BASE_ORG o4 on o3.parent_id = o4.id 
+			INNER JOIN BMS_BASE_ORG o5 on o4.parent_id = o5.id and o5.name = #{factory}
+		WHERE o1.name = #{small_workgroup} AND o1.deleted = '0'
+	</select>
+	
+	<!-- 根据工厂/部门、科室、车间、班组、小班组 信息查询org信息-->
+	<select id="getOrg" parameterType="List" resultType="Map">
+			<foreach collection="list" index="index" item="item"
+				 separator="UNION ALL" >
+					SELECT o1.name plant_org
+						<if test="item.dept_org!=null">
+							,o2.name dept_org
+						</if>
+						<if test="item.dept_org==null">
+							,'' dept_org
+						</if>
+						<if test="item.workshop_org!=null">
+							,o3.name workshop_org
+						</if>
+						<if test="item.workshop_org ==null">
+							,'' workshop_org
+						</if>
+						<if test="item.workgroup_org!=null">
+							,o4.name workgroup_org
+						</if>
+						<if test="item.workgroup_org ==null">
+							,'' workgroup_org
+						</if>
+						<if test="item.team_org!=null">
+							,o5.name team_org 
+						</if>
+						<if test="item.team_org ==null">
+							,'' team_org 
+						</if>
+						FROM BMS_BASE_ORG o1
+						<if test="item.dept_org!=null">
+							LEFT JOIN BMS_BASE_ORG o2 on o1.id = o2.parent_id and o2.deleted = '0' and o2.name = #{item.dept_org}
+						</if>
+						<if test="item.workshop_org!=null">
+							LEFT JOIN BMS_BASE_ORG o3 on 
+							<if test="item.dept_org!=null">
+							o2.id = o3.parent_id 
+							</if>
+							<if test="item.dept_org==null">
+							o1.id = o3.parent_id 
+							</if>
+							and o3.deleted = '0' and o3.name = #{item.workshop_org}
+						</if>
+						<if test="item.workgroup_org!=null">
+							LEFT JOIN BMS_BASE_ORG o4 on 
+							<if test="item.workshop_org!=null">
+								o3.id = o4.parent_id 
+							</if>
+							<if test="item.workshop_org ==null and item.dept_org!=null">
+								o2.id = o4.parent_id 
+							</if>
+							<if test="item.workshop_org ==null and item.dept_org ==null">
+								o1.id = o4.parent_id 
+							</if>
+							and o4.deleted = '0' and o4.name = #{item.workgroup_org}
+						</if>
+						<if test="item.team_org!=null">
+							LEFT JOIN BMS_BASE_ORG o5 on 
+							<if test="item.workgroup_org!=null">
+								o4.id = o5.parent_id 
+							</if>
+							<if test="item.workgroup_org ==null and item.workshop_org!=null">
+								o3.id = o5.parent_id 
+							</if>
+							<if test="item.workgroup_org ==null and item.workshop_org ==null and item.dept_org!=null">
+								o2.id = o5.parent_id 
+							</if>
+							<if test="item.workgroup_org ==null and item.workshop_org ==null and item.dept_org ==null">
+								o1.id = o5.parent_id 
+							</if>
+							and o5.deleted = '0' and o5.name = #{item.team_org}
+						</if>
+					WHERE o1.name = #{item.plant_org} AND o1.deleted = '0'
+			</foreach>
+	</select>
+	
+	<!-- 添加岗位 -->
+	<insert id="addPositionData" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+			insert into BMS_HR_BASE_JOB(parent_job_id,job_no,job_name,job_level,job_grade_id,age,level_limit_min,level_limit_max,sax,minimum_education,specialty,foreign_language,work_experience,basic_besponsibilit,requirements,skill_and_capability,required_train,other_requirements,deleted,editor_id,edit_date) 
+			values(#{parent_job_id},#{job_no},#{job_name},#{job_level},#{job_grade_id},#{age},#{level_limit_min},#{level_limit_max},#{sax},#{minimum_education},#{specialty},#{foreign_language},#{work_experience},#{basic_besponsibilit},#{requirements},#{skill_and_capability},#{required_train},#{other_requirements},#{deleted},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	<!-- 编辑岗位 -->
+	<update id="editPositionData">
+			update BMS_HR_BASE_JOB set 
+			<if test="parent_job_id!=''">
+			parent_job_id=#{parent_job_id},
+			</if>
+			job_no=#{job_no},
+			job_name=#{job_name},
+			job_level=#{job_level},
+			job_grade_id=#{job_grade_id},
+			age=#{age},
+			level_limit_min=#{level_limit_min},
+			level_limit_max=#{level_limit_max},
+			sax=#{sax},
+			minimum_education=#{minimum_education},
+			specialty=#{specialty},
+			foreign_language=#{foreign_language},
+			work_experience=#{work_experience},
+			basic_besponsibilit=#{basic_besponsibilit},
+			requirements=#{requirements},
+			skill_and_capability=#{skill_and_capability},
+			required_train=#{required_train},
+			other_requirements=#{other_requirements},
+			deleted=#{deleted},
+			editor_id=#{editor_id},
+			edit_date=#{edit_date}  
+			
+			where id=#{id}
+	</update>
+	<!--删除岗位 -->
+	<update id="deletePositionData">
+		<![CDATA[
+			update BMS_HR_BASE_JOB set deleted='1',editor_id=#{editor_id},edit_date=#{edit_date}  
+			where id=#{id}
+		]]>
+	</update>
+	<!-- 获得岗位等级下拉框 -->
+	<select id="getPositionGradeList" parameterType="Map" resultType="Map">
+		SELECT
+              id,
+              job_grade_name as name
+            FROM
+              BMS_HR_BASE_JOB_GRADE
+            WHERE
+              1=1
+            ORDER BY
+              id ASC	
+	</select>
+	<!-- 获得父岗位下拉框 -->
+	<select id="getParentPositionList" parameterType="Map" resultType="Map">
+	SELECT
+              j.id,j.job_name,g.job_grade_name,g.`level`
+            FROM
+              BMS_HR_BASE_JOB j
+LEFT JOIN BMS_HR_BASE_JOB_GRADE g
+ON j.job_grade_id=g.id
+            WHERE
+              deleted=0
+              <if test="id!=null">
+              and j.id not in (#{id})
+              </if>
+and g.`level`<![CDATA[	<	]]>(
+SELECT DISTINCT g.`level` FROM BMS_HR_BASE_JOB_GRADE g
+WHERE 
+1=1
+and g.id=#{gid}
+)
+ORDER BY g.`level`
+	</select>
+	<!-- 获得岗位 -->
+	<select id="getPositionData" parameterType="Map" resultType="Map">
+		SELECT
+              *
+            FROM
+              BMS_HR_BASE_JOB
+            WHERE
+              deleted=0
+              <if test="job_grade_id!=null">
+              and job_grade_id=#{job_grade_id}
+              </if>
+              <if test="id!=null">
+              and id=#{id}
+              </if>
+            ORDER BY
+              id ASC	
+	</select>
+	
+	<!-- 获得部门岗位 -->
+	<select id="getStandardPositionData" parameterType="Map" resultType="Map">
+		SELECT
+              oj.id,
+              oj.org_id,
+              oj.job_id,
+              j.id as job_id,
+              j.job_no,
+              j.job_name,
+              g.job_grade_name,
+              j.job_level,
+              j.basic_besponsibilit,
+              o.name as org_name,
+              j.requirements,
+              j.age,
+              j.sax,
+              j.minimum_education,
+              j.specialty,
+              j.foreign_language,
+              j.work_experience,
+              j.required_train,
+              j.other_requirements
+            FROM
+              BMS_HR_BASE_ORG_JOB oj,BMS_HR_BASE_JOB j,BMS_BASE_ORG o,BMS_HR_BASE_JOB_GRADE g 
+            WHERE
+              oj.org_id=o.id and
+              oj.job_id=j.id and
+			  g.id = j.job_grade_id and 
+              oj.deleted=0
+              <if test="org_id!=null">
+              and oj.org_id=#{org_id}
+              </if>
+              <if test="id!=null">
+              and oj.id=#{id}
+              </if>
+            ORDER BY
+              oj.id ASC	
+	</select>
+	<!-- 获得工作关系图 -->
+	<select id="getWorkRelationshipChart" parameterType="Map" resultType="Map">
+		SELECT j.id,j.parent_job_id,j.job_name,j.job_no,j.job_level,g.job_grade_name from BMS_HR_BASE_JOB j LEFT JOIN BMS_HR_BASE_JOB_GRADE g on j.job_grade_id=g.id where j.deleted=0
+	</select>
+	<!-- 添加部门岗位 -->
+	<insert id="addStandardPositionData" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+			insert into BMS_HR_BASE_ORG_JOB(org_id,job_id,deleted,editor_id,edit_date) 
+			values(#{org_id},#{job_id},#{deleted},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	<!--删除部门岗位 -->
+	<update id="deleteStandardPositionData">
+		<![CDATA[
+			update BMS_HR_BASE_ORG_JOB set deleted='1',editor_id=#{editor_id},edit_date=#{edit_date}  
+			where id=#{id}
+		]]>
+	</update>
+	<!-- 部门标准岗位编号模糊查询 -->
+	<select id="getStandardPositionFuzzySelect" parameterType="Map" resultType="Map">
+		select 
+			id,
+			job_no,
+			job_name
+		from 
+			BMS_HR_BASE_JOB
+		where 
+			deleted=0 and 
+			job_no
+			like CONCAT('%',#{job_no},'%')
+		order by 
+			id asc
+	</select>
+	
+	<!-- 获得标准人力 -->
+	<select id="getStandardHumanData" parameterType="Map" resultType="Map">
+			SELECT
+			  h.id,
+			  o.id as org_id,
+			  oj.id as job_id,
+              j.job_no,
+              j.job_name,
+              g.job_grade_name,
+              j.job_level,
+              h.standard_humans,
+              
+              o.name as org_name,
+              h.capacity,
+              h.bus_type_id
+            FROM
+              (BMS_HR_BASE_ORG_JOB oj,
+              BMS_HR_BASE_JOB j,
+              BMS_BASE_ORG o,
+              BMS_HR_BASE_JOB_GRADE g)
+            left join
+              BMS_HR_BASE_STANDARD_HUMAN h
+            on
+              h.org_id = o.id
+              and h.job_id = oj.id
+              <if test="capacity!=null">
+              and h.capacity=#{capacity}
+              </if>
+              <if test="bus_type_id!=null">
+              and h.bus_type_id=#{bus_type_id}
+              </if>
+              <if test="type!=null">
+              and h.type=#{type}
+              </if>
+            WHERE
+              oj.org_id=o.id and
+              oj.job_id=j.id and
+			  g.id = j.job_grade_id and 
+              oj.deleted=0
+              <if test="org_id!=null">
+              and oj.org_id=#{org_id}
+              </if>
+              <if test="id!=null">
+              and oj.id=#{id}
+              </if>
+              <if test="isTab!=null">
+            GROUP BY
+			  h.capacity
+			  </if>
+	</select>
+	<!-- 获得车型数据 -->
+	<select id="getBusTypeData" parameterType="Map" resultType="Map">
+			SELECT
+			  id,
+			  internal_name
+            FROM
+              BMS_BASE_BUS_TYPE
+            WHERE
+              1=1
+	</select>
+	<!-- 添加标准人力 -->
+	<insert id="addStandardHumanData" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+			insert into BMS_HR_BASE_STANDARD_HUMAN(type,org_id,job_id,capacity,bus_type_id,standard_humans,deleted,editor_id,edit_date) 
+			values(#{type},#{org_id},#{job_id},#{capacity},#{bus_type_id},#{standard_humans},#{deleted},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	<!-- 编辑标准人力-->
+	<update id="editStandardHumanData">
+			update BMS_HR_BASE_STANDARD_HUMAN set 
+			standard_humans = #{standard_humans}
+			where id=#{id}
+	</update>
+	
+	<!-- 获得人力配置 -->
+	<select id="getHumanConfigurationData" parameterType="Map" resultType="Map">
+			SELECT
+			  h.id,
+			  o.id as org_id,
+			  oj.id as job_id,
+              j.job_no,
+              j.job_name,
+              g.job_grade_name,
+              j.job_level,
+              h.standard_humans,
+              o.name as org_name,
+              h.capacity,
+              h.bus_type_id
+            FROM
+              BMS_HR_BASE_ORG_JOB oj,
+              BMS_HR_BASE_JOB j,
+              BMS_BASE_ORG o,
+              BMS_HR_BASE_JOB_GRADE g,
+              BMS_HR_BASE_STANDARD_HUMAN h
+            WHERE
+              h.org_id = o.id
+              and h.job_id = oj.id
+              <if test="capacity!=null">
+              and h.capacity=#{capacity}
+              </if>
+              <if test="bus_type_id!=null">
+              and h.bus_type_id=#{bus_type_id}
+              </if>
+              <if test="type!=null">
+              and h.type=#{type}
+              </if>
+              and oj.org_id=o.id and
+              oj.job_id=j.id and
+			  g.id = j.job_grade_id and 
+              oj.deleted=0
+              <if test="org_id!=null">
+              and oj.org_id=#{org_id}
+              </if>
+              <if test="id!=null">
+              and oj.id=#{id}
+              </if>
+              <if test="isTab!=null">
+            GROUP BY
+			  h.capacity
+			  </if>
+			order by
+			  oj.id
+	</select>
+	<!-- 获得车型数据 -->
+	<select id="getBusTypeData1" parameterType="Map" resultType="Map">
+			SELECT
+			  t.id,
+			  t.internal_name
+            FROM
+              BMS_BASE_BUS_TYPE t,
+              BMS_HR_BASE_STANDARD_HUMAN h
+            WHERE
+              1=1 and
+              h.bus_type_id=t.id
+              <if test="capacity!=null">
+              and h.capacity=#{capacity}
+              </if>
+              <if test="org_id!=null">
+              and h.org_id=#{org_id}
+              </if>
+            group by
+              h.bus_type_id
+	</select>
+	<!-- 获得现有人力 -->
+	<select id="getRealHumanData" parameterType="Map" resultType="Map">
+			SELECT
+			  count(*) as realHuman
+            FROM
+              BMS_HR_STAFF s
+            WHERE
+              1=1
+              
+              and s.job=#{job}
+              
+              <if test="team_org!=null">
+              and s.team_org=#{team_org}
+              </if>
+              <if test="team_org==null">
+              and (s.team_org is null or s.team_org='')
+              </if>
+              
+              <if test="workgroup_org!=null">
+              and s.workgroup_org=#{workgroup_org}
+              </if>
+              <if test="workgroup_org==null">
+              and (s.workgroup_org is null or s.workgroup_org='')
+              </if>
+              
+              <if test="workshop_org!=null">
+              and s.workshop_org=#{workshop_org}
+              </if>
+              <if test="workshop_org==null">
+              and (s.workshop_org is null or s.workshop_org='')
+              </if>
+              
+              <if test="dept_org!=null">
+              and s.dept_org=#{dept_org}
+              </if>
+              <if test="dept_org==null">
+              and (s.dept_org is null or s.dept_org='')
+              </if>
+              
+              <if test="plant_org!=null">
+              and s.plant_org=#{plant_org}
+              </if>
+              <if test="plant_org==null">
+              and (s.plant_org is null or s.plant_org='')
+              </if>
+	</select>
+	<select id="getHumanDetailData" parameterType="Map" resultType="Map">
+			SELECT
+			  staff_number,name,skill_parameter
+            FROM
+              BMS_HR_STAFF s
+            WHERE
+              1=1
+              
+              and s.job=#{job}
+              
+              <if test="team_org!=null">
+              and s.team_org=#{team_org}
+              </if>
+              <if test="team_org==null">
+              and (s.team_org is null or s.team_org='')
+              </if>
+              
+              <if test="workgroup_org!=null">
+              and s.workgroup_org=#{workgroup_org}
+              </if>
+              <if test="workgroup_org==null">
+              and (s.workgroup_org is null or s.workgroup_org='')
+              </if>
+              
+              <if test="workshop_org!=null">
+              and s.workshop_org=#{workshop_org}
+              </if>
+              <if test="workshop_org==null">
+              and (s.workshop_org is null or s.workshop_org='')
+              </if>
+              
+              <if test="dept_org!=null">
+              and s.dept_org=#{dept_org}
+              </if>
+              <if test="dept_org==null">
+              and (s.dept_org is null or s.dept_org='')
+              </if>
+              
+              <if test="plant_org!=null">
+              and s.plant_org=#{plant_org}
+              </if>
+              <if test="plant_org==null">
+              and (s.plant_org is null or s.plant_org='')
+              </if>
+	</select>
+	
+	<!-- 获得工厂产能 -->
+	<select id="getFactoryCapacityData" parameterType="Map" resultType="Map">
+			SELECT
+			  factory,capacity,edit_date
+            FROM
+              BMS_HR_FACTORY_CAPACITY s
+            WHERE
+              1=1
+              <if test="factory!=null">
+              and s.factory=#{factory}
+              </if>
+            order by 
+              edit_date desc
+	</select>
+	
+	<!-- 添加工厂产能 -->
+	<insert id="addFactoryCapacityData" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+			insert into BMS_HR_FACTORY_CAPACITY(factory,capacity,editor_id,edit_date) 
+			values(#{factory},#{capacity},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	
+	<!-- 自编号维护查询 -->
+	<select id="queryIsCustomerList" parameterType="Map"
+		resultType="Map">
+		SELECT p.factory,p.workshop,p.workgroup,p.small_workgroup,o.is_customer,p.org_id
+		
+		FROM (
+			
+			SELECT o1.name as small_workgroup,o2.name as workgroup,o3.name as workshop,o5.name as factory,o1.is_customer,o1.id as org_id FROM BMS_BASE_ORG o1
+			INNER JOIN BMS_BASE_ORG o2 on o1.parent_id = o2.id 
+			INNER JOIN BMS_BASE_ORG o3 on o2.parent_id = o3.id 
+			INNER JOIN BMS_BASE_ORG o4 on o3.parent_id = o4.id 
+			INNER JOIN BMS_BASE_ORG o5 on o4.parent_id = o5.id 
+		WHERE o1.deleted = '0' and o1.org_type='6'
+		
+		) p
+		
+		LEFT JOIN BMS_BASE_ORG o on p.org_id=o.id
+		WHERE 1=1
+
+		<if test="orgType==null or orgType==''">
+			and FIND_IN_SET(p.factory,#{orgStr})>0
+		</if>
+		<if test="orgType==0 or orgType==1 or orgType==2 or orgType==3">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0
+		</if>
+		<if test="orgType==4 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and p.workshop = ( SELECT o.name
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="orgType==5 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0 and p.workgroup = ( SELECT o.name
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="orgType==6 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0 and
+			FIND_IN_SET(p.workgroup,#{orgStr})>0 and p.small_workgroup = ( SELECT
+			o.name FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="is_customer!=null and is_customer!=''">
+			AND o.is_customer = #{is_customer}
+		</if>
+		
+		GROUP BY p.org_id
+		ORDER BY p.factory,p.workshop,p.workgroup,p.small_workgroup
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+
+	<!-- 自编号维护查询 -->
+	<select id="queryIsCustomerCount" parameterType="Map"
+		resultType="int">
+		SELECT count(tmp.org_id) FROM(
+		SELECT p.org_id
+		FROM (
+			
+			SELECT o1.name as small_workgroup,o2.name as workgroup,o3.name as workshop,o5.name as factory,o1.is_customer,o1.id as org_id FROM BMS_BASE_ORG o1
+			INNER JOIN BMS_BASE_ORG o2 on o1.parent_id = o2.id 
+			INNER JOIN BMS_BASE_ORG o3 on o2.parent_id = o3.id 
+			INNER JOIN BMS_BASE_ORG o4 on o3.parent_id = o4.id 
+			INNER JOIN BMS_BASE_ORG o5 on o4.parent_id = o5.id 
+		WHERE o1.deleted = '0' and o1.org_type='6'
+		
+		) p
+		LEFT JOIN BMS_BASE_ORG o on p.org_id=o.id
+		WHERE 1=1
+		<if test="orgType==null or orgType==''">
+			and FIND_IN_SET(p.factory,#{orgStr})>0
+		</if>
+		<if test="orgType==0 or orgType==1 or orgType==2 or orgType==3">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0
+		</if>
+		<if test="orgType==4 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and p.workshop = ( SELECT o.name
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="orgType==5 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0 and p.workgroup = ( SELECT o.name
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="orgType==6 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0 and
+			FIND_IN_SET(p.workgroup,#{orgStr})>0 and p.small_workgroup = ( SELECT
+			o.name FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="is_customer!=null and is_customer!=''">
+			AND o.is_customer = #{is_customer}
+		</if>
+		GROUP BY p.org_id
+		ORDER BY p.factory,p.workshop,p.workgroup,p.small_workgroup
+		) tmp
+	</select>
+	
+	<!-- 自编号修改 -->
+	<update id="updateIsCustomer">
+			update BMS_BASE_ORG set 
+			is_customer = #{is_customer},editor_id=#{editor_id},edit_date=#{edit_date}
+			where id=#{org_id}
+	</update>
+</mapper>

@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"  
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                     http://www.springframework.org/schema/beans/spring-beans.xsd 
+                     http://www.springframework.org/schema/tx 
+                     http://www.springframework.org/schema/tx/spring-tx.xsd 
+                     http://www.springframework.org/schema/aop 
+                     http://www.springframework.org/schema/aop/spring-aop.xsd
+                     http://www.springframework.org/schema/task   
+    				 http://www.springframework.org/schema/task/spring-task.xsd">
+	
+	<!--配置数据源属性文件  -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<!--  <value>/WEB-INF/configs/sqlServer.properties</value> -->
+			<value>/WEB-INF/configs/mysql.properties</value>
+		</property>
+	</bean>
+	
+	<!-- 配置数据源 -->
+	<bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+	<property name="url" value="${jdbc.url}" />
+	<property name="username" value="${jdbc.user}" />
+	<property name="password" value="${jdbc.pwd}" />	
+	<!-- 初始化连接大小  -->
+	<property name="initialSize" value="20" />
+	<!-- 连接池最大使用连接数量 -->
+	<property name="maxActive" value="1000" />
+	<!-- 连接池最大空闲 -->
+	<property name="maxIdle" value="20" />
+	<!-- 连接池最小空闲 -->
+	<property name="minIdle" value="1" />
+	<!-- 获取连接最大等待时间 -->
+	<property name="maxWait" value="60000" />
+	
+	<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+	<property name="timeBetweenEvictionRunsMillis" value="60000" />
+	<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+	<property name="minEvictableIdleTimeMillis" value="25200000" />
+	</bean>
+	
+	<!--配置数据源  -->
+	<!-- <bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>${jdbc.driver}</value>
+		</property>
+		<property name="url">
+			<value>${jdbc.url}</value>
+		</property>
+		<property name="username">
+			<value>${jdbc.user}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.pwd}</value>
+		</property>
+	</bean> -->
+	
+	<bean id="transactionManager"  
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager ">  
+        <property name="dataSource">  
+            <ref bean="dataSource" />  
+        </property>  
+    </bean>
+	<bean id="transactionTemplate"  
+        class="org.springframework.transaction.support.TransactionTemplate">  
+        <property name="transactionManager" ref="transactionManager" />  
+        <property name="propagationBehaviorName" value="PROPAGATION_NESTED" />  
+        <property name="timeout" value="1000" />  
+        <property name="isolationLevelName" value="ISOLATION_READ_UNCOMMITTED" />  
+    </bean>
+    
+	<!-- 事务注解驱动，标注@Transactional的类和方法将具有事务性 -->  
+	<!-- <tx:annotation-driven transaction-manager="txManager"/> -->
+
+	
+	<!--<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+	    <property name="configLocation" value="classpath:com/byd/bms/test/sqlMapper/mybatis_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean> 	
+    
+    <bean id="loginDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.test.dao.ILoginDao"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="loginAction" class="com.byd.bms.test.action.LoginAction">
+		<property name="loginDao" ref="loginDao"></property>
+	</bean> -->
+	
+	<!-- 定时任务配置 task start -->
+<!-- 	<task:annotation-driven /> 定时器开关    
+    <bean id="taskTest" class="com.byd.bms.test.action.TaskTest"></bean>  
+    <task:scheduled-tasks>  
+        <task:scheduled ref="taskTest" method="say" cron="5/3 * * * * ?" />  
+        <task:scheduled ref="taskTest" method="hello" cron="5/3 * * * * ?"/>  
+    </task:scheduled-tasks>  --> 
+    <!-- 定时任务配置 task end -->
+    
+	<!-- order model start-->
+	<bean id="orderSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+	    <property name="configLocation" value="classpath:com/byd/bms/order/sqlMapper/mybatis_order_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="orderDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.order.dao.IOrderDao"/>
+		<property name="sqlSessionFactory" ref="orderSqlSessionFactory" />
+	</bean>
+	<bean id="orderAction" class="com.byd.bms.order.action.OrderAction" scope="prototype">
+		<property name="orderDao" ref="orderDao"></property>
+	</bean>
+	<bean id="OrderConfigAction" class="com.byd.bms.order.action.OrderConfigAction" scope="prototype">
+		<property name="orderDao" ref="orderDao"></property>	
+	</bean>
+	<!-- order model end-->
+	
+	<!-- Production model start-->
+	<bean id="productionSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+	    <property name="configLocation" value="classpath:com/byd/bms/production/sqlMapper/mybatis_production_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="productionDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.production.dao.IProductionDao"/>
+		<property name="sqlSessionFactory" ref="productionSqlSessionFactory" />
+	</bean>
+	<bean id="productionAction" class="com.byd.bms.production.action.ProductionAction" scope="prototype">
+		<property name="productionDao" ref="productionDao"></property>
+	</bean>
+	<bean id="tempOrderAction" class="com.byd.bms.production.action.TempOrderAction" scope="prototype">
+		<property name="productionDao" ref="productionDao"></property>
+	</bean>
+	<bean id="pieceWorkTimeAction" class="com.byd.bms.production.action.PieceWorkTimeAction" scope="prototype">
+		<property name="productionDao" ref="productionDao"></property>
+	</bean>
+	<bean id="waitWorkTimeAction" class="com.byd.bms.production.action.WaitWorkTimeAction" scope="prototype">
+		<property name="productionDao" ref="productionDao"></property>
+	</bean>
+	<!-- Production model end-->
+	
+	<!-- Plan model start-->
+<!-- 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+		<property name="dataSource" ref="dataSource"/>
+	</bean> -->
+	<bean id="planSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+	    <property name="configLocation" value="classpath:com/byd/bms/plan/sqlMapper/mybatis_plan_config.xml" />  
+	    <property name="dataSource" ref="dataSource" /> 	    
+	    <property name="transactionFactoryClass"
+	     value="org.apache.ibatis.transaction.managed.ManagedTransactionFactory"/> 	     
+	</bean>
+	
+	<bean id="planDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.plan.dao.IPlanDao"/>
+		<property name="sqlSessionFactory" ref="planSqlSessionFactory" />
+	</bean>
+	<bean id="planAction" class="com.byd.bms.plan.action.PlanAction" scope="prototype">
+		<property name="planDao" ref="planDao"></property>
+	</bean>
+	<!-- 发车-->
+	<bean id="busDispatchAction" class="com.byd.bms.plan.action.BusDispatchAction" scope="prototype">
+		<property name="planDao" ref="planDao"></property>
+	</bean>
+	<!-- Plan model end-->
+	
+	<!-- techtrans model start-->
+	<bean id="techtransSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" scope="prototype" >  
+	    <property name="configLocation" value="classpath:com/byd/bms/techtrans/sqlMapper/mybatis_ecnDocument_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="ecnDocumentDao" class="org.mybatis.spring.mapper.MapperFactoryBean" scope="prototype">
+		<property name="mapperInterface" value="com.byd.bms.techtrans.dao.IEcnDocumentDao"/>
+		<property name="sqlSessionFactory" ref="techtransSqlSessionFactory" />
+	</bean>
+	<bean id="ecnDocumentAction" class="com.byd.bms.techtrans.action.EcnDocumentAction" scope="prototype">
+		<property name="ecnDocumentDao" ref="ecnDocumentDao"></property>
+		<property name="transactionTemplate" ref="transactionTemplate" /> 
+	</bean>
+	<!-- techtrans model end-->
+	
+	
+	<!-- techtransTask model start-->
+	<bean id="techtransTaskSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" scope="prototype">  
+	    <property name="configLocation" value="classpath:com/byd/bms/techtrans/sqlMapper/mybatis_ecnTask_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="ecnDocumentTaskDao" class="org.mybatis.spring.mapper.MapperFactoryBean" scope="prototype">
+		<property name="mapperInterface" value="com.byd.bms.techtrans.dao.IEcnTaskDao"/>
+		<property name="sqlSessionFactory" ref="techtransTaskSqlSessionFactory" />
+	</bean>
+	<bean id="ecnDocumentTaskAction" class="com.byd.bms.techtrans.action.EcnDocumentTaskAction" scope="prototype">
+		<property name="ecnDocumentTaskDao" ref="ecnDocumentTaskDao"></property>
+		<property name="transactionTemplate" ref="transactionTemplate" /> 
+	</bean>
+	<!-- techtransTask model end-->
+	
+	<!-- swrnotice model start-->
+	<bean id="swrNoticeSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" scope="prototype">  
+	    <property name="configLocation" value="classpath:com/byd/bms/techtrans/sqlMapper/mybatis_swrDocument_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="swrDocumentDao" class="org.mybatis.spring.mapper.MapperFactoryBean" scope="prototype">
+		<property name="mapperInterface" value="com.byd.bms.techtrans.dao.ISwrDocumentDao"/>
+		<property name="sqlSessionFactory" ref="swrNoticeSqlSessionFactory" />
+	</bean>
+	<bean id="swrNoticeAction" class="com.byd.bms.techtrans.action.SWRNoticeAction" scope="prototype">
+		<property name="swrDocumentDao" ref="swrDocumentDao"></property>
+	</bean>
+	<!-- swrnotice model end-->
+	
+	<!-- login model -->
+	<bean id="utilSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+	    <property name="configLocation" value="classpath:com/byd/bms/util/sqlMapper/mybatis_util_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	
+	<bean id="commDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.util.dao.ICommDao"/>
+		<property name="sqlSessionFactory" ref="utilSqlSessionFactory" />
+	</bean>
+	
+<!-- 	<bean id="loginDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.util.dao.ILoginDao"/>
+		<property name="sqlSessionFactory" ref="utilSqlSessionFactory" />
+	</bean> -->
+	<bean id="loginDao" class="com.byd.bms.util.dao.LoginDaoImpl">
+		<property name="sqlSessionFactory" ref="utilSqlSessionFactory" />
+	</bean>
+	
+	<bean id="roleAuthorityDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.util.dao.IRoleAuthorityDao"/>
+		<property name="sqlSessionFactory" ref="utilSqlSessionFactory" />
+	</bean>	
+	 <!-- <bean id="baseAction" class="com.byd.bms.util.action.BaseAction">
+    	<property name="loginDao" ref="loginDao"></property>
+    </bean> -->
+    <bean id="baseAction" class="com.byd.bms.util.action.BaseAction" abstract="true" scope="prototype">
+    	<property name="loginDao" ref="loginDao"></property>
+    </bean>
+	<bean id="loginAction" class="com.byd.bms.util.action.LoginAction" scope="prototype">
+		<property name="loginDao" ref="loginDao"></property>
+	</bean>
+
+	<bean id="commonAction" class="com.byd.bms.util.action.CommonAction" scope="prototype">
+		<property name="commDao" ref="commDao"></property>
+	</bean>
+	
+	<bean id="logoutAction" class="com.byd.bms.util.action.LogoutAction" scope="prototype">
+	
+	</bean>
+	
+	<!-- 基础数据模块 -->
+	<bean id="baseDataSqlMapper" class="org.mybatis.spring.SqlSessionFactoryBean" scope="prototype">
+		<property name="configLocation" value="classpath:com/byd/bms/setting/sqlMapper/mybatis_baseData_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="baseDataDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.setting.dao.IBaseDataDao"/>
+		<property name="sqlSessionFactory" ref="baseDataSqlMapper" />
+	</bean>
+	<bean id="baseDataAction" class="com.byd.bms.setting.action.BaseDataAction">
+		<property name="baseDataDao" ref="baseDataDao"></property>
+	</bean>
+	<bean id="workshopAction" class="com.byd.bms.setting.action.WorkshopAction">
+		<property name="baseDataDao" ref="baseDataDao"></property>
+	</bean>
+	<bean id="lineAction" class="com.byd.bms.setting.action.LineAction">
+		<property name="baseDataDao" ref="baseDataDao"></property>
+	</bean>
+	<bean id="processAction" class="com.byd.bms.setting.action.ProcessAction">
+		<property name="baseDataDao" ref="baseDataDao"></property>
+	</bean>	
+	<bean id="workgroupAction" class="com.byd.bms.setting.action.WorkgroupAction">
+		<property name="baseDataDao" ref="baseDataDao"></property>
+	</bean>	
+	<bean id="busTypeAction" class="com.byd.bms.setting.action.BusTypeAction">
+		<property name="baseDataDao" ref="baseDataDao"></property>
+	</bean>	
+	<bean id="keysAction" class="com.byd.bms.setting.action.KeysAction">
+		<property name="baseDataDao" ref="baseDataDao"></property>
+	</bean>
+	<bean id="hzAction" class="com.byd.bms.setting.action.HZAction">
+		<property name="baseDataDao" ref="baseDataDao"></property>
+	</bean>	
+	<bean id="partsAction" class="com.byd.bms.setting.action.PartsAction">
+		<property name="baseDataDao" ref="baseDataDao"></property>
+	</bean>		
+	<!-- 品质模块 start-->
+	<bean id="qualitySqlMapper" class="org.mybatis.spring.SqlSessionFactoryBean" >
+		<property name="configLocation" value="classpath:com/byd/bms/quality/sqlMapper/mybatis_quality_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="qualityDao" class="org.mybatis.spring.mapper.MapperFactoryBean" >
+		<property name="mapperInterface" value="com.byd.bms.quality.dao.IQualityDao"/>
+		<property name="sqlSessionFactory" ref="qualitySqlMapper" />
+	</bean>
+	<bean id="testTplAction" class="com.byd.bms.quality.action.TestTplAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="testFlowTplAction" class="com.byd.bms.quality.action.TestFlowTplAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+		<property name="transactionTemplate" ref="transactionTemplate" /> 
+	</bean>
+	<bean id="trackTplAction" class="com.byd.bms.quality.action.TrackTplAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="orderConfigTplAction" class="com.byd.bms.quality.action.OrderConfigTplAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="qcStdRecordAction" class="com.byd.bms.quality.action.QCStdRecordAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="qualityTargetAction" class="com.byd.bms.quality.action.QualityTargetAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="stdFaultLibAction" class="com.byd.bms.quality.action.StandardFaultLibAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="materialAbnormalAction" class="com.byd.bms.quality.action.MaterialAbnormalAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="testRecordInAction" class="com.byd.bms.quality.action.TestRecordInAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="prodTrackInAction" class="com.byd.bms.quality.action.ProdTrackInAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="orderConfigInAction" class="com.byd.bms.quality.action.OrderConfigInAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<bean id="testFlowCardInAction" class="com.byd.bms.quality.action.TestFlowCardInAction" scope="prototype">
+		<property name="qualityDao" ref="qualityDao"></property>
+	</bean>
+	<!-- 品质模块 end-->
+
+	<!-- 售后模块 start-->
+	<bean id="afterSaleSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" scope="prototype">  
+	    <property name="configLocation" value="classpath:com/byd/bms/aftersale/sqlMapper/mybatis_aftersale_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="afterSaleDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.aftersale.dao.IAfterSaleDao"/>
+		<property name="sqlSessionFactory" ref="afterSaleSqlSessionFactory" />
+	</bean>
+	<bean id="afterSaleAction" class="com.byd.bms.aftersale.action.AfterSaleAction" scope="prototype">
+		<property name="afterSaleDao" ref="afterSaleDao"></property>
+	</bean>
+	<!-- 售后模块 end-->
+	
+	<!-- add by wuxiao 2016/5/19 -->
+	<!-- 邮件模块 start-->
+	<bean id="emailSqlMapper" class="org.mybatis.spring.SqlSessionFactoryBean" >
+		<property name="configLocation" value="classpath:com/byd/bms/email/sqlMapper/mybatis_email_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="emailDao" class="org.mybatis.spring.mapper.MapperFactoryBean" >
+		<property name="mapperInterface" value="com.byd.bms.email.dao.IEmailDao"/>
+		<property name="sqlSessionFactory" ref="emailSqlMapper" />
+	</bean>
+	
+	<!-- 邮件模块 end-->
+	
+	<!-- 报表模块 start -->
+	<bean id="reportSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" >  
+	    <property name="configLocation" value="classpath:com/byd/bms/report/sqlMapper/mybatis_report_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="reportDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.report.dao.IReportDao"/>
+		<property name="sqlSessionFactory" ref="reportSqlSessionFactory" />
+	</bean>
+	<bean id="orderReportAction" class="com.byd.bms.report.action.OrderReportAction" scope="prototype">
+		<property name="reportDao" ref="reportDao"></property>
+	</bean>
+	<bean id="planReportAction" class="com.byd.bms.report.action.PlanReportAction" scope="prototype">
+		<property name="reportDao" ref="reportDao"></property>
+	</bean>
+	<bean id="ecnReportAction" class="com.byd.bms.report.action.EcnReportAction" scope="prototype">
+		<property name="reportDao" ref="reportDao"></property>
+	</bean>
+	<bean id="qualityReportAction" class="com.byd.bms.report.action.QualityReportAction" scope="prototype">
+		<property name="reportDao" ref="reportDao"></property>
+	</bean>
+	<bean id="productionReportAction" class="com.byd.bms.report.action.ProductionReportAction" scope="prototype">
+		<property name="reportDao" ref="reportDao"></property>
+		<property name="commDao" ref="commDao"></property>
+	</bean>
+	<bean id="afterSaleReportAction" class="com.byd.bms.report.action.AfterSaleReportAction" scope="prototype">
+		<property name="reportDao" ref="reportDao"></property>
+	</bean>
+	<bean id="costReportAction" class="com.byd.bms.report.action.CostReportAction" scope="prototype">
+		<property name="reportDao" ref="reportDao"></property>
+	</bean>
+	
+	<!-- 报表模块 end -->
+	
+	<!-- selfcost model start-->
+	<bean id="selfcostSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+	    <property name="configLocation" value="classpath:com/byd/bms/selfcost/sqlMapper/mybatis_selfcost_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="selfcostDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.selfcost.dao.ISelfcostDao"/>
+		<property name="sqlSessionFactory" ref="selfcostSqlSessionFactory" />
+	</bean>
+	<bean id="selfcostAction" class="com.byd.bms.selfcost.action.SelfcostAction" scope="prototype">
+		<property name="selfcostDao" ref="selfcostDao"></property>
+	</bean>
+	<!-- selfcost model end-->
+	
+	<!-- 用户管理 start -->
+	<bean id="accountSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" scope="prototype">  
+	    <property name="configLocation" value="classpath:com/byd/bms/account/sqlMapper/mybatis_account_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="accountDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.account.dao.IAccountManageDao"/>
+		<property name="sqlSessionFactory" ref="accountSqlSessionFactory" />
+	</bean>
+	<bean id="accountManageAction" class="com.byd.bms.account.action.AccountManageAction" scope="prototype">
+		<property name="accountDao" ref="accountDao"></property>
+	</bean>
+	
+	<!-- hr model start-->
+	<bean id="hrSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+	    <property name="configLocation" value="classpath:com/byd/bms/hr/sqlMapper/mybatis_hr_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="hrDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.hr.dao.IHrDao"/>
+		<property name="sqlSessionFactory" ref="hrSqlSessionFactory" />
+	</bean>
+	<bean id="hrAction" class="com.byd.bms.hr.action.HrAction" scope="prototype">
+		<property name="hrDao" ref="hrDao"></property>
+	</bean>
+	<bean id="standardWorkGroupAction" class="com.byd.bms.hr.action.StandardWorkGroupAction" scope="prototype">
+		<property name="hrDao" ref="hrDao"></property>
+		<property name="transactionTemplate" ref="transactionTemplate" /> 
+	</bean>
+	<bean id="standardTimeAndPriceAction" class="com.byd.bms.hr.action.StandardTimeAndPriceAction" scope="prototype">
+		<property name="hrDao" ref="hrDao"></property>
+		<property name="orgDao" ref="orgDao"></property>
+	</bean>
+	<bean id="staffAction" class="com.byd.bms.hr.action.StaffAction" scope="prototype">
+		<property name="hrDao" ref="hrDao"></property>
+		<property name="orgDao" ref="orgDao"></property>
+	</bean>
+	<!-- add by wuxiao 组织结构 -->
+	<bean id="orgSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" scope="prototype">  
+	    <property name="configLocation" value="classpath:com/byd/bms/hr/sqlMapper/mybatis_hr_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="orgDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.hr.dao.IOrgDao"/>
+		<property name="sqlSessionFactory" ref="orgSqlSessionFactory" />
+	</bean>
+	<bean id="orgDataAction" class="com.byd.bms.hr.action.OrgDataAction" scope="prototype">
+		<property name="orgDao" ref="orgDao"></property>
+	</bean>
+	<!-- added by xjw 人事报表查询 -->
+	<bean id="hrReportAction" class="com.byd.bms.hr.action.HrReportAction" scope="prototype">
+		<property name="hrDao" ref="hrDao"></property>
+	</bean>
+	<!-- hr model end-->
+</beans>

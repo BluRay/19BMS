@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<struts>
+	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
+	<constant name="struts.i18n.encoding" value="utf-8" />
+	<constant name="struts.multipart.maxSize" value="1000000000" />
+<!-- 	<constant name="struts.multipart.saveDir" value="/tmp" /> -->
+	<package name="myPackage" namespace="/" extends="json-default" >
+	
+		<action name="login" class="loginAction">		
+			<result name="success">/jsp/index.jsp</result>
+			<result name="error">/errer.jsp</result>
+		</action>
+		<!-- 注销 -->
+		<action name="logout" class="logoutAction">		
+			<result name="success">/login.jsp</result>
+			<result name="error">/errer.jsp</result>
+		</action>
+		
+		<!-- 订单模块 start -->
+		<action name="order" class="orderAction">
+			<result name="index">/jsp/order/orderIndex.jsp</result>
+			<result name="maintain">/jsp/order/orderMaintain2.jsp</result>
+			<result name="maintain2">/jsp/order/orderMaintain2.jsp</result><!-- 测试订单工厂车号配置 -->
+			<result name="review">/jsp/order/orderReview.jsp</result>
+			<result name="config">/jsp/order/orderConfig.jsp</result>
+			<result name="configAllot">/jsp/order/orderConfigAllot.jsp</result>
+			<result name="busnumber">/jsp/order/orderBusNumber.jsp</result>
+			<result name="ordersearch">/jsp/order/orderSearch.jsp</result>
+		</action>
+		<action name="OrderConfig" class="OrderConfigAction">  
+			<result name="config" type="redirect">/order!config.action</result> 
+		</action>
+		<!-- 订单模块 end -->
+		
+		<!-- 计划模块 start -->
+		<action name="plan" class="planAction">
+			<result name="index">/jsp/plan/planIndex.jsp</result>
+			<result name="importMaster">/jsp/plan/planImportMaster.jsp</result>
+			<result name="preview">/jsp/plan/planPreview.jsp</result>
+			<result name="revision">/jsp/plan/planRevision.jsp</result>			
+			<result name="month">/jsp/plan/planMonth.jsp</result>		
+			<result name="issuance">/jsp/plan/planIssuance.jsp</result>
+			<result name="issuance2">/jsp/plan/planIssuance2.jsp</result>
+			<result name="generatevin">/jsp/plan/planGenerateVIN.jsp</result>
+			<result name="busnumbersearch">/jsp/plan/planBusNumberSearch.jsp</result>
+			<result name="plandone">/jsp/plan/planDone.jsp</result>
+			<result name="plansearch">/jsp/plan/planSearch.jsp</result>
+			<result name="bustransfer">/jsp/plan/planBusTransfer.jsp</result>
+			<result name="exceptionmanager">/jsp/plan/planExceptionManager.jsp</result>
+			<result name="pausemanager">/jsp/plan/planPauseManager.jsp</result>
+			<result name="importMasterSuccess" type="redirect">plan!importMaster.action</result> 			
+		</action>
+		<!-- 发车模块 -->
+		<action name="busDispatch" class="busDispatchAction">
+			<result name="plan_list">/jsp/plan/planDispatch.jsp</result>
+			<result name="doDispatch">/jsp/plan/busDoDispatch.jsp</result>
+			<result name="orderDispatch">/jsp/plan/orderToolsDispatch.jsp</result>
+			<result name="dispatchQuery">/jsp/plan/busDispatchQuery.jsp</result>
+			<result name="dispatchDesc">/jsp/plan/busDispatchDesc.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		
+		<!-- 计划模块 end -->
+		
+		<!-- 技改模块 start -->
+		<action name="ecnDocument" class="ecnDocumentAction">
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			<interceptor-ref name="defaultStack" />
+			<result name="index">/jsp/techtrans/techTransIndex.jsp</result>
+			<result name="maintain">/jsp/techtrans/techTranDocumentMaintain.jsp</result>
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			    <!-- 文件过滤 -->
+                <param name="allowedTypes">image/bmp,image/png,image/gif,image/jpeg,image/jpg</param>
+                <!-- 文件大小, 以字节为单位 -->
+                <param name="maximumSize">1024*1024*10*2</param>
+			<interceptor-ref name="defaultStack" />
+		</action>
+		<action name="ecnDocumentTask" class="ecnDocumentTaskAction">
+			<result name="maintain">/jsp/techtrans/techTranDocumentTaskMaintain.jsp</result>
+			<result name="taskfollowupmaintain">/jsp/techtrans/techTranTaskFollowUpMaintain.jsp</result>
+			<result name="ecnSearch">/jsp/techtrans/ecnInformationSearch.jsp</result>
+			<result name="worktimeMaintain">/jsp/techtrans/ecnWorkTimeMaintain.jsp</result>
+			<result name="worktimeVerify">/jsp/techtrans/ecnWorktimeVerify.jsp</result>	
+			<result name="ecnWorkTimeInfoPage">/jsp/techtrans/ecnWorkTimeInfo.jsp</result>			
+		</action>
+		<action name="swrNotice" class="swrNoticeAction">
+			<result name="maintain">/jsp/techtrans/swrNoticeMaintain.jsp</result>
+			<result name="showTechTransList">/jsp/techtrans/techTransList.jsp</result>
+		</action>
+		<!-- 技改模块 end -->
+		
+		<!-- 成本模块 start -->
+		<action name="selfcost" class="selfcostAction">
+			<result name="index">/jsp/selfcost/selfcostIndex.jsp</result>
+			<result name="singlebusmanufacturing">/jsp/selfcost/selfcostSinglebusManufacturing.jsp</result>
+			<result name="uploadsinglebusmanufacturing" type="redirect">selfcost!singlebusmanufacturing.action?factory_id=${query_factory_id}&amp;cost_month=${query_cost_month}</result>
+			<result name="schedule">/jsp/selfcost/selfcostSchedule.jsp</result>
+			<result name="uploadschedule" type="redirect">selfcost!schedule.action?factory_id=${query_factory_id}</result>
+			<result name="classification">/jsp/selfcost/selfcostClassification.jsp</result>
+			<result name="uploadclassification" type="redirect">selfcost!classification.action?factory_id=${query_factory_id}&amp;cost_month=${query_cost_month}</result>
+		</action>
+		<!-- 成本模块 end -->
+		
+		<!-- <action name="common" class="commonAction">
+		</action> -->
+		<action name="common" class="commonAction">
+			<!-- <result name="facotryList" type="json"></result> -->
+			<result type="json">
+				<param name="root">selectList</param>
+			</result>
+		</action> 
+		
+	</package>
+	 <include file="struts-baseData.xml"></include>
+	 <include file="struts-quality.xml"></include>
+	 <include file="struts-aftersale.xml"></include>
+	 <include file="struts-report.xml"></include>
+	 <include file="struts-account.xml"></include>
+	 <include file="struts-production.xml"></include>
+	 <include file="struts-hr.xml"></include>
+	 <include file="struts-email.xml"></include>
+</struts>

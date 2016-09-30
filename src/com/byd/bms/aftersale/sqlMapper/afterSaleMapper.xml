@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.byd.bms.aftersale.dao.IAfterSaleDao">
+	
+	<resultMap type="afterSalesProblems" id="afterSalesProblemsMap">
+		<id property="id" column="id"/>
+		<result property="vin" column="vin"/>
+		<result property="customer_bus_number" column="customer_bus_number"/>	
+		<result property="license_number" column="license_number"/>	
+		<result property="order_describe" column="order_describe"/>
+		<result property="customer_name" column="customer_name"/>	
+		<result property="factory_date" column="factory_date"/>	
+		<result property="fault_type_ids" column="fault_type_ids"/>	
+		<result property="faultTypeName" column="faultTypeName"/>	
+		<result property="fault_level_id" column="fault_level_id"/>	
+		<result property="faultLevelName" column="faultLevelName"/>	
+		<result property="fault_date" column="fault_date"/>	
+		<result property="fault_mils" column="fault_mils"/>	
+		<result property="fault_components" column="fault_components"/>	
+		<result property="fault_phenomenon" column="fault_phenomenon"/>	
+		<result property="fault_photo" column="fault_photo"/>	
+		<result property="fault_reason" column="fault_reason"/>	
+		<result property="status" column="status"/>	
+		<result property="memo" column="memo"/>	
+		<result property="editor_id" column="editor_id"/>	
+		<result property="edit_date" column="edit_date"/>	
+	</resultMap>
+	
+	<resultMap type="improveSalesProblems" id="improveSalesProblemsMap">
+		<id property="id" column="id"/>
+		<result property="problem_id" column="problem_id"/>
+		<result property="fault_phenomenon" column="fault_phenomenon"/>	
+		<result property="severity_level" column="severity_level"/>	
+		<result property="provisional_measures" column="provisional_measures"/>
+		<result property="reason" column="reason"/>	
+		<result property="improved_measure" column="improved_measure"/>	
+		<result property="verify" column="verify"/>	
+		<result property="standard" column="standard"/>	
+		<result property="before_photo" column="before_photo"/>	
+		<result property="after_photo" column="after_photo"/>	
+		<result property="editor_id" column="editor_id"/>	
+		<result property="edit_date" column="edit_date"/>	
+	</resultMap>
+	
+	<select id="getAfterSalesProblemsList" parameterType="Map" resultType="com.byd.bms.aftersale.entity.AfterSalesProblems">
+			SELECT p.*,k.key_name faultLevelName,f.factory_name,u.username editor,i.severity_level FROM BMS_AF_AFTER_SALES_PROBLEMS p 
+			LEFT JOIN BMS_BASE_FACTORY f ON p.factory_id = f.id 
+			LEFT JOIN BMS_BASE_KEY k ON p.fault_level_id = k.id 
+			LEFT JOIN BMS_BASE_USER u ON p.editor_id = u.id
+			LEFT JOIN BMS_AF_IMPROVE_SALES_PROBLEMS i ON p.id = i.problem_id  
+			where 1=1 
+			<if test="id!=null">
+				AND p.id = #{id} 
+			</if>			
+			<if test="seach_factory!=null">
+				AND p.factory_id in (
+	  					select case when LOCATE(p.factory_id,#{seach_factory})>0 then p.factory_id else 0 end as factory_id
+							from BMS_BASE_FACTORY f )
+			</if>
+			<if test="search_customer_name!=null">
+				AND p.customer_name LIKE CONCAT('%',#{search_customer_name},'%')  
+			</if>
+			<if test="search_fault_phenomenon!=null">
+				AND p.fault_phenomenon LIKE CONCAT('%',#{search_fault_phenomenon},'%')  
+			</if>
+			<if test="search_VIN!=null">
+				AND p.vin LIKE CONCAT('%',#{search_VIN},'%')  
+			</if>
+			<if test="search_bus_number!=null">
+				AND p.bus_number LIKE CONCAT('%',#{search_bus_number},'%')  
+			</if>
+			<if test="search_parts_name!=null">
+				AND p.fault_components LIKE CONCAT('%',#{search_parts_name},'%')  
+			</if>
+			<if test="startDate!=null and endDate==null">
+				<![CDATA[ AND p.fault_date>= #{startDate} ]]>
+			</if>
+			<if test="startDate==null and endDate!=null">
+				<![CDATA[ AND p.fault_date<= #{endDate} ]]>
+			</if>
+			<if test="startDate!=null and endDate!=null">
+				<![CDATA[ AND #{startDate}<=p.fault_date AND p.fault_date <= #{endDate} ]]>
+			</if>
+			<if test="status!=null">
+				AND p.status = #{status} 
+			</if>
+			order by p.factory_id,p.fault_date desc
+			<if test="offset!=null">
+				LIMIT #{offset} ,#{pageSize} 
+			</if>
+	</select>
+	<select id="getAfterSalesProblemsTotalCount" parameterType="Map" resultType="int">
+			SELECT count(p.id) FROM BMS_AF_AFTER_SALES_PROBLEMS p 
+			LEFT JOIN BMS_BASE_FACTORY f ON p.factory_id = f.id 
+			LEFT JOIN BMS_BASE_USER u ON p.editor_id = u.id where 1=1 
+			<if test="id!=null">
+				AND p.id = #{id} 
+			</if>				
+			<if test="seach_factory!=null">
+				AND p.factory_id in (
+	  					select case when LOCATE(p.factory_id,#{seach_factory})>0 then p.factory_id else 0 end as factory_id
+							from BMS_BASE_FACTORY f )
+			</if>
+			<if test="search_fault_phenomenon!=null">
+				AND p.fault_phenomenon LIKE CONCAT('%',#{search_fault_phenomenon},'%')   
+			</if>
+			<if test="search_VIN!=null">
+				AND p.vin LIKE CONCAT('%',#{search_VIN},'%')  
+			</if>
+			<if test="search_bus_number!=null">
+				AND p.bus_number LIKE CONCAT('%',#{search_bus_number},'%')  
+			</if>
+			<if test="search_parts_name!=null">
+				AND p.fault_components LIKE CONCAT('%',#{search_parts_name},'%')  
+			</if>
+			<if test="startDate!=null and endDate==null">
+				<![CDATA[ AND p.fault_date>= #{startDate} ]]>
+			</if>
+			<if test="startDate==null and endDate!=null">
+				<![CDATA[ AND p.fault_date<= #{endDate} ]]>
+			</if>
+			<if test="startDate!=null and endDate!=null">
+				<![CDATA[ AND #{startDate}<=p.fault_date AND p.fault_date <= #{endDate} ]]>
+			</if>
+			<if test="status!=null">
+				AND p.status = #{status} 
+			</if>
+			order by p.factory_id,p.fault_date desc
+	</select>
+	
+	<insert id="addAfterSaleProblem" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.aftersale.entity.AfterSalesProblems">
+		<![CDATA[
+			INSERT INTO BMS_AF_AFTER_SALES_PROBLEMS
+			(factory_id,customer_name,vin,bus_number,order_id,order_describe,customer_bus_number,license_number,
+			factory_date,fault_type_ids,fault_type_name,fault_level_id,fault_date,fault_mils,fault_components,fault_phenomenon,fault_photo,fault_reason,memo,editor_id,edit_date)
+			VALUES(#{factory_id},#{customer_name},#{vin},#{bus_number},#{order_id},#{order_describe},#{customer_bus_number},#{license_number},#{factory_date},
+			#{fault_type_ids},#{fault_type_name},#{fault_level_id},#{fault_date},#{fault_mils},#{fault_components},#{fault_phenomenon},
+			#{fault_photo},#{fault_reason},#{memo},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	
+	<update id="modifyAfterSaleProblem" parameterType="com.byd.bms.aftersale.entity.AfterSalesProblems">
+		<![CDATA[
+			UPDATE BMS_AF_AFTER_SALES_PROBLEMS SET
+			factory_id = #{factory_id},customer_name = #{customer_name},order_id = #{order_id},order_describe = #{order_describe},customer_bus_number = #{customer_bus_number},
+			license_number = #{license_number},factory_date = #{factory_date},fault_type_ids = #{fault_type_ids},fault_type_name = #{fault_type_name},
+			fault_level_id = #{fault_level_id},fault_date = #{fault_date},fault_mils = #{fault_mils},fault_components = #{fault_components},fault_phenomenon = #{fault_phenomenon},
+			 ]]>
+			<if test="fault_photo!=null">
+				fault_photo = #{fault_photo},
+			</if> 
+			fault_reason = #{fault_reason},memo = #{memo},editor_id = #{editor_id},edit_date = #{edit_date} 
+			where id = #{id}
+	</update>
+	
+	<select id="getBusInfo" parameterType="Map" resultType="Map">
+		SELECT o.id orderId,o.order_name,t.bus_type_code,o.order_qty,b.customer_number,b.bus_number,b.vin,d.dispatch_date FROM BMS_PLAN_BUS b 
+			LEFT JOIN BMS_ORDER o ON b.order_id = o.id
+			LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id
+			LEFT JOIN BMS_PLAN_BUS_DISPATCH d ON b.bus_number = d.bus_number 
+ 			WHERE 1=1 
+ 			<if test="vin!=null">
+				AND b.vin=#{vin}
+			</if>
+			<if test="busNumber!=null">
+				AND b.bus_number=#{busNumber}
+			</if>
+			<if test="factory_id!=null">
+				AND b.factory_id=#{factory_id}
+			</if>	
+	</select>
+	
+	<select id="getImproveSalesProblemsList" parameterType="Map" resultType="com.byd.bms.aftersale.entity.ImproveSalesProblems">
+		SELECT i.id,p.id problem_id,i.severity_level,p.fault_level_id,i.provisional_measures,i.reason,i.improved_measure,i.verify,i.standard,i.before_photo,i.after_photo,i.attachment,i.editor_id,i.edit_date,p.fault_phenomenon,u.username editor 
+			FROM BMS_AF_AFTER_SALES_PROBLEMS p 
+			LEFT JOIN BMS_AF_IMPROVE_SALES_PROBLEMS i ON p.id = i.problem_id
+			LEFT JOIN BMS_BASE_USER u ON p.editor_id = u.id where 1=1
+			<if test="problem_id!=null">
+				AND p.id = #{problem_id} 
+			</if>
+			order by p.fault_date desc,i.edit_date
+	</select>
+	
+	<insert id="addImproveSalesProblems" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.aftersale.entity.ImproveSalesProblems">
+		<![CDATA[
+			INSERT INTO BMS_AF_IMPROVE_SALES_PROBLEMS
+			(problem_id,severity_level,provisional_measures,reason,improved_measure,verify,standard,
+			before_photo,after_photo,attachment,editor_id,edit_date)
+			VALUES(#{problem_id},#{severity_level},#{provisional_measures},#{reason},#{improved_measure},#{verify},#{standard},
+			#{before_photo},#{after_photo},#{attachment},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	
+	<update id="updateImproveSalesProblems" parameterType="com.byd.bms.aftersale.entity.ImproveSalesProblems">
+			UPDATE BMS_AF_IMPROVE_SALES_PROBLEMS SET
+			severity_level = #{severity_level},provisional_measures=#{provisional_measures},reason=#{reason},improved_measure=#{improved_measure},
+			verify=#{verify},standard=#{standard},
+			<if test="before_photo!=null">
+				before_photo=#{before_photo},
+			</if> 
+			<if test="after_photo!=null">
+				after_photo=#{after_photo},
+			</if> 
+			<if test="attachment!=null">
+				attachment=#{attachment},
+			</if> 		
+			editor_id=#{editor_id},edit_date=#{edit_date} 
+			WHERE id = #{id}
+	</update>
+	
+	<update id="updateAfterSaleProblem" parameterType="com.byd.bms.aftersale.entity.ImproveSalesProblems">
+		<![CDATA[
+			UPDATE BMS_AF_AFTER_SALES_PROBLEMS SET status = '2' 
+			WHERE id = #{problem_id}
+		]]>
+	</update>
+	
+	<select id="getProblemsList" parameterType="Map" resultType="com.byd.bms.aftersale.entity.AfterSalesProblems">
+			SELECT p.*,i.provisional_measures,i.reason,i.improved_measure,i.verify,i.standard,i.severity_level,
+			k.key_name faultLevelName,f.factory_name,u.username editor,u1.username report_editor,i.edit_date report_edit_date 
+			FROM BMS_AF_AFTER_SALES_PROBLEMS p 
+			LEFT JOIN BMS_AF_IMPROVE_SALES_PROBLEMS i ON p.id = i.problem_id 
+			LEFT JOIN BMS_BASE_FACTORY f ON p.factory_id = f.id 
+			LEFT JOIN BMS_BASE_KEY k ON p.fault_level_id = k.id 
+			LEFT JOIN BMS_BASE_USER u ON p.editor_id = u.id 
+			LEFT JOIN BMS_BASE_USER u1 ON i.editor_id = u1.id 
+			where 1=1 
+			<if test="id!=null">
+				AND p.id = #{id} 
+			</if>			
+			<if test="seach_factory!=null">
+				AND p.factory_id in (
+	  					select case when LOCATE(p.factory_id,#{seach_factory})>0 then p.factory_id else 0 end as factory_id
+							from BMS_BASE_FACTORY f )
+			</if>
+			<if test="search_customer_name!=null">
+				AND p.customer_name LIKE CONCAT('%',#{search_customer_name},'%')  
+			</if>
+			<if test="search_fault_phenomenon!=null">
+				AND p.fault_phenomenon LIKE CONCAT('%',#{search_fault_phenomenon},'%')  
+			</if>
+			<if test="search_VIN!=null">
+				AND p.vin LIKE CONCAT('%',#{search_VIN},'%')  
+			</if>
+			<if test="search_bus_number!=null">
+				AND p.bus_number LIKE CONCAT('%',#{search_bus_number},'%')  
+			</if>
+			<if test="search_parts_name!=null">
+				AND p.fault_components LIKE CONCAT('%',#{search_parts_name},'%')  
+			</if>
+			<if test="startDate!=null and endDate==null">
+				<![CDATA[ AND p.fault_date>= #{startDate} ]]>
+			</if>
+			<if test="startDate==null and endDate!=null">
+				<![CDATA[ AND p.fault_date<= #{endDate} ]]>
+			</if>
+			<if test="startDate!=null and endDate!=null">
+				<![CDATA[ AND #{startDate}<=p.fault_date AND p.fault_date <= #{endDate} ]]>
+			</if>
+			<if test="status!=null">
+				AND p.status = #{status} 
+			</if>
+			order by p.fault_date desc,i.edit_date
+	</select>
+	
+</mapper>

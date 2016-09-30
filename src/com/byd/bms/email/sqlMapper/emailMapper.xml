@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.hr.dao.IOrgDao">
+	<!-- 获得邮件模板 -->
+	<select id="getEmailTemplet" parameterType="Map" resultType="Map">
+		SELECT
+		IFNULL(BMS_BASE_EMAIL.`declare`,'') as `declare`,
+		IFNULL(BMS_BASE_EMAIL.content,'') as content,
+		IFNULL(BMS_BASE_EMAIL.`subject`,'') as `subject`,
+		IFNULL(BMS_BASE_EMAIL.inbox,'') as inbox,
+		IFNULL(BMS_BASE_EMAIL.cc,'') as cc,
+		IFNULL(BMS_BASE_EMAIL.email_type,'') as email_type,
+		IFNULL(BMS_BASE_EMAIL.factory_id,'') as factory_id,
+		IFNULL(BMS_BASE_FACTORY.factory_name,'') as factory_name
+		FROM
+		BMS_BASE_EMAIL
+		LEFT JOIN BMS_BASE_FACTORY ON BMS_BASE_EMAIL.factory_id =
+		BMS_BASE_FACTORY.id
+		WHERE
+		1=1
+		<if test="email_type!='' and email_type!=null">
+			AND email_type=#{email_type}
+		</if>
+	</select>
+</mapper>

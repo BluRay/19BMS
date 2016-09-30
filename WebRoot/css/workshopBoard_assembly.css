@@ -1,0 +1,97 @@
+body{/* background: #D0E0D0; */width:1348px;height: 768px;margin: 0;padding: 0;font-size: 16px;font-weight: normal;
+}
+.main {
+	height: 99%;
+	overflow-y: hidden;
+}
+.div_head{
+	height:12%;
+	background:#d9d9d9;
+	font-weight: bold;
+	color:red;
+}
+.div_foot{
+	height:7%;
+	background:#d9d9d9;
+	color:red;
+	font-size:48px;
+	line-height:100%;
+	margin-top:30px;
+	padding-top:5px;
+	padding-bottom:5px;
+	vertical-align: middle;
+	font-weight:bold;
+}
+.div_board{
+	height:20%;padding-top:15px
+}
+
+.board_main{
+	width: 250px; line-height:15px;text-align:center;height:100%;
+	float:left;font-weight:bold;
+}
+.board_production{
+	width: 1000px; line-height:15px;text-align:center;height:100%;
+	float:left;font-weight:bold;
+}
+.board_main2{
+	width: 170px; line-height:15px;text-align:center;height:100%;
+	float:left;font-weight:bold;
+}
+.board_work{
+	width:100%;height:8%;text-align:center;font-size:60px;line-height:100%;font-weight:bold;color:rgb(58, 158, 33);margin-top:15px
+}
+#board_logo{
+	width:7%;display: inline-block;margin-left: 5px;
+}
+#byd_logo{height: 80%;margin-top: -30px;}
+#board_time{
+	width:30%;height:99%;color:black;font-size:40px;display: inline-block;text-align:right;font-weight:bold;margin-top: 30px;
+}
+#board_title{
+	width: 60%;height:99%;color:black;font-size:60px;display: inline-block;text-align:left;font-weight:bold;margin-top: 30px;
+}
+.board_table{
+	font-size: 48px; line-height: 50px; text-align: center;width:100%;height:99%
+}
+.board_table2{
+	font-size: 36px; text-align: center;width:100%;height:99%
+}
+.board_table2 .tr{
+	height:50%
+}
+
+/* 焊装CSS样式 */
+.div_board_welding{
+	height:50%;background-image:url('/19bms/images/welding_board.png');
+	background-repeat:no-repeat;margin-top:20px;margin-bottom:10px;
+	
+}
+.parts_data{
+	position: relative;
+	font-size: 46px;
+	width: 100px;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+}
+.process_name{
+	position: relative;
+	font-size: 46px;
+	width: 140px;
+	height: 80px;
+	line-height: 80px;
+	text-align: center;
+}
+.div_foot_w{
+	height:80px;
+	background:#d9d9d9;
+	color:red;
+	font-size:48px;
+	line-height:80px;
+	margin-top:15px;
+	padding-top:0px;
+	padding-bottom:5px;
+	vertical-align: middle;
+	font-weight:bold;
+}

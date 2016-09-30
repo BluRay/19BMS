@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.account.dao.IAccountManageDao">
+	<select id="queryAccountById" parameterType="int"
+		resultType="com.byd.bms.util.entity.BmsBaseUser">
+		select u.*,d.department,f.factory_name from BMS_BASE_USER u
+		left join
+		BMS_BASE_DEPARTMENT d on u.department_id=d.id
+		left join
+		BMS_BASE_FACTORY f on d.factory_id=f.id
+		where u.id=#{userId}
+	</select>
+	<select id="queryAccountsList" parameterType="Map"
+		resultType="com.byd.bms.util.entity.BmsBaseUser">
+		select u.*,d.department,f.factory_name from BMS_BASE_USER u left join
+		BMS_BASE_DEPARTMENT d on u.department_id=d.id
+		left join
+		BMS_BASE_FACTORY f on u.factory_id=f.id where u.isdelete='0' and u.card_number!='admin'
+		<if test="cardNumber !=null and cardNumber !=''">
+			and u.card_number like CONCAT('%',#{cardNumber},'%') 
+		</if>
+		<if test="userName !=null and userName !=''">
+			and u.username like CONCAT('%',#{userName},'%') 
+		</if>
+		<if test="email !=null and email !=''">
+			and u.email = #{email}
+		</if>
+		<if test="factory_id !=null and factory_id !=''">
+			and u.factory_id = #{factory_id}
+		</if>
+		<if test="department_id !=null and department_id !=''">
+			and u.department_id = #{department_id}
+		</if>
+			order by u.id
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="queryAccountsCount" parameterType="Map" resultType="int">
+		select count(u.id) from BMS_BASE_USER u left join BMS_BASE_DEPARTMENT
+		d on u.department_id=d.id
+		left join BMS_BASE_FACTORY f on
+		d.factory_id=f.id where u.card_number!='admin'
+		<if test="cardNumber !=null and cardNumber !=''">
+			and u.card_number like CONCAT('%',#{cardNumber},'%') 
+		</if>
+		<if test="userName !=null and userName !=''">
+			and u.username like CONCAT('%',#{userName},'%') 
+		</if>
+		<if test="email !=null and email !=''">
+			and u.email = #{email}
+		</if>
+		<if test="factory_id !=null and factory_id !=''">
+			and d.factory_id = #{factory_id}
+		</if>
+		<if test="department_id !=null and department_id !=''">
+			and u.department_id = #{department_id}
+		</if>
+	</select>
+	<select id="queryAccountExist" parameterType="Map" resultType="int">
+		select count(u.id) from BMS_BASE_USER u left join BMS_BASE_DEPARTMENT
+		d on u.department_id=d.id
+		left join BMS_BASE_FACTORY f on
+		d.factory_id=f.id where 1=1
+		<if test="cardNumber !=null and cardNumber !=''">
+			and u.card_number = #{cardNumber}
+		</if>
+	</select>
+	
+	<insert id="addAccount" parameterType="com.byd.bms.util.entity.BmsBaseUser">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_BASE_USER
+		(card_number,card_8H10D,username,email,telephone,cellphone,password,display_name,factory_id,department_id,admin)
+		values(#{card_number},#{card_8H10D},#{username},#{email},#{telephone},#{cellphone},#{password},#{username},#{factory_id},#{department_id},#{admin})
+	</insert>
+	<insert id="addDefaultRole" parameterType="Map">
+		insert into BMS_BASE_USER_ROLE (user_id,role_id) values(#{userId},#{roleId})
+	</insert>
+	<update id="updateAccount" parameterType="com.byd.bms.util.entity.BmsBaseUser">
+		update BMS_BASE_USER
+		<set>
+			<if test="card_number !=null ">
+				card_number=#{card_number},
+			</if>
+			<if test="card_8H10D !=null ">
+				card_8H10D=#{card_8H10D},
+			</if>
+			<if test="username !=null">
+				username=#{username},
+			</if>
+			<if test="role_id !=0">
+				role_id=#{role_id},
+			</if>
+			<if test="email !=null">
+				email=#{email},
+			</if>
+			<if test="telephone !=null">
+				telephone=#{telephone},
+			</if>
+			<if test="cellphone !=null">
+				cellphone=#{cellphone},
+			</if>
+			<if test="password !=null">
+				password=#{password},
+			</if>
+			<if test="pwd_modified !=null">
+				pwd_modified=#{pwd_modified},
+			</if>
+			<if test="display_name !=null">
+				display_name=#{username},
+			</if>
+			<if test="factory_id !=null">
+				factory_id=#{factory_id},
+			</if>
+			<if test="department_id !=null">
+				department_id=#{department_id},
+			</if>
+			<if test="admin !=null">
+				admin=#{admin},
+			</if>
+			<if test="isdelete !=null">
+				isdelete=#{isdelete}
+			</if>
+
+		</set>
+		where id=#{id}
+	</update>
+	<select id="queryAuthList" parameterType="int" resultType="Map">
+		select distinct r.*,case when u.user_id is not null then 'authed' else
+		'unauthed' end as auth_flag,u.factory,u.workshop
+		from BMS_BASE_ROLE r left join BMS_BASE_USER_ROLE u on r.id=u.role_id and
+		u.user_id=#{userId}
+		order by r.model_flag,r.serial_number,r.role_name
+	</select>
+	<select id="queryAuthAssign" parameterType="int" resultType="int">
+		select count(id) from BMS_BASE_USER_ROLE where user_id=#{userId}
+	</select>
+	<delete id="deleteAuth" parameterType="int" >
+		 delete  from BMS_BASE_USER_ROLE where user_id=#{userId}
+	</delete>
+	<insert id="insertAuth" useGeneratedKeys="true"
+		parameterType="java.util.List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_BASE_USER_ROLE
+		(user_id,role_id,workshop,factory)
+		values
+		<foreach collection="list" item="detail" index="index"
+			separator=",">
+			(#{detail.user_id},#{detail.role_id},#{detail.workshop},#{detail.factory})
+		</foreach>
+	</insert>
+</mapper>

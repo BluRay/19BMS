@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd"> 
+<configuration>
+	<typeAliases>
+		<typeAlias alias="bmsecntask" type="com.byd.bms.techtrans.entity.BmsEcnTask"/>
+		<typeAlias alias="bmstaskdetailconfig" type="com.byd.bms.techtrans.entity.BmsTaskDetailConfig" />
+		<typeAlias alias="bmsEcnTime" type="com.byd.bms.techtrans.entity.BmsEcnTime" />
+		<typeAlias alias="bmsecndetailtime" type="com.byd.bms.techtrans.entity.BmsEcnTaskDetail"/>
+		<typeAlias alias="bmssingleTasklist" type="com.byd.bms.techtrans.entity.BmsSingleTaskFollow"/>
+		<typeAlias alias="bmssingletaskorderlist" type="com.byd.bms.techtrans.entity.BmsSingleTaskOrderList"/>
+		<typeAlias alias="bmssinglebusdetaillist" type="com.byd.bms.techtrans.entity.BmsSingleBusDetailList"/>
+	</typeAliases>
+	<mappers>
+		<mapper resource="com/byd/bms/techtrans/sqlMapper/ecnTaskMapper.xml"/>
+	</mappers>
+</configuration>

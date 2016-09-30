@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<struts>
+	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
+	<package name="aftersaleModel" extends="json-default">
+		<!-- 售后问题 -->
+		<action name="afterSale" method="execute" class="afterSaleAction" >
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			<interceptor-ref name="defaultStack" />
+			<result name="index">/jsp/aftersale/afterSaleIndex.jsp</result>
+			<result name="afterSaleProblem">/jsp/aftersale/afterSaleProblem.jsp</result>
+			<result name="improveReport">/jsp/aftersale/improveReport.jsp</result>
+			<result name="queryAfterSaleProblems">/jsp/aftersale/queryAfterSaleProblems.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			    <!-- 文件过滤 -->
+                <param name="allowedTypes">image/bmp,image/png,image/gif,image/jpeg,image/jpg</param>
+                <!-- 文件大小, 以字节为单位 -->
+               <!-- <param name="maximumSize">1025956</param> -->
+			<interceptor-ref name="defaultStack" />
+		</action>
+	</package>
+</struts>

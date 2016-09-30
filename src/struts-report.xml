@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<struts>
+	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
+	<package name="reportModal" extends="json-default">
+		<action name="orderReport" class="orderReportAction">
+			<result name="orderIndex">/jsp/report/order_report_index.jsp</result>
+			<result name="orderInProcessReport">/jsp/report/order_in_process.jsp</result>
+			<result name="factoryOrderProcessReport">/jsp/report/factory_order_process_report.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+				<param name="root">list</param>
+			</result>
+		</action>
+		<action name="planReport" class="planReportAction">
+			<result name="factoryRateReport">/jsp/report/plan_factory_rate.jsp</result>
+			<result name="workshopRateReport">/jsp/report/plan_workshop_rate.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="ecnReport" class="ecnReportAction">
+			<result name="ecnIndex">/jsp/report/ecn_report_index.jsp</result>
+			<result name="ecnTimeReport">/jsp/report/ecn_time_report.jsp</result>
+			<result name="ecnOrderScheduleReport">/jsp/report/ecn_order_schedule_report.jsp</result>
+			<result name="ecnBusTypeReport">/jsp/report/ecn_bus_type_report.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="qualityReport" class="qualityReportAction">
+			<result name="qualityIndex">/jsp/report/quality_report_index.jsp</result>
+			<result name="DPU">/jsp/report/dpu_report.jsp</result>
+			<result name="passRate">/jsp/report/pass_rate_report.jsp</result>
+			<result name="processProblem">/jsp/report/process_problem_report.jsp</result>
+			<result name="qcScoreCompare">/jsp/report/qc_score_compare.jsp</result>
+			<result name="processProblem_W">/jsp/report/wprocess_problem_report.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="productionReport" class="productionReportAction">
+			<result name="productionIndex">/jsp/report/production_report_index.jsp</result>
+			<result name="daily">/jsp/report/production_report.jsp</result>
+			<result name="pauseReport">/jsp/report/production_pause_report.jsp</result>
+			<result name="exceptionReport">/jsp/report/production_exception_report.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="costReport" class="costReportAction">
+			<result name="costIndex">/jsp/report/cost_report_index.jsp</result>
+			<result name="ecnCostReport">/jsp/report/ecn_cost_report.jsp</result>
+			<!-- add by wuxiao 2015/9/17 -->
+			<result name="singleBusManufacturingCost">/jsp/report/single_bus_manufacturing_cost_report.jsp</result>
+			<result name="classificationCost">/jsp/report/classification_cost_report.jsp</result>
+			<result name="totalCost">/jsp/report/total_cost_report.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="afterSaleReport" class="afterSaleReportAction">
+			<result name="afterSaleIndex">/jsp/report/afterSale_report_index.jsp</result>
+			<result name="allAfterSaleProblemsReport">/jsp/report/afterSale_summarizing_report.jsp</result>
+			<result name="factoryAfterSaleProblemsReport">/jsp/report/afterSale_factory_report.jsp</result>
+			<result name="busTypeAfterSaleProblemsReport">/jsp/report/afterSale_bustype_report.jsp</result>
+			<result name="orderAfterSaleProblemsReport">/jsp/report/afterSale_order_report.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+	</package>
+</struts>	
+	

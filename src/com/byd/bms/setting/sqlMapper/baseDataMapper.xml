@@ -1,0 +1,909 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.util.dao.IRoleAuthorityDao">
+	<!-- 工厂表映射 -->
+	<resultMap type="factory" id="factoryMap">
+		<id property="id" column="id" />
+		<result property="factoryCode" column="factory_code" />
+		<result property="factoryName" column="factory_name" />
+		<result property="area" column="area" />
+		<result property="assemblyCode" column="vin_assembly_code" />
+		<result property="deleteFlag" column="delete_flag" />
+		<result property="memo" column="memo" />
+		<result property="editorId" column="editor_id" />
+		<result property="editor" column="editor" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<select id="getFactoryList" parameterType="Map" resultMap="factoryMap">
+		select f.*,u.username editor from BMS_BASE_FACTORY f left join
+		BMS_BASE_USER u on u.id=f.editor_id where 1=1 and f.delete_flag='0'
+		<if test="factory!=null">
+			and (f.factory_name like CONCAT('%',#{factory},'%') or
+			f.factory_code like CONCAT('%',#{factory},'%') )
+		</if>
+		<if test="assembcode!=null">
+			and f.vin_assembly_code = #{assembcode}
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+
+	</select>
+	<select id="getFactoryTotalCount" parameterType="Map"
+		resultType="int">
+		select count(f.id) from BMS_BASE_FACTORY f left join BMS_BASE_USER u
+		on u.id=f.editor_id where 1=1 and f.delete_flag='0'
+		<if test="factory!=null">
+			and (f.factory_name like CONCAT('%',#{factory},'%') or
+			f.factory_code like CONCAT('%',#{factory},'%') )
+		</if>
+		<if test="assembcode!=null">
+			and f.vin_assembly_code = #{assembcode}
+		</if>
+	</select>
+	<insert id="addFactory" parameterType="factory">
+		<selectKey resultType="int" keyProperty="otaid" order="AFTER">
+			SELECT LAST_INSERT_ID() AS otaid
+		</selectKey>
+		insert into BMS_BASE_FACTORY
+		(factory_code,factory_name,area,vin_assembly_code,memo,editor_id,edit_date)
+		values(#{factoryCode},#{factoryName},#{area},#{assemblyCode},#{memo},#{editorId},#{editDate})
+	</insert>
+	<update id="deleteFactory" parameterType="java.util.List">
+
+		update BMS_BASE_FACTORY set delete_flag='1' where id in
+		<foreach collection="list" item="ids" index="index" open="("
+			close=")" separator=",">
+			#{ids}
+		</foreach>
+
+	</update>
+	<select id="checkDeleteFactory" parameterType="java.util.List" resultType="int">
+
+		select count(w.id) from BMS_BASE_WORKSHOP as w WHERE 1=1 and (w.delete_flag='0' or ISNULL(w.delete_flag)) and w.factory_id in
+		<foreach collection="list" item="ids" index="index" open="("
+			close=")" separator=",">
+			#{ids}
+		</foreach>
+
+	</select>
+	<update id="updateFactory" parameterType="factory">
+		update
+		BMS_BASE_FACTORY set
+		factory_code=#{factoryCode},factory_name=#{factoryName},vin_assembly_code=#{assemblyCode},
+		area=#{area},memo=#{memo},editor_id=#{editorId},edit_date=#{editDate}
+		where id=#{id}
+	</update>
+	
+	<!-- 车间表映射 -->
+	<resultMap type="workshop" id="workshopMap">
+		<id property="id" column="id" />
+		<result property="factoryId" column="factory_id" />
+		<result property="factoryName" column="factory_name" />
+		<result property="workshopName" column="workshop_name" />
+		<result property="workshopCode" column="workshop_code" />
+		<result property="preposing_workshop_id" column="preposing_workshop_id" />
+		<result property="deleteFlag" column="delete_flag" />
+		<result property="memo" column="memo" />
+		<result property="editorId" column="editor_id" />
+		<result property="editDate" column="edit_date" />
+		<result property="editor" column="editor" />
+	</resultMap>
+	<select id="getWorkshopList" parameterType="Map" resultMap="workshopMap">
+		SELECT w.id,w.workshop_name,f.id factoryId,f.factory_name factoryName,w.preposing_workshop_id,w.workshop_code,w.delete_flag,w.edit_date,w.memo,u.username editor from BMS_BASE_WORKSHOP as w left join
+		BMS_BASE_USER u on u.id=w.editor_id left join BMS_BASE_FACTORY f on w.factory_id=f.id where 1=1
+		<if test="factoryId!=''">
+			and (w.factory_id=#{factoryId})
+		</if>
+		<if test="workshopName!=null">
+			and (w.workshop_name like CONCAT('%',#{workshopName},'%') or
+			w.workshop_name like CONCAT('%',#{workshopName},'%') )
+		</if>
+		<if test="deleteFlag==1">
+			and (w.delete_flag=#{deleteFlag})
+		</if>
+		<if test="deleteFlag==0">
+			and (w.delete_flag=#{deleteFlag})
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getWorkshopTotalCount" parameterType="Map"
+		resultType="int">
+		select count(w.id) from BMS_BASE_WORKSHOP as w left join
+		BMS_BASE_USER u on u.id=w.editor_id left join BMS_BASE_FACTORY f on w.factory_id=f.id where 1=1
+		<if test="factoryId!=''">
+			and (w.factory_id=#{factoryId})
+		</if>
+		<if test="workshopName!=null">
+			and (w.workshop_name like CONCAT('%',#{workshopName},'%') or
+			w.workshop_name like CONCAT('%',#{workshopName},'%') )
+		</if>
+		<if test="deleteFlag==1">
+			and (w.delete_flag=#{deleteFlag})
+		</if>
+		<if test="deleteFlag==0">
+			and (w.delete_flag=#{deleteFlag})
+		</if>
+	</select>
+	<insert id="addWorkshop" parameterType="workshop">
+		<selectKey resultType="int" keyProperty="otaid" order="AFTER">
+			SELECT LAST_INSERT_ID() AS otaid
+		</selectKey>
+		insert into BMS_BASE_WORKSHOP
+		(factory_id,workshop_name,workshop_code,memo,editor_id,edit_date)
+		values(#{factoryId},#{workshopName},#{workshopCode},#{memo},#{editorId},#{editDate})
+	</insert>
+	<update id="updateWorkshop" parameterType="workshop">
+		update
+		BMS_BASE_WORKSHOP set
+		factory_id=#{factoryId},workshop_name=#{workshopName},workshop_code=#{workshopCode},preposing_workshop_id=#{preposing_workshop_id},
+		memo=#{memo},editor_id=#{editorId},edit_date=#{editDate}
+		where id=#{id}
+	</update>
+	<update id="deleteWorkshop" parameterType="java.util.List">
+
+		update BMS_BASE_WORKSHOP set delete_flag='1' where id in
+		<foreach collection="list" item="ids" index="index" open="("
+			close=")" separator=",">
+			#{ids}
+		</foreach>
+	</update>
+	<select id="checkDeleteWorkshop" parameterType="java.util.List" resultType="int">
+
+		select count(l.id) from BMS_BASE_LINE as l WHERE 1=1 and (l.delete_flag='0' or ISNULL(l.delete_flag)) and l.workshop_id in
+		<foreach collection="list" item="ids" index="index" open="("
+			close=")" separator=",">
+			#{ids}
+		</foreach>
+
+	</select>
+	
+	<!-- 线别表映射 -->
+	<resultMap type="line" id="lineMap">
+		<id property="id" column="id" />
+		<result property="factoryId" column="factoryId" />
+		<result property="factoryName" column="factoryName" />
+		<result property="workshopId" column="workshop_id" />
+		<result property="workshopName" column="workshopName" />
+		<result property="lineName" column="line" />
+		<result property="deleteFlag" column="delete_flag" />
+		<result property="memo" column="memo" />
+		<result property="editorId" column="editor_id" />
+		<result property="editDate" column="edit_date" />
+		<result property="editor" column="editor" />
+	</resultMap>
+	<select id="getLineList" parameterType="Map" resultMap="lineMap">
+		SELECT l.*,w.workshop_name workshopName,w.id workshopId,f.factory_name factoryName,f.id factoryId,u.username editor,u.id editorId FROM BMS_BASE_LINE as l 
+			LEFT JOIN BMS_BASE_WORKSHOP as w on l.workshop_id=w.id 
+			LEFT JOIN BMS_BASE_FACTORY as f on w.factory_id=f.id 
+			LEFT JOIN BMS_BASE_USER u on l.editor_id = u.id 
+				where 1=1
+		<if test="factoryId!=''">
+			and (f.id=#{factoryId})
+		</if>
+		<if test="workshopId!=''">
+			and (w.id=#{workshopId})
+		</if>
+		<if test="lineName!=null">
+			and (l.line like CONCAT('%',#{lineName},'%') or
+			l.line like CONCAT('%',#{lineName},'%') )
+		</if>
+		<if test="deleteFlag==1">
+			and (l.delete_flag=#{deleteFlag})
+		</if>
+		<if test="deleteFlag==0">
+			and (l.delete_flag=#{deleteFlag})
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getLineTotalCount" parameterType="Map"
+		resultType="int">
+		SELECT count(l.id) FROM BMS_BASE_LINE as l 
+			LEFT JOIN BMS_BASE_WORKSHOP as w on l.workshop_id=w.id 
+			LEFT JOIN BMS_BASE_FACTORY as f on w.factory_id=f.id 
+			LEFT JOIN BMS_BASE_USER u on l.editor_id = u.id 
+				where 1=1
+		<if test="factoryId!=''">
+			and (f.id=#{factoryId})
+		</if>
+		<if test="workshopId!=''">
+			and (w.id=#{workshopId})
+		</if>
+		<if test="lineName!=null">
+			and (l.line like CONCAT('%',#{lineName},'%') or
+			l.line like CONCAT('%',#{lineName},'%') )
+		</if>
+		<if test="deleteFlag==1">
+			and (l.delete_flag=#{deleteFlag})
+		</if>
+		<if test="deleteFlag==0">
+			and (l.delete_flag=#{deleteFlag})
+		</if>
+	</select>
+	<insert id="addLine" parameterType="line">
+		<selectKey resultType="int" keyProperty="otaid" order="AFTER">
+			SELECT LAST_INSERT_ID() AS otaid
+		</selectKey>
+		insert into BMS_BASE_LINE
+		(workshop_id,line,memo,editor_id,edit_date)
+		values(#{workshopId},#{lineName},#{memo},#{editorId},#{editDate})
+	</insert>
+	<update id="updateLine" parameterType="line">
+		update
+		BMS_BASE_LINE set
+		line=#{lineName},memo=#{memo},editor_id=#{editorId},edit_date=#{editDate}
+		where id=#{id}
+	</update>
+	<update id="deleteLine" parameterType="java.util.List">
+
+		update BMS_BASE_LINE set delete_flag='1' where id in
+		<foreach collection="list" item="ids" index="index" open="("
+			close=")" separator=",">
+			#{ids}
+		</foreach>
+	</update>
+	<select id="checkDeleteLine" parameterType="java.util.List" resultType="int">
+
+		select count(p.id) from BMS_BASE_PROCESS as p WHERE 1=1 and (p.delete_flag='0' or ISNULL(p.delete_flag)) and p.line_id in
+		<foreach collection="list" item="ids" index="index" open="("
+			close=")" separator=",">
+			#{ids}
+		</foreach>
+
+	</select>
+	<!-- 工序表映射 -->
+	<resultMap type="process" id="processMap">
+		<id property="id" column="id" />
+		<result property="factoryId" column="factoryId" />
+		<result property="factoryName" column="factoryName" />
+		<result property="workshopId" column="workshopId" />
+		<result property="workshopName" column="workshopName" />
+		<result property="lineId" column="line_id" />
+		<result property="lineName" column="lineName" />
+		<result property="processCode" column="process_code" />
+		<result property="processName" column="process_name" />
+		<result property="keyProcessFlag" column="key_process_flag" />
+		<result property="monitoryPointFlag" column="monitory_point_flag" />
+		<result property="qualityMonitoryFlag" column="quality_monitory_flag" />
+		<result property="planNodeId" column="plan_node_id" />
+		<result property="planNodeName" column="planNodeName" />
+		<result property="deleteFlag" column="delete_flag" />
+		<result property="memo" column="memo" />
+		<result property="editorId" column="editor_id" />
+		<result property="editDate" column="edit_date" />
+		<result property="editor" column="editor" />
+	</resultMap>
+	<select id="getProcessList" parameterType="Map" resultMap="processMap">
+		SELECT p.*,l.id lineId,l.line lineName,w.id workshopId,w.workshop_name workshopName,f.id factoryId,f.factory_name factoryName,k.id planNodeId,k.key_name planNodeName,u.id editor_id,u.username editor
+				FROM BMS_BASE_PROCESS as p 
+				LEFT JOIN BMS_BASE_LINE as l ON p.line_id=l.id
+				LEFT JOIN BMS_BASE_WORKSHOP as w on l.workshop_id=w.id 
+				LEFT JOIN BMS_BASE_FACTORY as f on w.factory_id=f.id 
+				LEFT JOIN BMS_BASE_KEY as k on p.plan_node_id= k.id
+				LEFT JOIN BMS_BASE_USER u on l.editor_id = u.id 
+				where 1=1 
+		<if test="factoryId!=''">
+			and (f.id=#{factoryId}) 
+		</if>
+		<if test="workshopId!=''">
+			and (w.id=#{workshopId}) 
+		</if>
+		<if test="lineId!=''">
+			and (l.id=#{lineId}) 
+		</if>
+		<if test="processName!=null">
+			and p.process_name like CONCAT("%",#{processName},"%") 
+		</if>
+		<if test="monitoryPointFlag==1 and keyProcessFlag!=1">
+			and (p.monitory_point_flag=#{monitoryPointFlag}) 
+		</if>
+		<if test="monitoryPointFlag!=1 and keyProcessFlag==1">
+			and (p.key_process_flag=#{keyProcessFlag}) 
+		</if>
+		<if test="monitoryPointFlag==1 and keyProcessFlag==1">
+			and (p.key_process_flag=#{keyProcessFlag} or p.monitory_point_flag=#{monitoryPointFlag} ) 
+		</if>
+		<if test="onlineFlag==1 and offlineFlag!=1" >
+			and (k.key_name_en like CONCAT('%','Online','%') or
+			key_name_en like CONCAT('%','Online','%') )
+		</if>
+		<if test="onlineFlag!=1 and offlineFlag==1">
+			and (k.key_name_en like CONCAT('%','Offline','%') or
+			key_name_en like CONCAT('%','Offline','%') )
+		</if>
+		
+		<if test="onlineFlag==1 and offlineFlag==1">
+			and ((k.key_name_en like CONCAT('%','Online','%') or
+			key_name_en like CONCAT('%','Online','%') ) or (k.key_name_en like CONCAT('%','Offline','%') or
+			key_name_en like CONCAT('%','Offline','%') ))
+		</if>
+		
+		<if test="deleteFlag==1 or deleteFlag==0">
+			and (p.delete_flag=#{deleteFlag}) 
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	<select id="getProcessTotalCount" parameterType="Map"
+		resultType="int">
+			SELECT count(p.id)
+				FROM BMS_BASE_PROCESS as p 
+				LEFT JOIN BMS_BASE_LINE as l ON p.line_id=l.id
+				LEFT JOIN BMS_BASE_WORKSHOP as w on l.workshop_id=w.id 
+				LEFT JOIN BMS_BASE_FACTORY as f on w.factory_id=f.id 
+				LEFT JOIN BMS_BASE_KEY as k on p.plan_node_id= k.id
+				LEFT JOIN BMS_BASE_USER u on l.editor_id = u.id 
+				where 1=1
+		<if test="factoryId!=''">
+			and (f.id=#{factoryId}) 
+		</if>
+		<if test="workshopId!=''">
+			and (w.id=#{workshopId}) 
+		</if>
+		<if test="lineId!=''">
+			and (l.id=#{lineId}) 
+		</if>
+		<if test="processName!=null">
+			and p.process_name like CONCAT("%",#{processName},"%") 
+		</if>
+		<if test="monitoryPointFlag==1 and keyProcessFlag!=1">
+			and (p.monitory_point_flag=#{monitoryPointFlag}) 
+		</if>
+		<if test="monitoryPointFlag!=1 and keyProcessFlag==1">
+			and (p.key_process_flag=#{keyProcessFlag}) 
+		</if>
+		<if test="monitoryPointFlag==1 and keyProcessFlag==1">
+			and (p.key_process_flag=#{keyProcessFlag} or p.monitory_point_flag=#{monitoryPointFlag} ) 
+		</if>
+		<if test="onlineFlag==1 and offlineFlag!=1" >
+			and (k.key_name_en like CONCAT('%','Online','%') or
+			key_name_en like CONCAT('%','Online','%') )
+		</if>
+		<if test="onlineFlag!=1 and offlineFlag==1">
+			and (k.key_name_en like CONCAT('%','Offline','%') or
+			key_name_en like CONCAT('%','Offline','%') )
+		</if>
+		
+		<if test="onlineFlag==1 and offlineFlag==1">
+			and ((k.key_name_en like CONCAT('%','Online','%') or
+			key_name_en like CONCAT('%','Online','%') ) or (k.key_name_en like CONCAT('%','Offline','%') or
+			key_name_en like CONCAT('%','Offline','%') ))
+		</if>
+
+		<if test="deleteFlag==1 or deleteFlag==0">
+			and (p.delete_flag=#{deleteFlag})
+		</if>
+	</select>
+	<insert id="addProcess" parameterType="process">
+		<selectKey resultType="int" keyProperty="otaid" order="AFTER">
+			SELECT LAST_INSERT_ID() AS otaid
+		</selectKey>
+		insert into BMS_BASE_PROCESS
+		(line_id,process_code,process_name,monitory_point_flag,key_process_flag,
+		<if test="planNodeId!=null and planNodeId!='' ">
+			plan_node_id,
+		</if>
+		memo,editor_id,edit_date)
+		values(#{lineId},#{processCode},#{processName},#{monitoryPointFlag},#{keyProcessFlag},
+		<if test="planNodeId!=null and planNodeId!='' ">
+			#{planNodeId},
+		</if>
+		#{memo},#{editorId},#{editDate})
+	</insert>
+	<update id="deleteProcess" parameterType="java.util.List">
+
+		update BMS_BASE_PROCESS set delete_flag='1' where id in
+		<foreach collection="list" item="ids" index="index" open="("
+			close=")" separator=",">
+			#{ids}
+		</foreach>
+
+	</update>
+	
+	<select id="getProcessExistPlanId" parameterType="Map" resultType="int">
+	<!-- SELECT p.id FROM BMS_BASE_PROCESS p
+	WHERE p.line_id IN 
+	(SELECT id FROM BMS_BASE_LINE 
+	WHERE workshop_id IN (SELECT id FROM BMS_BASE_WORKSHOP 
+		WHERE factory_id = (SELECT id FROM BMS_BASE_FACTORY WHERE id = (SELECT factory_id FROM BMS_BASE_WORKSHOP WHERE id = (SELECT workshop_id FROM BMS_BASE_LINE WHERE id = #{line_id}))))) 
+	AND p.delete_flag = 0 AND p.plan_node_id >0 
+	<if test="process_id!=null and process_id!='' ">
+		AND p.id != #{process_id}
+	</if>	
+	AND p.plan_node_id = #{plan_node_id} -->
+	SELECT p.id FROM BMS_BASE_PROCESS p where p.plan_node_id =#{plan_node_id} and p.line_id=#{line_id} and p.plan_node_id is not null
+	<if test="process_id!=null and process_id!='' ">
+		AND p.id != #{process_id}
+	</if>	
+	</select>
+	
+	<update id="updateProcess" parameterType="process">
+		update
+		BMS_BASE_PROCESS set
+		line_id=#{lineId},process_code=#{processCode},process_name=#{processName},
+		monitory_point_flag=#{monitoryPointFlag},key_process_flag=#{keyProcessFlag},
+		<if test="planNodeId!=null and planNodeId!='' ">
+			plan_node_id=#{planNodeId},
+		</if>
+		memo=#{memo},editor_id=#{editorId},edit_date=#{editDate}
+		where id=#{id}
+	</update>
+	
+	<!-- 车间班组映射 -->
+	<resultMap type="workgroup" id="workgroupMap">
+		<id property="id" column="id" />
+		<result property="factoryId" column="factoryId" />
+		<result property="factoryName" column="factoryName" />
+		<result property="workshopId" column="workshop_id" />
+		<result property="workshopName" column="workshopName" />
+		<result property="workgroupId" column="workgroup_id" />
+		<result property="groupName" column="groupName" />
+		<result property="memo" column="memo" />
+		<result property="deleteFlag" column="delete_flag" />
+		<result property="editorId" column="editor_id" />
+		<result property="editDate" column="edit_date" />
+		<result property="editor" column="editor" />
+	</resultMap>
+	<select id="getWorkgroupList" parameterType="Map" resultMap="workgroupMap">
+		SELECT g.*,w.workshop_name workshopName,f.factory_name factoryName,f.id factoryId,k.key_name groupName,u.username editor,u.id editorId FROM BMS_BASE_WORKGROUP as g 
+			LEFT JOIN BMS_BASE_WORKSHOP as w on g.wrokshop_id=w.id 
+			LEFT JOIN BMS_BASE_FACTORY as f on w.factory_id=f.id 
+			LEFT JOIN BMS_BASE_KEY as k on g.workgroup_id=k.id
+			LEFT JOIN BMS_BASE_USER u on g.editor_id = u.id 
+				where 1=1
+		<if test="factoryId!=''">
+			and (f.id=#{factoryId})
+		</if>
+		<if test="workshopId!=''">
+			and (w.id=#{workshopId})
+		</if>
+		<if test="workgroupName!=null">
+			and (k.key_name like CONCAT('%',#{workgroupName},'%') or
+			k.key_name like CONCAT('%',#{workgroupName},'%') )
+		</if>
+		<if test="deleteFlag==1">
+			and (g.delete_flag=#{deleteFlag})
+		</if>
+		<if test="deleteFlag==0">
+			and (g.delete_flag=#{deleteFlag})
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getWorkgroupTotalCount" parameterType="Map"
+		resultType="int">
+		SELECT count(g.id) FROM BMS_BASE_WORKGROUP as g 
+			LEFT JOIN BMS_BASE_WORKSHOP as w on g.wrokshop_id=w.id 
+			LEFT JOIN BMS_BASE_FACTORY as f on w.factory_id=f.id 
+			LEFT JOIN BMS_BASE_KEY as k on g.workgroup_id=k.id
+			LEFT JOIN BMS_BASE_USER u on g.editor_id = u.id 
+				where 1=1
+		<if test="factoryId!=''">
+			and (f.id=#{factoryId})
+		</if>
+		<if test="workshopId!=''">
+			and (w.id=#{workshopId})
+		</if>
+		<if test="workgroupName!=null">
+			and (k.key_name like CONCAT('%',#{workgroupName},'%') or
+			k.key_name like CONCAT('%',#{workgroupName},'%') )
+		</if>
+		<if test="deleteFlag==1">
+			and (g.delete_flag=#{deleteFlag})
+		</if>
+		<if test="deleteFlag==0">
+			and (g.delete_flag=#{deleteFlag})
+		</if>
+	</select>
+	<insert id="addWorkgroup" parameterType="workgroup">
+		<selectKey resultType="int" keyProperty="otaid" order="AFTER">
+			SELECT LAST_INSERT_ID() AS otaid
+		</selectKey>
+		insert into BMS_BASE_WORKGROUP
+		(wrokshop_id,workgroup_id,memo,editor_id,edit_date)
+		values(#{workshopId},#{workgroupId},#{memo},#{editorId},#{editDate})
+	</insert>
+	<update id="updateWorkgroup" parameterType="workgroup">
+		update
+		BMS_BASE_WORKGROUP set
+		workgroup_id=#{workgroupId},memo=#{memo},editor_id=#{editorId},edit_date=#{editDate}
+		where id=#{id}
+	</update>
+	<update id="deleteWorkgroup" parameterType="java.util.List">
+
+		update BMS_BASE_WORKGROUP set delete_flag='1' where id in
+		<foreach collection="list" item="ids" index="index" open="("
+			close=")" separator=",">
+			#{ids}
+		</foreach>
+	</update>
+	<!-- 车型表映射 -->
+	<resultMap type="busType" id="busTypeMap">
+		<id property="id" column="id" />
+		<result property="busTypeCode" column="bus_type_code" />
+		<result property="internalName" column="internal_name" />
+		<result property="brand" column="brand" />
+		<result property="wmi" column="wmi" />
+		<result property="manufacturer" column="manufacturer" />
+		<result property="busVehicleTypeId" column="bus_vehicle_type_id" />
+		<result property="busVehicleTypeName" column="busVehicleTypeName" />
+		<result property="busBodyTypeId" column="bus_body_type_id" />
+		<result property="busBodyTypeName" column="busBodyTypeName" />
+		<result property="vehicleModel" column="vehicle_model" />
+		<result property="chassisModel" column="chassis_model" />
+		<result property="vehicleLength" column="vehicle_length" />
+		<result property="wheelbase" column="wheelbase" />
+		<result property="maxWeight" column="max_weight" />
+		<result property="passengers" column="passengers" />
+		<result property="fuelType" column="fuel_type" />
+		<result property="driveMotorTypeId" column="drive_motor_type_id" />
+		<result property="driveMotorTypeName" column="driveMotorTypeName" />
+		<result property="driveMotor" column="drive_motor" />
+		<result property="motorModel" column="motor_model" />
+		<result property="motorPower" column="motor_power" />
+		<result property="batteryModel" column="battery_model" />
+		<result property="batteryCapacity" column="battery_capacity" />
+		<result property="ratedVoltage" column="rated_voltage" />
+		<result property="vinPrefix" column="vin_prefix" />
+		<result property="memo" column="memo" />
+		<result property="editorId" column="editor_id" />
+		<result property="editor" column="editor" />
+		<result property="editDate" column="edit_date" />
+		<result property="passengerNum" column="passenger_num" />
+		<result property="springNum" column="spring_num" />
+		<result property="lightDowndip" column="light_downdip" />
+		<result property="maxSpeed" column="max_speed" />
+	</resultMap>
+	<select id="getBusTypeList" parameterType="Map" resultMap="busTypeMap">
+		select b.*,u.username editor from BMS_BASE_BUS_TYPE b left join
+		BMS_BASE_USER u on u.id=b.editor_id where 1=1 
+		<if test="busTypeCode!=null">
+			and (b.bus_type_code like CONCAT('%',#{busTypeCode},'%') or
+			b.bus_type_code like CONCAT('%',#{busTypeCode},'%') )
+		</if>
+		<if test="internalName!=null">
+			and (b.internal_name like CONCAT('%',#{internalName},'%') or
+			b.internal_name like CONCAT('%',#{internalName},'%') )
+		</if>
+		<if test="vehicleType!=''">
+			and (b.bus_vehicle_type_id = #{vehicleType}) 
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+
+	</select>
+	<select id="getBusTypeTotalCount" parameterType="Map"
+		resultType="int">
+		select count(b.id) from BMS_BASE_BUS_TYPE b left join
+		BMS_BASE_USER u on u.id=b.editor_id where 1=1 
+		<if test="busTypeCode!=null">
+			and (b.bus_type_code like CONCAT('%',#{busTypeCode},'%') or
+			b.bus_type_code like CONCAT('%',#{busTypeCode},'%') )
+		</if>
+		<if test="internalName!=null">
+			and (b.internal_name like CONCAT('%',#{internalName},'%') or
+			b.internal_name like CONCAT('%',#{internalName},'%') )
+		</if>
+		<if test="vehicleType!=''">
+			and (b.bus_vehicle_type_id = #{vehicleType}) 
+		</if>
+	</select>
+	<insert id="addBusType" parameterType="busType">
+		<selectKey resultType="int" keyProperty="otaid" order="AFTER">
+			SELECT LAST_INSERT_ID() AS otaid
+		</selectKey>
+		insert into BMS_BASE_BUS_TYPE
+		(bus_type_code,internal_name,brand,wmi,manufacturer,bus_vehicle_type_id,bus_body_type_id,vehicle_model,
+		chassis_model,vehicle_length,wheelbase,max_weight,passengers,fuel_type,drive_motor_type_id,drive_motor,
+		motor_model,motor_power,battery_model,battery_capacity,rated_voltage,vin_prefix,editor_id,edit_date,passenger_num,spring_num,light_downdip,max_speed)
+		values(#{busTypeCode},#{internalName},#{brand},#{wmi},#{manufacturer},#{busVehicleTypeId},#{busBodyTypeId},
+		#{vehicleModel},#{chassisModel},#{vehicleLength},#{wheelbase},#{maxWeight},#{passengers},#{fuelType},#{driveMotorTypeId},
+		#{driveMotor},#{motorModel},#{motorPower},#{batteryModel},#{batteryCapacity},#{ratedVoltage},#{vinPrefix},#{editorId},#{editDate},
+		#{passengerNum},#{springNum},#{lightDowndip},#{maxSpeed}
+		)
+	</insert>
+	<update id="updateBusType" parameterType="busType">
+		update
+		BMS_BASE_BUS_TYPE set
+		bus_type_code=#{busTypeCode},internal_name=#{internalName},brand=#{brand},manufacturer=#{manufacturer},bus_vehicle_type_id=#{busVehicleTypeId},
+		bus_body_type_id=#{busBodyTypeId},vehicle_model=#{vehicleModel},chassis_model=#{chassisModel},vehicle_length=#{vehicleLength},wheelbase=#{wheelbase},
+		max_weight=#{maxWeight},passengers=#{passengers},fuel_type=#{fuelType},drive_motor_type_id=#{driveMotorTypeId},drive_motor=#{driveMotor},
+		motor_model=#{motorModel},motor_power=#{motorPower},battery_model=#{batteryModel},battery_capacity=#{batteryCapacity},rated_voltage=#{ratedVoltage},
+		vin_prefix=#{vinPrefix},editor_id=#{editorId},edit_date=#{editDate},passenger_num=#{passengerNum},spring_num=#{springNum},light_downdip=#{lightDowndip},max_speed=#{maxSpeed}
+		where id=#{id}
+	</update>
+	
+	<!-- 弹性键映射 -->
+	<resultMap type="keys" id="keysMap">
+		<id property="id" column="id" />
+		<result property="keyCode" column="key_code" />
+		<result property="keyType" column="key_type" />
+		<result property="keyName" column="key_name" />
+		<result property="keyNameEn" column="key_name_en" />
+		<result property="value" column="value" />
+		<result property="deleteFlag" column="delete_flag" />
+		<result property="editorId" column="editor_id" />
+		<result property="editor" column="editor" />
+		<result property="editDate" column="edit_date" />
+	</resultMap>
+	<select id="getKeysList" parameterType="Map" resultMap="keysMap">
+		select k.*,u.username editor from BMS_BASE_KEY k left join
+		BMS_BASE_USER u on u.id=k.editor_id where 1=1 
+		<if test="keyId!=null">
+			and k.id= #{keyId} 
+		</if>
+		<if test="keyType!=null">
+			and (k.key_type like CONCAT('%',#{keyType},'%') or
+			k.key_type like CONCAT('%',#{keyType},'%') )
+		</if>
+		<if test="keyCode!=null">
+			and (k.key_code like CONCAT('%',#{keyCode},'%') or
+			k.key_code like CONCAT('%',#{keyCode},'%') ) 
+		</if>
+		 	ORDER BY k.key_code,k.value
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+			
+	</select>
+	<select id="getKeysTotalCount" parameterType="Map"
+		resultType="int">
+		select count(k.id) from BMS_BASE_KEY k left join
+		BMS_BASE_USER u on u.id=k.editor_id where 1=1 
+		<if test="keyType!=null">
+			and (k.key_type like CONCAT('%',#{keyType},'%') or
+			k.key_type like CONCAT('%',#{keyType},'%') )
+		</if>
+		<if test="keyCode!=null">
+			and (k.key_code like CONCAT('%',#{keyCode},'%') or
+			k.key_code like CONCAT('%',#{keyCode},'%') )
+		</if>
+		ORDER BY k.key_code,k.value
+	</select>
+	<insert id="addKey" parameterType="Keys">
+		<selectKey resultType="int" keyProperty="otaid" order="AFTER">
+			SELECT LAST_INSERT_ID() AS otaid
+		</selectKey>
+		insert into BMS_BASE_KEY
+		(key_type,key_code,key_name,value,editor_id,edit_date)
+		values(#{keyType},#{keyCode},#{keyName},#{value},#{editorId},#{editDate})
+	</insert>
+	<update id="updateKey" parameterType="Keys">
+		update
+		BMS_BASE_KEY set
+		delete_flag=#{deleteFlag}		
+		where id=#{id}
+	</update>
+	
+	<select id="getKeysByKeyName" parameterType="Map" resultMap="keysMap">
+		select k.*,u.username editor from BMS_BASE_KEY k left join
+		BMS_BASE_USER u on u.id=k.editor_id where 1=1 
+		<if test="key_name!=null">
+			and k.key_name=#{key_name} 
+		</if>
+		<if test="keyCode!=null">
+			and k.key_code=#{key_code} 
+		</if>
+	</select>
+	
+	<!-- 频率映射 -->
+	<resultMap type="hz" id="hzMap">
+		<id property="id" column="id" />
+		<result property="factory_id" column="factory_id" />
+		<result property="factory" column="factory_name" />
+		<result property="workshop_id" column="workshop_id" />
+		<result property="workshop" column="workshop_name" />
+		<result property="type_code" column="type_code" />
+		<result property="hz_type_id" column="hz_type_id" />
+		<result property="value" column="value" />
+		<result property="unit" column="unit" />
+		<result property="effecDateStart" column="effecDateStart" />
+		<result property="effecDateEnd" column="effecDateEnd" />
+		<result property="editor_id" column="editor_id" />
+		<result property="editor" column="editor" />
+		<result property="edit_date" column="edit_date" />
+		<result property="status" column="status" />
+	</resultMap>
+	
+	<insert id="addHZ" parameterType="hz"
+		useGeneratedKeys="true">
+		<selectKey resultType="int" keyProperty="otaid" order="AFTER">
+			SELECT LAST_INSERT_ID() AS otaid
+		</selectKey>
+		insert into BMS_BASE_HZ
+		(factory_id,
+		<if test="workshop_id!=0">
+			workshop_id,
+		</if>
+		hz_type_id,value,unit,effecDateStart,effecDateEnd,status,editor_id,edit_date) 
+		values(#{factory_id},
+		<if test="workshop_id!=0">
+			#{workshop_id},
+		</if>
+		#{hz_type_id},#{value},#{unit},#{effecDateStart},#{effecDateEnd},'0',#{editor_id},#{edit_date})
+	</insert>
+	
+	<select id="getHZList" parameterType="Map"
+		resultMap="hzMap">
+		SELECT h.*,u.username editor,f.factory_name factory,w.workshop_name workshop,k.key_name typeName 
+		FROM BMS_BASE_HZ h LEFT JOIN BMS_BASE_USER u ON h.editor_id = u.id
+		LEFT JOIN BMS_BASE_FACTORY f ON h.factory_id = f.id 
+		LEFT JOIN BMS_BASE_WORKSHOP w ON h.workshop_id = w.id 
+		LEFT JOIN BMS_BASE_KEY k ON h.hz_type_id = k.id 
+		WHERE h.status = '0'  
+		<if test="factory_id!=null and factory_id!=0">
+			and h.factory_id=#{factory_id}
+		</if>
+		<if test="workshop_id!=null and  workshop_id!=0">
+			and h.workshop_id=#{workshop_id}
+		</if>
+		<if test="hz_type_id!=null and  hz_type_id!=0">
+			and h.hz_type_id=#{hz_type_id}
+		</if>
+		<if test="effecDateStart!=null and  effecDateStart!=''">
+			<![CDATA[and h.effecDateStart>=#{effecDateStart}]]>
+		</if>
+		<if test="effecDateEnd!=null and  effecDateEnd!=''">
+			<![CDATA[and h.effecDateEnd <= #{effecDateEnd}]]>
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getHZTotalCount" parameterType="Map"
+		resultType="int">
+		SELECT COUNT(*) FROM BMS_BASE_HZ h LEFT JOIN BMS_BASE_USER u ON 
+		h.editor_id = u.id
+		LEFT JOIN BMS_BASE_FACTORY f ON h.factory_id = f.id 
+		LEFT JOIN BMS_BASE_WORKSHOP w ON h.workshop_id = w.id 
+		LEFT JOIN BMS_BASE_KEY k ON h.hz_type_id = k.id 
+		WHERE h.status = '0' 
+		<if test="factory_id!=null and factory_id!=0">
+			and h.factory_id=#{factory_id}
+		</if>
+		<if test="workshop_id!=null and  workshop_id!=0">
+			and h.workshop_id=#{workshop_id}
+		</if>
+		<if test="hz_type_id!=null and  hz_type_id!=0">
+			and h.hz_type_id=#{hz_type_id}
+		</if>
+		<if test="effecDateStart!=null and  effecDateStart!=''">
+			<![CDATA[and h.effecDateStart>=#{effecDateStart}]]>
+		</if>
+		<if test="effecDateEnd!=null and  effecDateEnd!=''">
+			<![CDATA[and h.effecDateEnd <= #{effecDateEnd}]]>
+		</if>
+	</select>
+	<update id="updateHZ" parameterType="hz">
+		update BMS_BASE_HZ
+		<set>
+			factory_id=#{factory_id},
+			<if test="workshop_id!=null and  workshop_id!=0">
+				workshop_id=#{workshop_id},
+			</if>
+			hz_type_id=#{hz_type_id},value=#{value},unit=#{unit},effecDateStart=#{effecDateStart},
+			effecDateEnd=#{effecDateEnd},status=#{status},editor_id=#{editor_id},edit_date=#{edit_date}
+		</set>
+		where id=#{id}
+	</update>
+	
+	<!-- 零部件映射 -->
+	<resultMap type="parts" id="partsMap">
+		<id property="id" column="id" />
+		<result property="parts_type" column="parts_type" />
+		<result property="partsTypeName" column="partsTypeName" />
+		<result property="parts_name" column="parts_name" />
+		<result property="parts_code" column="parts_code" />
+		<result property="quality_flag" column="quality_flag" />
+		<result property="workshop_id" column="workshop_id" />
+		<result property="workshop_name" column="workshop_name" />
+		<result property="status" column="status" />
+		<result property="memo" column="memo" />
+		<result property="editorId" column="editor_id" />
+		<result property="editDate" column="edit_date" />
+		<result property="editor" column="editor" />
+	</resultMap>
+	<select id="getPartsList" parameterType="Map" resultMap="partsMap">
+		SELECT p.*,p.parts_type parts_type,p.parts_type partsTypeName,u.id editor_id,u.username editor
+		FROM BMS_BASE_PARTS p 
+		LEFT JOIN BMS_BASE_KEY k ON p.parts_type = k.id 
+		LEFT JOIN BMS_BASE_USER u ON p.editor_id = u.id 
+		where 1=1 and p.status !='1' 
+		<if test="parts_type!=null and parts_type!=''">
+			and (p.parts_type=#{parts_type}) 
+		</if>
+		<if test="workshop_id!=''">
+			and (p.workshop_id=#{workshop_id}) 
+		</if>
+		<if test="parts_name!=null">
+			and (p.parts_name like CONCAT('%',#{parts_name},'%') or
+			parts_name like CONCAT('%',#{parts_name},'%') ) 
+		</if>
+		<if test="quality_flag==1">
+			and (p.quality_flag=#{quality_flag}) 
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	<select id="getPartsTotalCount" parameterType="Map"
+		resultType="int">
+			SELECT count(p.id)
+			FROM BMS_BASE_PARTS p 
+			LEFT JOIN BMS_BASE_KEY k ON p.parts_type = k.id 
+			LEFT JOIN BMS_BASE_USER u ON p.editor_id = u.id 
+			where 1=1 and p.status !='1'
+			<if test="parts_type!=null and parts_type!=''">
+				and (p.parts_type=#{parts_type}) 
+			</if>
+			<if test="workshop_id!=''">
+				and (p.workshop_id=#{workshop_id}) 
+			</if>
+			<if test="parts_name!=null">
+				and (p.parts_name like CONCAT('%',#{parts_name},'%') or
+				parts_name like CONCAT('%',#{parts_name},'%') ) 
+			</if>
+			<if test="quality_flag==1">
+				and (p.quality_flag=#{quality_flag}) 
+			</if>
+	</select>
+	<insert id="addParts" parameterType="parts">
+		<selectKey resultType="int" keyProperty="otaid" order="AFTER">
+			SELECT LAST_INSERT_ID() AS otaid
+		</selectKey>
+		INSERT INTO BMS_BASE_PARTS 
+		(parts_type,parts_name,parts_code,
+		<if test="quality_flag!=null and quality_flag!=''">
+			quality_flag,
+		</if>
+		<if test="workshop_id!=null and workshop_id!='' and  workshop_id!=0 ">
+			workshop_id,
+		</if>
+		<if test="workshop_id!=null and workshop_id!='' and  workshop_id!=0 ">
+			workshop_name,
+		</if>
+		editor_id,edit_date)
+		values(#{parts_type},#{parts_name},#{parts_code},
+		<if test="quality_flag!=null and quality_flag!=''">
+			#{quality_flag},
+		</if>
+		<if test="workshop_id!=null and workshop_id!='' and  workshop_id!=0 ">
+			#{workshop_id},
+		</if>
+		<if test="workshop_id!=null and workshop_id!='' and  workshop_id!=0 ">
+			#{workshop_name},
+		</if>
+		#{editorId},#{editDate})
+	</insert>
+	<update id="updateParts" parameterType="parts">
+		update
+		BMS_BASE_PARTS set
+		parts_type=#{parts_type},parts_name=#{parts_name},parts_code=#{parts_code},
+		quality_flag=#{quality_flag},status=#{status},
+		<if test="workshop_id!=null and workshop_id!='' and  workshop_id!=0 ">
+			workshop_id=#{workshop_id},
+		</if>
+		<if test="workshop_id!=null and workshop_id!='' and  workshop_id!=0 ">
+			workshop_name=#{workshop_name},
+		</if>
+		editor_id=#{editorId},edit_date=#{editDate}
+		where id=#{id}
+	</update>
+	<select id="getParts" parameterType="Map" resultMap="partsMap">
+		SELECT p.*,p.parts_type parts_type,p.parts_type partsTypeName,u.id editor_id,u.username editor
+		FROM BMS_BASE_PARTS p 
+		LEFT JOIN BMS_BASE_KEY k ON p.parts_type = k.id 
+		LEFT JOIN BMS_BASE_USER u ON p.editor_id = u.id 
+		where 1=1 and p.status!='1'
+		<if test="parts_name!=null">
+			and p.parts_name =#{parts_name}
+		</if>
+	</select>
+</mapper>

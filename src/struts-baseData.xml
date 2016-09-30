@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<struts>
+	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
+	<package name="baseDataModel" extends="json-default" >
+		<!-- 工厂 -->
+		<action name="baseData" class="baseDataAction">
+			<result name="settingIndex">/jsp/setting/index.jsp</result>
+			<result name="index">/jsp/setting/factory.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">factoryList</param>
+			</result>
+		</action>
+
+		<!-- 车间 -->
+		<action name="workshop" class="workshopAction">
+		
+			<result name="workshop">/jsp/setting/workshop.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">workshopList</param>
+			</result>
+		</action>
+		
+		<!-- 线别 -->
+		<action name="line" class="lineAction">
+		
+			<result name="line">/jsp/setting/line.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">lineList</param>
+			</result>
+		</action>
+		<!-- 工序 -->
+		<action name="process" class="processAction">
+		
+			<result name="process">/jsp/setting/process.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">processList</param>
+			</result>
+		</action>
+		<!-- 车间班组-->
+		<action name="workgroup" class="workgroupAction">
+		
+			<result name="workgroup">/jsp/setting/workgroup.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">workgroupList</param>
+			</result>
+		</action>
+		<!-- 车型 -->
+		<action name="busType" class="busTypeAction">
+		
+			<result name="busType">/jsp/setting/busType.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">busTypeList</param>
+			</result>
+		</action>
+		<!-- 弹性键-->
+		<action name="keys" class="keysAction">
+		
+			<result name="keys">/jsp/setting/keys.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">keysList</param>
+			</result>
+		</action>
+		<!-- 频率-->
+		<action name="hz" class="hzAction">
+		
+			<result name="hz">/jsp/setting/hz.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">hzList</param>
+			</result>
+		</action>
+		<!-- 零部件-->
+		<action name="parts" class="partsAction">
+		
+			<result name="parts">/jsp/setting/parts.jsp</result>
+			<result name="error">/errer.jsp</result>
+			<result type="json">
+				<param name="root">partsList</param>
+			</result>
+		</action>
+	</package>
+</struts>

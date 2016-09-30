@@ -1,0 +1,2693 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.hr.dao.IHrDao">
+
+	<!-- 获得标准班组树 -->
+	<select id="getStandardWorkGroupTree" resultType="Map">
+		SELECT
+		CONCAT('t',k.id) AS id,0 AS parentId,k.key_name AS display_name ,'0'
+		AS type,k.id AS workshop_id,k.key_name AS workgroup_name FROM
+		BMS_BASE_KEY k WHERE k.key_code = 'WORKSHOP'
+		UNION ALL
+		SELECT * FROM
+		(SELECT w.id AS id,w.parent_id AS
+		parentId,CONCAT(w.workgroup_no,'-',w.workgroup_name) AS display_name
+		,w.type,w.workshop_id,w.workgroup_name FROM
+		BMS_HR_BASE_STANDARD_WORKGROUP w
+		ORDER BY w.workgroup_no,w.id ASC) tmp
+	</select>
+
+	<select id="getOrgIdByOrgName" parameterType="String"
+		resultType="String">
+		SELECT GROUP_CONCAT(o.id) from BMS_BASE_ORG o WHERE o.name
+		= #{orgName}
+	</select>
+
+	<!-- 获取车间下的标准班组清单 -->
+	<select id="getStandardWorkGroupList" parameterType="Map"
+		resultType="Map">
+		SELECT w.* FROM BMS_HR_BASE_STANDARD_WORKGROUP w
+		WHERE w.parent_id = #{pId}
+		ORDER BY w.workgroup_no,w.id ASC
+	</select>
+
+	<!-- 判断此标准班组下是否有小班组以及此标准班组是否已使用 -->
+	<select id="checkStandardWorkGroupUsed" parameterType="Map"
+		resultType="Map">
+		SELECT id FROM BMS_BASE_ORG o WHERE o.deleted ='0' and
+		o.name = (SELECT w1.workgroup_name FROM BMS_HR_BASE_STANDARD_WORKGROUP
+		w1 WHERE w1.id = #{workgroupId})
+		UNION ALL
+		SELECT id FROM
+		BMS_HR_BASE_STANDARD_WORKGROUP w WHERE w.parent_id = #{workgroupId}
+	</select>
+	<!-- 根据条件查询所有已存在的标准班组及小班组 -->
+	<select id="queryStandardWorkGroupList" parameterType="List"
+		resultType="Map">
+		<foreach collection="list" index="index" item="item"
+			separator="UNION ALL">
+			SELECT w.* FROM BMS_HR_BASE_STANDARD_WORKGROUP
+			w
+			WHERE w.workgroup_name = #{item.workgroup_name}
+			and w.type = #{item.type}
+			and w.workshop_id = #{item.workshop_id}
+			and w.parent_id = #{item.parent_id}
+		</foreach>
+	</select>
+
+	<!--删除标准班组 -->
+	<update id="deleteStandardWorkGroup" parameterType="Map">
+		<![CDATA[
+			delete from BMS_HR_BASE_STANDARD_WORKGROUP where id= #{workgroupId}
+		]]>
+	</update>
+
+	<!--新增标准班组 -->
+	<insert id="addStandardWorkGroup" parameterType="List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			INSERT INTO
+			BMS_HR_BASE_STANDARD_WORKGROUP(workshop_id,parent_id,type,workgroup_no,workgroup_name,editor_id,edit_date
+			<if test="item.responsibility!=null">
+				,responsibility
+			</if>
+			<if test="item.memo!=null">
+				,memo
+			</if>
+			)
+			VALUES(#{item.workshop_id},#{item.parent_id},#{item.type},#{item.workgroup_no},#{item.workgroup_name},#{item.editor_id},#{item.edit_date}
+			<if test="item.responsibility!=null">
+				,#{item.responsibility}
+			</if>
+			<if test="item.memo!=null">
+				,#{item.memo}
+			</if>
+			)
+		</foreach>
+
+	</insert>
+
+	<update id="updateStandardWorkGroup" parameterType="List">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_HR_BASE_STANDARD_WORKGROUP
+			SET workgroup_no = #{item.workgroup_no},workgroup_name =
+			#{item.workgroup_name},responsibility = #{item.responsibility},memo =
+			#{item.memo},editor_id = #{item.editor_id},edit_date =
+			#{item.edit_date}
+			WHERE id = #{item.id}
+		</foreach>
+	</update>
+	<!-- 更新组织结构标准班组名称 -->
+	<update id="updateWorkGroupOrgName" parameterType="List">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_BASE_ORG
+			SET org_code = #{item.workgroup_no},name = #{item.workgroup_name}
+			WHERE FIND_IN_SET(name,(SELECT GROUP_CONCAT(workgroup_name) from
+			BMS_HR_BASE_STANDARD_WORKGROUP WHERE id = #{item.id})) >0
+			AND FIND_IN_SET(parent_id,#{item.parent_name})
+			AND org_kind = '1'
+			<if test="item.type==0">
+				AND org_type = '5'
+			</if>
+			<if test="item.type==1">
+				AND org_type = '6'
+			</if>
+		</foreach>
+	</update>
+
+	<!-- 根据车型、月份、班组org_id查询标准工时和单价 -->
+	<select id="getStandardTimeAndPriceList" parameterType="Map"
+		resultType="Map">
+		SELECT o.id groupId,o.org_code groupCode,o.name
+		groupName,s.id smallGroupId,s.org_code smallGroupCode,s.name
+		smallGroupName,
+		h.bus_type,h.month,h.standard_hour,h.standard_price,h.id
+		FROM BMS_BASE_ORG o
+		LEFT JOIN BMS_BASE_ORG s ON o.id = s.parent_id AND s.deleted = '0' AND
+		s.org_type = '6'
+		LEFT JOIN BMS_HR_BASE_STANDARD_HOUR_PRICE h ON s.id = h.org_id AND
+		h.deleted != '1' AND h.bus_type = #{bus_type_id} AND h.month =
+		#{month}
+		WHERE o.id = #{org_id}
+		AND o.deleted = '0'
+		ORDER BY o.id, o.level, o.sort_number ASC
+	</select>
+
+	<!-- 根据车型、月份、班组org_id查询单价 -->
+	<select id="queryStandardPriceList" parameterType="Map"
+		resultType="Map">
+		SELECT p.factory,p.workshop,p.workgroup,p.small_workgroup,p.bus_type,
+		group_concat(p.month,':',p.standard_price order by p.month separator
+		',') AS priceStr
+		FROM BMS_HR_BASE_STANDARD_HOUR_PRICE p
+		WHERE 1=1
+
+		<if test="orgType==null or orgType==''">
+			and FIND_IN_SET(p.factory,#{orgStr})>0
+		</if>
+		<if test="orgType==0 or orgType==1 or orgType==2 or orgType==3">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0
+		</if>
+		<if test="orgType==4 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and p.workshop = ( SELECT o.name
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="orgType==5 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0 and p.workgroup = ( SELECT o.name
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="orgType==6 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0 and
+			FIND_IN_SET(p.workgroup,#{orgStr})>0 and p.small_workgroup = ( SELECT
+			o.name FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="bus_type!=null">
+			AND p.bus_type = #{bus_type}
+		</if>
+		<if test="month_s!=null">
+				<![CDATA[AND p.month >= #{month_s} ]]>
+		</if>
+		<if test="month_e!=null">
+				<![CDATA[AND p.month <= #{month_e} ]]>
+		</if>
+		GROUP BY p.org_id,p.bus_type
+		ORDER BY p.factory,p.workshop,p.workgroup,p.small_workgroup,p.bus_type
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+
+	<!-- 根据车型、月份、班组org_id查询单价 -->
+	<select id="queryStandardPriceTotalCount" parameterType="Map"
+		resultType="int">
+		SELECT count(tmp.org_id) FROM(
+		SELECT p.org_id,p.bus_type
+		FROM BMS_HR_BASE_STANDARD_HOUR_PRICE p
+		WHERE 1=1
+		<if test="orgType==null or orgType==''">
+			and FIND_IN_SET(p.factory,#{orgStr})>0
+		</if>
+		<if test="orgType==0 or orgType==1 or orgType==2 or orgType==3">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0
+		</if>
+		<if test="orgType==4 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and p.workshop = ( SELECT o.name
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="orgType==5 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0 and p.workgroup = ( SELECT o.name
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="orgType==6 ">
+			and FIND_IN_SET(p.factory,#{orgStr})>0 and
+			FIND_IN_SET(p.workshop,#{orgStr})>0 and
+			FIND_IN_SET(p.workgroup,#{orgStr})>0 and p.small_workgroup = ( SELECT
+			o.name FROM BMS_BASE_ORG o WHERE o.id = #{org_id})
+		</if>
+		<if test="bus_type!=null">
+			AND p.bus_type = #{bus_type}
+		</if>
+		<if test="month_s!=null">
+				<![CDATA[AND p.month >= #{month_s} ]]>
+		</if>
+		<if test="month_e!=null">
+				<![CDATA[AND p.month <= #{month_e} ]]>
+		</if>
+		GROUP BY p.org_id,p.bus_type
+		ORDER BY p.factory,p.workshop,p.workgroup,p.small_workgroup,p.bus_type
+		) tmp
+	</select>
+
+	<!--新增标准工时/单价 -->
+	<insert id="addStandardTimeAndPrice" parameterType="List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			INSERT INTO
+			BMS_HR_BASE_STANDARD_HOUR_PRICE(org_id,bus_type,month,standard_hour,standard_price,editor_id,edit_date,factory,workshop,workgroup
+			<if test="item.small_workgroup!=null">
+				,small_workgroup
+			</if>
+			)
+			VALUES(#{item.org_id},#{item.bus_type_id},#{item.month},#{item.standard_hour},#{item.standard_price},#{item.editor_id},#{item.edit_date},#{item.factory},#{item.workshop},#{item.workgroup}
+			<if test="item.small_workgroup!=null">
+				,#{item.small_workgroup}
+			</if>
+			)
+		</foreach>
+
+	</insert>
+	<!--修改标准工时/单价 -->
+	<update id="updateStandardTimeAndPrice" parameterType="List">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_HR_BASE_STANDARD_HOUR_PRICE
+			SET standard_hour = #{item.standard_hour},standard_price =
+			#{item.standard_price},editor_id = #{item.editor_id},edit_date =
+			#{item.edit_date}
+			WHERE id = #{item.id}
+		</foreach>
+	</update>
+
+	<select id="getWorkTimePriceList" resultType="Map"
+		parameterType='Map'>
+		<![CDATA[
+		SELECT p.*,u.username FROM BMS_HR_BASE_PRICE p LEFT JOIN BMS_BASE_USER u ON p.editor_id = u.id
+		WHERE 1=1 
+		]]>
+		<if test="stratDate!='' ">
+			AND p.start_date >= #{stratDate}
+		</if>
+		<if test="endDate!='' ">
+			<![CDATA[ AND p.end_date <= #{endDate} ]]>
+		</if>
+
+		<if test="workTimeType=='' ">
+			AND (p.factory = #{factory} OR p.factory = '')
+		</if>
+		<if test="workTimeType==1 ">
+			AND p.type=1 AND (p.factory = #{factory} OR p.factory = '')
+		</if>
+		<if test="workTimeType==2 ">
+			AND p.type=2 AND p.factory = #{factory}
+		</if>
+		<if test="workTimeType==3 ">
+			AND p.type=3 AND p.factory = #{factory}
+		</if>
+		<if test="workTimeType==4 ">
+			AND p.type=4 AND p.factory = #{factory}
+		</if>
+		<if test="workTimeType==5 ">
+			AND p.type=5
+		</if>
+		<if test="skillParameter!='' ">
+			AND p.skillParameter = #{skillParameter}
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getWorkTimePriceListTotalCount" resultType="int"
+		parameterType='Map'>
+		<![CDATA[
+		SELECT count(id) FROM BMS_HR_BASE_PRICE 
+		WHERE 1=1 
+		]]>
+		<if test="stratDate!='' ">
+			AND start_date >= #{stratDate}
+		</if>
+		<if test="endDate!='' ">
+			<![CDATA[ AND end_date <= #{endDate} ]]>
+		</if>
+		<if test="workTimeType=='' ">
+			AND (factory = #{factory} OR factory = '')
+		</if>
+		<if test="workTimeType==1 ">
+			AND type=1
+		</if>
+		<if test="workTimeType==2 ">
+			AND type=2 AND factory = #{factory}
+		</if>
+		<if test="workTimeType==3 ">
+			AND type=3 AND factory = #{factory}
+		</if>
+		<if test="workTimeType==4 ">
+			AND type=4 AND factory = #{factory}
+		</if>
+		<if test="workTimeType==5 ">
+			AND type=5
+		</if>
+		<if test="skillParameter!='' ">
+			AND skillParameter = #{skillParameter}
+		</if>
+
+	</select>
+	<insert id="addWorkTimePrice" useGeneratedKeys="true"
+		keyProperty="id" parameterType="Map">
+		<![CDATA[
+			insert into BMS_HR_BASE_PRICE(type,factory,skill_parameter,price,start_date,end_date,
+			editor_id,edit_date) 
+			values(#{newWorkTimeType},#{newFactory},#{newSkillParameter},#{newPrice},#{newStartDate},#{newEndDate},
+			#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	<update id="editWorkTimePrice" parameterType="Map">
+		<![CDATA[
+			UPDATE BMS_HR_BASE_PRICE SET type=#{editWorkTimeType},factory=#{editFactory},skill_parameter=#{editSkillParameter},
+			price=#{editPrice},start_date=#{editStartDate},end_date=#{editEndDate},editor_id=#{editor_id},edit_date=#{edit_date}
+			WHERE ID=#{editPrice_id}
+		]]>
+	</update>
+	<update id="delWorkTimePrice" parameterType="String">
+		delete from
+		BMS_HR_BASE_PRICE where id=#{id}
+	</update>
+
+
+	<!-- 查询奖惩汇总信息 -->
+	<select id="getRewardsCollectList" resultType="Map"
+		parameterType='Map'>
+		SELECT
+		r.staff_number,s.name,s.workgroup_org,s.team_org,s.plant_org,s.workshop_org,r.rewards_factory,r.rewards_workshop,100
+		AS 'fullmark',sum(r.add) AS `add`,
+		SUM(deduct) AS
+		deduct,100+ifnull(sum(r.add),0)-ifnull(SUM(deduct),0) AS mark FROM
+		BMS_HR_REWARDS r
+		LEFT JOIN BMS_HR_STAFF s ON r.staff_number = s.staff_number
+		WHERE
+		r.rewards_date LIKE CONCAT(#{staff_date},'%')
+		<!-- <if test="orgType==1 or orgType==2"> and s.plant_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==3 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.dept_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==4 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.workshop_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==5 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.workgroup_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==6 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.team_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> -->
+		and FIND_IN_SET(r.rewards_factory,#{orgStr})>0 and
+		FIND_IN_SET(substring_index(r.rewards_workshop, '车间', 1),#{orgStr})>0
+		<if test="staff_number!=null">
+			AND (r.staff_number LIKE CONCAT('%',#{staff_number},'%')
+			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+		GROUP BY s.name,r.rewards_factory,r.rewards_workshop
+		order by s.workgroup_org,s.team_org
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="getRewardsCollectTotalCount" resultType="int"
+		parameterType='Map'>
+		SELECT COUNT(distinct r.staff_number) FROM BMS_HR_REWARDS r
+		LEFT JOIN BMS_HR_STAFF s ON r.staff_number = s.staff_number
+		WHERE
+		r.rewards_date LIKE CONCAT('%',#{staff_date},'%')
+		<!-- <if test="orgType==1 or orgType==2"> and s.plant_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==3 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.dept_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==4 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.workshop_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==5 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.workgroup_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==6 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.team_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> -->
+		and FIND_IN_SET(r.rewards_factory,#{orgStr})>0 and
+		FIND_IN_SET(substring_index(r.rewards_workshop, '车间', 1),#{orgStr})>0
+
+		<if test="staff_number!=null">
+			AND (r.staff_number LIKE CONCAT('%',#{staff_number},'%')
+			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+	</select>
+
+	<!-- 查询奖惩信息 -->
+	<select id="getRewardsList" resultType="Map" parameterType='Map'>
+		SELECT r.*,s.name FROM BMS_HR_REWARDS r
+		LEFT JOIN BMS_HR_STAFF s ON r.staff_number = s.staff_number
+		WHERE
+		r.rewards_date LIKE CONCAT('%',#{staff_date},'%')
+		<!-- <if test="orgType==1 or orgType==2"> and s.plant_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==3 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.dept_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==4 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.workshop_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==5 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.workgroup_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==6 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.team_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> -->
+		<if test="orgStr !=null">
+			and FIND_IN_SET(r.rewards_factory,#{orgStr})>0
+			and FIND_IN_SET(substring_index(r.rewards_workshop, '车间', 1),#{orgStr})>0
+		</if>
+		<if test="staff_number!=null">
+			AND (r.staff_number LIKE CONCAT('%',#{staff_number},'%')
+			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+		<if test="rewards_factory!=null">
+			AND r.rewards_factory = #{rewards_factory}
+		</if>
+		<if test="rewards_workshop!=null">
+			AND r.rewards_workshop = #{rewards_workshop}
+		</if>
+		order by staff_number,rewards_date
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if> 
+	</select>
+	<select id="getRewardsTotalCount" resultType="int"
+		parameterType='Map'>
+		SELECT count(r.id) FROM BMS_HR_REWARDS r
+		LEFT JOIN BMS_HR_STAFF s ON r.staff_number = s.staff_number
+		WHERE
+		r.rewards_date LIKE CONCAT('%',#{staff_date},'%')
+		<!-- <if test="orgType==1 or orgType==2"> and s.plant_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==3 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.dept_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==4 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.workshop_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==5 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.workgroup_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==6 "> 
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.team_org = ( SELECT o.name 
+			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> -->
+		<if test="orgStr !=null">
+			and FIND_IN_SET(r.rewards_factory,#{orgStr})>0
+			and FIND_IN_SET(substring_index(r.rewards_workshop, '车间', 1),#{orgStr})>0
+		</if>
+		<if test="staff_number!=null">
+			AND (r.staff_number LIKE CONCAT('%',#{staff_number},'%')
+			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+	</select>
+
+	<!-- 根据工厂、车间、班组、小班组、车型、月份查询标准工时和单价 -->
+	<select id="getStandardTimeAndPrice" parameterType="Map"
+		resultType="Map">
+		SELECT h.* FROM BMS_HR_BASE_STANDARD_HOUR_PRICE h
+		WHERE h.org_id = #{org_id}
+		AND h.bus_type = #{bus_type_id}
+		AND h.month = #{month}
+		AND h.deleted = '0'
+	</select>
+
+
+	<select id="getPieceTimeReportList2" resultType="Map" parameterType='Map'>	
+		SELECT
+		staff_number,staff_name,job,plant_org,workshop_org,workgroup_org,team_org,distribution,GROUP_CONCAT(bus_number,',',work_date,',',participation,',',ppay,',',CONCAT(bus_count,'|')
+		separator '') AS 'piece_str'
+		FROM BMS_PIECE_PAY_CAL
+		WHERE work_date >= #{date_start} AND work_date &lt;= #{date_end}
+		<if test="list.size !=0">
+			AND staff_number IN
+			<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(workshop,#{workshop})>0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		<if test="staff_number!=''">
+			AND (staff_number = #{staff_number} OR staff_name = #{staff_number})
+		</if>
+		<if test="bus_number!=''">
+			AND UPPER(bus_number) = #{bus_number}
+		</if>
+		GROUP BY staff_number
+		ORDER BY staff_number;
+	</select>
+	<select id="getPieceTimeReportListCount2" resultType="int" parameterType='Map'>
+	SELECT COUNT(staff_number) as count_num FROM
+	(SELECT
+	staff_number,staff_name,job,workshop_org,workgroup_org,team_org,skill_parameter,GROUP_CONCAT(bus_number,',',work_date,',',participation,',',CONCAT(ppay,'|')
+	separator '') AS 'piece_str'
+	FROM BMS_PIECE_PAY_CAL
+	WHERE work_date >= #{date_start} AND work_date &lt;= #{date_end}
+	AND factory = #{factory}
+	<if test="list.size !=0">
+			AND staff_number IN
+			<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	<if test="workshop !=null and workshop !=''">
+		and find_in_set(workshop,#{workshop})>0
+	</if>
+	<if test="group!='全部'">
+		AND workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND team = #{subgroup}
+	</if>
+	<if test="staff_number!=''">
+		AND (staff_number = #{staff_number} OR staff_name = #{staff_number})
+	</if>
+	<if test="bus_number!=''">
+		AND UPPER(bus_number) = #{bus_number}
+	</if>
+	GROUP BY staff_number
+	ORDER BY staff_number
+	</select>
+	
+	<select id="getPieceTimeReportStaffList" resultType="String" parameterType='Map' >
+	SELECT DISTINCT s.staff_number  FROM BMS_HR_STAFF_HOURS h 
+	LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id
+	WHERE h.factory = #{factory}
+	<if test="workshop !=null and workshop !=''">
+		AND find_in_set(h.workshop,#{workshop})>0
+	</if>
+	<if test="group!='全部'">
+		AND h.workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND team = #{subgroup}
+	</if>
+	<if test="bus_number!=''">
+		AND UPPER(bus_number) = #{bus_number}
+	</if>
+	<if test="staff_number!=''">
+		AND (s.staff_number = #{staff_number} OR s.name = #{staff_number})
+	</if>
+	AND hour_type = '1'
+	AND h.`status` IN('1', '3') AND h.participation > 0 
+	AND h.work_date >= #{date_start} AND h.work_date &lt;= #{date_end}
+	ORDER BY s.staff_number
+	<if test="offset!=null">
+		LIMIT #{offset} ,#{pageSize} 
+	</if>
+	</select>
+	
+	<select id="getPieceTimeReportStaffListCount" resultType="int" parameterType='Map' >
+	SELECT count(DISTINCT s.staff_number) FROM BMS_HR_STAFF_HOURS h 
+	LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id
+	WHERE h.factory = #{factory} 	
+	<if test="workshop !=null and workshop !=''">
+		AND find_in_set(h.workshop,#{workshop})>0
+	</if>
+	<if test="group!='全部'">
+		AND h.workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND team = #{subgroup}
+	</if>
+	<if test="bus_number!=''">
+		AND UPPER(bus_number) = #{bus_number}
+	</if>
+	<if test="staff_number!=''">
+		AND (s.staff_number = #{staff_number} OR s.name = #{staff_number})
+	</if>
+	AND hour_type = '1'
+	AND h.`status` IN('1', '3') AND participation>0
+	AND h.work_date >= #{date_start} AND h.work_date &lt;= #{date_end}
+	</select>
+	
+	<select id="getPieceTimeReportBusList" resultType="String" parameterType='Map' >
+	SELECT DISTINCT bus_number FROM BMS_HR_STAFF_HOURS h 
+	LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id
+	WHERE h.factory = #{factory} 	
+	<if test="workshop !=null and workshop !=''">
+		AND find_in_set(h.workshop,#{workshop})>0
+	</if>
+	<if test="group!='全部'">
+		AND h.workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND team = #{subgroup}
+	</if>
+	<if test="bus_number!=''">
+		AND UPPER(bus_number) = #{bus_number}
+	</if>
+	<if test="staff_number!=''">
+		AND (s.staff_number = #{staff_number} OR s.name = #{staff_number})
+	</if>
+	AND hour_type = '1'
+	AND h.`status` IN('1', '3') AND participation>0
+	AND h.work_date >= #{date_start} AND h.work_date &lt;= #{date_end}
+	<if test="offset!=null">
+		LIMIT #{offset} ,#{pageSize} 
+	</if>
+	</select>
+	
+	<select id="getPieceTimeReportBusListCount" resultType="int" parameterType='Map' >
+	SELECT count(DISTINCT h.bus_number) FROM BMS_HR_STAFF_HOURS h
+	LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id
+	WHERE h.factory = #{factory} 	
+	<if test="workshop !=null and workshop !=''">
+		AND find_in_set(h.workshop,#{workshop})>0
+	</if>
+	<if test="group!='全部'">
+		AND h.workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND team = #{subgroup}
+	</if>
+	<if test="bus_number!=''">
+		AND UPPER(bus_number) = #{bus_number}
+	</if>
+	<if test="staff_number!=''">
+		AND (s.staff_number = #{staff_number} OR s.name = #{staff_number})
+	</if>
+	AND hour_type = '1'
+	AND h.`status` IN('1', '3') AND participation>0
+	AND h.work_date >= #{date_start} AND h.work_date &lt;= #{date_end}
+	</select>
+	
+	<select id="getPieceTimeReportList" resultType="Map" parameterType='Map' >
+	SELECT bus_number,standard_price,work_date,factory as plant_org,workshop as workshop_org,workgroup as workgroup_org,team as team_org,
+	GROUP_CONCAT(staff_number,',',staff_name,',',IFNULL(job,'-'),',',participation,',',ifnull(distribution,''),',',CONCAT(ROUND(ppay,2),'|') separator '') AS 'piece_str'
+	FROM BMS_PIECE_PAY_CAL 
+	WHERE work_date >= #{date_start} AND  work_date &lt;= #{date_end}
+	AND factory = #{factory}
+	<if test="list.size !=0">
+		AND bus_number IN
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</if>
+	<if test="workshop !=null and workshop !=''">
+		AND find_in_set(workshop,#{workshop})>0
+	</if>
+	<if test="group!='全部'">
+		AND workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND team = #{subgroup}
+	</if>
+	<if test="bus_number!=''">
+		AND UPPER(bus_number) = #{bus_number}
+	</if>
+	<if test="staff_number!=''">
+		AND (staff_number = #{staff_number} OR staff_name = #{staff_number})
+	</if>
+	GROUP BY work_date,bus_number,factory,workshop,workgroup,team
+	ORDER BY work_date,bus_number,factory,workshop,workgroup,team
+		
+	</select>
+	<select id="getPieceTimeReportListCount" resultType="int" parameterType='Map' >
+	SELECT COUNT(bus_number) as count_num FROM
+	(SELECT bus_number,work_date,plant_org,workshop_org,workgroup_org,team_org,
+	GROUP_CONCAT(staff_number,',',staff_name,',',team_org,',',participation,',',ifnull(skill_parameter,''),',',CONCAT(ROUND(ppay,2),'|') separator '') AS 'piece_str'
+	FROM BMS_PIECE_PAY_CAL WHERE work_date >= #{date_start} AND  work_date &lt;= #{date_end}
+	<if test="factory!='全部'">
+		AND factory = #{factory}
+	</if>
+	<if test="workshop !=null and workshop !=''">
+		and find_in_set(h.workshop,#{workshop})>0
+	</if>
+	<if test="group!='全部'">
+		AND workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND team = #{subgroup}
+	</if>
+	<if test="staff_number!=''">
+		AND (staff_number = #{staff_number} OR staff_name = #{staff_number})
+	</if>
+	<if test="bus_number!=''">
+		AND UPPER(bus_number) = #{bus_number}
+	</if>
+	GROUP BY work_date,bus_number,factory,workshop,workgroup,team
+	ORDER BY work_date,bus_number,factory,workshop,workgroup,team) a
+	
+	</select>
+	
+	<!-- 计件工时统计优化-谭海文 2016-04-01 -->
+	<select id="getWorkHourReportList" resultType="Map"
+		parameterType='Map'>
+	select
+	tmp.staff_id,group_concat(tmp.workHoursType,'=',tmp.participationStr
+	order by tmp.staff_id separator '|') workhours,ss.staff_number,ss.name
+	as staff_name,r.new_value,
+	a.D1,a.D2,a.D3,a.D4,a.D5,a.D6,a.D7,a.D8,a.D9,a.D10,a.D11,a.D12,a.D13,a.D14,a.D15,a.D16,a.D17,a.D18,a.D19,a.D20,
+	a.D21,a.D22,a.D23,a.D24,a.D25,a.D26,a.D27,a.D28,a.D29,a.D30,a.D31
+	from(
+	SELECT a.staff_id,case hour_type when '1' then '计件' when '2' then '额外' when
+	'3' then '技改' when '4' then '等待' end as
+	workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,
+	group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
+	order by work_date separator '') AS participationStr FROM
+	(SELECT staff_id,hour_type,
+	case hour_type when '1' then SUM(bus_count) else SUM(work_hour) end
+	AS sum_participation,work_date,factory plant_org,workshop
+	workshop_org,workgroup workgroup_org,team team_org
+	FROM BMS_HR_STAFF_HOURS
+	WHERE work_date LIKE CONCAT(#{work_date},'%')
+	and FIND_IN_SET(STATUS,'1,3')
+	and (participation > 0 or work_hour>0) 
+	<if test="factory!='全部'">
+		AND factory = #{factory}
+	</if>
+	<if test="workshop!=''">
+		AND FIND_IN_SET(workshop,#{workshop}) >0
+	</if>
+	<if test="group!='全部'">
+		AND workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND team = #{subgroup}
+	</if>
+	GROUP BY staff_id,hour_type,work_date ORDER BY staff_id,hour_type) a
+	GROUP BY a.staff_id,hour_type) tmp
+	LEFT JOIN BMS_HR_STAFF ss ON ss.id = tmp.staff_id
+	left join BMS_HR_STAFF_UPDATE_RECORD r on tmp.staff_id=r.staff_id and
+	substring(r.edit_date,1,7)&lt;=#{work_date} and r.type='skill_parameter'
+	and r.edit_date=(select max(r1.edit_date) from BMS_HR_STAFF_UPDATE_RECORD
+	r1 where tmp.staff_id=r1.staff_id and
+	substring(r1.edit_date,1,7)&lt;=#{work_date} and r1.type='skill_parameter')
+	LEFT JOIN BMS_HR_STAFF_ATTENDANCE a ON ss.staff_number = a.staff_number
+	where a.month=#{work_date} 
+	<if test="staff_number!=null">
+		AND (ss.staff_number LIKE CONCAT('%',#{staff_number},'%') OR ss.name
+		LIKE CONCAT('%',#{staff_number},'%'))
+	</if>
+	group by tmp.staff_id
+	ORDER BY ss.staff_number,tmp.workHoursType
+	<if test="offset!=null">
+		LIMIT #{offset} ,#{pageSize}
+	</if>	
+	</select>	
+<!-- 	<select id="getWorkHourReportList" resultType="Map"
+		parameterType='Map'>
+		SELECT
+		u.staff_number,u.staff_name,u.skill_parameter,u.plant_org,u.workshop_org,u.workgroup_org,u.team_org,
+		group_concat(u.workHoursType,'=',u.participationStr order by
+		u.staff_number separator '|') AS 'workhours',
+		a.D1,a.D2,a.D3,a.D4,a.D5,a.D6,a.D7,a.D8,a.D9,a.D10,a.D11,a.D12,a.D13,a.D14,a.D15,a.D16,a.D17,a.D18,a.D19,a.D20,
+		a.D21,a.D22,a.D23,a.D24,a.D25,a.D26,a.D27,a.D28,a.D29,a.D30,a.D31
+		FROM
+		(
+		SELECT n.*,ss.staff_number,ss.name as staff_name,r.new_value as
+		skill_parameter
+		FROM (
+		(SELECT a.staff_id,'计件' AS
+		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
+		group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
+		order by work_date separator '') AS participationStr FROM
+		(SELECT staff_id,SUM(bus_count) AS
+		sum_participation,work_date,factory plant_org,workshop
+		workshop_org,workgroup workgroup_org,team team_org
+		FROM BMS_HR_STAFF_HOURS
+		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
+		and hour_type = '1' and FIND_IN_SET(STATUS,'1,3')
+		and participation > 0
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		GROUP BY staff_id,work_date ORDER BY work_date) a
+		GROUP BY a.staff_id
+		ORDER BY a.work_date,staff_id)
+		UNION
+		(SELECT a.staff_id,'额外' AS
+		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
+		group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
+		order by work_date separator '') AS participationStr FROM
+		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
+		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
+		FROM BMS_HR_STAFF_HOURS
+		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
+		and hour_type = '2' and FIND_IN_SET(STATUS,'1,3')
+		and work_hour > 0
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		GROUP BY staff_id,work_date ORDER BY work_date) a
+		GROUP BY a.staff_id
+		ORDER BY a.work_date,staff_id)
+		UNION
+		(SELECT a.staff_id,'技改' AS
+		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
+		group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
+		order by work_date separator '') AS participationStr FROM
+		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
+		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
+		FROM BMS_HR_STAFF_HOURS h1
+		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
+		and hour_type = '3' and FIND_IN_SET(STATUS,'1,3')
+		and work_hour > 0
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		GROUP BY staff_id,work_date ORDER BY work_date) a
+		GROUP BY a.staff_id
+		ORDER BY a.work_date,staff_id)
+		UNION
+		(SELECT a.staff_id,'等待' AS
+		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
+		group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
+		order by work_date separator '') AS participationStr FROM
+		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
+		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
+		FROM BMS_HR_STAFF_HOURS
+		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
+		and hour_type = '4' and FIND_IN_SET(STATUS,'1,3')
+		and work_hour > 0
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		GROUP BY staff_id,work_date ORDER BY work_date) a
+		GROUP BY a.staff_id
+		ORDER BY a.work_date,staff_id)
+
+		) n LEFT JOIN BMS_HR_STAFF ss ON ss.id = n.staff_id
+		left join BMS_HR_STAFF_UPDATE_RECORD r on n.staff_id=r.staff_id and
+		substring(r.edit_date,1,7)=substring(n.work_date,1,7) and
+		r.type='skill_parameter'
+		and r.edit_date=(select max(r1.edit_date) from BMS_HR_STAFF_UPDATE_RECORD
+		r1 where n.staff_id=r1.staff_id and
+		substring(r1.edit_date,1,7)=substring(n.work_date,1,7) and
+		r1.type='skill_parameter')
+		) u
+		LEFT JOIN BMS_HR_STAFF_ATTENDANCE a ON u.staff_number = a.staff_number AND
+		a.month = #{work_date}
+		LEFT JOIN BMS_HR_BASE_PRICE p ON p.type = '0' AND p.start_date &lt;= 
+			CONCAT(#{work_date},'-01') AND p.end_date >= CONCAT(#{work_date},'-01')
+		where 1=1
+		<if test="staff_number!=null">
+			AND (u.staff_number LIKE CONCAT('%',#{staff_number},'%') OR u.staff_name
+			LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+		GROUP BY u.staff_number
+		ORDER BY u.staff_number,workHoursType
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select> -->
+	<!-- 计件工时统计优化-谭海文 2016-04-01 -->
+	<select id="getWorkHourReportListCount" resultType="int"
+		parameterType='Map'>
+		SELECT count(distinct staff_id)
+		FROM BMS_HR_STAFF_HOURS 
+		where status in ('1','3') and (participation>0 or work_hour>0)
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		and work_date LIKE CONCAT('%',#{work_date},'%');
+		<!-- select count(*) from(
+		SELECT
+		u.staff_number,u.staff_name,u.skill_parameter,u.plant_org,u.workshop_org,u.workgroup_org,u.team_org,
+		group_concat(u.workHoursType,'=',u.participationStr order by
+		u.staff_number separator '|') AS 'workhours'
+		FROM
+		(
+		SELECT n.*,ss.staff_number,ss.name as staff_name,r.new_value as
+		skill_parameter
+		FROM (
+		(SELECT a.staff_id,'计件' AS
+		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
+		group_concat(substr(a.work_date,9,10),':',CONCAT(a.sum_participation,';')
+		order by work_date separator '') AS participationStr FROM
+		(SELECT staff_id,COUNT(DISTINCT bus_number) AS
+		sum_participation,work_date,factory plant_org,workshop
+		workshop_org,workgroup workgroup_org,team team_org
+		FROM BMS_HR_STAFF_HOURS
+		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
+		and hour_type = '1' and FIND_IN_SET(STATUS,'1,3')
+		and participation > 0
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		GROUP BY staff_id,work_date ORDER BY work_date) a
+		GROUP BY a.staff_id
+		ORDER BY a.work_date,staff_id)
+		UNION
+		(SELECT a.staff_id,'额外' AS
+		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
+		group_concat(substr(a.work_date,9,10),':',CONCAT(a.sum_participation,';')
+		order by work_date separator '') AS participationStr FROM
+		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
+		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
+		FROM BMS_HR_STAFF_HOURS
+		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
+		and hour_type = '2' and FIND_IN_SET(STATUS,'1,3')
+		and work_hour > 0
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		GROUP BY staff_id,work_date ORDER BY work_date) a
+		GROUP BY a.staff_id
+		ORDER BY a.work_date,staff_id)
+		UNION
+		(SELECT a.staff_id,'技改' AS
+		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
+		group_concat(substr(a.work_date,9,10),':',CONCAT(a.sum_participation,';')
+		order by work_date separator '') AS participationStr FROM
+		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
+		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
+		FROM BMS_HR_STAFF_HOURS h1
+		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
+		and hour_type = '3' and FIND_IN_SET(STATUS,'1,3')
+		and work_hour > 0
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		GROUP BY staff_id,work_date ORDER BY work_date) a
+		GROUP BY a.staff_id
+		ORDER BY a.work_date,staff_id)
+		UNION
+		(SELECT a.staff_id,'等待' AS
+		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
+		group_concat(substr(a.work_date,9,10),':',CONCAT(a.sum_participation,';')
+		order by work_date separator '') AS participationStr FROM
+		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
+		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
+		FROM BMS_HR_STAFF_HOURS
+		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
+		and hour_type = '4' and FIND_IN_SET(STATUS,'1,3')
+		and work_hour > 0
+		<if test="factory!='全部'">
+			AND factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND team = #{subgroup}
+		</if>
+		GROUP BY staff_id,work_date ORDER BY work_date) a
+		GROUP BY a.staff_id
+		ORDER BY a.work_date,staff_id)
+
+		) n LEFT JOIN BMS_HR_STAFF ss ON ss.id = n.staff_id
+		left join BMS_HR_STAFF_UPDATE_RECORD r on n.staff_id=r.staff_id and
+		substring(r.edit_date,1,7)=substring(n.work_date,1,7) and
+		r.type='skill_parameter'
+		and r.edit_date=(select max(r1.edit_date) from BMS_HR_STAFF_UPDATE_RECORD
+		r1 where n.staff_id=r1.staff_id and
+		substring(r1.edit_date,1,7)=substring(n.work_date,1,7) and
+		r1.type='skill_parameter')
+		) u
+		LEFT JOIN BMS_HR_STAFF_ATTENDANCE a ON u.staff_number = a.staff_number AND
+		a.month = #{work_date}
+		LEFT JOIN BMS_HR_BASE_PRICE p ON p.type = '0' AND p.start_date &lt;= 
+			CONCAT(#{work_date},'-01') AND p.end_date >= CONCAT(#{work_date},'-01')
+		where 1=1
+		<if test="staff_number!=null">
+			AND (u.staff_number LIKE CONCAT('%',#{staff_number},'%') OR u.staff_name
+			LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+		GROUP BY u.staff_number
+		ORDER BY u.staff_number,workHoursType
+		) p -->
+	</select>
+	<!-- <select id="getWorkHourReportListCount" resultType="int" parameterType='Map' 
+		> SELECT COUNT(*) FROM (SELECT u.staff_number,u.staff_name,u.skill_parameter,u.plant_org,u.workshop_org,u.workgroup_org,u.team_org, 
+		group_concat(u.workHoursType,'=',u.participationStr order by u.staff_number 
+		separator '|') FROM ( (SELECT a.staff_number,a.staff_name,'计件' AS workHoursType,a.skill_parameter,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org, 
+		group_concat(substr(a.work_date,9,10),':',(a.sum_participation) order by 
+		work_date separator ',') AS participationStr FROM (SELECT staff_number,staff_name,skill_parameter,SUM(participation) 
+		AS sum_participation,work_date,factory plant_org,workshop workshop_org,workgroup 
+		workgroup_org,team team_org FROM V_PIECE_PAY WHERE work_date LIKE CONCAT('%',#{work_date},'%') 
+		GROUP BY staff_number,work_date ORDER BY work_date) a GROUP BY a.staff_number 
+		ORDER BY a.work_date,staff_number) UNION (SELECT a.staff_number,a.staff_name,'额外' 
+		AS workHoursType,a.skill_parameter,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org, 
+		group_concat(substr(a.work_date,9,10),':',(a.sum_participation) order by 
+		work_date separator ',') AS participationStr FROM (SELECT staff_number,staff_name,skill_parameter,SUM(real_work_hour) 
+		AS sum_participation,work_date,factory plant_org,workshop workshop_org,workgroup 
+		workgroup_org,team team_org FROM V_TMP_PAY WHERE work_date LIKE CONCAT('%',#{work_date},'%') 
+		GROUP BY staff_number,work_date ORDER BY work_date) a GROUP BY a.staff_number 
+		ORDER BY a.work_date,staff_number) UNION (SELECT a.staff_number,a.staff_name,'技改' 
+		AS workHoursType,a.skill_parameter,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org, 
+		group_concat(substr(a.work_date,9,10),':',(a.sum_participation) order by 
+		work_date separator ',') AS participationStr FROM (SELECT staff_number,staff_name,skill_parameter,SUM(real_work_hour) 
+		AS sum_participation,work_date,factory plant_org,workshop workshop_org,workgroup 
+		workgroup_org,team team_org FROM V_ECN_PAY WHERE work_date LIKE CONCAT('%',#{work_date},'%') 
+		GROUP BY staff_number,work_date ORDER BY work_date) a GROUP BY a.staff_number 
+		ORDER BY a.work_date,staff_number) UNION (SELECT a.staff_number,a.staff_name,'等待' 
+		AS workHoursType,a.skill_parameter,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org, 
+		group_concat(substr(a.work_date,9,10),':',(a.sum_participation) order by 
+		work_date separator ',') AS participationStr FROM (SELECT staff_number,staff_name,'' 
+		AS skill_parameter,SUM(work_hour) AS sum_participation,work_date,factory 
+		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org FROM 
+		V_WAIT_PAY WHERE work_date LIKE CONCAT('%',#{work_date},'%') GROUP BY staff_number,work_date 
+		ORDER BY work_date) a GROUP BY a.staff_number ORDER BY a.work_date,staff_number) 
+		) u where 1=1 <if test="factory!='全部'"> AND u.plant_org = #{factory} </if> 
+		<if test="workshop!='全部'"> AND FIND_IN_SET(u.workshop_org,#{workshop}) >0 
+		</if> <if test="group!='全部'"> AND u.workgroup_org = #{group} </if> <if test="subgroup!='全部'"> 
+		AND u.team_org = #{subgroup} </if> <if test="staff_number!=null"> AND (u.staff_number 
+		LIKE CONCAT('%',#{staff_number},'%') OR u.staff_name LIKE CONCAT('%',#{staff_number},'%')) 
+		</if> GROUP BY u.staff_number ORDER BY u.staff_number,workHoursType ) p </select> -->
+
+	<select id="getWaitManHourList" resultType="Map" parameterType='Map'>
+		SELECT * FROM BMS_WAIT_PAY_CAL w WHERE w.work_date LIKE
+		CONCAT('%',#{waitmanhourdate},'%')
+		<if test="factory!='全部'">
+			AND w.factory = #{factory}
+		</if>
+		<if test="workshop!='全部'">
+			AND w.workshop = #{workshop}
+		</if>
+		<if test="group!='全部'">
+			AND w.workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND w.team = #{subgroup}
+		</if>
+		<if test="staff_number!=null">
+			AND (staff_number LIKE CONCAT('%',#{staff_number},'%') OR
+			staff_name LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+		ORDER BY factory,workshop,workgroup,team,work_date
+	</select>
+
+	<!-- 查询员工考勤信息 -->
+	<select id="checkStaff" parameterType="Map"
+		resultType="com.byd.bms.hr.entity.BmsHrStaff">
+		SELECT id,staff_number,status FROM BMS_HR_STAFF WHERE
+		FIND_IN_SET(staff_number,#{staff_numbers})
+	</select>
+	
+	<select id="getAttendanceInfo" resultType="Map" parameterType='Map'>
+	SELECT * FROM BMS_HR_STAFF_ATTENDANCE 
+	WHERE `month` = #{month} AND staff_number = #{staff_number}
+	</select>
+
+	<select id="getAttendanceList" resultType="Map" parameterType='Map'>
+		SELECT s.staff_number,a.month,a.attendance_days,a.attendance_hours,
+		IF(a.D1='0','',a.D1) AS D1,IF(a.D2='0','',a.D2) AS
+		D2,IF(a.D3='0','',a.D3) AS D3,IF(a.D4='0','',a.D4) AS D4,
+		IF(a.D5='0','',a.D5) AS D5,IF(a.D6='0','',a.D6) AS
+		D6,IF(a.D7='0','',a.D7) AS D7,IF(a.D8='0','',a.D8) AS D8,
+		IF(a.D9='0','',a.D9) AS D9,IF(a.D10='0','',a.D10) AS
+		D10,IF(a.D11='0','',a.D11) AS D11,IF(a.D12='0','',a.D12) AS D12,
+		IF(a.D13='0','',a.D13) AS D13,IF(a.D14='0','',a.D14) AS
+		D14,IF(a.D15='0','',a.D15) AS D15,IF(a.D16='0','',a.D16) AS D16,
+		IF(a.D17='0','',a.D17) AS D17,IF(a.D18='0','',a.D18) AS
+		D18,IF(a.D19='0','',a.D19) AS D19,IF(a.D20='0','',a.D20) AS D20,
+		IF(a.D21='0','',a.D21) AS D21,IF(a.D22='0','',a.D22) AS
+		D22,IF(a.D23='0','',a.D23) AS D23,IF(a.D24='0','',a.D24) AS D24,
+		IF(a.D25='0','',a.D25) AS D25,IF(a.D26='0','',a.D26) AS
+		D26,IF(a.D27='0','',a.D27) AS D27,IF(a.D28='0','',a.D28) AS D28,
+		IF(a.D29='0','',a.D29) AS D29,IF(a.D30='0','',a.D30) AS
+		D30,IF(a.D31='0','',a.D31) AS D31,
+		s.name FROM (select distinct
+		t1.staff_id from (
+		select s.id staff_id from BMS_HR_STAFF s where 1=1
+		and s.salary_type='计件'
+		<if test="factory!=null and factory!=''"> AND s.plant_org = #{factory} </if>
+		<if test="dept!=null and dept!=''"> AND s.dept_org = #{dept} </if>
+		<if test="workshop!=null and workshop!=''"> AND s.workshop_org = #{workshop} </if>
+		<if test="workgroup!=null and workgroup!=''"> AND s.workgroup_org = #{workgroup} </if>
+		<if test="team!=null and team!=''"> AND s.team_org = #{team}</if>
+		<if test="staff_number!=null and staff_number !=''">
+			AND (s.staff_number LIKE CONCAT('%',#{staff_number},'%')
+			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+		AND (FIND_IN_SET(s.workshop_org,(SELECT workshop FROM BMS_BASE_USER_ROLE WHERE user_id = #{userid} AND role_id = #{role_id})) 
+			OR s.workshop_org LIKE CONCAT('%',(SELECT workshop FROM BMS_BASE_USER_ROLE WHERE user_id = #{userid} AND role_id =#{role_id}),'%'))
+		
+		union all
+		select distinct st.staff_id from V_ORG_STAFF_INFO st where
+		1=1
+		AND (FIND_IN_SET(st.workshop,(SELECT workshop FROM BMS_BASE_USER_ROLE WHERE user_id = #{userid} AND role_id = #{role_id})) 
+			OR st.workshop LIKE CONCAT('%',(SELECT workshop FROM BMS_BASE_USER_ROLE WHERE user_id = #{userid} AND role_id = #{role_id}),'%'))
+		<if test="factory!=null and factory!=''"> AND st.factory = #{factory} </if>
+		<if test="dept!=null and dept!=''"> AND st.dept = #{dept} </if>
+		<if test="workshop!=null and workshop!=''"> AND st.workshop = #{workshop} </if>
+		<if test="workgroup!=null and workgroup!=''"> AND st.workgroup = #{workgroup} </if>
+		<if test="team!=null and team!=''"> AND st.team = #{team}</if>
+		<if test="staff_number!=null and staff_number !=''">
+			AND (st.staff_number LIKE CONCAT('%',#{staff_number},'%')
+			OR st.staff_name LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+		) t1
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+		) v LEFT JOIN BMS_HR_STAFF s ON s.id = v.staff_id
+		LEFT JOIN
+		BMS_HR_STAFF_ATTENDANCE a ON a.staff_number = s.staff_number
+		and
+		a.month = #{month}
+
+	</select>
+	<select id="getAttendanceTotalCount" resultType="int"
+		parameterType='Map'>
+		<!-- SELECT count(a.id) FROM BMS_HR_STAFF_ATTENDANCE a LEFT JOIN BMS_HR_STAFF 
+			s ON a.staff_number = s.staff_number LEFT JOIN (SELECT DISTINCT(staff_id),org_id,factory,dept,workshop,workgroup,team 
+			FROM V_ORG_STAFF_INFO ) v ON s.id = v.staff_id WHERE a.month = #{month} <if 
+			test="factory!=null and factory!=''">AND v.factory = #{factory} </if> <if 
+			test="dept!=null and dept!=''">AND v.dept = #{dept} </if> <if test="workshop!=null 
+			and workshop!=''">AND v.workshop = #{workshop} </if> <if test="workgroup!=null 
+			and workgroup!=''">AND v.workgroup = #{workgroup} </if> <if test="team!=null 
+			and team!=''">AND v.team = #{team}</if> <if test="staff_number!=null"> AND 
+			(a.staff_number LIKE CONCAT('%',#{staff_number},'%') OR s.name LIKE CONCAT('%',#{staff_number},'%')) 
+			</if> -->
+		select count(distinct t1.staff_id) from (
+		select s.id staff_id from
+		BMS_HR_STAFF s where 1=1 and s.salary_type='计件'
+		<if test="factory!=null and factory!=''"> AND s.plant_org = #{factory} </if>
+		<if test="dept!=null and dept!=''"> AND s.dept_org = #{dept} </if>
+		<if test="workshop!=null and workshop!=''"> AND s.workshop_org = #{workshop} </if>
+		<if test="workgroup!=null and workgroup!=''"> AND s.workgroup_org = #{workgroup} </if>
+		<if test="team!=null and team!=''"> AND s.team_org = #{team}</if>
+		<if test="staff_number!=null and staff_number !=''">
+			AND (s.staff_number LIKE CONCAT('%',#{staff_number},'%')
+			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+		AND (FIND_IN_SET(s.workshop_org,(SELECT workshop FROM BMS_BASE_USER_ROLE WHERE user_id = #{userid} AND role_id = #{role_id})) 
+			OR s.workshop_org LIKE CONCAT('%',(SELECT workshop FROM BMS_BASE_USER_ROLE WHERE user_id = #{userid} AND role_id = #{role_id}),'%'))
+		union all
+		select distinct st.staff_id from V_ORG_STAFF_INFO st where
+		1=1
+		AND (FIND_IN_SET(st.workshop_org,(SELECT workshop FROM BMS_BASE_USER_ROLE WHERE user_id = #{userid} AND role_id = #{role_id})) 
+			OR st.workshop_org LIKE CONCAT('%',(SELECT workshop FROM BMS_BASE_USER_ROLE WHERE user_id = #{userid} AND role_id = #{role_id}),'%'))
+		<if test="factory!=null and factory!=''"> AND st.factory = #{factory} </if>
+		<if test="dept!=null and dept!=''"> AND st.dept = #{dept} </if>
+		<if test="workshop!=null and workshop!=''"> AND st.workshop = #{workshop} </if>
+		<if test="workgroup!=null and workgroup!=''"> AND st.workgroup = #{workgroup} </if>
+		<if test="team!=null and team!=''"> AND st.team = #{team}</if>
+		<if test="staff_number!=null and staff_number !=''">
+			AND (st.staff_number LIKE CONCAT('%',#{staff_number},'%')
+			OR st.staff_name LIKE CONCAT('%',#{staff_number},'%'))
+		</if>
+		) t1
+	</select>
+
+	<!-- 查询员工信息 -->
+	<select id="getStaffList" resultType="Map" parameterType='Map'>
+		SELECT s.* FROM BMS_HR_STAFF s
+		WHERE 1=1
+		<if test="orgType==null or orgType==''">
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0
+		</if>
+		<if test="orgType==0 ">
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0
+		</if>
+		<if test="orgType==1 or orgType==2">
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0
+			<!-- and s.plant_org = ( SELECT o.name FROM BMS_BASE_ORG o WHERE o.id 
+				= #{org_id}) -->
+		</if>
+
+		<if test="orgType==3 ">
+			and case when ISNULL(s.plant_org) THEN 1=1 else
+			FIND_IN_SET(s.plant_org,#{orgStr})>0 end
+			and FIND_IN_SET(s.dept_org,#{orgStr})>0
+
+			<!-- and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.dept_org = ( SELECT 
+				o.name FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) -->
+		</if>
+		<if test="orgType==4 ">
+			and case when ISNULL(s.plant_org) THEN 1=1 else
+			FIND_IN_SET(s.plant_org,#{orgStr})>0 end
+			and case when ISNULL(s.dept_org) THEN 1=1 else
+			FIND_IN_SET(s.dept_org,#{orgStr})>0 end
+			and FIND_IN_SET(s.workshop_org,#{orgStr})>0
+			<!-- and FIND_IN_SET(s.plant_org,#{orgStr})>0 and FIND_IN_SET(s.dept_org,#{orgStr})>0 
+				and s.workshop_org = ( SELECT o.name FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) -->
+		</if>
+		<if test="orgType==5 ">
+			and case when ISNULL(s.plant_org) THEN 1=1 else
+			FIND_IN_SET(s.plant_org,#{orgStr})>0 end
+			and case when ISNULL(s.dept_org) THEN 1=1 else
+			FIND_IN_SET(s.dept_org,#{orgStr})>0 end
+			and case when ISNULL(s.workshop_org) THEN 1=1 else
+			FIND_IN_SET(s.workshop_org,#{orgStr})>0 end
+			and FIND_IN_SET(s.workgroup_org,#{orgStr})>0
+		</if>
+		<if test="orgType==6 ">
+			and case when ISNULL(s.plant_org) THEN 1=1 else
+			FIND_IN_SET(s.plant_org,#{orgStr})>0 end
+			and case when ISNULL(s.dept_org) THEN 1=1 else
+			FIND_IN_SET(s.dept_org,#{orgStr})>0 end
+			and case when ISNULL(s.workshop_org) THEN 1=1 else
+			FIND_IN_SET(s.workshop_org,#{orgStr})>0 end
+			and case when ISNULL(s.workgroup_org) THEN 1=1 else
+			FIND_IN_SET(s.workgroup_org,#{orgStr})>0 end
+			and FIND_IN_SET(s.team_org,#{orgStr})>0
+		</if>
+
+		<if test="staff_number!=null">
+			AND( LOCATE(s.staff_number,#{staff_number})>0 OR
+			LOCATE(s.name,#{staff_number})>0 )
+			<!-- AND ( s.staff_number LIKE CONCAT('%',#{staff_number},'%') OR s.name 
+				LIKE CONCAT('%',#{staff_number},'%')) -->
+		</if>
+		<if test="staff_level!=null">
+			AND s.staff_level LIKE CONCAT('%',#{staff_level},'%')
+		</if>
+		<if test="salary_type!=null">
+			AND s.salary_type = #{salary_type}
+		</if>
+		<if test="job!=null">
+			AND s.job LIKE CONCAT('%',#{job},'%')
+		</if>
+		<if test="workplace!=null">
+			AND s.workplace LIKE CONCAT('%',#{workplace},'%')
+		</if>
+		<if test="status!=null">
+			AND s.status = #{status}
+		</if>
+		<if test="job_type!=null or job_grade!=null">
+			AND FIND_IN_SET(s.job,(SELECT GROUP_CONCAT(j.job_name) FROM
+			BMS_HR_BASE_JOB j LEFT JOIN BMS_HR_BASE_JOB_GRADE g ON j.job_grade_id
+			= g.id
+			WHERE 1=1
+			<if test="job_type!=null">
+				AND g.type = #{job_type}
+			</if>
+			<if test="job_grade!=null">
+				AND g.id = #{job_grade}
+			</if>
+			)) >0
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+
+	<select id="getStaffTotalCount" resultType="int" parameterType='Map'>
+		SELECT count(s.id) FROM BMS_HR_STAFF s
+		WHERE 1=1
+		<if test="orgType==null or orgType==''">
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0
+		</if>
+		<if test="orgType==0 ">
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0
+		</if>
+		<if test="orgType==1 or orgType==2">
+			and FIND_IN_SET(s.plant_org,#{orgStr})>0
+			<!-- and s.plant_org = ( SELECT o.name FROM BMS_BASE_ORG o WHERE o.id 
+				= #{org_id}) -->
+		</if>
+
+		<if test="orgType==3 ">
+			and case when ISNULL(s.plant_org) THEN 1=1 else
+			FIND_IN_SET(s.plant_org,#{orgStr})>0 end
+			and FIND_IN_SET(s.dept_org,#{orgStr})>0
+
+			<!-- and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.dept_org = ( SELECT 
+				o.name FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) -->
+		</if>
+		<if test="orgType==4 ">
+			and case when ISNULL(s.plant_org) THEN 1=1 else
+			FIND_IN_SET(s.plant_org,#{orgStr})>0 end
+			and case when ISNULL(s.dept_org) THEN 1=1 else
+			FIND_IN_SET(s.dept_org,#{orgStr})>0 end
+			and FIND_IN_SET(s.workshop_org,#{orgStr})>0
+			<!-- and FIND_IN_SET(s.plant_org,#{orgStr})>0 and FIND_IN_SET(s.dept_org,#{orgStr})>0 
+				and s.workshop_org = ( SELECT o.name FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) -->
+		</if>
+		<if test="orgType==5 ">
+			and case when ISNULL(s.plant_org) THEN 1=1 else
+			FIND_IN_SET(s.plant_org,#{orgStr})>0 end
+			and case when ISNULL(s.dept_org) THEN 1=1 else
+			FIND_IN_SET(s.dept_org,#{orgStr})>0 end
+			and case when ISNULL(s.workshop_org) THEN 1=1 else
+			FIND_IN_SET(s.workshop_org,#{orgStr})>0 end
+			and FIND_IN_SET(s.workgroup_org,#{orgStr})>0
+		</if>
+		<if test="orgType==6 ">
+			and case when ISNULL(s.plant_org) THEN 1=1 else
+			FIND_IN_SET(s.plant_org,#{orgStr})>0 end
+			and case when ISNULL(s.dept_org) THEN 1=1 else
+			FIND_IN_SET(s.dept_org,#{orgStr})>0 end
+			and case when ISNULL(s.workshop_org) THEN 1=1 else
+			FIND_IN_SET(s.workshop_org,#{orgStr})>0 end
+			and case when ISNULL(s.workgroup_org) THEN 1=1 else
+			FIND_IN_SET(s.workgroup_org,#{orgStr})>0 end
+			and FIND_IN_SET(s.team_org,#{orgStr})>0
+		</if>
+
+		<if test="staff_number!=null">
+			AND( LOCATE(s.staff_number,#{staff_number})>0 OR
+			LOCATE(s.name,#{staff_number})>0 )
+			<!-- AND( s.staff_number LIKE CONCAT('%',#{staff_number},'%') OR s.name 
+				LIKE CONCAT('%',#{staff_number},'%')) -->
+		</if>
+		<if test="staff_level!=null">
+			AND s.staff_level LIKE CONCAT('%',#{staff_level},'%')
+		</if>
+		<if test="salary_type!=null">
+			AND s.salary_type = #{salary_type}
+		</if>
+		<if test="job!=null">
+			AND s.job LIKE CONCAT('%',#{job},'%')
+		</if>
+		<if test="workplace!=null">
+			AND s.workplace LIKE CONCAT('%',#{workplace},'%')
+		</if>
+		<if test="status!=null">
+			AND s.status = #{status}
+		</if>
+		<if test="job_type!=null or job_grade!=null">
+			AND FIND_IN_SET(s.job,(SELECT GROUP_CONCAT(j.job_name) FROM
+			BMS_HR_BASE_JOB j LEFT JOIN BMS_HR_BASE_JOB_GRADE g ON j.job_grade_id
+			= g.id
+			WHERE 1=1
+			<if test="job_type!=null">
+				AND g.type = #{job_type}
+			</if>
+			<if test="job_grade!=null">
+				AND g.id = #{job_grade}
+			</if>
+			)) >0
+		</if>
+
+	</select>
+
+	<select id="queryStaffSkillParameterList" resultType="Map"
+		parameterType='Map'>
+		
+		select tmp.staff_number,tmp.name,tmp.plant_org,tmp.dept_org,tmp.workshop_org,tmp.workgroup_org,tmp.team_org,
+		group_concat(tmp.month,':',tmp.skill_parameter order by tmp.month separator ',') as priceStr
+		from (
+		<foreach collection="monthList" index="index" item="item" separator="union">
+			select s.id,s.staff_number,s.name,s.plant_org,s.dept_org,s.workshop_org,s.workgroup_org,s.team_org,#{item} month,r.new_value skill_parameter
+			from (select st.* from BMS_HR_STAFF st where 1=1 and st.salary_type = '计件' 
+			<if test="factory !=null and factory!=''">
+				and FIND_IN_SET(st.plant_org,#{factory})>0 
+			</if>
+			<if test="dept !=null and dept !=''">
+				and FIND_IN_SET(st.dept_org,#{dept})>0
+			</if>
+			<if test="workshop !=null and workshop!=''">
+				and FIND_IN_SET(st.workshop_org,#{workshop})>0
+			</if>
+			<if test="workgroup !=null and workgroup!=''">
+				and FIND_IN_SET(st.workgroup_org,#{workgroup})>0
+			</if>
+			<if test="team !=null and team!=''">
+				and FIND_IN_SET(st.team_org,#{team})>0
+			</if>			
+			order by st.workshop_org,st.workgroup_org,st.team_org 
+			<if test="offset!=null">
+				limit #{offset} ,#{pageSize}
+			</if>) s
+			<![CDATA[
+			left join BMS_HR_STAFF_UPDATE_RECORD r on s.id=r.staff_id and r.type='skill_parameter'
+			and substring(r.edit_date,1,7)<=#{item}
+			and r.edit_date=(select max(r1.edit_date) from BMS_HR_STAFF_UPDATE_RECORD r1 
+			where s.id=r1.staff_id and r1.type='skill_parameter' and substr(r1.edit_date,1,7)<=#{item} ) 
+			]]>	
+		</foreach>
+		) tmp
+		group by tmp.staff_number	
+		
+	</select>
+
+	<select id="queryStaffSkillParameterTotalCount" resultType="int"
+		parameterType='Map'>
+		select count(st.id) from BMS_HR_STAFF st where 1=1 and st.salary_type = '计件' 
+			<if test="factory !=null and factory!=''">
+				and FIND_IN_SET(st.plant_org,#{factory})>0 
+			</if>
+			<if test="dept !=null and dept !=''">
+				and FIND_IN_SET(st.dept_org,#{dept})>0
+			</if>
+			<if test="workshop !=null and workshop!=''">
+				and FIND_IN_SET(st.workshop_org,#{workshop})>0
+			</if>
+			<if test="workgroup !=null and workgroup!=''">
+				and FIND_IN_SET(st.workgroup_org,#{workgroup})>0
+			</if>
+			<if test="team !=null and team!=''">
+				and FIND_IN_SET(st.team_org,#{team})>0
+			</if>					
+	</select>
+
+	<select id="getStaffListByStaffNumbers" resultType="String"
+		parameterType='Map'>
+		SELECT s.staff_number FROM BMS_HR_STAFF s
+		WHERE FIND_IN_SET(s.staff_number,#{staff_numbers})>0
+	</select>
+
+	<update id="delAttendance" parameterType='Map'>
+		<!-- DELETE FROM
+		BMS_HR_STAFF_ATTENDANCE
+		WHERE staff_number in (select * from (
+		SELECT s.staff_number FROM BMS_HR_STAFF_ATTENDANCE s WHERE
+		FIND_IN_SET(s.staff_number,#{staff_numbers})>0 AND month = #{month})
+		a) -->
+		DELETE FROM
+		BMS_HR_STAFF_ATTENDANCE
+		WHERE FIND_IN_SET(staff_number,#{staff_numbers})>0 AND month = #{month}
+	</update>
+
+	<update id="delRewards" parameterType='Map'>
+		DELETE FROM
+		BMS_HR_REWARDS
+		WHERE staff_number =#{staff_numbers} AND rewards_date = #{date}
+	</update>
+	<update id="delRewardsByID" parameterType='Map'>
+		DELETE FROM
+		BMS_HR_REWARDS
+		WHERE id =#{reward_id}
+	</update>
+	<insert id="insertRewards" parameterType="List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			INSERT INTO BMS_HR_REWARDS(staff_number,rewards_date
+			<if test="item.rewards_factory!=null and item.rewards_factory!=''">,rewards_factory</if>
+			<if test="item.rewards_workshop!=null and item.rewards_workshop!=''">,rewards_workshop</if>
+			<if test="item.reasons!=null and item.reasons!=''">,reasons</if>
+			<if test="item.add!=null and item.add!=''">,`add`</if>
+			<if test="item.deduct!=null and item.deduct!=''">,deduct</if>
+			<if test="item.group_leader!=null and item.group_leader!=''">,group_leader</if>
+			<if test="item.gaffer!=null and item.gaffer!=''">,gaffer</if>
+			<if test="item.proposer!=null and item.proposer!=''">,proposer</if>
+			<if test="item.editor_id!=null and item.editor_id!=''">,editor_id</if>
+			<if test="item.edit_date!=null and item.edit_date!=''">,edit_date</if>
+			)
+			VALUES(#{item.staff_number},#{item.rewards_date}
+			<if test="item.rewards_factory!=null and item.rewards_factory!=''">,#{item.rewards_factory}</if>
+			<if test="item.rewards_workshop!=null and item.rewards_workshop!=''">,#{item.rewards_workshop}</if>
+			<if test="item.reasons!=null and item.reasons!=''">,#{item.reasons}</if>
+			<if test="item.add!=null and item.add!=''">,#{item.add}</if>
+			<if test="item.deduct!=null and item.deduct!=''">,#{item.deduct}</if>
+			<if test="item.group_leader!=null and item.group_leader!=''">,#{item.group_leader}</if>
+			<if test="item.gaffer!=null and item.gaffer!=''">,#{item.gaffer}</if>
+			<if test="item.proposer!=null and item.proposer!=''">,#{item.proposer}</if>
+			<if test="item.editor_id!=null and item.editor_id!=''">,#{item.editor_id}</if>
+			<if test="item.edit_date!=null and item.edit_date!=''">,#{item.edit_date}</if>
+			)
+		</foreach>
+	</insert>
+
+	<insert id="insertAttendance" parameterType="List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			INSERT INTO
+			BMS_HR_STAFF_ATTENDANCE(staff_number,month,attendance_days,attendance_hours
+			<if test="item.D1!=null and item.D1!=''">,D1</if>
+			<if test="item.D2!=null and item.D2!=''">,D2</if>
+			<if test="item.D3!=null and item.D3!=''">,D3</if>
+			<if test="item.D4!=null and item.D4!=''">,D4</if>
+			<if test="item.D5!=null and item.D5!=''">,D5</if>
+			<if test="item.D6!=null and item.D6!=''">,D6</if>
+			<if test="item.D7!=null and item.D7!=''">,D7</if>
+			<if test="item.D8!=null and item.D8!=''">,D8</if>
+			<if test="item.D9!=null and item.D9!=''">,D9</if>
+			<if test="item.D10!=null and item.D10!=''">,D10</if>
+			<if test="item.D11!=null and item.D11!=''">,D11</if>
+			<if test="item.D12!=null and item.D12!=''">,D12</if>
+			<if test="item.D13!=null and item.D13!=''">,D13</if>
+			<if test="item.D14!=null and item.D14!=''">,D14</if>
+			<if test="item.D15!=null and item.D15!=''">,D15</if>
+			<if test="item.D16!=null and item.D16!=''">,D16</if>
+			<if test="item.D17!=null and item.D17!=''">,D17</if>
+			<if test="item.D18!=null and item.D18!=''">,D18</if>
+			<if test="item.D19!=null and item.D19!=''">,D19</if>
+			<if test="item.D20!=null and item.D20!=''">,D20</if>
+			<if test="item.D21!=null and item.D21!=''">,D21</if>
+			<if test="item.D22!=null and item.D22!=''">,D22</if>
+			<if test="item.D23!=null and item.D23!=''">,D23</if>
+			<if test="item.D24!=null and item.D24!=''">,D24</if>
+			<if test="item.D25!=null and item.D25!=''">,D25</if>
+			<if test="item.D26!=null and item.D26!=''">,D26</if>
+			<if test="item.D27!=null and item.D27!=''">,D27</if>
+			<if test="item.D28!=null and item.D28!=''">,D28</if>
+			<if test="item.D29!=null and item.D29!=''">,D29</if>
+			<if test="item.D30!=null and item.D30!=''">,D30</if>
+			<if test="item.D31!=null and item.D31!=''">,D31</if>
+			)
+			VALUES(#{item.staff_number},#{item.month},#{item.attendance_days},#{item.attendance_hours}
+			<if test="item.D1!=null and item.D1!=''">,#{item.D1}</if>
+			<if test="item.D2!=null and item.D2!=''">,#{item.D2}</if>
+			<if test="item.D3!=null and item.D3!=''">,#{item.D3}</if>
+			<if test="item.D4!=null and item.D4!=''">,#{item.D4}</if>
+			<if test="item.D5!=null and item.D5!=''">,#{item.D5}</if>
+			<if test="item.D6!=null and item.D6!=''">,#{item.D6}</if>
+			<if test="item.D7!=null and item.D7!=''">,#{item.D7}</if>
+			<if test="item.D8!=null and item.D8!=''">,#{item.D8}</if>
+			<if test="item.D9!=null and item.D9!=''">,#{item.D9}</if>
+			<if test="item.D10!=null and item.D10!=''">,#{item.D10}</if>
+			<if test="item.D11!=null and item.D11!=''">,#{item.D11}</if>
+			<if test="item.D12!=null and item.D12!=''">,#{item.D12}</if>
+			<if test="item.D13!=null and item.D13!=''">,#{item.D13}</if>
+			<if test="item.D14!=null and item.D14!=''">,#{item.D14}</if>
+			<if test="item.D15!=null and item.D15!=''">,#{item.D15}</if>
+			<if test="item.D16!=null and item.D16!=''">,#{item.D16}</if>
+			<if test="item.D17!=null and item.D17!=''">,#{item.D17}</if>
+			<if test="item.D18!=null and item.D18!=''">,#{item.D18}</if>
+			<if test="item.D19!=null and item.D19!=''">,#{item.D19}</if>
+			<if test="item.D20!=null and item.D20!=''">,#{item.D20}</if>
+			<if test="item.D21!=null and item.D21!=''">,#{item.D21}</if>
+			<if test="item.D22!=null and item.D22!=''">,#{item.D22}</if>
+			<if test="item.D23!=null and item.D23!=''">,#{item.D23}</if>
+			<if test="item.D24!=null and item.D24!=''">,#{item.D24}</if>
+			<if test="item.D25!=null and item.D25!=''">,#{item.D25}</if>
+			<if test="item.D26!=null and item.D26!=''">,#{item.D26}</if>
+			<if test="item.D27!=null and item.D27!=''">,#{item.D27}</if>
+			<if test="item.D28!=null and item.D28!=''">,#{item.D28}</if>
+			<if test="item.D29!=null and item.D29!=''">,#{item.D29}</if>
+			<if test="item.D30!=null and item.D30!=''">,#{item.D30}</if>
+			<if test="item.D31!=null and item.D31!=''">,#{item.D31}</if>
+			)
+		</foreach>
+	</insert>
+
+	<insert id="insertSkillParameter" parameterType="List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			INSERT INTO
+			BMS_HR_SKILLPARAMETER(staff_number,skill_parameter,editor_id,edit_date)
+			VALUES(#{item.staff_number},#{item.skill_parameter},#{item.editor},#{item.edit_date})
+		</foreach>
+	</insert>
+	<!--批量信息员工信息 -->
+	<insert id="insertStaffs" parameterType="List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			INSERT INTO BMS_HR_STAFF(staff_number,editor_id,edit_date
+			<if test="item.name!=null and item.name!=''">
+				,name
+			</if>
+			<if test="item.sex!=null and item.sex!=''">
+				,sex
+			</if>
+			<if test="item.birthday!=null and item.birthday!=''">
+				,birthday
+			</if>
+			<if test="item.age!=null and item.age!=''">
+				,age
+			</if>
+			<if test="item.highest_education!=null and item.highest_education!=''">
+				,highest_education
+			</if>
+			<if test="item.fresh_student!=null and item.fresh_student!=''">
+				,fresh_student
+			</if>
+			<if test="item.political_status!=null and item.political_status!=''">
+				,political_status
+			</if>
+			<if test="item.identity_card!=null and item.identity_card!=''">
+				,identity_card
+			</if>
+			<if
+				test="item.factory_incoming_date!=null and item.factory_incoming_date!=''">
+				,factory_incoming_date
+			</if>
+			<if test="item.staff_level!=null and item.staff_level!=''">
+				,staff_level
+			</if>
+			<if test="item.skill_parameter!=null and item.skill_parameter!=''">
+				,skill_parameter
+			</if>
+			<if test="item.salary_type!=null and item.salary_type!=''">
+				,salary_type
+			</if>
+			<if test="item.plant_org!=null and item.plant_org!=''">
+				,plant_org
+			</if>
+			<if test="item.dept_org!=null and item.dept_org!=''">
+				,dept_org
+			</if>
+			<if test="item.workshop_org!=null and item.workshop_org!=''">
+				,workshop_org
+			</if>
+			<if test="item.workgroup_org!=null and item.workgroup_org!=''">
+				,workgroup_org
+			</if>
+			<if test="item.team_org!=null and item.team_org!=''">
+				,team_org
+			</if>
+			<if test="item.job!=null and item.job!=''">
+				,job
+			</if>
+			<if test="item.status!=null and item.status!=''">
+				,status
+			</if>
+			<if test="item.join_channel!=null and item.join_channel!=''">
+				,join_channel
+			</if>
+			<if test="item.leave_way!=null and item.leave_way!=''">
+				,leave_way
+			</if>
+			<if test="item.leave_date!=null and item.leave_date!=''">
+				,leave_date
+			</if>
+			<if test="item.leave_reason!=null and item.leave_reason!=''">
+				,leave_reason
+			</if>
+			<if test="item.last_company!=null and item.last_company!=''">
+				,last_company
+			</if>
+			<if test="item.last_leave_reason!=null and item.last_leave_reason!=''">
+				,last_leave_reason
+			</if>
+			<if test="item.phone!=null and item.phone!=''">
+				,phone
+			</if>
+			<if test="item.family_address!=null and item.family_address!=''">
+				,family_address
+			</if>
+			<if test="item.nation!=null and item.nation!=''">
+				,nation
+			</if>
+			<if test="item.corporation!=null and item.corporation!=''">
+				,corporation
+			</if>
+			<if test="item.workplace!=null and item.workplace!=''">
+				,workplace
+			</if>
+			)
+			VALUES(#{item.staff_number},#{item.editor},#{item.edit_date}
+			<if test="item.name!=null and item.name!=''">
+				,#{item.name}
+			</if>
+			<if test="item.sex!=null and item.sex!=''">
+				,#{item.sex}
+			</if>
+			<if test="item.birthday!=null and item.birthday!=''">
+				,#{item.birthday}
+			</if>
+			<if test="item.age!=null and item.age!=''">
+				,#{item.age}
+			</if>
+			<if test="item.highest_education!=null and item.highest_education!=''">
+				,#{item.highest_education}
+			</if>
+			<if test="item.fresh_student!=null and item.fresh_student!=''">
+				,#{item.fresh_student}
+			</if>
+			<if test="item.political_status!=null and item.political_status!=''">
+				,#{item.political_status}
+			</if>
+			<if test="item.identity_card!=null and item.identity_card!=''">
+				,#{item.identity_card}
+			</if>
+			<if
+				test="item.factory_incoming_date!=null and item.factory_incoming_date!=''">
+				,#{item.factory_incoming_date}
+			</if>
+			<if test="item.staff_level!=null and item.staff_level!=''">
+				,#{item.staff_level}
+			</if>
+			<if test="item.skill_parameter!=null and item.skill_parameter!=''">
+				,#{item.skill_parameter}
+			</if>
+			<if test="item.salary_type!=null and item.salary_type!=''">
+				,#{item.salary_type}
+			</if>
+			<if test="item.plant_org!=null and item.plant_org!=''">
+				,#{item.plant_org}
+			</if>
+			<if test="item.dept_org!=null and item.dept_org!=''">
+				,#{item.dept_org}
+			</if>
+			<if test="item.workshop_org!=null and item.workshop_org!=''">
+				,#{item.workshop_org}
+			</if>
+			<if test="item.workgroup_org!=null and item.workgroup_org!=''">
+				,#{item.workgroup_org}
+			</if>
+			<if test="item.team_org!=null and item.team_org!=''">
+				,#{item.team_org}
+			</if>
+			<if test="item.job!=null and item.job!=''">
+				,#{item.job}
+			</if>
+			<if test="item.status!=null and item.status!=''">
+				,#{item.status}
+			</if>
+			<if test="item.join_channel!=null and item.join_channel!=''">
+				,#{item.join_channel}
+			</if>
+			<if test="item.leave_way!=null and item.leave_way!=''">
+				,#{item.leave_way}
+			</if>
+			<if test="item.leave_date!=null and item.leave_date!=''">
+				,#{item.leave_date}
+			</if>
+			<if test="item.leave_reason!=null and item.leave_reason!=''">
+				,#{item.leave_reason}
+			</if>
+			<if test="item.last_company!=null and item.last_company!=''">
+				,#{item.last_company}
+			</if>
+			<if test="item.last_leave_reason!=null and item.last_leave_reason!=''">
+				,#{item.last_leave_reason}
+			</if>
+			<if test="item.phone!=null and item.phone!=''">
+				,#{item.phone}
+			</if>
+			<if test="item.family_address!=null and item.family_address!=''">
+				,#{item.family_address}
+			</if>
+			<if test="item.nation!=null and item.nation!=''">
+				,#{item.nation}
+			</if>
+			<if test="item.corporation!=null and item.corporation!=''">
+				,#{item.corporation}
+			</if>
+			<if test="item.workplace!=null and item.workplace!=''">
+				,#{item.workplace}
+			</if>
+			)
+		</foreach>
+	</insert>
+
+	<!--批量修改员工信息 -->
+	<update id="updateStaffs" parameterType="List">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_HR_STAFF
+			SET editor_id = #{item.editor},edit_date = #{item.edit_date}
+			,name = #{item.name}
+			,sex = #{item.sex}
+			,birthday = #{item.birthday}
+			,age = #{item.age}
+			,highest_education = #{item.highest_education}
+			,fresh_student = #{item.fresh_student}
+			,political_status = #{item.political_status}
+			,identity_card = #{item.identity_card}
+			,factory_incoming_date = #{item.factory_incoming_date}
+			,staff_level = #{item.staff_level}
+			,skill_parameter = #{item.skill_parameter}
+			,salary_type = #{item.salary_type}
+			<if test="item.plant_org!=null and item.plant_org!=''">
+				,plant_org = #{item.plant_org}
+			</if>
+			<if test="item.plant_org==null or item.plant_org==''">
+				,plant_org = null
+			</if>
+			<if test="item.dept_org!=null and item.dept_org!=''">
+				,dept_org = #{item.dept_org}
+			</if>
+			<if test="item.dept_org==null or item.dept_org==''">
+				,dept_org = null
+			</if>
+			<if test="item.workshop_org!=null and item.workshop_org!=''">
+				,workshop_org = #{item.workshop_org}
+			</if>
+			<if test="item.workshop_org==null or item.workshop_org==''">
+				,workshop_org = #{item.workshop_org}
+			</if>
+			<if test="item.workgroup_org!=null and item.workgroup_org!=''">
+				,workgroup_org = #{item.workgroup_org}
+			</if>
+			<if test="item.workgroup_org==null or item.workgroup_org==''">
+				,workgroup_org = null
+			</if>
+			<if test="item.team_org!=null and item.team_org!=''">
+				,team_org = #{item.team_org}
+			</if>
+			<if test="item.team_org==null or item.team_org==''">
+				,team_org = null
+			</if>
+			,job = #{item.job}
+			,status = #{item.status}
+			,join_channel = #{item.join_channel}
+			,leave_way = #{item.leave_way}
+			,leave_date = #{item.leave_date}
+			,leave_reason = #{item.leave_reason}
+			,last_company = #{item.last_company}
+			,last_leave_reason = #{item.last_leave_reason}
+			,phone = #{item.phone}
+			,family_address = #{item.family_address}
+			,nation = #{item.nation}
+			,corporation = #{item.corporation}
+			,workplace = #{item.workplace}
+			WHERE staff_number = #{item.staff_number}
+		</foreach>
+	</update>
+
+	<!-- 计件工资报表 start -->
+	<select id="queryPieceSalary" parameterType="map" resultType="map"
+		statementType="CALLABLE">
+		call P_CACULATE_SALLARY(#{factory},#{workshop},#{workgroup},#{team},#{monthStart},#{staff},#{offset},#{pageSize})
+	</select>
+
+	<select id="queryPieceSalaryCount" parameterType="map"
+		resultType="int">
+		<!-- select count(distinct st.staff_id) from V_ORG_STAFF_INFO st where 
+			1=1 <if test="factory !=null and factory !=''"> and st.factory=#{factory} 
+			</if> <if test="workshop !=null and workshop !=''"> and find_in_set(st.workshop,#{workshop})>0 
+			</if> <if test="workgroup !=null and workgroup !=''"> and st.workgroup=#{workgroup} 
+			</if> <if test="team !=null and team !=''"> and st.team=#{team} </if> <if 
+			test="staff !=null and staff !=''"> and (st.staff_number=#{staff} or st.staff_name=#{staff}) 
+			</if> <if test="monthStart !=null and monthStart !=''"> and st.work_date 
+			like concat(#{monthStart},'%') </if> -->
+		select  count(t.staff_number)  from ( select distinct tmp.staff_number from (
+		select s.staff_number,s.workshop_org,s.workgroup_org,s.team_org,s.job from BMS_HR_STAFF s 
+		where 1=1 and s.salary_type='计件'
+		and ((s.status='离职' and s.leave_date>=#{monthStart}) or s.status='在职') 
+		<if test="factory !=null and factory !=''">
+			and s.plant_org=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(s.workshop_org,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and s.workgroup_org=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and s.team_org=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s.staff_number=#{staff} or s.name=#{staff})
+		</if>
+	union all 
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_HR_STAFF_HOURS h 
+	left join BMS_HR_STAFF s1 on h.staff_id =s1.id where h.status in ('1','3') 
+	and h.work_date like concat(#{monthStart},'%')
+	and ((s1.status='离职' and s1.leave_date>=#{monthStart}) or s1.status='在职') 
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and h.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and h.team=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if>
+		<if test="monthStart !=null and monthStart !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)>=#{monthStart}
+		]]>
+		</if>
+		<if test="monthEnd !=null and monthEnd !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)<=#{monthEnd}
+		]]>
+		</if>
+		 ) tmp  )t;	
+		<!-- select count(distinct t1.staff_id )
+		from(
+		select s.id staff_id
+		from
+		BMS_HR_STAFF s
+		where 1=1 and s.salary_type='计件' and s.status='在职'
+		<if test="factory !=null and factory !=''">
+			and s.plant_org=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(s.workshop_org,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and s.workgroup_org=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and s.team_org=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s.staff_number=#{staff} or s.name=#{staff})
+		</if>
+		union all
+		select distinct st.staff_id
+		from V_ORG_STAFF_INFO st
+		where 1=1
+		<if test="factory !=null and factory !=''">
+			and st.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(st.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and st.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and st.team=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (st.staff_number=#{staff} or st.staff_name=#{staff})
+		</if>
+		<if test="monthStart !=null and monthStart !=''">
+		<![CDATA[
+			and substr(st.work_date,1,7)>=#{monthStart}
+		]]>
+		</if>
+		<if test="monthEnd !=null and monthEnd !=''">
+		<![CDATA[
+			and substr(st.work_date,1,7)<=#{monthEnd}
+		]]>
+		</if>
+		) t1 -->
+	</select>
+	<select id="queryPieceSalaryHistory" parameterType="map"
+		resultType="map">
+		select h.id,h.month,h.staff_number,h.staff_name,s.status staff_status,h.skill_parameter,h.job,h.plant_org,h.workshop_org,h.workgroup_org,h.team_org,h.attendance_days,h.attendance_hours,sum(h.piece_total) piece_total,
+		sum(h.bonus_total) bonus_total,sum(h.piece_pay_total) piece_pay_total,sum(h.ecnwh_total) ecnwh_total,sum(h.ecn_pay_total) ecn_pay_total,sum(h.wwh_total) wwh_total,
+		sum(h.wait_pay_total) wait_pay_total,sum(h.tmpwh_total) tmpwh_total,sum(h.tmp_pay_total) tmp_pay_total,sum(h.dscore_total) dscore_total,sum(h.deduct_pay_total) deduct_pay_total,
+		case when find_in_set('已提交',group_concat(h.status,','))>0 then '已提交' else '已结算' end status 
+		from BMS_HR_PIECE_SALARY_HISTORY h 
+		left join BMS_HR_STAFF s on h.staff_number=s.staff_number
+		where h.staff_number in (
+		select distinct tmp.staff_number from (
+		select s.staff_number
+		from BMS_HR_STAFF s where 1=1 and s.salary_type='计件'
+		<if test="factory !=null and factory !=''">
+			and s.plant_org=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(s.workshop_org,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and s.workgroup_org=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and s.team_org=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s.staff_number=#{staff} or s.name=#{staff})
+		</if>
+		union all
+		select distinct s1.staff_number
+		from BMS_HR_STAFF_HOURS h
+		left join BMS_HR_STAFF s1 on h.staff_id =s1.id where h.status in
+		('1','3')
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and h.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and h.team=#{team}
+		</if>
+		<if test="monthStart !=null and monthStart !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)>=#{monthStart}
+		]]>
+		</if>
+		<if test="monthEnd !=null and monthEnd !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)<=#{monthEnd}
+		]]>
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if>		
+		) tmp)
+		<if test="monthStart !=null and monthStart !=''">
+		<![CDATA[
+			and h.month>=#{monthStart}
+		]]>
+		</if>
+		<if test="monthEnd !=null and monthEnd !=''">
+		<![CDATA[
+			and h.month<=#{monthEnd}
+		]]>
+		</if>
+		and h.status in('已提交','已结算')
+		<if test="factory !=null and factory !=''">
+			and h.submit_factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.submit_workshop,#{workshop})>0
+		</if>
+		group by h.staff_number
+		order by plant_org,workshop_org,workgroup_org,team_org,job
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="querySalaryStaffList" parameterType="Map"
+		resultType="String">
+		select distinct s1.staff_number from BMS_HR_STAFF_HOURS h
+		left join BMS_HR_STAFF s1 on h.staff_id =s1.id where h.status in
+		('1','3')
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and h.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and h.team=#{team}
+		</if>
+		<if test="monthStart !=null and monthStart !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)>=#{monthStart}
+		]]>
+		</if>
+		<if test="monthEnd !=null and monthEnd !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)<=#{monthEnd}
+		]]>
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if>
+		<!-- select distinct tmp.staff_number
+		from (
+		select s.staff_number from
+		BMS_HR_STAFF s where s.salary_type='计件'
+		<if test="factory !=null and factory !=''">
+			and s.plant_org=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(s.workshop_org,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and s.workgroup_org=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and s.team_org=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s.staff_number=#{staff} or s.name=#{staff})
+		</if>
+		union all
+		select distinct s1.staff_number from BMS_HR_STAFF_HOURS h
+		left join BMS_HR_STAFF s1 on h.staff_id =s1.id where h.status in
+		('1','3')
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and h.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and h.team=#{team}
+		</if>
+		<if test="monthStart !=null and monthStart !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)>=#{monthStart}
+		]]>
+		</if>
+		<if test="monthEnd !=null and monthEnd !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)<=#{monthEnd}
+		]]>
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if>
+		) tmp order by tmp.staff_number
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+ -->
+	</select>
+	<select id="queryPieceSalaryHistoryCount" parameterType="map"
+		resultType="int">
+		select count(distinct h.staff_number) from BMS_HR_PIECE_SALARY_HISTORY h where
+		h.staff_number in (
+		select distinct tmp.staff_number from (
+		select
+		s.staff_number from BMS_HR_STAFF s where 1=1 and s.salary_type='计件'
+		<if test="factory !=null and factory !=''">
+			and s.plant_org=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(s.workshop_org,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and s.workgroup_org=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and s.team_org=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s.staff_number=#{staff} or s.name=#{staff})
+		</if>
+		union all
+		select distinct s1.staff_number from BMS_HR_STAFF_HOURS h
+		left join BMS_HR_STAFF s1 on h.staff_id =s1.id where h.status in
+		('1','3')
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and h.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and h.team=#{team}
+		</if>
+		<if test="monthStart !=null and monthStart !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)>=#{monthStart}
+		]]>
+		</if>
+		<if test="monthEnd !=null and monthEnd !=''">
+		<![CDATA[
+			and substr(h.work_date,1,7)<=#{monthEnd}
+		]]>
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if>
+		) tmp)
+		<if test="monthStart !=null and monthStart !=''">
+		<![CDATA[
+			and h.month>=#{monthStart}
+		]]>
+		</if>
+		<if test="monthEnd !=null and monthEnd !=''">
+		<![CDATA[
+			and h.month<=#{monthEnd}
+		]]>
+		</if>
+		and h.status in('已提交','已结算')
+		<if test="factory !=null and factory !=''">
+			and h.submit_factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.submit_workshop,#{workshop})>0
+		</if>
+	</select>
+	
+	<select id="queryBalanceSalaryCount" parameterType="map" resultType="int">
+		select count(id) from BMS_HR_PIECE_SALARY_HISTORY 
+		where status='已结算' and submit_factory=#{submit_factory} and
+		submit_workshop=#{submit_workshop}
+		and month=#{month}	
+	</select>
+	<update id="deletePieceSalaryHistory" parameterType="map">
+		delete from BMS_HR_PIECE_SALARY_HISTORY where 1=1 and status in
+		('已提交','已驳回')
+		<!-- and saver=#{saver} --> and submit_factory=#{submit_factory} and
+		submit_workshop=#{submit_workshop}
+		and month=#{month}
+		<if test="staff !=null and staff !=''">
+			and (staff_number =#{staff} or staff_name =#{staff})
+		</if>
+	</update>
+	<update id="savePieceSalaryHistory" parameterType="list">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			insert into BMS_HR_PIECE_SALARY_HISTORY
+			(month,staff_number,staff_name,plant_org,workshop_org,workgroup_org,team_org,job,skill_parameter,attendance_days,
+			attendance_hours,piece_total,bonus_total,piece_pay_total,ecnwh_total,ecn_pay_total,wwh_total,wait_pay_total,tmpwh_total,tmp_pay_total,
+			dscore_total,deduct_pay_total,saver,save_date,submit_factory,submit_workshop)
+			values
+			(#{detail.month},#{detail.staff_number},#{detail.staff_name},#{detail.plant_org},#{detail.workshop_org},
+			#{detail.workgroup_org},#{detail.team_org},#{detail.job},#{detail.skill_parameter},#{detail.attendance_days},
+			#{detail.attendance_hours},#{detail.piece_total},#{detail.bonus_total},#{detail.piece_pay_total},#{detail.ecnwh_total},#{detail.ecn_pay_total},
+			#{detail.wwh_total},#{detail.wait_pay_total},#{detail.tmpwh_total},#{detail.tmp_pay_total},#{detail.dscore_total},#{detail.deduct_pay_total},
+			#{detail.saver},#{detail.save_date},#{detail.submit_factory},#{detail.submit_workshop})
+		</foreach>
+	</update>
+
+	<update id="updatePieceSalaryHistory" parameterType="Map">
+		update
+		BMS_HR_PIECE_SALARY_HISTORY set status=#{status} 
+		<if test="calculator !=null and calculator !=''">
+			,calculator=#{calculator} 
+		</if>
+		<if test="calculateDate !=null and calculateDate !=''">
+			,calculate_date=#{calculateDate} 
+		</if>
+		where status in('已提交','已驳回')
+		<if test="staffList.size>0">
+		and staff_number in
+		<foreach collection="staffList" index="index" item="item"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		</if>
+		
+		<if test="monthStart !=null and monthStart !=''">
+		<![CDATA[
+			and month>=#{monthStart}
+		]]>
+		</if>
+		<if test="monthEnd !=null and monthEnd !=''">
+		<![CDATA[
+			and month<=#{monthEnd}
+		]]>
+		</if>
+		<if test="factory !=null and factory !=''">
+			and submit_factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(submit_workshop,#{workshop})>0
+		</if>
+		
+	</update>
+	<update id="updateWorkHourStatus" parameterType="map">
+		update BMS_HR_STAFF_HOURS set status=#{status} where
+		substr(work_date,1,7)= #{monthStart}
+		<if test="staff !='' and staff !=null">
+			and staff_id=(select id from BMS_HR_STAFF where staff_number=#{staff} or name=#{staff})
+		</if>
+		<if test="factory !='' and factory !=null">
+			and factory=#{factory}
+		</if>
+		<if test="workshop !='' and workshop !=null">
+			and find_in_set(workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !='' and workgroup !=null">
+			and workgroup=#{workgroup}
+		</if>
+		<if test="team !='' and team !=null">
+			and team=#{team}
+		</if>
+		<if test="q_status !=null and q_status!=''">
+			and status =#{q_status}
+		</if>
+		
+	</update>
+	<update id="updateRewordsStatus" parameterType="map">
+		update
+		BMS_HR_REWARDS set status=#{status} where substr(rewards_date,1,7)=
+		#{monthStart} and rewards_factory=#{factory} and rewards_workshop=#{workshop}
+	</update>
+	<update id="updateAttendanceStatus" parameterType="map">
+		update
+		BMS_HR_STAFF_ATTENDANCE set status=#{status} where month=
+		#{monthStart} 
+	</update>
+	<!-- 计件工资报表 end -->
+
+	<!-- 获技改工时统计list技改单维度 -->
+	<select id="getEcnReportData" parameterType="Map" resultType="Map">
+		select distinct ecn_document_number,
+		CONCAT(task_id,'.',task_content) as task,
+		total_hours*ecn_number as totalhours,
+		total_hours*ecn_number*price as totalprice,
+		work_date,
+		staff_number,
+		staff_name,
+		job,
+		workshop_org,
+		workgroup_org,
+		team_org,
+		round(work_hour,2) as work_hour,
+		round(price*work_hour,2) as salary,
+		plant_org,
+		round(real_work_hour,2) as real_work_hour
+		from BMS_ECN_PAY_CAL
+		where
+		1=1
+		<if test="factory !=null and factory !=''">
+			and factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and team=#{team}
+		</if>
+		<if test="dateStart !=null and dateStart !=''">
+			<![CDATA[
+			and work_date>=#{dateStart}
+			]]>
+		</if>
+		<if test="dateEnd !=null and dateEnd !=''">
+			<![CDATA[
+			and work_date<=#{dateEnd}
+			]]>
+		</if>
+		<if test="staff !=null and staff !=''">
+			<![CDATA[
+			and (staff_number like CONCAT('%',#{staff},'%') or staff_name like CONCAT('%',#{staff},'%'))
+			]]>
+		</if>
+		<if test="ecn_document_number !=null and ecn_document_number !=''">
+			<![CDATA[
+			and ecn_document_number like CONCAT('%',#{ecn_document_number},'%')
+			]]>
+		</if>
+		<if test="task !=null and task !=''">
+			<![CDATA[
+			and task_content like CONCAT('%',#{task},'%')
+			]]>
+		</if>
+		order by
+		ecn_document_number desc,
+		task asc,
+		work_date asc
+	</select>
+	<!-- 获技改工时统计list人员维度 -->
+	<select id="getEcnReportData1" parameterType="Map" resultType="Map">
+		select distinct ecn_document_number,
+		CONCAT(task_id,'.',task_content) as task,
+		total_hours*ecn_number as totalhours,
+		total_hours*ecn_number*price as totalprice,
+		work_date,
+		staff_number,
+		staff_name,
+		job,
+		workshop_org,
+		workgroup_org,
+		team_org,
+		round(work_hour,2) as work_hour,
+		round(price*work_hour,2) as salary,
+		plant_org,
+		round(real_work_hour,2) as real_work_hour
+		from BMS_ECN_PAY_CAL
+		where
+		1=1
+		<if test="factory !=null and factory !=''">
+			and factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and team=#{team}
+		</if>
+		<if test="dateStart !=null and dateStart !=''">
+			<![CDATA[
+			and work_date>=#{dateStart}
+			]]>
+		</if>
+		<if test="dateEnd !=null and dateEnd !=''">
+			<![CDATA[
+			and work_date<=#{dateEnd}
+			]]>
+		</if>
+		<if test="staff !=null and staff !=''">
+			<![CDATA[
+			and (staff_number like CONCAT('%',#{staff},'%') or staff_name like CONCAT('%',#{staff},'%'))
+			]]>
+		</if>
+		<if test="ecn_document_number !=null and ecn_document_number !=''">
+			<![CDATA[
+			and ecn_document_number like CONCAT('%',#{ecn_document_number},'%')
+			]]>
+		</if>
+		<if test="task !=null and task !=''">
+			<![CDATA[
+			and task_content like CONCAT('%',#{task},'%')
+			]]>
+		</if>
+		order by
+		staff_number asc,
+		task asc,
+		work_date asc
+	</select>
+
+	<!-- 员工姓名、工号模糊查询、弹出下拉列表 -->
+	<select id="getStaffInfoFuzzySelect" parameterType="Map"
+		resultType="Map">
+		select name as staff_name,staff_number from BMS_HR_STAFF where
+		1=1
+		<if test="staff !=null and staff !=''">
+			<![CDATA[
+			and (staff_number like CONCAT('%',#{staff},'%') or name like CONCAT('%',#{staff},'%'))
+			]]>
+		</if>
+	</select>
+
+	<!-- 获额外工时统计list技改单维度 -->
+	<select id="getTmpReportData" parameterType="Map" resultType="Map">
+		select distinct tmp_order_num,
+		total_hours as totalhours,
+		total_hours*price as totalprice,
+		work_date,
+		staff_number,
+		staff_name,
+		job,
+		workshop_org,
+		workgroup_org,
+		team_org,
+		reason_content,
+		round(work_hour,2) as work_hour,
+		round(price*work_hour,2) as salary,
+		plant_org,
+		round(real_work_hour,2) as real_work_hour
+		from BMS_TMP_PAY_CAL
+		where
+		1=1
+		<if test="factory !=null and factory !=''">
+			and factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and team=#{team}
+		</if>
+		<if test="dateStart !=null and dateStart !=''">
+			<![CDATA[
+			and work_date>=#{dateStart}
+			]]>
+		</if>
+		<if test="dateEnd !=null and dateEnd !=''">
+			<![CDATA[
+			and work_date<=#{dateEnd}
+			]]>
+		</if>
+		<if test="staff !=null and staff !=''">
+			<![CDATA[
+			and (staff_number like CONCAT('%',#{staff},'%') or staff_name like CONCAT('%',#{staff},'%'))
+			]]>
+		</if>
+		<if test="reason_content !=null and reason_content !=''">
+			<![CDATA[
+			and (reason_content like CONCAT('%',#{reason_content},'%') OR tmp_order_num like CONCAT('%',#{reason_content},'%'))
+			]]>
+		</if>
+		order by
+		tmp_order_num desc,
+		work_date asc
+	</select>
+	<!-- 获额外工时统计list人员维度 -->
+	<select id="getTmpReportData1" parameterType="Map" resultType="Map">
+		select distinct tmp_order_num,
+		total_hours as totalhours,
+		total_hours*price as totalprice,
+		work_date,
+		staff_number,
+		staff_name,
+		job,
+		workshop_org,
+		workgroup_org,
+		team_org,
+		skill_parameter,
+		round(work_hour,2) as work_hour,
+		round(price*work_hour,2) as salary,
+		plant_org,
+		round(real_work_hour,2) as real_work_hour
+		from BMS_TMP_PAY_CAL
+		where
+		1=1
+		<if test="factory !=null and factory !=''">
+			and factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and team=#{team}
+		</if>
+		<if test="dateStart !=null and dateStart !=''">
+			<![CDATA[
+			and work_date>=#{dateStart}
+			]]>
+		</if>
+		<if test="dateEnd !=null and dateEnd !=''">
+			<![CDATA[
+			and work_date<=#{dateEnd}
+			]]>
+		</if>
+		<if test="staff !=null and staff !=''">
+			<![CDATA[
+			and (staff_number like CONCAT('%',#{staff},'%') or staff_name like CONCAT('%',#{staff},'%'))
+			]]>
+		</if>
+		<if test="reason_content !=null and reason_content !=''">
+			<![CDATA[
+			and reason_content like CONCAT('%',#{reason_content},'%')
+			]]>
+		</if>
+		order by
+		staff_number asc,
+		work_date asc
+	</select>
+	
+	<!-- added by xjw 删除对应生效日期下员工分配信息 -->
+	<delete id="deleteStaffDistribution" parameterType="Map">
+		delete from BMS_HR_STAFF_DISTRIBUTION where effective_date=#{effectiveDate}
+		and staff_number in
+		<foreach collection="stafflist" item="staff" open="(" separator="," close=")">
+			#{staff}
+		</foreach>
+	</delete>
+	
+	<!-- added by xjw 保存对应生效日期下员工分配信息 -->
+	<insert id="saveStaffDistribution" parameterType="list" >
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into BMS_HR_STAFF_DISTRIBUTION (staff_number,effective_date,distribution,editor,edit_date)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.staff_number},#{item.effective_date},#{item.distribution},#{item.editor},#{item.edit_date})
+		</foreach>
+	</insert>
+	
+	<select id="getStaffDistribution" parameterType="Map" resultType="Map">
+		SELECT s.plant_org factory,s.workshop_org workshop,s.workgroup_org workgroup,s.team_org team,s.staff_number,s.name staff_name,d.distribution,d.effective_date,d.editor,d.edit_date 
+		FROM BMS_HR_STAFF_DISTRIBUTION d
+		LEFT JOIN BMS_HR_STAFF s on s.staff_number=d.staff_number
+		where 1=1
+		<if test="effctiveDateStart !=null and effctiveDateStart !=''">
+			and d.effective_date >=#{effctiveDateStart}
+		</if>
+		<if test="effctiveDateEnd !=null and effctiveDateEnd !=''">
+			and d.effective_date &lt;=#{effctiveDateEnd}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and s.plant_org =#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and s.workshop_org =#{workshop}
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and s.workgroup_org =#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and s.team_org =#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s.name like concat(#{staff},'%') or s.staff_number like concat(#{staff},'%'))
+		</if>
+		order by s.plant_org,s.team_org,d.effective_date,s.staff_number
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	
+	<select id="getStaffDistributionCount" parameterType="Map" resultType="int">
+		SELECT count(s.staff_number)
+		FROM BMS_HR_STAFF_DISTRIBUTION d
+		LEFT JOIN BMS_HR_STAFF s on s.staff_number=d.staff_number
+		where 1=1
+		<if test="effctiveDateStart !=null and effctiveDateStart !=''">
+			and d.effective_date >=#{effctiveDateStart}
+		</if>
+		<if test="effctiveDateEnd !=null and effctiveDateEnd !=''">
+			and d.effective_date &lt;=#{effctiveDateEnd}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and s.plant_org =#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and s.workshop_org =#{workshop}
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and s.workgroup_org =#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and s.team_org =#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s.name like concat(#{staff},'%') or s.staff_number like concat(#{staff},'%'))
+		</if>
+		order by s.plant_org,s.team_org,s.staff_number;
+	</select>
+</mapper> 
+

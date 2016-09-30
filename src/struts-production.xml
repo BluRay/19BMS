@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<struts>
+	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
+	<package name="productionModel" extends="json-default" >
+		<action name="production" class="productionAction">
+			<result name="index">/jsp/production/productionIndex.jsp</result>
+			<result name="exceptionindex">/jsp/production/productionExceptionIndex.jsp</result>
+			<result name="execution">/jsp/production/productionExecution.jsp</result>
+			<result name="exception">/jsp/production/productionException.jsp</result>
+			<result name="workshopsupply">/jsp/production/productionWorkshopSupply.jsp</result>
+			<result name="partsfinish">/jsp/production/productionPartsFinish.jsp</result>
+			<result name="customernumber">/jsp/production/productionCustomerNumber.jsp</result>
+			<result name="importcustomernumberSuccess" type="redirect">production!customernumber.action?order_no=${order_no}</result>			
+			<result name="productionhours">/jsp/production/productionHours.jsp</result>
+			<result name="bodycolor">/jsp/production/productionBodyColor.jsp</result>
+			<!-- add by wuxiao 2016/4/25 -->
+			<result name="productionCCC">/jsp/production/productionCCC.jsp</result>
+			<result name="productionDate">/jsp/production/productionDate.jsp</result>
+			<!-- add by wuxiao end -->
+			<result name="busseats">/jsp/production/productionBusSeats.jsp</result>
+			<result name="certification">/jsp/production/productionCertification.jsp</result>
+			<result name="showPrintPage">/jsp/production/busNoPrint.jsp</result>
+			<result name="showVinPrint">/jsp/production/vinPrint.jsp</result>
+			<result name="showNameplatePrint">/jsp/production/nameplatePrint.jsp</result>
+			<result name="productionsearch">/jsp/production/productionSearch.jsp</result>
+			<result name="productionsearchbusinfo">/jsp/production/productionSearchBusInfo.jsp</result>
+			<result name="monitorindex">/jsp/production/productionMonitorIndex.jsp</result>
+			<!-- <result name="monitorworkshop">/jsp/production/productionMonitorWorkshop.jsp</result> -->
+			<result name="monitorworkshop_assembly">/jsp/production/monitorBoardAssembly.jsp</result>
+			<result name="monitorworkshop_welding">/jsp/production/monitorBoardWelding_2.jsp</result>
+			<result type="json"><param name="root">result</param></result>
+		</action>
+		<!-- 临时派工单 -->
+		<action name="tempOrder" class="tempOrderAction">
+			<result name="createPage">/jsp/production/tmpOrderCreate.jsp</result>
+			<result name="approvePage">/jsp/production/tmpOrderApprove.jsp</result>
+			<result name="assignPage">/jsp/production/tmpOrderAssign.jsp</result>
+			<result name="assessPage">/jsp/production/tmpOrderAssess.jsp</result>
+			<result name="assessOrderVerifyPage">/jsp/production/tmpOrderAssessVerify.jsp</result>
+			<result name="workHoursMtaPage">/jsp/production/workHoursMtaPage.jsp</result>
+			<result name="acceptOrderPage">/jsp/production/tempOrderAccept.jsp</result>
+			<result name="workHoursVerifyPage">/jsp/production/workhourVerify.jsp</result>
+			<result name="tempOrderInfoPage">/jsp/production/tempOrderInfo.jsp</result>
+			<result name="queryOrderPage">/jsp/production/tempOrderQuery.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 计件工时 -->
+		<action name="pieceWorkTime" class="pieceWorkTimeAction">
+			<result name="mtaPage">/jsp/production/pieceWorkTimeMta.jsp</result>
+			<result name="updatePage">/jsp/production/pieceWorkTimeUpdate.jsp</result>
+			<result name="verifyPage">/jsp/production/pieceWorkTimeVerify.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 等待工时 -->
+		<action name="waitWorkTime" class="waitWorkTimeAction">
+			<result name="mtaPage">/jsp/production/waitWorkTimeMta.jsp</result>
+			<result name="updatePage">/jsp/production/waitWorkTimeUpdate.jsp</result>
+			<result name="verifyPage">/jsp/production/waitWorkTimeVerify.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+	</package>
+</struts>

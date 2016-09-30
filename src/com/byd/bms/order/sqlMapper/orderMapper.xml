@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.byd.bms.order.dao.IOrderDao">
+	
+	<resultMap type="bmsorder" id="orderMap">
+		<id property="id" column="id"/>
+		<result property="order_no" column="order_no"/>
+		<result property="order_name" column="order_name"/>	
+		<result property="order_name_str" column="order_name_str"/>	
+		<result property="order_code" column="order_code"/>	
+		<result property="order_type" column="order_type" />
+		<result property="factory_name" column="factory_name"/>	
+		<result property="production_qty" column="production_qty"/>	
+		<result property="issed_qty" column="issed_qty"/>	
+		<result property="bus_type_id" column="bus_type_id"/>
+		<result property="bus_type" column="bus_type_code"/>	
+		<result property="order_qty" column="order_qty"/>	
+		<result property="productive_year" column="productive_year"/>	
+		<result property="color" column="color"/>	
+		<result property="seats" column="seats"/>	
+		<result property="delivery_date" column="delivery_date"/>	
+		<result property="status" column="status"/>	
+		<result property="memo" column="memo"/>	
+		<result property="bus_number_start" column="bus_number_start"/>	
+		<result property="bus_number_end" column="bus_number_end"/>	
+		<result property="editor_id" column="editor_id"/>	
+		<result property="edit_date" column="edit_date"/>	
+	</resultMap>
+	
+	<insert id="insertOrder" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.order.entity.BmsOrder">
+		<![CDATA[
+			insert into BMS_ORDER(order_no,order_name,order_code,order_type,bus_type_id,order_qty,productive_year,color,seats,delivery_date,status,memo,editor_id,edit_date) 
+			values(#{order_no},#{order_name},#{order_code},#{order_type},#{bus_type_id},#{order_qty},#{productive_year},#{color},#{seats},#{delivery_date},#{status},#{memo},'1','2015-06-10')
+		]]>
+	</insert>
+	
+	<update id="updateOrder" parameterType="com.byd.bms.order.entity.BmsOrder">
+		<![CDATA[
+			update BMS_ORDER set color=#{color},seats=#{seats},delivery_date=#{delivery_date},memo=#{memo}
+			where id=#{id}
+		]]>
+	</update>
+	
+	<update id="updateOrderReviewResults" parameterType="com.byd.bms.order.entity.BmsOrderReviewResults">
+		<![CDATA[
+			update BMS_ORDER_REVIEW_RESULTS set factory_order_id=#{factory_order_id},deliery_date=#{deliery_date},
+			assembly_online_date=#{assembly_online_date},
+			risk_point_technics=#{risk_point_technics},solutions_technics=#{solutions_technics},meet_requirements_flag_technics=#{meet_requirements_flag_technics},
+			risk_point_production=#{risk_point_production},solutions_production=#{solutions_production},meet_requirements_flag_production=#{meet_requirements_flag_production},
+			risk_point_materiel=#{risk_point_materiel},solutions_materiel=#{solutions_materiel},meet_requirements_flag_materiel=#{meet_requirements_flag_materiel},
+			risk_point_device=#{risk_point_device},solutions_device=#{solutions_device},meet_requirements_flag_device=#{meet_requirements_flag_device},
+			risk_point_plan=#{risk_point_plan},solutions_plan=#{solutions_plan},meet_requirements_flag_plan=#{meet_requirements_flag_plan} 
+			where id=#{id}
+		]]>
+	</update>
+	
+	<insert id="insertOrderReviewResults" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.order.entity.BmsOrderReviewResults">
+		<![CDATA[
+			insert into BMS_ORDER_REVIEW_RESULTS (factory_order_id,deliery_date,assembly_online_date,risk_point_technics,
+			solutions_technics,meet_requirements_flag_technics,risk_point_production,
+			solutions_production,meet_requirements_flag_production,
+			risk_point_materiel,solutions_materiel,meet_requirements_flag_materiel,
+			risk_point_device,solutions_device,meet_requirements_flag_device,
+			risk_point_plan,solutions_plan,meet_requirements_flag_plan,
+			editor_id,edit_date) 
+			values(#{factory_order_id},#{deliery_date},#{assembly_online_date},
+			#{risk_point_technics},#{solutions_technics},#{meet_requirements_flag_technics},
+			#{risk_point_production},#{solutions_production},#{meet_requirements_flag_production},
+			#{risk_point_materiel},#{solutions_materiel},#{meet_requirements_flag_materiel},
+			#{risk_point_device},#{solutions_device},#{meet_requirements_flag_device},
+			#{risk_point_plan},#{solutions_plan},#{meet_requirements_flag_plan},
+			#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	
+	<insert id="insertFactoryOrder" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.order.entity.BmsFactoryOrder">
+		<![CDATA[
+			insert into BMS_FACTORY_ORDER(order_id,factory_id,production_qty,busnum_start,busnum_end,bus_number_start,bus_number_count,editor_id,edit_date) 
+			values(#{order_id},#{factory_id},#{production_qty},#{busnum_start},#{busnum_end},#{bus_number_start},#{bus_number_count},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	<insert id="updateFactoryOrder" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.order.entity.BmsFactoryOrder">
+		<![CDATA[
+			UPDATE BMS_FACTORY_ORDER SET production_qty = production_qty + ${production_qty} 
+			WHERE order_id = #{order_id} AND factory_id = #{factory_id}
+		]]>
+	</insert>
+	
+	<insert id="insertFactoryOrderDetail" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.order.entity.BmsFactoryOrderDetail">
+		<![CDATA[
+		insert into BMS_FACTORY_ORDER_DETAIL(factory_order_id,busnum_start,busnum_end,bus_number_start,bus_number_count,editor_id,edit_date) 
+		values(#{factory_order_id},#{busnum_start},#{busnum_end},#{bus_number_start},
+		(SELECT count(bus_number) FROM  BMS_PLAN_BUS WHERE order_id = (SELECT order_id FROM BMS_FACTORY_ORDER WHERE id = #{factory_order_id}) 
+		AND welding_online_date IS NOT NULL 
+		AND RIGHT(bus_number,4) + 0 >= ${bus_number_start} 
+		AND RIGHT(bus_number,4) + 0 <= (${busnum_end} - ${busnum_start} + ${bus_number_start} + 0)
+		)
+		,#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	
+	<select id="getFactoryOrderID" parameterType="Map" resultType="int">
+		<![CDATA[
+		SELECT IFNULL(SUM(id),0) AS id FROM BMS_FACTORY_ORDER WHERE order_id = #{order_id} 
+		AND factory_id = #{factory_id}
+		]]>
+	</select>
+	
+	<select id="getFactoryOrderList" parameterType="int" resultType="com.byd.bms.order.entity.BmsFactoryOrder">
+		<![CDATA[
+			SELECT * from BMS_FACTORY_ORDER where order_id=#{orderID}
+		]]>
+	</select>
+	
+	<insert id="insertOrderConfig" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.order.entity.BmsOrderConfig">
+		<![CDATA[
+			insert into BMS_ORDER_CONFIG(order_id,order_config_name,customer,tire_type,bus_vehicle_type,config_qty,config_file,editor_id,edit_date) 
+			values((SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}),#{order_config_name},#{customer},#{tire_type},#{bus_vehicle_type},#{config_qty},#{config_file},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	
+	<insert id="insertOrderConfigAllot" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.order.entity.BmsOrderConfigAllot">
+		<![CDATA[
+			insert into BMS_ALLOT_FACTORY_ORDER_CONFIG 
+			(order_id,factory_id,order_config_id,product_qty,sequence,busnum_start,busnum_end,editor_id,edit_date) 
+			values (#{order_id},#{factory_id},#{order_config_id},#{product_qty},#{sequence},#{busnum_start},
+			#{busnum_end},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	
+	<update id="deleteOrderConfigAllot" parameterType="map">
+		<![CDATA[
+			delete from BMS_ALLOT_FACTORY_ORDER_CONFIG where order_id= #{order_id} AND factory_id = #{factory_id}
+		]]>
+	</update>
+	
+	<update id="deleteOrderConfig" parameterType="String">
+		<![CDATA[
+			delete from BMS_ORDER_CONFIG where order_id= (SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
+		]]>
+	</update>
+	
+	<update id="deleteOrderConfigAllotByOrder" parameterType="String">
+		<![CDATA[
+			delete from BMS_ALLOT_FACTORY_ORDER_CONFIG where order_id= (SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
+		]]>
+	</update>
+	
+	<update id="deleteFactoryOrder" parameterType="String">
+		<![CDATA[
+			delete from BMS_FACTORY_ORDER where order_id=#{orderID}
+		]]>
+	</update>
+	
+	<update id="deleteUnDoPlanBusNumber" parameterType="int">
+		<!-- DELETE FROM BMS_PLAN_BUS_NUMBER WHERE bus_number IN 
+		(SELECT bus_number FROM BMS_PLAN_BUS WHERE order_id = #{order_id} AND welding_online_date IS NULL) -->
+		<![CDATA[
+		DELETE b,p FROM BMS_PLAN_BUS_NUMBER b,BMS_PLAN_BUS p 
+		WHERE b.bus_number = p.bus_number AND p.order_id = #{order_id} AND b.print_sign = 0
+		]]>
+	</update>
+	<update id="deleteUnDoPlanBus" parameterType="int">
+		<!-- DELETE FROM BMS_PLAN_BUS WHERE order_id = #{order_id} AND welding_online_date IS NULL -->
+		<![CDATA[ 
+		DELETE FROM BMS_PLAN_BUS WHERE order_id = #{order_id} AND bus_number IN 
+		(SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE print_sign = 0)
+		]]>
+	</update>
+	<update id="deleteUnDoProductionPlan" parameterType="Map">
+		<![CDATA[ 
+		DELETE FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = #{order_id} AND factory_id = #{factory_id} AND plan_date >= #{plan_date}
+		]]>
+	</update>
+	<update id="updateFactoryOrderDetailCount" parameterType="Map">
+		<![CDATA[
+		UPDATE BMS_FACTORY_ORDER_DETAIL d 
+		SET d.bus_number_count = (SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.order_id = #{order_id} 
+			AND bus_number IN (SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE print_sign = 1)
+			AND RIGHT(b.bus_number,4) >= d.bus_number_start AND RIGHT(b.bus_number,4) <= (d.bus_number_start + d.busnum_end - d.busnum_start + 1)) 
+		WHERE d.factory_order_id IN (SELECT o.id FROM BMS_FACTORY_ORDER o WHERE o.order_id = #{order_id} AND o.factory_id = #{factory_id})
+		]]>
+	</update>
+	
+	<update id="deleteFactoryOrderDetail" parameterType="String">
+		<![CDATA[
+			delete from BMS_FACTORY_ORDER_DETAIL WHERE factory_order_id IN 
+			(SELECT id FROM BMS_FACTORY_ORDER WHERE order_id = #{orderID})
+		]]>
+	</update>
+	
+	<select id="getOrderInfo" parameterType="String" resultMap="orderMap">
+		<!-- select o.*,t.bus_type_code from BMS_ORDER o LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1 -->
+		SELECT f.production_qty,a.area,t.bus_type_code,o.* FROM BMS_FACTORY_ORDER f 
+			LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 
+			LEFT JOIN BMS_ORDER o ON f.order_id = o.id
+			LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1
+			
+	</select>
+	
+	<select id="getOrderProgress" parameterType="Map" resultType="Map">
+		SELECT o.id as 'order_id',o.order_no,o.order_name,t.bus_type_code,o.order_qty,f.production_qty,a.area,a.id AS 'factory_id',
+		(SELECT SUM(p.quantity) FROM BMS_PD_WORKSHOP_SUPPLY p WHERE p.order_id = o.id AND p.factory_id = f.factory_id AND supply_workshop ='自制件' AND receive_workshop ='部件') as zzj_offline_count,
+		(SELECT SUM(p.online_real_qty) FROM BMS_PD_PARTS_PLAN_FINISH p WHERE p.order_id = o.id AND p.factory_id = f.factory_id AND p.parts_id=194) as parts_online_count,
+		(SELECT SUM(p.offline_real_qty) FROM BMS_PD_PARTS_PLAN_FINISH p WHERE p.order_id = o.id AND p.factory_id = f.factory_id AND p.parts_id=194) as parts_offline_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.welding_online_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as welding_online_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.welding_offline_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as welding_offline_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.fiberglass_offline_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as fiberglass_offline_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.painting_online_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as painting_online_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.painting_offline_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as painting_offline_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.chassis_online_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as chassis_online_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.chassis_offline_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as chassis_offline_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.assembly_online_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as assembly_online_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.assembly_offline_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as assembly_offline_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.warehousing_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as warehousing_count,
+		(SELECT COUNT(b.id) FROM BMS_PLAN_BUS b WHERE b.dispatch_date is NOT NULL AND b.order_id = o.id AND b.factory_id = f.factory_id) as dispatch_count
+		FROM BMS_FACTORY_ORDER f 
+		LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 
+		LEFT JOIN BMS_ORDER o ON f.order_id = o.id
+		LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1
+		<if test="search_order_no!=null">
+			and o.order_no like CONCAT('%',#{search_order_no},'%')  
+		</if>
+		<if test="search_order_name!=null">
+			and o.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and o.productive_year = #{search_productive_year} 
+		</if>
+		<if test="search_factory!=null">
+			and f.factory_id = #{search_factory} 
+		</if>
+		<if test="order_id!=null">
+			and o.id = #{order_id} 
+		</if>
+		ORDER BY o.id DESC
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	<select id="getOrderProgressCount" parameterType="Map" resultType="int">
+		SELECT count(o.id) FROM BMS_FACTORY_ORDER f 
+		LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 
+		LEFT JOIN BMS_ORDER o ON f.order_id = o.id
+		LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1
+		<if test="search_order_no!=null">
+			and o.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and o.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and o.productive_year = #{search_productive_year} 
+		</if>
+		<if test="search_factory!=null">
+			and f.factory_id = #{search_factory} 
+		</if>
+		<if test="order_id!=null">
+			and o.id = #{order_id} 
+		</if>
+	</select>
+	
+	<select id="getOrderConfigAllotList" parameterType="Map" resultType="com.byd.bms.order.entity.BmsOrderConfigAllot">
+		SELECT o.id AS o_id,o.production_qty,f.id as factory_id,a.order_config_id,a.product_qty,a.sequence,a.busnum_start,a.busnum_end,
+		b.id as order_id,b.order_name,b.order_no,b.order_qty,b.delivery_date,b.color,b.seats,f.factory_name,t.bus_type_code as bus_type,
+		c.order_config_name,c.customer,c.config_file FROM BMS_FACTORY_ORDER o
+			LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.order_id = a.order_id AND o.factory_id = a.factory_id
+			LEFT JOIN BMS_ORDER b ON o.order_id = b.id 
+			LEFT JOIN BMS_BASE_FACTORY f ON o.factory_id = f.id 
+			LEFT JOIN BMS_BASE_BUS_TYPE t ON b.bus_type_id = t.id
+			LEFT JOIN BMS_ORDER_CONFIG c ON a.order_config_id = c.id where 1=1 AND (a.product_qty !=0 OR a.product_qty IS NULL)
+		<if test="search_order_no!=null">
+			and b.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and b.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and b.productive_year = #{search_productive_year} 
+		</if>
+		<if test="search_factory!=null">
+			and o.factory_id = #{search_factory} 
+		</if>
+		<if test="order_id!=null">
+			and o.id = #{order_id} 
+		</if>
+		ORDER BY b.id DESC,o.id DESC
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	<select id="getOrderConfigAllotTotalCount" parameterType="Map" resultType="int">
+		SELECT count(o.id)
+		FROM BMS_FACTORY_ORDER o
+			LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.order_id = a.order_id AND o.factory_id = a.factory_id
+			LEFT JOIN BMS_ORDER b ON o.order_id = b.id 
+			LEFT JOIN BMS_BASE_FACTORY f ON o.factory_id = f.id 
+			LEFT JOIN BMS_BASE_BUS_TYPE t ON b.bus_type_id = t.id
+			LEFT JOIN BMS_ORDER_CONFIG c ON a.order_config_id = c.id where 1=1 AND (a.product_qty !=0 OR a.product_qty IS NULL)
+		<if test="search_order_no!=null">
+			and b.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and b.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and b.productive_year = #{search_productive_year} 
+		</if>
+		<if test="search_factory!=null">
+			and o.factory_id = #{search_factory} 
+		</if>
+		<if test="order_id!=null">
+			and o.id = #{order_id} 
+		</if>
+		ORDER BY b.id DESC,o.id DESC
+	</select>
+	
+	<select id="getOrderReviewList" parameterType="Map" resultType="com.byd.bms.order.entity.BmsOrderReviewResults">
+		SELECT o.id AS o_id,o.production_qty,a.status,a.order_name,a.order_no,a.order_qty,a.delivery_date,r.*,f.factory_name,b.bus_type_code AS bus_type,u.display_name FROM BMS_FACTORY_ORDER o
+			LEFT JOIN BMS_ORDER a ON o.order_id = a.id 
+			LEFT JOIN BMS_ORDER_REVIEW_RESULTS r ON o.id = r.factory_order_id 
+			LEFT JOIN BMS_BASE_FACTORY f ON o.factory_id = f.id 
+			LEFT JOIN BMS_BASE_BUS_TYPE b ON a.bus_type_id = b.id
+			LEFT JOIN BMS_BASE_USER u ON r.editor_id = u.id where 1=1
+		<if test="search_order_no!=null">
+			and a.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and a.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and a.productive_year = #{search_productive_year} 
+		</if>
+		<if test="search_factory!=null">
+			and o.factory_id = #{search_factory} 
+		</if>
+		<if test="order_id!=null">
+			and o.id = #{order_id} 
+		</if>
+		ORDER BY a.id desc,o.id DESC
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	<select id="getOrderReviewTotalCount" parameterType="Map" resultType="int">
+		SELECT count(o.id) FROM BMS_FACTORY_ORDER o
+			LEFT JOIN BMS_ORDER a ON o.order_id = a.id 
+			LEFT JOIN BMS_ORDER_REVIEW_RESULTS r ON o.id = r.factory_order_id 
+			LEFT JOIN BMS_BASE_FACTORY f ON o.factory_id = f.id 
+			LEFT JOIN BMS_BASE_BUS_TYPE b ON a.bus_type_id = b.id
+			LEFT JOIN BMS_BASE_USER u ON r.editor_id = u.id where 1=1
+		<if test="search_order_no!=null">
+			and a.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and a.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and a.productive_year = #{search_productive_year} 
+		</if>
+		<if test="search_factory!=null">
+			and o.factory_id = #{search_factory} 
+		</if>
+		ORDER BY a.id desc,o.id DESC
+	</select>
+	
+	<select id="getOrderList" parameterType="Map" resultMap="orderMap">
+		<!-- select o.*,t.bus_type_code from BMS_ORDER o LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1 -->
+		SELECT (d.busnum_end-d.busnum_start+1) production_qty,f.busnum_start,f.busnum_end,a.area,a.id AS 'factory_id',a.factory_name,f.edit_date,u.username as 'user_name',
+		(SELECT COUNT(id) FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = f.order_id) AS issed_qty,t.bus_type_code,o.*,CONCAT(o.order_name,t.bus_type_code,o.order_qty,'台') AS 'order_name_str',d.bus_number_start,(d.bus_number_start+d.busnum_end-d.busnum_start) bus_number_end
+			FROM BMS_FACTORY_ORDER f 
+			LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 
+			LEFT JOIN BMS_ORDER o ON f.order_id = o.id
+			LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id 
+			left join BMS_BASE_USER u on f.editor_id = u.id
+			LEFT JOIN BMS_FACTORY_ORDER_DETAIL d ON f.id = d.factory_order_id 
+			where 1=1 
+		<if test="search_order_no!=null">
+			and o.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and o.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and o.productive_year = #{search_productive_year} 
+		</if>
+		<if test="search_factory!=null">
+			and f.factory_id = #{search_factory} 
+		</if>
+		<if test="order_id!=null">
+			and f.order_id = #{order_id} 
+		</if>
+		ORDER BY id DESC,d.busnum_start ASC
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>			
+	</select>
+	<select id="getOrderDetailList" parameterType="Map" resultMap="orderMap">
+		SELECT (d.busnum_end - d.busnum_start +1) AS production_qty,d.busnum_start,d.busnum_end,d.bus_number_count,a.area,a.id AS 'factory_id',a.factory_name,
+		(SELECT COUNT(id) FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = f.order_id) AS issed_qty,
+		(SELECT IFNULL(MIN(RIGHT(bus_number,4) + 0),0) as minbusnum FROM BMS_PLAN_BUS WHERE order_id = #{order_id} AND welding_online_date IS NOT NULL AND RIGHT(bus_number,4) + 0 >= d.bus_number_start AND RIGHT(bus_number,4) + 0 &lt;= (d.busnum_end-d.busnum_start + d.busnum_start)) AS minbusnum,
+		(SELECT IFNULL(MAX(RIGHT(bus_number,4) + 0),0) as maxbusnum FROM BMS_PLAN_BUS WHERE order_id = #{order_id} AND welding_online_date IS NOT NULL AND RIGHT(bus_number,4) + 0 >= d.bus_number_start AND RIGHT(bus_number,4) + 0 &lt;= (d.busnum_end-d.busnum_start + d.busnum_start)) AS maxbusnum,
+		t.bus_type_code,o.* FROM BMS_FACTORY_ORDER f 
+			LEFT OUTER JOIN BMS_FACTORY_ORDER_DETAIL d ON f.id = d.factory_order_id
+			LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 
+			LEFT JOIN BMS_ORDER o ON f.order_id = o.id
+			LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1
+		<if test="search_order_no!=null">
+			and o.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and o.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and o.productive_year = #{search_productive_year} 
+		</if>
+		<if test="search_factory!=null">
+			and f.factory_id = #{search_factory} 
+		</if>
+		<if test="order_id!=null">
+			and f.order_id = #{order_id} 
+		</if>
+		ORDER BY d.id
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>			
+	</select>
+	
+	<select id="getOrderTotalCount" parameterType="Map" resultType="int">
+		<!-- select count(id) from BMS_ORDER where 1=1 -->
+		SELECT count(o.id) FROM BMS_FACTORY_ORDER f 
+			LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 
+			LEFT JOIN BMS_FACTORY_ORDER_DETAIL d ON f.id = d.factory_order_id 
+			LEFT JOIN BMS_ORDER o ON f.order_id = o.id where 1=1
+		<if test="search_order_no!=null">
+			and o.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and o.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and o.productive_year = #{search_productive_year} 
+		</if>
+		<if test="search_factory!=null">
+			and f.factory_id = #{search_factory} 
+		</if>
+		<if test="order_id!=null">
+			and f.order_id = #{order_id} 
+		</if>
+	</select>
+	
+	<select id="getOrderConfigList" parameterType="Map" resultType="com.byd.bms.order.entity.BmsOrderConfig">
+		<![CDATA[
+		SELECT c.*,o.id AS o_id,o.order_no,o.order_name,o.order_qty,b.bus_type_code as bus_type,a.product_qty as allot_qty,
+		(SELECT COUNT(id) FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = o.id) AS issed_qty,
+		(SELECT COUNT(s.id) AS online_count FROM BMS_PLAN_BUS s WHERE s.order_cofig_id = c.id AND s.factory_id = a.factory_id AND s.bus_number IN (SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE print_sign = 1)) AS online_count
+		FROM BMS_ORDER o 
+		LEFT JOIN BMS_ORDER_CONFIG c ON o.id = c.order_id 
+		LEFT OUTER JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.id = a.order_id AND c.id = a.order_config_id 
+		AND a.factory_id = #{factory_id}
+		
+		LEFT JOIN BMS_BASE_BUS_TYPE b ON o.bus_type_id = b.id where 1=1
+ 		]]>
+		<if test="search_order_no!=null">
+			and o.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and o.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and o.productive_year = #{search_productive_year} 
+		</if>
+		<if test="order_id!=null">
+			and o.id = #{order_id} 
+		</if>
+		ORDER BY o.id DESC
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>			
+	</select>
+	
+	<select id="getOrderConfigTotalCount" parameterType="Map" resultType="int">
+		<!-- select count(id) from BMS_ORDER where 1=1 -->
+		SELECT count(o.id) FROM BMS_ORDER o 
+		LEFT JOIN BMS_ORDER_CONFIG c ON o.id = c.order_id 
+		LEFT JOIN BMS_BASE_BUS_TYPE b ON o.bus_type_id = b.id where 1=1
+		<if test="search_order_no!=null">
+			and o.order_no like CONCAT('%',#{search_order_no},'%')   
+		</if>
+		<if test="search_order_name!=null">
+			and o.order_name like CONCAT('%',#{search_order_name},'%')   
+		</if>
+		<if test="search_productive_year!=null">
+			and o.productive_year = #{search_productive_year} 
+		</if>
+		<if test="order_id!=null">
+			and o.id = #{order_id} 
+		</if>
+	</select>
+	
+	<select id="getOrderSerial" parameterType="map" resultType="String">
+		<![CDATA[
+ 			select max(order_no) from BMS_ORDER where order_no like concat('%',#{year},'%')
+ 		]]>
+	</select>
+	<select id="getOrderConfigInfo" parameterType="int" resultType="map">
+		<![CDATA[
+ 			select * from BMS_ORDER_CONFIG where id =#{order_config_id}
+ 		]]>
+	</select>
+	<update id="updateOrderConfigInfo" parameterType="com.byd.bms.order.entity.BmsOrderConfig">
+		UPDATE BMS_ORDER_CONFIG SET 
+		order_id=(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}),
+		order_config_name=#{order_config_name},
+		customer=#{customer},tire_type=#{tire_type},
+		config_qty=#{config_qty},
+		<if test="config_file != ''">
+			config_file=#{config_file},
+		</if>	
+		bus_vehicle_type=#{bus_vehicle_type},	
+		editor_id=#{editor_id},edit_date=#{edit_date}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getBusNumberStart" parameterType="Map" resultType="int">
+		SELECT IFNULL(SUM(production_qty),0) FROM BMS_FACTORY_ORDER WHERE order_id IN 
+		(SELECT id FROM BMS_ORDER WHERE productive_year = #{productive_year} AND order_type != 'KD件') 
+		AND order_id &lt;= #{order_id} 
+		ORDER BY order_id ,id
+	</select>
+	
+	<select id="getBusNumberByOrder" parameterType="int" resultType="Map">
+		SELECT b.id,b.factory_id,f.factory_name,b.order_id,b.bus_number,b.vin,b.latest_process_id,p.process_name,
+		o.order_no,o.order_name,o.order_qty FROM BMS_PLAN_BUS b
+		LEFT OUTER JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id
+		LEFT OUTER JOIN BMS_ORDER o ON b.order_id = o.id
+		LEFT OUTER JOIN BMS_BASE_PROCESS p ON b.latest_process_id = p.id
+		WHERE b.order_id = #{order_id} 
+		<if test="factory_id != null">
+		 and b.factory_id = #{factory_id} 
+		</if>
+	</select>
+	
+	<select id="getOrderBusDetail" parameterType="Map" resultType="Map">
+		SELECT id,bus_number,welding_online_date,welding_offline_date,fiberglass_offline_date,painting_online_date,painting_offline_date,
+		chassis_online_date,chassis_offline_date,assembly_online_date,assembly_offline_date,warehousing_date,dispatch_date 
+		FROM BMS_PLAN_BUS WHERE order_id = #{order_id} and factory_id=#{factory_id}
+	</select>
+	<select id="getProductionPlanCount" parameterType="String" resultType="int">
+		<![CDATA[
+		SELECT COUNT(id) FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = 
+		(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
+		]]>
+	</select>
+	<select id="getOrderBusNumberCount" parameterType="map" resultType="int">
+		<![CDATA[
+		SELECT COUNT(id) FROM BMS_PLAN_BUS WHERE factory_id = #{factory_id} 
+		AND order_id = #{order_id} AND order_cofig_id = #{order_cofig_id} AND welding_online_date IS NOT NULL
+		]]>
+	</select>
+	<select id="getAllOrderBusNumberCount" parameterType="map" resultType="int">
+		<![CDATA[
+		SELECT COUNT(id) FROM BMS_PLAN_BUS WHERE order_id = (SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
+		AND order_cofig_id = #{order_cofig_id} AND welding_online_date IS NOT NULL
+		]]>
+	</select>
+	
+</mapper>

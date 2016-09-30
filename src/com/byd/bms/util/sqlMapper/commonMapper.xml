@@ -1,0 +1,764 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.util.dao.ICommDao">
+
+	<resultMap type="userinfo" id="userMap">
+		<id property="id" column="id" />
+		<result property="username" column="username" />
+		<result property="password" column="password" />
+		<result property="role_id" column="role_id" />
+		<result property="card_number" column="card_number" />
+		<result property="email" column="email" />
+		<result property="telephone" column="telephone" />
+		<result property="cellphone" column="cellphone" />
+		<result property="display_name" column="display_name" />
+		<result property="admin" column="admin" />
+		<result property="factory" column="factory_name" />
+		<result property="factory_id" column="factory_id" />
+		<result property="department" column="department" />
+		<result property="department_id" column="department_id" />
+	</resultMap>
+
+	<select id="getUser" parameterType="String" resultMap="userMap">
+		select
+		u.*,d.department,f.factory_name from BMS_BASE_USER u left join
+		BMS_BASE_DEPARTMENT d on u.department_id=d.id
+		left join
+		BMS_BASE_FACTORY f on d.factory_id=f.id where
+		u.card_number=#{userName}
+	</select>
+
+	<select id="getProcessInfo" parameterType="int"
+		resultType="com.byd.bms.util.entity.BmsBaseProcess">
+		select p.*,k.key_name as 'cur_key_name' from
+		BMS_BASE_PROCESS p
+		LEFT OUTER JOIN BMS_BASE_KEY k ON p.plan_node_id =
+		k.id
+		where p.id=#{processID}
+	</select>
+	<select id="getAllReasonType" parameterType="int" resultType="Map">
+		SELECT * FROM BMS_BASE_KEY WHERE key_code = 'REASON_TYPE'
+	</select>
+
+	<select id="getExceptionDepartmentSelect" parameterType="int"
+		resultType="Map">
+		SELECT * FROM BMS_BASE_KEY WHERE
+		key_code='EXCEPTION_RESPONSIBILITY_DEPARTMENT'
+	</select>
+	<select id="getDepartment" parameterType="int" resultType="Map">
+		SELECT * FROM BMS_BASE_DEPARTMENT WHERE factory_id=#{factory_id}
+	</select>
+
+	<resultMap type="BmsBaseBusType" id="busTypeMap">
+		<id property="id" column="id" />
+		<result property="bus_type_code" column="bus_type_code" />
+		<result property="internal_name" column="internal_name" />
+	</resultMap>
+	<select id="getBusType" resultMap="busTypeMap">
+		select * from
+		BMS_BASE_BUS_TYPE group by bus_type_code
+	</select>
+	<select id="getFactorySelect" parameterType="String" resultType="Map">
+		select id,factory_name as name from BMS_BASE_FACTORY where
+		delete_flag='0'
+	</select>
+
+	<select id="getAuthorityFactorySelect" parameterType="Map"
+		resultType="Map">
+		select id,factory_name as name
+		from BMS_BASE_FACTORY f
+		where delete_flag='0' and f.factory_name in(
+		select case when LOCATE(f.factory_name,r.factory)>0 then f.factory_name else
+		'' end as factory_name
+		from BMS_BASE_USER_ROLE r
+		LEFT JOIN BMS_BASE_ROLE rr on r.role_id= rr.id
+		LEFT JOIN BMS_BASE_ROLE_AUTHORITY a on r.role_id = a.role_id
+		LEFT JOIN BMS_BASE_USER u on r.user_id = u.id and u.id = #{user_id}
+		WHERE a.url =#{url} and r.user_id = #{user_id}
+		union all
+		SELECT ff.factory_name
+		from BMS_BASE_USER u1
+		LEFT JOIN BMS_BASE_FACTORY ff on u1.factory_id = ff.id
+		where u1.id = #{user_id}
+		)
+	</select>
+
+	<select id="getOrderFactorySelect" parameterType="Int"
+		resultType="Map">
+		SELECT f.id id, f.factory_name name FROM BMS_ORDER o LEFT JOIN
+		BMS_FACTORY_ORDER fo ON o.id = fo.order_id
+		LEFT JOIN BMS_BASE_FACTORY f
+		ON fo.factory_id = f.id WHERE
+		f.delete_flag='0' and o.id=#{orderId}
+		<!-- <if test="orderId !=null and orderId !=0"> and o.id=#{orderId} </if> -->
+	</select>
+
+	<select id="getBusTypeSelect" parameterType="String" resultType="Map">
+		select id,bus_type_code code,internal_name name from BMS_BASE_BUS_TYPE
+		group by bus_type_code
+	</select>
+	<select id="getOrderConfigSelect" parameterType="Map"
+		resultType="Map">
+		select c.id,c.order_config_name name from BMS_ORDER_CONFIG c left join
+		BMS_ORDER o on c.order_id=o.id
+		where 1=1
+		<if test="orderNo !=null and  orderNo !=''">
+			and o.order_no=#{orderNo}
+		</if>
+	</select>
+	<select id="getOrderSelect" parameterType="Int" resultType="Map">
+		select o.id,o.order_name name,o.order_no orderNo,o.order_code
+		orderCode,o.order_qty orderQty ,t.internal_name busType
+		from BMS_ORDER
+		o left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		where o.status in
+		('0','1','2') and o.bus_type_id=#{busTypeId}
+	</select>
+	<select id="getOrderFuzzySelect" parameterType="Map" resultType="Map">
+		select o.id,o.order_name name,o.order_no orderNo,o.order_code
+		orderCode,o.order_qty orderQty,t.internal_name busType
+		from BMS_ORDER o
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id where o.order_no
+		like CONCAT('%',#{orderNo},'%') and o.status !='4'
+		<if test="busType!=null and  busType!=''">
+			and t.internal_name=#{busType}
+		</if>
+		order by o.id desc
+	</select>
+
+	<select id="getBusNumberFuzzySelect" parameterType="Map"
+		resultType="Map">
+		select b.bus_number
+		from BMS_PLAN_BUS b
+		where b.bus_number LIKE CONCAT('%',#{bus_input},'%')
+		order by b.bus_number desc
+	</select>
+
+	<select id="getPartsSelect" parameterType="String" resultType="Map">
+		select id,parts_name name,parts_code code,parts_type type from
+		BMS_BASE_PARTS where parts_name like CONCAT('%',#{parts},'%') and
+		status !='1'
+	</select>
+	<select id="getPartsSelectByParts" parameterType="String"
+		resultType="Map">
+		select id,parts_name name,parts_code code,parts_type type
+		from BMS_BASE_PARTS where parts_name = #{parts}
+	</select>
+	<select id="getWorkshopSelect" parameterType="int" resultType="Map">
+		select id,workshop_name as name from BMS_BASE_WORKSHOP where
+		delete_flag='0' and factory_id=#{factoryId}
+	</select>
+	<select id="getWorkgroupSelect" parameterType="String"
+		resultType="Map">
+		select w.id,k.key_name name from BMS_BASE_WORKGROUP w
+		left
+		join BMS_BASE_KEY k on w.workgroup_id=k.id and k.key_code='WORKGROUP'
+		where w.wrokshop_id=#{workshop}
+	</select>
+	<select id="getLineSelect" parameterType="int" resultType="Map">
+		select id,line as name from BMS_BASE_LINE where delete_flag='0' and
+		workshop_id=#{workshopId}
+	</select>
+	<select id="getProcessMonitorSelect" parameterType="int"
+		resultType="Map">
+		select id as ID,process_code as NAME,process_name as
+		PROCESS_NAME from BMS_BASE_PROCESS where monitory_point_flag = '1' and
+		line_id=#{lineId} and delete_flag = '0'
+	</select>
+	<select id="getProcessExceptMonitorSelect" parameterType="int"
+		resultType="Map">
+		select id as ID,process_code as NAME,process_name as
+		PROCESS_NAME from BMS_BASE_PROCESS where
+		line_id=#{lineId} and
+		delete_flag = '0'
+	</select>
+	<select id="getProcessSelectByWorkshopId" parameterType="int"
+		resultType="Map">
+		select id as ID,process_code as NAME,process_name as
+		PROCESS_NAME from
+		BMS_BASE_PROCESS where
+		<!-- monitory_point_flag = '1' AND -->
+		line_id IN (SELECT id FROM BMS_BASE_LINE WHERE workshop_id
+		=#{workshopId})
+	</select>
+
+	<select id="getFrequencySelect" parameterType="String"
+		resultType="Map">
+		select id,key_name as name from BMS_BASE_KEY where
+		key_code='TESTING_FREQUENCY'
+	</select>
+	<select id="getEcn_TypeSelect" parameterType="String"
+		resultType="Map">
+		select id,key_name as name from BMS_BASE_KEY where
+		key_code='ECN_TYPE'
+	</select>
+	<select id="getTestToolsSelect" parameterType="String"
+		resultType="Map">
+		select id,key_name as name from BMS_BASE_KEY where
+		key_code='TESTING_TOOL'
+	</select>
+	<select id="getWorkshopSelect_Key" parameterType="String"
+		resultType="Map">
+		select id,key_name as name from BMS_BASE_KEY where
+		key_code='WORKSHOP'
+	</select>
+	<select id="getEcnTypeSelect_Key" parameterType="String"
+		resultType="Map">
+		select id,key_name as name from BMS_BASE_KEY where
+		key_code='ECN_TYPE'
+	</select>
+	<resultMap type="bmsKeys" id="bmsKeys">
+		<id property="id" column="id" />
+		<result property="key_name" column="key_name" />
+		<result property="key_name_en" column="key_name_en" />
+		<result property="value" column="value" />
+	</resultMap>
+	<select id="getKeysSelect" parameterType="String" resultType="bmsKeys">
+		SELECT id,key_name,key_name_en,value from BMS_BASE_KEY where
+		delete_flag='0' and key_code=#{keyCode}
+	</select>
+
+	<select id="getUserFactory" parameterType="int" resultType="Map">
+		SELECT u.id,u.factory_id,f.factory_name FROM BMS_BASE_USER u
+		LEFT OUTER
+		JOIN BMS_BASE_DEPARTMENT p ON u.department_id = p.id
+		LEFT OUTER
+		JOIN
+		BMS_BASE_FACTORY f ON p.factory_id = f.id WHERE u.id=#{userId}
+	</select>
+
+	<select id="getUserInfoByCard" parameterType="String"
+		resultType="Map">
+		select u.*,d.department from BMS_BASE_USER u left join
+		BMS_BASE_DEPARTMENT d on u.department_id=d.id
+		where
+		u.card_8H10D=#{cardId}
+	</select>
+
+	<select id="getUserInfoByCardNumber" parameterType="String"
+		resultType="Map">
+		select u.*,d.department from BMS_BASE_USER u left join
+		BMS_BASE_DEPARTMENT d on u.department_id=d.id
+		where
+		u.card_number=#{cardNumber}
+	</select>
+
+	<select id="getProcessSelect" parameterType="Map" resultType="Map">
+		select w.workshop_name,l.line,p.process_name,p.process_code from
+		BMS_BASE_PROCESS p left join BMS_BASE_LINE l on p.line_id=l.id
+		left
+		join BMS_BASE_WORKSHOP w on l.workshop_id=w.id
+		where
+		w.workshop_name=#{workshop} and p.process_name like
+		CONCAT('%',#{processName},'%')
+	</select>
+	<select id="getBusNumberByOrder" parameterType="Map" resultType="Map">
+		SELECT
+		b.id,b.factory_id,f.factory_name,b.order_id,b.bus_number,b.vin,b.latest_process_id,p.process_name,
+		o.order_no,o.order_name,o.order_qty FROM BMS_PLAN_BUS b
+		LEFT OUTER JOIN
+		BMS_BASE_FACTORY f ON b.factory_id = f.id
+		LEFT OUTER JOIN BMS_ORDER o
+		ON b.order_id = o.id
+		LEFT OUTER JOIN BMS_BASE_PROCESS p ON
+		b.latest_process_id = p.id
+		LEFT OUTER JOIN BMS_BASE_BUS_TYPE t ON
+		o.bus_type_id = t.id
+		WHERE b.order_id = #{order_id}
+		<if test="bus_num_start!=null and  bus_num_start!=''">
+			<![CDATA[ and b.bus_number >= CONCAT(t.bus_type_code,"-",o.order_code,"-",o.productive_year,"-",#{bus_num_start}) ]]>
+		</if>
+		<if test="bus_num_end!=null and  bus_num_end!=''">
+			<![CDATA[ and b.bus_number <= CONCAT(t.bus_type_code,"-",o.order_code,"-",o.productive_year,"-",#{bus_num_end})]]>
+		</if>
+	</select>
+
+	<select id="getIndexOrderList" parameterType="Map" resultType="Map">
+		select o.production_qty, count(b.id)
+		alreadyNum,o.order_id,r.order_no,r.order_name,t.bus_type_code,r.order_qty
+		FROM BMS_FACTORY_ORDER o left join BMS_PLAN_BUS b on
+		b.order_id=o.order_id and b.warehousing_date is not null and
+		o.factory_id=b.factory_id
+		left join BMS_ORDER r on o.order_id=r.id
+		left
+		join BMS_BASE_BUS_TYPE t on r.bus_type_id=t.id
+		where 1=1
+		<if test="factoryId !=null">
+			and o.factory_id=#{factoryId}
+		</if>
+		group by o.order_id
+		order by o.edit_date desc
+		limit 0,5
+	</select>
+	<select id="getIndexExceptionList" parameterType="Map"
+		resultType="Map">
+		SELECT e.bus_number,k.key_name
+		reason,w.workshop_name,concat(p.process_code,p.process_name) process
+		FROM BMS_PD_PRODUCTION_EXCEPTION
+		e left join BMS_BASE_KEY k on
+		e.reason_type_id=k.id
+		LEFT JOIN BMS_BASE_WORKSHOP w ON e.workshop_id =
+		w.id
+		left join BMS_BASE_PROCESS p on p.id=e.process_id
+		where
+		e.exception_type='0' and e.status='0'
+		<if test="factoryId !=null ">
+			and e.factory_id=#{factoryId}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and w.workshop_name=#{workshop}
+		</if>
+		order by e.edit_date desc
+		limit 0,10
+	</select>
+	<select id="getPauseList" parameterType="Map" resultType="Map">
+		SELECT w.workshop_name,k.key_name reason,l.line
+		FROM
+		BMS_PD_PRODUCTION_EXCEPTION e
+		left join BMS_BASE_KEY k on e.reason_type_id=k.id
+		left join
+		BMS_BASE_WORKSHOP w on w.id=e.workshop_id
+		left join BMS_BASE_LINE l on
+		l.id=e.line_id
+		where
+		e.exception_type='1' and e.status='0'
+		<if test="factoryId !=null">
+			and e.factory_id=#{factoryId}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and w.workshop_name=#{workshop}
+		</if>
+		order by e.edit_date desc
+		limit 0,1
+	</select>
+	<select id="getIndexWorkshopProduction" parameterType="Map"
+		resultType="Map">
+		select tmp2.process_node,ifnull(tmp1.plan_total,0)
+		plan_total,ifnull(tmp2.online_num,0) done_num from(
+		select
+		sum(p.plan_qty) plan_total,k.key_name process_node from
+		BMS_PLAN_PRODUCTION_PLAN p left join BMS_BASE_KEY k on
+		p.plan_code_id=k.id
+		where p.factory_id=#{factoryId} and
+		p.plan_date=replace(#{curDate},'-','' ) and k.key_name =
+		CONCAT(#{workshop},'上线')
+		group by k.key_name) tmp1
+		right join
+		(
+		select
+		CONCAT(#{workshop},'上线') process_node,count(b.bus_number) online_num
+		from BMS_PLAN_BUS
+		b where
+		<if test="workshop=='焊装'">
+		<![CDATA[
+			b.welding_online_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.welding_online_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+		]]>
+		</if>
+		<if test="workshop=='涂装'">
+		<![CDATA[
+			b.painting_online_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.painting_online_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')			
+		]]>
+		</if>
+		<if test="workshop=='底盘'">
+		<![CDATA[
+			b.chassis_online_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.chassis_online_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')
+		]]>
+		</if>
+		<if test="workshop=='总装'">
+		<![CDATA[
+			b.assembly_online_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.assembly_online_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')
+		]]>
+		</if>
+		<if test="workshop=='检测线'">
+		<![CDATA[
+			b.testline_online_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.testline_online_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')
+		]]>
+		</if>
+
+		and b.factory_id=#{factoryId}
+		)tmp2 on
+		tmp1.process_node=tmp2.process_node
+		union all
+		select
+		tmp3.process_node,ifnull(tmp1.plan_total,0)
+		plan_tota,ifnull(tmp3.offline_num,0) done_num from(
+		select
+		sum(p.plan_qty) plan_total,k.key_name process_node from
+		BMS_PLAN_PRODUCTION_PLAN p left join BMS_BASE_KEY k on
+		p.plan_code_id=k.id
+		where p.plan_date=replace(#{curDate},'-','' ) and
+		k.key_name = CONCAT(#{workshop},'下线')
+		<if test="factoryId !=null">
+			and p.factory_id=#{factoryId}
+		</if>
+		group by k.key_name) tmp1
+		right join
+		(
+		select CONCAT(#{workshop},'下线')
+		process_node,count(b.bus_number) offline_num from BMS_PLAN_BUS
+		b where
+		<if test="workshop=='焊装'">
+		<![CDATA[
+			b.welding_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.welding_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')
+		]]>
+		</if>
+		<if test="workshop=='涂装'">
+		<![CDATA[
+			b.painting_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.painting_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')
+		]]>
+		</if>
+		<if test="workshop=='底盘'">
+		<![CDATA[
+			b.chassis_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.chassis_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')
+		]]>
+		</if>
+		<if test="workshop=='总装'">
+		<![CDATA[
+			b.assembly_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.assembly_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')
+		]]>
+		</if>
+		<if test="workshop=='检测线'">
+		<![CDATA[
+			b.testline_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.testline_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')
+		]]>
+		</if>
+		<if test="workshop=='玻璃钢'">
+		<![CDATA[
+			b.fiberglass_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+			and b.fiberglass_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00')			
+		]]>
+		</if>
+		<if test="factoryId !=null">
+			and b.factory_id=#{factoryId}
+		</if>
+		)tmp3 on tmp1.process_node=tmp3.process_node;
+
+	</select>
+	<select id="getOrderConfigList" parameterType="Map"
+		resultType="com.byd.bms.order.entity.BmsOrderConfig">
+		select g.id,c.product_qty
+		allot_qty,o.order_qty,o.order_name,o.order_no,g.order_config_name
+		from
+		BMS_ALLOT_FACTORY_ORDER_CONFIG c left join BMS_ORDER o on
+		c.order_id=o.id
+		left join BMS_ORDER_CONFIG g ON c.order_config_id=g.id
+		where 1=1 and c.factory_id = #{factory_id}
+		<if test="search_order_no!=null">
+			and o.order_no like CONCAT('%',#{search_order_no},'%')
+		</if>
+		<if test="search_productive_year!=null">
+			and o.productive_year = #{search_productive_year}
+		</if>
+		<if test="order_id!=null">
+			and o.id = #{order_id}
+		</if>
+		ORDER BY o.id DESC
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+
+	<select id="getParts" parameterType="Map" resultType="Map">
+		SELECT p.*,p.parts_type parts_type,p.parts_type partsTypeName,u.id
+		editor_id,u.username editor
+		FROM BMS_BASE_PARTS p
+		LEFT JOIN BMS_BASE_KEY k ON p.parts_type = k.id
+		LEFT JOIN BMS_BASE_USER u ON p.editor_id = u.id
+		where 1=1 and p.status!='1'
+		<if test="parts_name!=null">
+			and p.parts_name =#{parts_name}
+		</if>
+	</select>
+	<!-- 查询首页DUP -->
+	<select id="queryIndexDpuData" parameterType="Map" resultType="Map">
+		select round(count( t.result_judge)/count(distinct h.bus_number),1)
+		dup,substring(h.edit_date,1,10) item,w.workshop_name,h.factory_id
+		from
+		BMS_QM_TEST_CARD_HEADER h left join BMS_QM_TEST_CARD_DETAIL t on
+		h.id=t.test_card_id
+		left join BMS_BASE_WORKSHOP w on w.id=h.workshop_id
+		where t.result_judge ='不合格' and substring(h.edit_date,1,10)=#{curDate}
+		and h.factory_id=#{factoryId}
+		group by h.workshop_id
+	</select>
+	<!-- 查询首页一次校检合格率 -->
+	<select id="queryIndexPassRateData" parameterType="Map"
+		resultType="Map">
+		select round(count(h1.bus_number)/count(h.bus_number)*100,2) pass_rate,
+		h.factory_id,w.workshop_name,substring(h.edit_date,1,10) item
+		from
+		BMS_QM_TEST_CARD_HEADER h left join BMS_QM_TEST_CARD_HEADER h1 on
+		h.id=h1.id and h1.test_result='0'
+		left join BMS_BASE_WORKSHOP w on
+		w.id=h.workshop_id
+		where h.factory_id=#{factoryId} and
+		substring(h.edit_date,1,10) =#{curDate}
+		group by h.workshop_id
+	</select>
+	<!-- 生产结存查询 -->
+	<select id="getProductionSearch" parameterType="Map" resultType="Map">
+		SELECT * FROM
+		(SELECT COUNT(id) AS welding_count FROM BMS_PLAN_BUS
+		WHERE factory_id = #{factoryId}
+		AND welding_online_date IS NOT NULL AND welding_offline_date IS NULL) a,
+		(SELECT COUNT(id) AS fiberglass_count FROM BMS_PLAN_BUS WHERE
+		factory_id = #{factoryId}
+		AND welding_offline_date IS NOT NULL AND fiberglass_offline_date IS NULL)
+		b,
+		(SELECT COUNT(id) AS painting_count FROM BMS_PLAN_BUS WHERE
+		factory_id = #{factoryId}
+		AND painting_online_date IS NOT NULL AND painting_offline_date IS NULL)
+		c,
+		(SELECT COUNT(id) AS chassis_count FROM BMS_PLAN_BUS WHERE
+		factory_id = #{factoryId}
+		AND chassis_online_date IS NOT NULL AND chassis_offline_date IS NULL) d,
+		(SELECT COUNT(id) AS assembly_count FROM BMS_PLAN_BUS WHERE factory_id
+		= #{factoryId}
+		AND assembly_online_date IS NOT NULL AND assembly_offline_date IS NULL)
+		e,
+		(SELECT COUNT(id) AS debugarea_count FROM BMS_PLAN_BUS WHERE
+		factory_id = #{factoryId}
+		AND debugarea_online_date IS NOT NULL AND debugarea_offline_date IS NULL)
+		f,
+		(SELECT COUNT(id) AS testline_count FROM BMS_PLAN_BUS WHERE
+		factory_id = #{factoryId}
+		AND testline_online_date IS NOT NULL AND testline_offline_date IS NULL)
+		g,
+		(SELECT COUNT(id) AS warehousing_count FROM BMS_PLAN_BUS WHERE
+		factory_id = #{factoryId}
+		AND warehousing_date IS NOT NULL AND dispatch_date IS NULL ) h
+	</select>
+
+	<!-- 部件结存查询 -->
+	<select id="getPartsBalance" parameterType="Map" resultType="Map">
+		select t1.online_total-t2.offline_total as balance from
+		(select ifnull(sum(offline_real_qty),0) online_total
+		from BMS_PD_PARTS_PLAN_FINISH f
+		left join BMS_BASE_PARTS p on f.parts_id=p.id
+		where p.parts_name='喷砂' and f.factory_id=#{factoryId} ) t1,
+		(select ifnull(count(distinct b.bus_number),0) offline_total
+		from BMS_PLAN_BUS b
+		where b.factory_id=#{factoryId} and b.welding_online_date is not null) t2
+	</select>
+
+	<select id="queryStaffInfo" parameterType="Map" resultType="Map">
+		select s.*,ifnull(d.distribution,0) distribution,d.effective_date
+		from BMS_HR_STAFF s
+		left join BMS_HR_STAFF_DISTRIBUTION d on d.staff_number=s.staff_number and
+		effective_date=(
+		select max(d1.effective_date) from BMS_HR_STAFF_DISTRIBUTION d1 where
+		d.staff_number=d1.staff_number 
+		<if test="workDate !=null and workDate !=''">
+			and #{workDate}>=d1.effective_date
+		</if>		
+		)
+		where 1=1 and s.status='在职' 
+
+		<if test="staffNum !=null and staffNum !=''">
+			and s.staff_number=#{staffNum}
+		</if>
+		<if test="factory !=null and factory !='' and factory !='请选择'">
+			and s.plant_org=#{factory}
+		</if>
+		<if test="dept !=null and dept !='' and dept !='请选择'">
+			and s.dept_org=#{dept}
+		</if>
+		<if test="workshop !=null and workshop !='' and workshop !='请选择'">
+			and s.workshop_org=#{workshop}
+		</if>
+		<if test="workgroup !=null and workgroup !='' and workgroup!='请选择'">
+			and s.workgroup_org=#{workgroup}
+		</if>
+		<if test="subgroup !=null and subgroup !='' and subgroup!='请选择'">
+			and s.team_org=#{subgroup}
+		</if>
+
+	</select>
+
+	<select id="getWorkshopSelectOrg" parameterType="String"
+		resultType="Map">
+		select o.*
+		from BMS_BASE_ORG o
+		left join BMS_BASE_ORG o1 on
+		o.parent_id=o1.id
+		left join BMS_BASE_ORG o2 on o1.parent_id=o2.id
+		where
+		o2.name=#{factory} and o.deleted='0' and o.org_kind='1' and
+		o.org_type='4'
+	</select>
+
+	<select id="getWorkshopAuth" parameterType="Map" resultType="String">
+		select group_concat(r.workshop)
+		from BMS_BASE_USER u
+		left join BMS_BASE_USER_ROLE r on r.user_id=u.id
+		left join BMS_BASE_ROLE_AUTHORITY a on r.role_id=a.role_id
+		where r.workshop !='' and u.id=#{userId} and a.url =#{url}
+	</select>
+	<select id="getWorkshopSelectOrgAuth" parameterType="Map"
+		resultType="Map">
+		select o.*
+		from BMS_BASE_ORG o
+		left join BMS_BASE_ORG o1 on o.parent_id=o1.id
+		left join BMS_BASE_ORG o2 on o1.parent_id=o2.id
+		where o2.name=#{factory} and o.deleted='0' and o.org_kind='1' and
+		o.org_type='4'
+		<if test="workshopLimit !=null and workshopLimit !=''">
+			and
+			find_in_set(o.name,#{workshopLimit})>0
+		</if>
+		order by o.sort_number asc
+	</select>
+
+	<select id="queryChildOrgList" parameterType="String"
+		resultType="Map">
+		select o.*
+		from BMS_BASE_ORG o
+		left join BMS_BASE_ORG o1 on
+		o.parent_id=o1.id
+		where o1.id=#{parentOrgId} and o.deleted='0'
+		order by
+		o.sort_number asc
+	</select>
+
+	<select id="queryChildWorkGroupList" parameterType="String"
+		resultType="Map">
+		SELECT
+		BMS_HR_STAFF_HOURS.workgroup as id,BMS_HR_STAFF_HOURS.workgroup
+		as name
+		FROM
+		BMS_HR_STAFF_HOURS
+		WHERE
+		1=1 AND
+		<if test="start_date !=null and start_date !=''">
+			<![CDATA[ BMS_HR_STAFF_HOURS.work_date>=#{start_date} AND ]]>
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			<![CDATA[ BMS_HR_STAFF_HOURS.work_date<=#{end_date} AND ]]>
+		</if>
+		<if test="factory !=null and factory !=''">
+			BMS_HR_STAFF_HOURS.factory=#{factory} AND
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			BMS_HR_STAFF_HOURS.workshop=#{workshop}
+		</if>
+		<![CDATA[ AND BMS_HR_STAFF_HOURS.workgroup <> '' ]]>
+		AND NOT ISNULL(BMS_HR_STAFF_HOURS.workgroup)
+		GROUP BY
+		BMS_HR_STAFF_HOURS.workgroup
+	</select>
+
+	<select id="queryChildTeamList" parameterType="String"
+		resultType="Map">
+		SELECT
+		BMS_HR_STAFF_HOURS.team as id,BMS_HR_STAFF_HOURS.team as name
+		FROM
+		BMS_HR_STAFF_HOURS
+		WHERE
+		1=1 AND
+		<if test="start_date !=null and start_date !=''">
+			<![CDATA[ BMS_HR_STAFF_HOURS.work_date>=#{start_date} AND ]]>
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			<![CDATA[ BMS_HR_STAFF_HOURS.work_date<=#{end_date} AND ]]>
+		</if>
+		<if test="factory !=null and factory !=''">
+			BMS_HR_STAFF_HOURS.factory=#{factory} AND
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			BMS_HR_STAFF_HOURS.workshop=#{workshop} AND
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			BMS_HR_STAFF_HOURS.workgroup=#{workgroup}
+		</if>
+		<![CDATA[ AND BMS_HR_STAFF_HOURS.team <> '' ]]>
+		AND NOT ISNULL(BMS_HR_STAFF_HOURS.team)
+		GROUP BY
+		BMS_HR_STAFF_HOURS.team
+	</select>
+
+	<select id="getJobGradeList" parameterType="Map" resultType="Map">
+		SELECT id,g.job_grade_name AS name FROM BMS_HR_BASE_JOB_GRADE g WHERE
+		1=1
+		<if test="jobType !=null and jobType !=''">
+			AND g.type = #{jobType}
+		</if>
+	</select>
+
+	<!-- 获取权限组织结构树 -->
+	<select id="getOrgAuthTree" statementType="CALLABLE" resultType="Map"
+		parameterType='Map'>
+		<!-- SELECT * FROM BMS_BASE_ORG s WHERE s.deleted='0' AND FIND_IN_SET(id,f_orgids( 
+			(SELECT GROUP_CONCAT(o.id) FROM BMS_BASE_ORG o WHERE FIND_IN_SET(o.name, 
+			(select GROUP_CONCAT(factory_name) as name from BMS_BASE_FACTORY f where 
+			delete_flag='0' and f.factory_name in( select case when LOCATE(f.factory_name,r.factory)>0 
+			then f.factory_name else '' end as factory_name from BMS_BASE_USER_ROLE r 
+			LEFT JOIN BMS_BASE_ROLE rr on r.role_id= rr.id LEFT JOIN BMS_BASE_ROLE_AUTHORITY 
+			a on r.role_id = a.role_id LEFT JOIN BMS_BASE_USER u on r.user_id = u.id 
+			and u.id = #{userId} WHERE a.url = #{url} and r.user_id = #{userId} union 
+			all SELECT ff.factory_name from BMS_BASE_USER u1 LEFT JOIN BMS_BASE_FACTORY 
+			ff on u1.factory_id = ff.id where u1.id = #{userId} ) ) )>0 AND o.deleted 
+			= '0'),#{orgType}))>0 call P_QueryOrgTreeList(#{userId},#{url},#{orgType},#{orgKind}) 
+			call P_QueryOrgTreeList('3','hr!attendance.action','1,2,3,4,5,6','0,1') ORDER 
+			BY s.id, s.level, s.sort_number ASC -->
+
+		call P_QueryOrgTreeList(#{userId},#{url},#{orgType},#{orgKind})
+	</select>
+
+	<select id="getStaffNameByNumber" parameterType="String"
+		resultType="String">
+		select name from BMS_HR_STAFF where
+		staff_number=#{staff_number}
+	</select>
+
+	<select id="getTempoBydate" parameterType="String" resultType="String">
+		SELECT price FROM BMS_HR_BASE_PRICE WHERE type = '0' AND start_date
+		&lt;= #{date} AND end_date >= #{date} LIMIT 1
+	</select>
+
+	<select id="queryStaffHoursUnloading" parameterType="String"
+		resultType="Map">
+		SELECT * FROM BMS_HR_STAFF_HOURS WHERE work_date LIKE
+		CONCAT('%',#{work_date},'%')
+	</select>
+	<update id="delStaffHoursUnloading" parameterType="Map">
+		delete
+		from BMS_HR_STAFF_HOURS where work_date LIKE
+		CONCAT('%',#{work_date},'%')
+	</update>
+
+	<select id="getBusNumberByVin" parameterType="Map" resultType="Map">
+		select bus_number from BMS_PLAN_BUS where vin=#{vin}
+	</select>
+	<select id="getVinList" parameterType="Map" resultType="Map">
+		select
+		vin from BMS_PD_VIN where vin=#{vin}
+	</select>
+	<select id="getRoleAuthorityList" parameterType="integer"
+		resultType="Map">
+		SELECT a.url
+		FROM BMS_BASE_USER_ROLE r
+		left join BMS_BASE_ROLE_AUTHORITY a on r.role_id=a.role_id
+		where
+		r.user_id=#{userId}
+		<if test="url !=null and url !=''">
+			and a.url=#{url}
+		</if>
+	</select>
+
+	<select id="getBusVehicleType" parameterType="String"
+		resultType="Map">
+		SELECT id,vehicle_model as name FROM BMS_BASE_BUS_TYPE
+		where bus_type_code=#{busType}
+	</select>
+	
+</mapper>
