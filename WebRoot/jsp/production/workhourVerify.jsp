@@ -43,7 +43,7 @@
 					<form id="form" class="well form-search">
 						<table>
 							<tr>
-								<td>派工单号</td>
+								<td>派工流水号</td>
 								<td>申请日期</td>
 								<td>工时状态</td>
 								<td>制作工厂</td>
@@ -53,7 +53,7 @@
 							</tr>
 							<tr>
 								<td><input style="height: 30px;" type="text"
-									class="input-medium revise" placeholder="派工单号"
+									class="input-medium revise" placeholder="派工流水号"
 									id="tmp_order_no" /></td>
 								<td><input id="create_start" type="text"
 									class="input-small" style="width: 98px" placeholder="开始日期..."
@@ -101,7 +101,7 @@
 						class="table table-bordered ">
 						<thead>
 							<tr>
-								<th>派工单号</th>
+								<th>派工流水号</th>
 								<th>工单号</th>
 								<th width='300px'>作业原因/内容</th>
 								<th>总数<br />量
@@ -110,7 +110,7 @@
 								已完成<br/>
 								数量
 								</th>
-								<th>单工<br />时
+								<th>工<br />时
 								</th>
 								<th>所需<br />人力
 								</th>
@@ -131,7 +131,31 @@
 					</table>
 
 				</div>
-
+				<div class="modal fade" id="reasonModal" tabindex="-1" role="dialog" unselectable="on" onselectstart="return false;"
+					aria-hidden="true" style="display: none; -moz-user-select:-moz-none;width: 400px;left:50%">
+					<div class="modal-header">
+						<!-- <button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">×</button> -->
+						<h3>驳回原因</h3>
+					</div>
+					<div class="modal-body" style="margin-bottom: -20px;">
+						
+						<div class="control-group">
+							<table >
+								<tr>
+								<td width="80px" style="text-align:right">驳回原因：</td>
+								<td width="280px">
+									<textarea rows="2" id="reject_reason" style="width:280px"></textarea>
+								</td>								
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-primary" id="btnMtaSave">确认</button>
+						<button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>					
+					</div>
+					</div>
 				<div class="modal fade" id="editModal" tabindex="-1" role="dialog"
 					aria-hidden="true"
 					style="display: none; width: 800px; max-height: 600px; left: 40%">
@@ -144,7 +168,7 @@
 						<div class="control-group">
 							<table style="line-height: 30px">
 								<tr>
-									<td width="140px" style="text-align: right">派工单号：</td>
+									<td width="140px" style="text-align: right">派工流水号：</td>
 									<td id="edit_orderNo" colspan="2"></td>
 								</tr>
 								<tr>

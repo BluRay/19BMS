@@ -14,6 +14,7 @@
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/head.js"></script>
 	<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/exportTable2Excel.js"></script>
 	<script type="text/javascript" src="js/plan/planExceptionManager.js"></script>
 	<script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 	<script type="text/javascript" src="js/jsrender.min.js"></script>
@@ -64,7 +65,7 @@
 			</form>
 			<div id="pagination" class="pagination pagination-small pagination-right" style="display: none">
 				<ul>
-					<li id="export"><a href="">总共<span total="" id="total"></span>条记录
+					<li id="export"><a href="#">导出总共<span total="" id="total"></span>条记录
 					</a></li>
 				</ul>
 				<ul>
@@ -99,7 +100,28 @@
 				<tbody>	
 				</tbody>
 			</table>			
-	
+		<table id="tableExceptionAll" style="text-align:center;table-layout:fixed;font-size:12px;display:none" class="table table-bordered table-striped">
+				<thead>
+					<tr id="0">
+						<th width="65px" style="text-align:center;">生产工厂</th>
+						<th width="65px" style="text-align:center;">生产车间</th>						
+						<th width="65px" style="text-align:center;">当前工序</th>
+						<th width="120px" style="text-align:center;" width="140px">车号</th>
+						<th width="65px" style="text-align:center;">严重等级</th>
+						<th width="55px" style="text-align:center;">记录点</th>
+						<th width="85px" style="text-align:center;">异常原因</th>
+					 	<th width="150px" style="text-align:center;">详细原因</th>
+						<th width="65px" style="text-align:center;">处理措施</th>
+						<th width="65px" style="text-align:center;">责任部门</th>
+						<th width="65px" style="text-align:center;">登记人</th>
+						<th width="75px" style="text-align:center;">开始时间</th>
+						<th width="75px" style="text-align:center;">处理时间</th>
+						<th style="text-align:center;">状态</th>
+					</tr>
+				</thead>
+				<tbody>	
+				</tbody>
+			</table>
 			</div>
 			</div>
 <!-- newExcepModal order start -->

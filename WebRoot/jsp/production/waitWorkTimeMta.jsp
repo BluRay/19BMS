@@ -54,6 +54,11 @@
 							<td rowspan=2><textarea class="input-xlarge"
 									style="resize: none" name="reason_detail" id="reason_detail"
 									rows="2"></textarea></td>
+							<td style="text-align: right" width="80px">责任部门：</td>
+							<td><input type="text" class="input-small" id="duty_unit"></td>		
+							<td><input type="button" class="btn btn-success"
+								id="btnSave" value="保存"
+								style="margin-left: 2px; "></input></td>
 						</tr>
 						<tr>
 							<td width="80px" style="text-align: right">等待原因：</td>
@@ -64,11 +69,9 @@
 									<option value='其他'>其他</option>
 							</select></td>
 							<td width="80px" style="text-align: right">具体原因：</td>
-							<td></td>
-
-							<td><input type="button" class="btn btn-success"
-								id="btnSave" value="保存"
-								style="margin-left: 2px; margin-top: -10px;"></input></td>
+							<td style="text-align: right;width:80px">已录工时：</td>			
+							<td style="text-align: left;width:80px"><span id="record_hour"></span></td>				
+							
 						</tr>
 					</table>
 				</form>
@@ -79,14 +82,14 @@
 					type="hidden" id="d_team"
 					value="<s:property value='user.team_org' />">
 				<br>
-				<div>
+				<div style="position: relative;height:390px;overflow: auto;">
 					<div style="display: none;position:fixed;z-index:999;margin-top:150px;margin-left:500px" class="divLoading" >
                                 <span><i class="fa fa-spinner fa-spin fa-4x" style="height:1em;"></i></span>
                             </div>  
 					<table id="table_workhour"
-						style="margin-left: 0px; margin-top: 0px; width: 100%; text-align: left;"
+						style="margin-left: 0px; margin-top: 0px; width: 100%;text-align: left;"
 						class="exp-table table">
-						<thead style="background-color: rgb(225, 234, 240)">
+						<thead style="background-color: rgb(225, 234, 240);height:30px">
 							<tr>
 								<td style="width: 30px;"><i class="fa fa-plus addWorkhour"
 									style="cursor: pointer; color: blue; margin-left: 5px"></i></td>
@@ -94,7 +97,7 @@
 								<td>姓名</td>
 								<td>岗位</td>
 								<td>等待<br/>工时</td>
-								<td>分配<br/>比例</td>
+								<!-- <td>分配<br/>比例</td> -->
 								<td>人员去向</td>
 								<td>小班组</td>
 								<td>班组</td>

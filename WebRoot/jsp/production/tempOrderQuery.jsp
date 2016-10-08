@@ -32,7 +32,7 @@
 					<form id="form" class="well form-search">
 						<table>
 							<tr>
-								<td>派工单号</td>
+								<td>派工流水号</td>
 								<td>申请日期</td>
 								<td>状态</td>
 								<td>制作工厂</td>
@@ -87,12 +87,12 @@
 						class="table table-bordered ">
 						<thead>
 							<tr>
-								<th>派工单号</th>
+								<th>派工流水号</th>
 								<th width='300px'>作业原因/内容</th>
 								<th>工单号</th>
 								<th>总数量</th>
 								<th>已完成</th>
-								<th>单工时</th>
+								<th>工时</th>
 								<th>所需人力</th>
 								<th>总工时</th>
 								<th>制作工厂</th>
@@ -105,7 +105,7 @@
 						</tbody>
 					</table>
 				</div>
-
+			
 			</div>
 		</div>
 	</div>

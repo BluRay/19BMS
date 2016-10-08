@@ -173,20 +173,20 @@
         </div> 
 		<!-- new order start -->
 		<div class="modal" id="newModal" tabindex="-1" role="dialog"
-			style="display: none; width: 880px; left: 38%; height: 600px; top: 20px">
+			style="display: none; width: 920px; left: 38%; height: 600px; top: 20px">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal"
 					aria-hidden="true">×</button>
 				<h3 id="editModal_title">技改单新增</h3>
 			</div>
-			<div class="modal-body" style="max-height: 500px">
+			<div class="modal-body" style="max-height: 520px">
 				<form id="addECN" enctype="multipart/form-data" method="post"
 					action="ecnDocument!addECN.action" class="form-horizontal">
-					<div style="height: 200px">
+					<div style="height: 220px">
 						<input name="new_allEcnTask" type="hidden" id="new_allEcnTask" />
 						<input name="new_tecn_flagValue" type="hidden"
 							id="new_tecn_flagValue" />
-						<div style="float: left; width: 50%; height: 200px">
+						<div style="float: left; width: 50%; height: 220px">
 							<div class="control-group">
 								<label class="control-label" for="new_ecn_type">*&nbsp;技改类型</label>
 								<div class="controls">
@@ -223,10 +223,17 @@
 									<input type="text" name="new_responsible_organization"
 										style="width: 220px;" class="input-medium"
 										id="new_responsible_organization" />
+								<%-- 	<select name="new_responsible_organization" id="new_responsible_organization"
+										class="input-medium carType">
+										<option value="">请选择</option>
+										<option value="工程院">工程院</option>
+										<option value="技术部">技术部</option>
+									</select> --%>	
 								</div>
 							</div>
+							
 						</div>
-						<div style="float: right; width: 50%; height: 200px">
+						<div style="float: right; width: 50%; height: 220px">
 							<div class="control-group">
 								<label class="control-label" for="new_ecn_document_number">*&nbsp;技改编号</label>
 								<div class="controls">
@@ -259,9 +266,15 @@
 								</div>
 							</div>
 							<div class="control-group">
+								<label class="control-label" for="new_changed_point">&nbsp;变更点数</label>
+								<div class="controls">
+									<input type="text" name="new_changed_point"  class="input-medium" id="new_changed_point" />										
+								</div>
+							</div>
+							<div class="control-group">
 								<label class="control-label" for="new_tecn_flag">&nbsp;临时技改单</label>
 								<div class="controls">
-									<input type="checkbox" name="new_tecn_flag"
+									<input type="checkbox" style="height:30px" name="new_tecn_flag"
 										class="input-medium" id="new_tecn_flag" />
 								</div>
 							</div>
@@ -274,12 +287,12 @@
 				</form>
 				<div class="container">
 					<div style="width: 100%">
-						<ul class="nav nav-tabs" id="new_tab" role="tablist"
-							style="height: 38px;">
+						<ul class="nav nav-tabs" id="new_tab" role="tablist">
+						<li><i id="new_addTask" class="fa fa-plus"
+								style="cursor: pointer; padding-top: 12px; color: blue;"></i></li>
 							<li class="active"><a href="#new_task1" data-toggle="tab"
 								style="font-size: 14px; color: #333">任务1</a></li>
-							<li><i id="new_addTask" class="fa fa-plus"
-								style="cursor: pointer; padding-top: 12px; color: blue;"></i></li>
+							
 						</ul>
 					</div>
 					<div class="tab-content" id="new_accordion">
@@ -309,10 +322,20 @@
 												</tr>
 												<tr>
 													<td style="width: 120px;"><label class="control-label"
+														for="">*&nbsp;&nbsp;变更类型</label></td>
+													<td><label><input value='重大变更' checked="checked"
+														type="checkbox"
+														name="new_change_type" title="全部切换" />重大变更 </label>
+														<label><input value='顾客变更'
+														 type="radio"
+														name="new_change_type" title="立即切换" />顾客变更</label></td>
+												</tr>
+												<tr>
+													<td style="width: 120px;"><label class="control-label"
 														for="">&nbsp;&nbsp;单车总工时</label></td>
 													<td><input type="text" style="width: 80px;" />&nbsp;&nbsp;小时</td>
 												</tr>
-												<tr>
+												<!-- <tr>
 													<td
 														style="vertical-align: top; padding-top: 10px; width: 120px;">技改车间/工时</td>
 													<td>
@@ -332,7 +355,7 @@
 														</table>
 													</td>
 
-												</tr>
+												</tr> -->
 												<tr>
 													<td style="vertical-align: top; width: 120px;">技改实施范围</td>
 													<td style="vertical-align: top;">
@@ -384,8 +407,8 @@
 					aria-hidden="true">×</button>
 				<h3 id="editModal_title">技改单维护</h3>
 			</div>
-			<div class="modal-body" style="max-height: 500px">
-				<div style="height: 200px">
+			<div class="modal-body" style="max-height: 500px;padding:0px" >
+				<div style="height: 240px">
 					<form id="editECN" enctype="multipart/form-data" method="post"
 						action="ecnDocument!eidtECN.action" class="form-horizontal">
 						<input name="edit_id" type="hidden" id="edit_id" /> <input
@@ -393,11 +416,11 @@
 							name="edit_tecn_flagValue" type="hidden" id="edit_tecn_flagValue" />
 						<input name="edit_deleteTaskId" type="hidden"
 							id="edit_deleteTaskId" />
-						<div style="float: left; width: 50%; height: 200px">
+						<div style="float: left; width: 50%; height: 220px">
 							<div class="control-group">
 								<label class="control-label" for="edit_ecn_type">*&nbsp;技改类型</label>
 								<div class="controls">
-									<select name="edit_ecn_type" id="edit_ecn_type"
+									<select name="edit_ecn_type" id="edit_ecn_type" readonly
 										class="input-medium carType">
 										<option>请选择</option>
 									</select>
@@ -432,6 +455,12 @@
 									<input type="text" name="edit_responsible_organization"
 										style="width: 220px;" class="input-medium"
 										id="edit_responsible_organization" />
+								<%-- 	<select name="edit_responsible_organization" id="edit_responsible_organization"
+										class="input-medium carType">
+										<option value="">请选择</option>
+										<option value="工程院">工程院</option>
+										<option value="技术部">技术部</option>
+									</select> --%>	
 								</div>
 							</div>
 							<!-- 			<div class="control-group">
@@ -442,7 +471,7 @@
 								</div>
 							</div> -->
 						</div>
-						<div style="float: right; width: 50%; height: 200px">
+						<div style="float: right; width: 50%; height: 220px">
 							<div class="control-group">
 								<label class="control-label" for="edit_ecn_document_number">*&nbsp;技改编号</label>
 								<div class="controls">
@@ -475,9 +504,15 @@
 								</div>
 							</div>
 							<div class="control-group">
+								<label class="control-label" for="edit_changed_point">&nbsp;变更点数</label>
+								<div class="controls">
+									<input type="text" name="edit_changed_point"  class="input-medium" id="edit_changed_point" />										
+								</div>
+							</div>
+							<div class="control-group">
 								<label class="control-label" for="edit_tecn_flag">&nbsp;临时技改单</label>
 								<div class="controls">
-									<input type="checkbox" name="edit_tecn_flag"
+									<input type="checkbox" name="edit_tecn_flag" style="height:30px"
 										class="input-medium" id="edit_tecn_flag" />
 								</div>
 							</div>
@@ -489,8 +524,7 @@
 					</form>
 				</div>
 				<div style="width: 100%">
-					<ul class="nav nav-tabs" id="edit_tab" role="tablist"
-						style="height: 38px;">
+					<ul class="nav nav-tabs" id="edit_tab" role="tablist">
 						<li><i id="edit_addTask" class="fa fa-plus"
 							style="cursor: pointer; padding-top: 12px; color: blue;"></i></li>
 					</ul>
@@ -516,11 +550,11 @@
 					aria-hidden="true">×</button>
 				<h3 id="editModal_title">技改单</h3>
 			</div>
-			<div class="modal-body" style="max-height: 500px">
-				<div style="height: 200px">
+			<div class="modal-body" style="max-height: 500px;padding:0px">
+				<div style="height: 240px">
 					<form id="editECN" enctype="multipart/form-data" method="post"
 						action="ecnDocument!eidtECN.action" class="form-horizontal">
-						<div style="float: left; width: 50%; height: 200px">
+						<div style="float: left; width: 50%; height: 220px">
 							<div class="control-group">
 								<label class="control-label" for="edit_ecn_type">*&nbsp;技改类型</label>
 								<div class="controls">
@@ -564,7 +598,7 @@
 							</div>
 							</div> -->
 						</div>
-						<div style="float: right; width: 50%; height: 200px">
+						<div style="float: right; width: 50%; height: 220px">
 							<div class="control-group">
 								<label class="control-label" for="edit_ecn_document_number">*&nbsp;技改编号</label>
 								<div class="controls">
@@ -598,9 +632,15 @@
 								</div>
 							</div>
 							<div class="control-group">
+								<label class="control-label" for="edit_changed_point">&nbsp;变更点数</label>
+								<div class="controls">
+									<input type="text" name="view_changed_point"  class="input-medium" id="view_changed_point" />										
+								</div>
+							</div>
+							<div class="control-group">
 								<label class="control-label" for="edit_tecn_flag">&nbsp;临时技改单</label>
 								<div class="controls">
-									<input disabled="disabled" type="checkbox"
+									<input disabled="disabled" type="checkbox" style="height:30px"
 										name="edit_tecn_flag" class="input-medium" id="view_tecn_flag" />
 								</div>
 							</div>

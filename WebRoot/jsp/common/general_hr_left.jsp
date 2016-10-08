@@ -38,12 +38,15 @@
 				<li><a href="standardWorkGroup!index.action" class="js-sub-menu-toggle">
 						<i class="fa fa-group"></i><span class="text">标准班组</span>
 				</a></li>
-				<li><a href="standardTimeAndPrice!index.action" class="js-sub-menu-toggle">
-						<i class="fa fa-calendar"></i><span class="text">计件标准工时/单价</span>
+				<li><a href="hr!workgroupPrice.action" class="js-sub-menu-toggle">
+						<i class="fa fa-calendar"></i><span class="text">班组承包单价</span>
 				</a></li>
-				<li><a href="standardTimeAndPrice!queryIndex.action" class="js-sub-menu-toggle">
+				<li><a href="staff!staffDistribution.action" class="js-sub-menu-toggle">
+						<i class="fa fa-user-md fw"></i><span class="text">班组成员承包单价</span>
+				</a></li>
+	<!-- 			<li><a href="standardTimeAndPrice!queryIndex.action" class="js-sub-menu-toggle">
 						<i class="fa fa-search"></i><span class="text">计件工时单价查询</span>
-				</a></li>
+				</a></li> -->
 				<li><a href="hr!workTimePrice.action" class="js-sub-menu-toggle">
 						<i class="fa fa-tasks"></i><span class="text">标准工时单价维护</span>
 				</a></li>
@@ -58,9 +61,6 @@
 				<li><a href="staff!staffManager.action" class="js-sub-menu-toggle">
 						<i class="fa fa-user-md fw"></i><span class="text">员工库</span>
 				</a></li>
-				<li><a href="staff!staffDistribution.action" class="js-sub-menu-toggle">
-						<i class="fa fa-user-md fw"></i><span class="text">分配比例</span>
-				</a></li>
 				<li><a href="orgData!isCustomer.action" class="js-sub-menu-toggle">
 						<!-- <i class="fa fa-user-md fw"></i> --><span class="text">自编号维护</span>
 				</a></li>
@@ -71,8 +71,8 @@
 				<span class="pull-right fa fa-angle-down fa-lg"></span>
 		</a>
 			<ul id="hr_pecie" class="collapse">
-				<li id=""><a href="staff!queryStaffSkillParameterIndex.action" class="js-sub-menu-toggle">
-						<i class="fa fa-stethoscope"></i><span class="text">员工技能系数</span></a></li>
+				<!-- <li id=""><a href="staff!queryStaffSkillParameterIndex.action" class="js-sub-menu-toggle">
+						<i class="fa fa-stethoscope"></i><span class="text">员工技能系数</span></a></li> -->
 				<li><a href="hr!attendance.action?model=hr"><i
 						class="fa fa-bar-chart-o fw"></i>&nbsp;考勤查询</a></li>
 				<li><a href="hr!rewardsCollect.action"

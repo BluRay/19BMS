@@ -172,12 +172,13 @@ a:hover{ text-decoration:none;}
 							<tr>
 								<td nowrap="nowrap">技改单</td>
 								<td nowrap="nowrap">技改任务</td>
+								<td nowrap="nowrap">操作车间</td>
 								<td nowrap="nowrap">总工时</td>
 								<td nowrap="nowrap">总费用</td>
 								<td nowrap="nowrap">操作日期</td>
 								<td nowrap="nowrap">工号</td>
 								<td nowrap="nowrap">姓名</td>
-								<td nowrap="nowrap">岗位</td>
+								<!-- <td nowrap="nowrap">岗位</td> -->
 								<td nowrap="nowrap">工厂</td>
 								<td nowrap="nowrap">车间</td>
 								<td nowrap="nowrap">班组</td>

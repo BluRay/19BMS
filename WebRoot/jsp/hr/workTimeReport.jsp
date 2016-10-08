@@ -147,8 +147,8 @@ input[type="text"] {
 											style="text-align: center; width: 40px; padding-left: 0px; padding-right: 0px">工号</th>
 										<th
 											style="text-align: center; width: 30px; padding-left: 0px; padding-right: 0px">姓名</th>
-										<th
-											style="text-align: center; width: 35px; padding-left: 0px; padding-right: 0px">技能系数</th>
+										<!-- <th
+											style="text-align: center; width: 35px; padding-left: 0px; padding-right: 0px">技能系数</th> -->
 										<th
 											style="text-align: center; width: 30px; padding-left: 0px; padding-right: 0px">工时类型</th>
 										<th id="D1"
@@ -233,8 +233,8 @@ input[type="text"] {
 											style="text-align: center;  padding-left: 0px; padding-right: 0px">工号</th>
 										<th
 											style="text-align: center;  padding-left: 0px; padding-right: 0px">姓名</th>
-										<th
-											style="text-align: center;  padding-left: 0px; padding-right: 0px">技能系数</th>
+										<!-- <th
+											style="text-align: center;  padding-left: 0px; padding-right: 0px">技能系数</th> -->
 										<th
 											style="text-align: center;  padding-left: 0px; padding-right: 0px">工时类型</th>
 										<th id="D1_all"

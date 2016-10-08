@@ -157,12 +157,13 @@ function ajaxQuery() {
 				var tr = $("<tr />");
 				$("<td />").html(salary.ecn_document_number).appendTo(tr);
 				$("<td />").html(salary.task).appendTo(tr);
+				$("<td />").html(salary.workshop).appendTo(tr);
 				$("<td />").html(parseFloat(salary.totalhours).toFixed(2)).appendTo(tr);
 				$("<td />").html(parseFloat(salary.totalprice).toFixed(2)).appendTo(tr);
 				$("<td />").html(salary.work_date).appendTo(tr);
 				$("<td />").html(salary.staff_number).appendTo(tr);
 				$("<td nowrap='nowrap' />").html(salary.staff_name).appendTo(tr);
-				$("<td nowrap='nowrap' />").html(salary.job).appendTo(tr);
+				//$("<td nowrap='nowrap' />").html(salary.job).appendTo(tr);
 				$("<td nowrap='nowrap' />").html(salary.plant_org).appendTo(tr);
 				$("<td nowrap='nowrap' />").html(salary.workshop_org).appendTo(tr);
 				$("<td nowrap='nowrap' />").html(salary.workgroup_org).appendTo(tr);

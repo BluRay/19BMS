@@ -138,7 +138,7 @@ function ajaxQuery(targetPage,queryAll){
 	    				$("<td />").html(staff.staff_name).appendTo(tr);
 	    				$("<td />").html(staff.job).appendTo(tr);
 	    				$("<td />").html(staff.work_hour).appendTo(tr);
-	    				$("<td />").html(staff.distribution).appendTo(tr);
+	    				/*$("<td />").html(staff.distribution).appendTo(tr);*/
 	    				$("<td />").html(staff.whereabouts).appendTo(tr);
 	    				$("<td />").html(parseFloat(staff.wpay).toFixed(2)).appendTo(tr);
 	

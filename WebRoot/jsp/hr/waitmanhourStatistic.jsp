@@ -132,7 +132,7 @@
 									<th style="text-align:center;padding-left:0px;padding-right:0px">姓名</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">岗位</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">等待工时</th>
-									<th style="text-align:center;padding-left:0px;padding-right:0px">分配比例</th>
+		<!-- 							<th style="text-align:center;padding-left:0px;padding-right:0px">分配比例</th> -->
 									<th style="text-align:center;padding-left:0px;padding-right:0px">人员去向</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">等待工资</th>
                     			</tr>
@@ -204,7 +204,7 @@
 									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">姓名</th>
 									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">岗位</th>
 									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">等待工时</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">分配比例</th>
+									<!-- <th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">分配比例</th> -->
 									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">等待工资</th>
                     			</tr>
                     		</thead>

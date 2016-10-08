@@ -71,7 +71,7 @@ BEGIN
 
 	drop TEMPORARY TABLE IF EXISTS TMP_HOUR_TOTAL;
 	create TEMPORARY TABLE TMP_HOUR_TOTAL as
-	select sum(h.work_hour) total_real_hour,o.id order_id,o.tmp_order_num,substr(h.work_date,1,7) work_month
+	select sum(h.work_hour) total_real_hour,o.id order_id,o.tmp_order_no,substr(h.work_date,1,7) work_month
 	from staff_hours_count h
 	#left join BMS_HR_STAFF_UPDATE_RECORD r on h.staff_id=r.staff_id  and r.type='skill_parameter' and substr(r.edit_date,1,7)<=substr(h.work_date,1,7)
 		#and r.edit_date=(select max(r1.edit_date) from BMS_HR_STAFF_UPDATE_RECORD r1 where h.staff_id=r1.staff_id  and r1.type='skill_parameter' and substr(r1.edit_date,1,7)<=substr(h.work_date,1,7))
@@ -88,8 +88,10 @@ BEGIN
 	delete from BMS_TMP_PAY_CAL  where factory=q_factory and workshop=q_workshop and work_date like concat(q_month,'%');	
 	#向计件工资计算表中插入工资记录	
 	insert into BMS_TMP_PAY_CAL 
-	select null,s.staff_number,s.name staff_name,s.job,s.plant_org,s.workshop_org,s.workgroup_org,s.team_org,r.new_value skill_parameter,p.price price,round((h.work_hour/tmp.total_real_hour)*tmp1.finished_qty*od.single_hour,2) work_hour,h.work_hour real_work_hour,
-		h.work_date,od.tmp_order_num,od.id order_id,od.total_hours,od.reason_content,h.factory,h.dept,h.workshop,h.workgroup,h.team
+	select null,s.staff_number,s.name staff_name,s.job,s.plant_org,s.workshop_org,s.workgroup_org,s.team_org,r.new_value skill_parameter,p.price price,
+	case when tmp.total_real_hour<(tmp1.finished_qty*od.single_hour)*0.8 then  round((h.work_hour/(tmp.total_real_hour))*(tmp.total_real_hour*1.2),2) 
+		else  round((h.work_hour/tmp.total_real_hour)*tmp1.finished_qty*od.single_hour,2) end as work_hour,
+		h.work_hour real_work_hour,h.work_date,od.order_serial_no,od.id order_id,tmp1.finished_qty*od.single_hour total_hours,od.reason_content,h.factory,h.dept,h.workshop,h.workgroup,h.team
 	from staff_hours_count h
 	left join BMS_HR_STAFF s on s.id=h.staff_id 
 	left join BMS_HR_STAFF_UPDATE_RECORD r on h.staff_id=r.staff_id  and r.type='skill_parameter' and substr(r.edit_date,1,7)<=substr(h.work_date,1,7)

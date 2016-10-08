@@ -57,6 +57,15 @@
 				<li id="orderSerach"><a href="production!productionDate.action">
 						<!-- <i class="fa fa-sort-numeric-asc fa-fw"></i> --><span class="text">车辆生产日期</span>
 				</a></li>
+				<li ><a href="production!productionBattery.action">
+						<!-- <i class="fa fa-sort-numeric-asc fa-fw"></i> --><span class="text">电池容量</span>
+				</a></li>
+				<li id="orderSerach"><a href="production!productionVoltage.action">
+						<!-- <i class="fa fa-sort-numeric-asc fa-fw"></i> --><span class="text">额定电压</span>
+				</a></li>
+				<li id="orderSerach"><a href="production!productionSpring.action">
+						<!-- <i class="fa fa-sort-numeric-asc fa-fw"></i> --><span class="text">弹簧片数</span>
+				</a></li>
 			</ul></li>
 		
 <!-- 		<li id="orderSerach"><a href="production!productionhours.action">
@@ -74,7 +83,7 @@
 					class="js-sub-menu-toggle"> <i
 						class="fa fa-check-square-o fa-fw"></i><span class="text">审批临时派工单</span>
 				</a></li> -->
-				<li id="orderReview"><a href="tempOrder!assignOrderPage.action"
+				<!-- <li id="orderReview"><a href="tempOrder!assignOrderPage.action"
 					class="js-sub-menu-toggle"> <i class="fa fa-bar-chart-o fw"></i><span
 						class="text">分配临时派工单</span>
 				</a></li>
@@ -85,7 +94,7 @@
 				<li><a href="tempOrder!assessOrderVerifyPage.action"
 					class="js-sub-menu-toggle"> <i class="fa fa-edit fw"></i><span
 						class="text">评估工时审核</span>
-				</a></li>
+				</a></li> -->
 				<li><a href="tempOrder!workHoursMtaPage.action"
 					class="js-sub-menu-toggle"> <i class="fa fa-edit fw"></i><span
 						class="text">额外工时维护</span>

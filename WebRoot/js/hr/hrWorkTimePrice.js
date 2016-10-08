@@ -47,14 +47,14 @@ $(document).ready(function(){
 			return false;
 		}
 		
-		if(newWorkTimeType == "4"){
+	/*	if(newWorkTimeType == "4"){
 			if(newSkillParameter == ""){
 				alert("请输入技能系数！");
 				$("#newSkillParameter").focus();
 				return false;
 			}
 		}
-		
+		*/
 		$.ajax({
 			type: "get",
 			dataType: "json",
@@ -62,7 +62,7 @@ $(document).ready(function(){
 		    data: {
 				"newWorkTimeType":newWorkTimeType,
 				"newFactory":newFactory,
-				"newSkillParameter":newSkillParameter,
+				/*"newSkillParameter":newSkillParameter,*/
 				"newPrice":newPrice,
 				"newStartDate":newStartDate,
 				"newEndDate":newEndDate,
@@ -98,7 +98,7 @@ $(document).ready(function(){
 		    	"editPrice_id":editPrice_id,
 				"editWorkTimeType":editWorkTimeType,
 				"editFactory":editFactory,
-				"editSkillParameter":editSkillParameter,
+				/*"editSkillParameter":editSkillParameter,*/
 				"editPrice":editPrice,
 				"editStartDate":editStartDate,
 				"editEndDate":editEndDate,
@@ -180,7 +180,7 @@ function ajaxQuery(targetPage){
 	    data: {
 	    	"workTimeType":$("#workTimeType").val(),
 	    	"factory":$("#factory :selected").text(),
-	    	"skillParameter":$("#skillParameter").val(),
+	    	/*"skillParameter":$("#skillParameter").val(),*/
 	    	"stratDate":$("#stratDate").val(),
 	    	"endDate":$("#endDate").val(),
 	       	"pager.pageSize":pageSize,
@@ -201,7 +201,7 @@ function ajaxQuery(targetPage){
     				$("<td style=\"padding-left:0px;padding-right:0px\"/>").html(count).appendTo(tr);
     				$("<td style=\"padding-left:0px;padding-right:0px\"/>").html(workTimeType).appendTo(tr);
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(price.factory).appendTo(tr);
-    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(price.skill_parameter).appendTo(tr);
+/*    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(price.skill_parameter).appendTo(tr);*/
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(price.price).appendTo(tr);
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(price.start_date).appendTo(tr);
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(price.end_date).appendTo(tr);

@@ -48,9 +48,14 @@ $(document).ready(
 						var evalue = $("#" + eleId).attr("id");
 
 						var recordid=$("#"+eleId).attr("recordid");
+						//alert(recordid)
 						var idarray=recordid.split(",");
 						//倒序删除，否则index最大的元素将无法删除
 						var del_detaillist=new Array();
+						if(idarray.length==1){
+							del_detaillist.push(detaillist[recordid]);
+							detaillist.splice(recordid, 1);
+						}else
 						for(var i=idarray[idarray.length-1];i>=idarray[0];i--){
 							del_detaillist.push(detaillist[i]);
 							detaillist.splice(i, 1);
@@ -104,7 +109,7 @@ $(document).ready(
 								qualityNode:qualityNode,
 								testItemName:"",
 								testItemNo:parseInt(itemNo),
-								testStdName:"",
+								testStdName:contentVal,
 								testTools:""
 						};
 						//alert(insert_recordid);		
@@ -148,7 +153,7 @@ $(document).ready(
 					changedVal=$(editContentId).val();
 					$("#" + eleId).html($(editContentId).val());
 				}
-				
+				var updatelist=[];
 				//更新detaillist中的属性值
 				idarray.forEach(function(i){
 					if(eleId.indexOf("node_")>=0){
@@ -174,8 +179,21 @@ $(document).ready(
 						//detaillist[i].testToolsId=parseInt(changedVal);
 						detaillist[i].testTools=changedVal;
 					}
-					
+					updatelist.push(detaillist[i]);
 				});
+				$.ajax({
+					url: "testFlowTpl!updateTplDetail.action",
+					type:"post",
+					dataType: "json",
+					data: {
+						"detailList":JSON.stringify(updatelist)
+					},
+					async: false,
+					error: function () {alertError();},
+					success: function (response) {	
+						getDetail();
+					}
+				})
 				emptyModal(isDraft);//清空编辑框
 			});
 			//保存模板更改

@@ -163,7 +163,7 @@ function getFactorySelect() {
 		},
 		success : function(response) {
 			getSelects_noall(response, "", "#search_factory");
-			getWorkshopSelect();
+			//getWorkshopSelect();
 		}
 	});
 }

@@ -5,8 +5,10 @@ var status_arr = {
 	"5" : "已完成",
 	"6" : "已驳回"
 };
+var wh_status_arr={'0':'已维护','1':'已审批','2':'已驳回','3':'已锁定'}
 var edit_list = [];
 var ready_hour = 0;
+var re_f = /^[0-9]+[0-9]*\.?[0|5]?$/;//浮点数正则表达式
 $(document)
 		.ready(
 				function() {
@@ -207,7 +209,7 @@ $(document)
 																			.data(
 																					"orderId");
 																	staff.workDate = workDate;
-																	staff.staffId = staffId;
+																	staff.staff_id = staffId;
 																	if (workshopId != '0') {
 																		staff.subgroupId = workshopId
 																	}
@@ -334,7 +336,7 @@ $(document)
 					// 工时输入验证
 					$(".work_hour")
 							.live(
-									"change",
+									"input",
 									function(e) {
 										var total_hour = 0;
 										var hour = $(e.target).val();
@@ -371,10 +373,11 @@ $(document)
 										 * if($("#mta_wdate").val().trim().length>0&&sfwlist.length>0){
 										 * alert("不能重复维护工时！"); //$(tr).remove();
 										 * }else
-										 */if (!const_float_validate
+										 */
+										/*if (!const_float_validate
 												.test(hour)) {
 											alert("工时只能是数字！");
-										}/*
+										}
 											 * else
 											 * if((parseFloat(total_hour)+parseFloat(ready_hour)) -
 											 * limit_total_hour > 0) {
@@ -383,7 +386,10 @@ $(document)
 											 * limit_total_hour + "H!");
 											 * $(this).val(""); }
 											 */
-
+										if (!re_f.test(hour)&&hour!="") {
+											$(this).val("");
+											alert("工时只能是数字,且只能以半小时为单位，例如：1.0,1.5,2.0！");							
+										}
 									});
 					// 选定小班组查询人员列表
 					$("#subgroup").live(
@@ -485,7 +491,7 @@ $(document)
 										+ $("#progressModal").data("orderId")
 										+ "'}";
 								$.ajax({
-									url : "tempOrder!updateOrder.action",
+									url : "tempOrder!updateOrderProcedure.action",
 									dataType : "json",
 									type : "get",
 									data : {
@@ -505,7 +511,7 @@ $(document)
 							});
 					// 工时修改页面工时change事件，有效修改数据保存到edit_list
 					$(".edit_work_hour").live(
-							"change",
+							"input",
 							function(e) {
 								var pre_submit_val = isNaN(parseFloat($(
 										e.target).attr("old_value"))) ? 0
@@ -517,15 +523,20 @@ $(document)
 										: parseFloat($("#editModal").data(
 												"totalHour"));
 								// alert("ready_hour:"+ready_hour);
-								if (isNaN(submit_val)) {
+								/*if (isNaN(submit_val)) {
 									alert("工时必须为数字！");
 									$(e.target).val(pre_submit_val);
-								}/*
+								}
 									 * else
 									 * if((submit_val-pre_submit_val)>(limit_total_hour-ready_hour)){
 									 * alert("总工时不能超过" + limit_total_hour +
 									 * "H!"); $(e.target).val(pre_submit_val); }
-									 */else {
+									 */
+								if (!re_f.test($(e.target).val())&&$(e.target).val()!="") {
+									$(this).val(pre_submit_val);
+									alert("技改工时只能是数字,且只能以半小时为单位，例如：1.0,1.5,2.0！");							
+								}
+								else {
 									var edit_obj = {};
 									edit_obj.id = $(e.target).closest("tr")
 											.data("id");
@@ -604,14 +615,13 @@ $(document)
 													.stringify(order);
 											$
 													.ajax({
-														url : "tempOrder!updateOrder.action",
+														url : "tempOrder!updateOrderProcedure.action",
 														dataType : "json",
 														type : "get",
 														data : {
 															"conditions" : conditions
 														},
-														success : function(
-																response) {
+														success : function(response) {
 															if (response.success) {
 																alert(response.message);
 																$(tr)
@@ -740,8 +750,10 @@ function ajaxQuery(targetPage) {
 							.each(
 									response.dataList,
 									function(index, value) {
-										var tmpOrderNum = value.tmp_order_num == undefined ? ""
-												: value.tmp_order_num;
+										var tmpOrderNum=value.tmp_order_no == undefined ? ""
+												: value.tmp_order_no;
+										var orderSerialNo= value.order_serial_no == undefined ? ""
+												: value.order_serial_no;
 										var reasonContent = value.reason_content == undefined ? ""
 												: value.reason_content;
 										var sapOrder = value.sap_order == undefined ? ""
@@ -752,8 +764,7 @@ function ajaxQuery(targetPage) {
 												: value.single_hour;
 										var labors = value.labors == undefined ? ""
 												: value.labors;
-										var totalHour = value.total_hours == undefined ? ""
-												: value.total_hours;
+										var totalHour = parseFloat(value.single_hour)*parseFloat(value.total_qty);
 										var status = value.status == undefined ? ""
 												: status_arr[value.status];
 										var applyDate = value.apply_date == undefined ? ""
@@ -775,7 +786,7 @@ function ajaxQuery(targetPage) {
 														"<a href=\"javascript:void(window.open('tempOrder!tempOrderInfoPage.action?tempOrderId="
 																+ value.id
 																+ "','newwindow','width=700,height=600,toolbar= no, menubar=no,scrollbars=no,resizable=no,location=no,status=no,top=150,left=280'))\" style='cusor:pointer'>"
-																+ tmpOrderNum
+																+ orderSerialNo
 																+ "</a>")
 												.appendTo(tr);
 										$("<td />").html(sapOrder).appendTo(tr)
@@ -797,7 +808,7 @@ function ajaxQuery(targetPage) {
 										$("<td />").html(singleHour).appendTo(
 												tr);
 										$("<td />").html(labors).appendTo(tr);
-										$("<td />").html(totalHour)
+										$("<td />").html(totalHour.toFixed(2))
 												.appendTo(tr);
 										$("<td />").html(workhourTotal.toFixed(2)).appendTo(tr);
 										$("<td />").html(value.applier)
@@ -971,7 +982,7 @@ function generateWorkhourTb(swhlist, caculate) {
 						var tr = $("<tr style='padding:5px'/>");
 						var workhour = swh.work_hour == undefined ? ""
 								: swh.work_hour;
-						if (swh.status == "已维护" || swh.status == "已驳回") {
+						if (wh_status_arr[swh.status] == "已驳回") {
 							$("<td />").html("<input type='checkbox' >")
 									.appendTo(tr);
 						} else {
@@ -980,8 +991,9 @@ function generateWorkhourTb(swhlist, caculate) {
 						$("<td />").html(swh.staff_number).appendTo(tr);
 						$("<td />").html(swh.staff_name).appendTo(tr);
 						$("<td />").html(swh.job).appendTo(tr);
-						var disabled = (swh.status == '已锁定' || swh.status == '已审批') ? 'disabled'
+						var disabled = (wh_status_arr[swh.status] != '已驳回') ? 'disabled'
 								: "";
+					
 						$("<td />")
 								.html(
 										"<input class='input-small edit_work_hour' "
@@ -993,7 +1005,7 @@ function generateWorkhourTb(swhlist, caculate) {
 						$("<td />").html(swh.workgroup_org).appendTo(tr);
 						$("<td />").html(swh.workshop_org).appendTo(tr);
 						$("<td />").html(swh.plant_org).appendTo(tr);
-						$("<td />").html(swh.status).appendTo(tr);
+						$("<td />").html(wh_status_arr[swh.status]).appendTo(tr);
 						$("<td />").html(swh.work_date).appendTo(tr);
 						$("#workhour_list").append(tr);
 						$(tr).data("id", swh.id);

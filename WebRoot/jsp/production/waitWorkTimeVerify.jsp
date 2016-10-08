@@ -67,9 +67,10 @@
 								<td  style="text-align:right">状态：</td>
 								<td >
 									<select id="hour_status" class="input-medium" style='width:100px'>
-										<option value='0'>已维护</option>
-										<option value='1'>已审批</option>
+										<option value='0' selected>已维护</option>
+										<option value='1' >已审批</option>
 										<option value='2'>已驳回</option>
+										<option value='3'>已锁定</option>
 									</select>
 								</td>	
 								<td><input type="button" class="btn btn-primary"
@@ -105,6 +106,31 @@
 						</ul>
 					</div>
 					<br>
+					<div class="modal fade" id="reasonModal" tabindex="-1" role="dialog" unselectable="on" onselectstart="return false;"
+					aria-hidden="true" style="display: none; -moz-user-select:-moz-none;width: 400px;left:50%">
+					<div class="modal-header">
+						<!-- <button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">×</button> -->
+						<h3>驳回原因</h3>
+					</div>
+					<div class="modal-body" style="margin-bottom: -20px;">
+						
+						<div class="control-group">
+							<table >
+								<tr>
+								<td width="80px" style="text-align:right">驳回原因：</td>
+								<td width="280px">
+									<textarea rows="2" id="reject_reason" style="width:280px"></textarea>
+								</td>								
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-primary" id="btnMtaSave">确认</button>
+						<button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>					
+					</div>
+					</div>
 					<div style="height:400px;overflow:auto">
 						<div style="display: none;position:fixed;z-index:999;margin-top:150px;margin-left:500px" class="divLoading" >
                                 <span><i class="fa fa-spinner fa-spin fa-4x" style="height:1em;"></i></span>
@@ -118,16 +144,18 @@
 									<td>等待日期</td>
 									<td>等待原因</td>
 									<td width=180px>详细原因</td>
+									<td>责任部门</td>
 									<td>工号</td>
 									<td>姓名</td>
 									<td>岗位</td>
 									<td>等待工时</td>
-									<td>分配比例</td>
+									<td>人员去向</td>
+									<!-- <td>分配比例</td> -->
 									<td>小班组</td>
 									<td>班组</td>
 									<td>状态</td>
-									<td>审核人</td>
-									<td>审核时间</td>
+								<!-- 	<td>审核人</td>
+									<td>审核时间</td> -->
 								</tr>
 							</thead>
 							<tbody class="exp-table" id="tb_workhour">

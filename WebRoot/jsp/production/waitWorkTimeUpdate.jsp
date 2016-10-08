@@ -67,7 +67,8 @@
 									<select id="hour_status" class="input-medium" style='width:100px'>
 										<option value='0'>已维护</option>
 										<option value='1'>已审批</option>
-										<option value='2'>已驳回</option>
+										<option value='2' selected>已驳回</option>
+										<option value='3'>已锁定</option>
 									</select>
 								</td>
 								<td><input type="button" class="btn btn-primary" id="btnQuery" value="查询" style="margin-left: 2px;"></input>
@@ -97,7 +98,7 @@
 							<td >姓名</td>
 							<td >岗位</td>
 							<td >等待<br/>工时</td>
-							<td >分配<br/>比例</td>
+							<!-- <td >分配<br/>比例</td> -->
 							<td>人员去向</td>
 							<td >小班组</td>
 							<td >班组</td>

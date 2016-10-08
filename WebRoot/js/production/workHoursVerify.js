@@ -5,7 +5,9 @@ var status_arr = {
 	"5" : "已完成",
 	"6" : "已驳回"
 };
+var wh_status_arr={'1':'已审批','2':'已驳回','3':'已锁定'}
 var edit_list = [];
+var workhour_list=[];
 var ready_hour = 0;
 $(document).ready(function() {
 	initPage();
@@ -32,8 +34,8 @@ $(document).ready(function() {
 		edit_list = [];
 		ready_hour = 0;
 		var conditions = "{tempOrderId:'" + $(tr).data("id") +"',workMonth:'"+workMonth+ "'}";
-		var swhlist = ajaxGetStaffWorkHours(conditions);
-		generateWorkhourTb(swhlist,true);
+		workhour_list = ajaxGetStaffWorkHours(conditions);
+		generateWorkhourTb(workhour_list,true);
 		$("#edit_workDate").val(workMonth);
 		$("#edit_orderNo").html(orderNo);
 		$("#edit_reason").html(reason);
@@ -46,7 +48,7 @@ $(document).ready(function() {
 		$("#editModal").data("factory", $(tr).data("factory"));
 		$("#editModal").data("workshop", $(tr).data("workshop"));
 
-		if(swhlist.length==0){
+		if(workhour_list.length==0){
 			$("#btnVerify").attr("disabled",true);
 			$("#btnReject").attr("disabled",true);
 		}else{
@@ -113,6 +115,11 @@ $(document).ready(function() {
 	});
 	// 驳回
 	$("#btnReject").click(function() {
+		$("#reasonModal").modal("show");
+		
+	});
+	//输入驳回原因确认后驳回
+	$("#btnMtaSave").live("click",function(){
 		var workDate=$("#edit_workDate").val();
 		var conditions={};
 		conditions.factory=$("#editModal").data("factory");
@@ -123,8 +130,16 @@ $(document).ready(function() {
 			alert("请选择操作月份！");
 			return false;
 		}
-		ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"reject",$("#editModal").data("orderId"),"reject");
-		$("#editModal").modal("hide");
+		var rejectReason=$("#reject_reason").val();
+		if(rejectReason){
+			if(edit_list.length>0){
+				ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"reject",$("#editModal").data("orderId"),"reject",rejectReason);
+				$("#editModal").modal("hide");
+			}			
+		}else{
+			alert("请输入驳回原因！");
+			
+		}		
 	});
 	
 	$("#q_factory").change(
@@ -182,8 +197,9 @@ function ajaxQuery(targetPage) {
 							.each(
 									response.dataList,
 									function(index, value) {
-										var tmpOrderNum = value.tmp_order_num == undefined ? ""
-												: value.tmp_order_num;
+										var tmpOrderNum = value.tmp_order_no == undefined ? ""
+												: value.tmp_order_no;
+										var tmpOrderSerial = value.order_serial_no;
 										var reasonContent = value.reason_content == undefined ? ""
 												: value.reason_content;
 										var sapOrder = value.sap_order == undefined ? ""
@@ -194,8 +210,7 @@ function ajaxQuery(targetPage) {
 												: value.single_hour;
 										var labors = value.labors == undefined ? ""
 												: value.labors;
-										var totalHour = value.total_hours == undefined ? ""
-												: value.total_hours;
+										var totalHour = parseFloat(totalQty)*parseFloat(singleHour);
 										var stauts = value.status == undefined ? ""
 												: status_arr[value.status];
 										var applyDate = value.apply_date == undefined ? ""
@@ -213,7 +228,7 @@ function ajaxQuery(targetPage) {
 						
 										var tr = $("<tr />");
 										$("<td />").html("<a href=\"javascript:void(window.open('tempOrder!tempOrderInfoPage.action?tempOrderId="+value.id+
-												"','newwindow','width=700,height=600,toolbar= no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,top=150,left=280'))\" style='cusor:pointer'>"+tmpOrderNum+"</a>").appendTo(tr);
+												"','newwindow','width=700,height=600,toolbar= no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,top=150,left=280'))\" style='cusor:pointer'>"+tmpOrderSerial+"</a>").appendTo(tr);
 										$("<td />").html(sapOrder).appendTo(tr)
 										$("<td />").html(reasonContent)
 												.appendTo(tr);
@@ -222,7 +237,7 @@ function ajaxQuery(targetPage) {
 										$("<td />").html(singleHour).appendTo(
 												tr);
 										$("<td />").html(labors).appendTo(tr);
-										$("<td />").html(totalHour)
+										$("<td />").html(totalHour.toFixed(2))
 												.appendTo(tr);
 										$("<td />").html(workhourTotal.toFixed(2)).appendTo(tr);
 										$("<td />").html(value.applier)
@@ -245,7 +260,7 @@ function ajaxQuery(targetPage) {
 										$("#tableResult tbody").append(tr);
 										$(tr).data("id", value.id);
 										$(tr).data("totalHour", totalHour);
-										$(tr).data("orderNo", tmpOrderNum);
+										$(tr).data("orderNo", tmpOrderSerial);
 										$(tr).data("sapOrder", sapOrder);
 										$(tr).data("factory", value.factory);
 										$(tr).data("workshop", value.workshop);
@@ -291,14 +306,18 @@ function getSelectList(){
 	$.each(boxList,function(index,box){
 		var obj={};
 		var tr=$(box).closest("tr");
+		var listindex=parseInt($(tr).data("swhlist_index"));
+		//alert(workhour_list[listindex].staff_name);
 		var swhid=$(tr).data("id");
-		obj.id=swhid;
+		obj=workhour_list[listindex];
+		/*obj.id=swhid;
+		obj.email=$(tr).data("email");*/
 		swhList.push(obj);
 	});
 	return swhList;
 }
 
-function ajaxUpdate(swhlist,conditions,whflag,tempOrderId,orderStatus) {
+function ajaxUpdate(swhlist,conditions,whflag,tempOrderId,orderStatus,rejectReason) {
 	var targetPage = $("#cur").attr("page") || 1;
 	$.ajax({
 		url : "tempOrder!updateWorkHourInfo.action",
@@ -315,6 +334,25 @@ function ajaxUpdate(swhlist,conditions,whflag,tempOrderId,orderStatus) {
 			if (response.success) {
 				ajaxCaculateSalary(conditions);
 				alert(response.message);
+				if(whflag=='reject'){
+					var emaillist=[];
+					var datalist=JSON.parse(swhlist);
+					$.each(datalist,function(i,swh){
+						var obj={};
+						obj['工号']=swh.staff_number;
+						obj['姓名']=swh.staff_name;
+						obj['岗位']=swh.job;
+						obj['额外工时']=swh.work_hour;
+						obj['小班组']=swh.team_org;
+						obj['班组']=swh.workgroup_org;
+						obj['车间']=swh.workshop_org;
+						obj['工厂']=swh.plant_org==null?"":swh.plant_org;
+						obj['操作日期']=swh.work_date;
+						emaillist.push(obj);
+					})
+					//alert(JSON.stringify(emaillist))
+					sendEmail(datalist[0].email,'',"派工流水号"+$("#edit_orderNo").html()+'额外工时信息驳回','工号,姓名,岗位,额外工时,小班组,班组,车间,工厂,操作日期',JSON.stringify(emaillist),rejectReason)
+				}
 				ajaxQuery(targetPage);
 			} else {
 				alert(response.message);
@@ -351,8 +389,8 @@ function generateWorkhourTb(swhlist,caculate) {
 	$("#workhour_list").html("");
 	$.each(swhlist, function(index, swh) {
 		var tr = $("<tr style='padding:5px'/>");
-		if (swh.status == "已锁定") {
-			$("<td />").html(swh.status).appendTo(tr);
+		if (wh_status_arr[swh.status] == "已锁定") {
+			$("<td />").html(wh_status_arr[swh.status]).appendTo(tr);
 		} else {
 			$("<td />").html("<input type='checkbox' >").appendTo(tr);
 		}
@@ -364,10 +402,12 @@ function generateWorkhourTb(swhlist,caculate) {
 		$("<td />").html(swh.workgroup_org).appendTo(tr);
 		$("<td />").html(swh.workshop_org).appendTo(tr);
 		$("<td />").html(swh.plant_org).appendTo(tr);
-		$("<td />").html(swh.status).appendTo(tr);
+		$("<td />").html(wh_status_arr[swh.status]).appendTo(tr);
 		$("<td />").html(swh.work_date).appendTo(tr);
 		$("#workhour_list").append(tr);
 		$(tr).data("id", swh.id);
+		$(tr).data("swhlist_index", index);
+		$(tr).data("email", swh.email);
 		$(tr).data("status", swh.status);
 		if(caculate){
 			ready_hour += parseFloat(swh.work_hour);

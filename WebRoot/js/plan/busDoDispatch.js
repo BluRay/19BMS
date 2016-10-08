@@ -36,7 +36,7 @@ $(document).ready(function() {
 								$("#kdForm").data("order_id", orderId);
 								$("#kdForm").data("customer_number",$(tds[9]).html());
 								//$("#kdForm").data("left_count",$(tds[8]).html());
-								
+								$("#kdForm").data("factory",$(tds[2]).html());
 								$("#customerType").val(value.bus_type);
 								$("#customerCode").val(value.order_code);
 							}else{
@@ -46,6 +46,7 @@ $(document).ready(function() {
 								$("#busNoForm").data("plan_id", planId);
 								$("#busNoForm").data("order_id", orderId);
 								$("#busNoForm").data("customer_number",$(tds[9]).html());
+								$("#busNoForm").data("factory",$(tds[2]).html());
 							}
 							/*//填充订单基本信息
 							$("#editOrderID").val(value.id);
@@ -295,7 +296,7 @@ $(document).ready(function() {
 					"cardNumber":cardNumber,
 					"username":username,
 					'department':department,
-					'qtys':qtys,
+					'qtys':qtys||1,
 					'bus_number':$("#kdForm").data("bus_number"),
 				},
 				success:function(response){
@@ -475,6 +476,8 @@ function ajaxGetBusInfo() {
 					toolList = response.toolList;
 					if(bus==null){
 						alert("此车辆不属于该计划对应订单！");						
+					}else if(bus.factory_name!=$("#busNoForm").data("factory")){
+						alert("此车辆不属于"+$("#busNoForm").data("factory")+"!");	
 					}else if(bus.warehousing_date==undefined){
 						alert("此车辆尚未入库！");	
 					}else if(bus.dispatch_date!=null){
@@ -516,11 +519,14 @@ function ajaxGetBusInfo() {
 								"<input type='hidden' name='dispatchRecordList["+trindex+"].flag_3c' id='flag3c_"
 										+ bus.bus_number + "'>").appendTo(tr);
 						$(
+								"<input type='hidden' name='dispatchRecordList["+trindex+"].qtys' value='1'>").appendTo(tr);
+						$(
 								"<input type='hidden' name='dispatchRecordList["+trindex+"].receiver' class='receiver'>").appendTo(tr);
 						$(
 						"<input type='hidden' name='dispatchRecordList["+trindex+"].workcardid' class='workcardid'>").appendTo(tr);
 						$(
 						"<input type='hidden' name='dispatchRecordList["+trindex+"].department' class='department'>").appendTo(tr);
+						
 						$(tr).data("busNo",bus.bus_number);
 						$("#dispatchDetail tbody").append(tr);
 						busNoArray.push($("#busNo").val());

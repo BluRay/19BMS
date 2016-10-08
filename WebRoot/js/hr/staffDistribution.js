@@ -1,3 +1,5 @@
+var factoryName = null;
+var workshop =null;
 $(document) .ready(function() {
 	initPage();
 	
@@ -8,21 +10,89 @@ $(document) .ready(function() {
 	});
 	//点击查询
 	$("#btnQuery").click(function(){
-		ajaxQuery();
+		var order_id=$("#q_order").attr("order_id");
+		ajaxQuery();		
+	});
+	
+	$("#q_order").live("input",function(){
+		//alert($(this).val());
+		$("#q_order").attr("order_id","");
+	});
+	$("#q_order").typeahead({
+		source : function(input,process){
+			//alert($(this).val());
+			var data={
+					"conditionMap.busType":"",
+					"conditionMap.orderNo":input,
+					"conditionMap.factory":factoryName
+			};		
+			return $.ajax({
+				url:"common!getOrderFuzzySelect.action",
+				dataType : "json",
+				type : "get",
+				data : data,
+				success: function (data) { 
+					orderList = data;
+					var results = new Array();
+					$.each(data, function(index, value) {
+						results.push(value.orderNo);
+					})
+					return process(results);
+				}
+			});
+		},
+		items : 30,
+		highlighter : function(item) {
+			var order_name = "";
+			var bus_type = "";
+			var order_qty = "";
+			$.each( orderList, function(index, value) {
+				//alert(value.orderNo);
+				if (value.orderNo == item) {
+					order_name = value.name;
+					bus_type = value.busType;
+					order_qty = value.orderQty + "台";
+				}
+			})
+			return item + "  " + order_name + " " + bus_type + order_qty;
+		},
+		matcher : function(item) {
+			// alert(this.query);
+			return true;
+		},
+		updater : function(item) {
+			$.each(orderList, function(index, value) {
+				if (value.orderNo == item) {
+					selectId = value.id;
+				}
+			})
+			// alert(submitId);
+			$("#q_order").attr("order_id", selectId);
+			return item;
+		}
 	});
 })
 
 function initPage() {
+	$("#q_order").val("");
 	pageSize=100;
 	getOrgAuthTree($("#workGroupTree"),"1,2,3,4,5,6",'1');
+	var nodes = zTreeObj.getSelectedNodes();
+	var treeNode = nodes[0];
+	while (treeNode!=null){
+		if(treeNode.org_type == '1'||treeNode.org_type == '2'){
+			factoryName = treeNode.displayName;
+		}			
+		treeNode = treeNode.getParentNode();
+	}
 	var d = new Date();
 	var eYear = d.getFullYear();
 	var eMon = d.getMonth() + 1;
 	var eDay = d.getDate();
 
 	$("#effective_date").val((eYear)+"-"+(eMon<10?"0"+eMon:eMon)+"-"+(eDay<10 ? "0"+ eDay : eDay))
-	$("#q_effective_date_start").val((eYear)+"-"+(eMon<10?"0"+eMon:eMon)+"-01");
-	$("#q_effective_date_end").val((eYear)+"-"+(eMon<10?"0"+eMon:eMon)+"-"+(eDay<10 ? "0"+ eDay : eDay));
+	/*$("#q_effective_date_start").val((eYear)+"-"+(eMon<10?"0"+eMon:eMon)+"-01");
+	$("#q_effective_date_end").val((eYear)+"-"+(eMon<10?"0"+eMon:eMon)+"-"+(eDay<10 ? "0"+ eDay : eDay));*/
 	// 展开侧边栏
 	$("#hrPlan").find(".treemenu").addClass("collapsed");
 	$("#hr_plan").addClass("in");
@@ -34,6 +104,13 @@ function initPage() {
 function zTreeBeforeClick(treeId, treeNode, clickFlag) {
 }
 function zTreeOnClick(event, treeId, treeNode) {
+	while (treeNode!=null){
+		if(treeNode.org_type == '1'||treeNode.org_type == '2'){
+			factoryName = treeNode.displayName;
+		}			
+		treeNode = treeNode.getParentNode();
+	}
+	//alert(factoryName);
 	ajaxQuery();
 }
 
@@ -64,6 +141,7 @@ function ajaxQuery(targetPage){
 	conditions.workshop=workshop;
 	conditions.workgroup=workgroup;
 	conditions.team=subgroup;
+	conditions.order_id=$("#q_order").attr("order_id");
 	conditions.staff=$("#q_staff").val();
 	conditions.effctiveDateStart=$("#q_effective_date_start").val();
 	conditions.effctiveDateEnd=$("#q_effective_date_end").val();
@@ -86,21 +164,25 @@ function ajaxQuery(targetPage){
 			var last_workgroup="";
 			var workshopTd="";
 			var workgroupTd="";
-			var effDateTd="";
-			var last_effDate="";
+			var factoryTd="";
+			var orderTd="";
+			var last_order="";
 			var workgroupTdCount=0;
 			var workshopTdCount=0;
-			var effDateTdCount=0;
+			var orderTdCount=0;
 			$.each(response.data,function(index,value){
 				var tr=$("<tr />");
 
-				if(last_workshop==value.workshop){
+				/*if(last_workshop==value.workshop){
 					var rowspan=parseInt($(workshopTd).attr("rowspan"));
 					$(workshopTd).attr("rowspan",rowspan+1);
+					$(factoryTd).attr("rowspan",rowspan+1);
 				}else{
 					workshopTdCount++;
+					$("<td id='fa_"+workshopTdCount+"' rowspan=1/>").html(value.factory).appendTo(tr);	
 					$("<td id='ws_"+workshopTdCount+"' rowspan=1/>").html(value.workshop).appendTo(tr);	
 					workshopTd="#ws_"+workshopTdCount;
+					factoryTd="#fa_"+workshopTdCount;
 				}
 				if(last_workshop==value.workshop&&last_workgroup==(value.workgroup+"—"+value.team)){
 					var rowspan=parseInt($(workgroupTd).attr("rowspan"));
@@ -110,24 +192,28 @@ function ajaxQuery(targetPage){
 					$("<td id='wg_"+workgroupTdCount+"' rowspan=1/>").html(value.workgroup+"—"+value.team).appendTo(tr);
 					workgroupTd="#wg_"+workgroupTdCount;
 				}
-				if(last_workshop==value.workshop&&last_workgroup==(value.workgroup+"—"+value.team)&&last_effDate==value.effective_date){
-					var rowspan=parseInt($(effDateTd).attr("rowspan"));
-					$(effDateTd).attr("rowspan",rowspan+1);
+				if(last_workshop==value.workshop&&last_workgroup==(value.workgroup+"—"+value.team)&&last_order==value.order_desc){
+					var rowspan=parseInt($(orderTd).attr("rowspan"));
+					$(orderTd).attr("rowspan",rowspan+1);
 				}else{
-					effDateTdCount++;
-					$("<td id='eff_"+effDateTdCount+"' rowspan=1/>").html(value.effective_date).appendTo(tr);
-					effDateTd="#eff_"+effDateTdCount;
-				}
-				
+					orderTdCount++;
+					$("<td id='eff_"+orderTdCount+"' rowspan=1/>").html(value.order_desc).appendTo(tr);
+					orderTd="#eff_"+orderTdCount;
+				}*/
+				$("<td id='fa_"+workshopTdCount+"' rowspan=1/>").html(value.factory).appendTo(tr);	
+				$("<td id='ws_"+workshopTdCount+"' rowspan=1/>").html(value.workshop).appendTo(tr);	
+				$("<td id='wg_"+workgroupTdCount+"' rowspan=1/>").html(value.workgroup+"—"+value.team).appendTo(tr);
+				$("<td id='eff_"+orderTdCount+"' rowspan=1/>").html(value.order_desc).appendTo(tr);
 				$("<td />").html(value.staff_number).appendTo(tr);
 				$("<td />").html(value.staff_name).appendTo(tr);
 				$("<td />").html(value.distribution).appendTo(tr);
+				$("<td />").html(value.effective_date).appendTo(tr);
 				$("<td />").html(value.editor).appendTo(tr);
 				$("<td />").html(value.edit_date).appendTo(tr);
 								
 				last_workshop=value.workshop;
 				last_workgroup=value.workgroup+"—"+value.team;
-				last_effDate=value.effective_date;
+				last_order=value.order_desc;
 				$("#staffTable tbody").append(tr);
 			})
 			$("#staffTable").show();
@@ -143,9 +229,14 @@ function ajaxQuery(targetPage){
 
 extArray = new Array(".xlsx");
 function LimitAttach(form, file) {
+	var orderId=$("#q_order").attr("order_id");
 	var effectiveDate=$("#effective_date").val();
-	if(effectiveDate.trim().length==0){
-		alert("请输入生效日期！");
+	if(orderId==undefined||orderId.trim().length==0){
+		alert("请输入有效订单编号！");
+		return false;
+	}
+	if(effectiveDate==undefined||effectiveDate.trim().length==0){
+		alert("请输入有效日期！");
 		return false;
 	}
 	if ($("#file").val() == "") {
@@ -164,7 +255,7 @@ function LimitAttach(form, file) {
 			break;
 		}
 	}
-	var conditions="{'effectiveDate':'"+$("#effective_date").val()+"'}";
+	var conditions="{'orderId':'"+$("#q_order").attr("order_id")+"','effectiveDate':'"+effectiveDate+"'}";
 	if (allowSubmit) {
 		$("#staffUploadForm").ajaxSubmit({
 			url:"staff!uploadDistribution.action",

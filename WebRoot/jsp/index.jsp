@@ -13,12 +13,19 @@
 <link href="<%=basePath%>/css/ie.css" rel="stylesheet">
 <link rel="stylesheet" href="<%=basePath%>/css/font-awesome.min.css">
 <link href="<%=basePath%>/css/home.css" rel="stylesheet">
-<script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="<%=basePath%>/js/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="<%=basePath%>/js/common.js"></script>
 <script type="text/javascript" src="<%=basePath%>/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 	
 	$(document).ready(function() {
+		if(window.location.href.indexOf("bms.byd.com.cn")>=0){
+			//alert("域名访问");
+			$("#a_logout").attr("href","http://websso.byd.com.cn/oam/server/logout?end_url=http://bms.byd.com.cn ");
+		}else{
+			$("#a_logout").attr("href","logout.action");
+		}
+		
 		$(".overlink").hover(function() {
 			$(this).css("font-size", "23pt");
 			$(".overlink").css("width", "80px");
@@ -100,6 +107,12 @@
 					});
 					//异常模块显示信息
 					$("#exceptionTable tbody").html("");
+					$.each(response.pauseList,function(index,pause){
+						var tr=$("<tr />");
+						$("<td width='50%' style='color:red'/>").html(pause.workshop_name+pause.line).appendTo(tr);
+						$("<td width='50%' style='color:red'/>").html(pause.reason).appendTo(tr);
+						$("#exceptionTable tbody").append(tr);
+					});
 					$.each(response.exceptionList,function(index,exception){
 						var tr=$("<tr />");
 						$("<td />").html(exception.bus_number).appendTo(tr);
@@ -253,7 +266,7 @@ a:hover {
 				<select style="-moz-appearance:none;-webkit-appearance:none;font-size:140%;vertical-align:middle;background-color: transparent;font-weight:bold;color:blue;border: 0px none;height: 45px;
 				padding-top: 13px;width:95px" id="factorySelect" class="input-small carType">				
 				</select>
-				<span class="fa fa-angle-down fa-lg " style="vertical-align:middle;color:blue;margin-left:-3px;"></span>
+				<%-- <span class="fa fa-angle-down fa-lg " style="vertical-align:middle;color:blue;margin-left:-3px;"></span> --%>
 			</div>
 			<div class="pull-right"
 				style="width: 45%; margin-top: 5px; margin-align: right; display: inline; text-align: right;">
@@ -263,7 +276,8 @@ a:hover {
 					<a href="account!accountCenter.action" style="color:black;vertical-align: middle;" rel="tooltip" title="账户管理"><%=session.getAttribute("user_name")%></a>
 				</div>
 				<div style="display: inline;">
-					<a href="logout.action"><img src="<%=basePath%>/images/power.png" style="width: 6%;" ></a>
+					
+					<a id='a_logout' href="logout.action"><img src="<%=basePath%>/images/power.png" style="width: 6%;" ></a>
 				</div>
 			</div>
 		</div>
@@ -331,12 +345,12 @@ a:hover {
 							<div style="height:102px;overflow-y:hidden;margin-top:10px; ">
 								<table id="exceptionTable"
 										style="text-align: center; color: white; font-size: 100%;border: 0;">
-										<thead>
+										<!-- <thead>
 										<tr>
 											<td width="45%">车号</td>
 											<td width="45%">异常原因</td>
 										</tr>
-										</thead>
+										</thead> -->
 										<tbody >
 										</tbody>
 								</table>		

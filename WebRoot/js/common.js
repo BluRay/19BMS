@@ -1,5 +1,5 @@
 var pageSize;
-var const_float_validate= /^[0-9]+[0-9]*\.*[0-9]*$/;//浮点数正则表达式
+var const_float_validate= /^[0-9]+[0-9]*\.?[0-9]*$/;//浮点数正则表达式
 var const_float_validate_one= /^\d*\.?\d?$/;//一位浮点数正则表达式
 var const_int_validate = /^[0-9]+[0-9]*$/;//整数正则表达式
 /* ztree树对象变量 */
@@ -61,17 +61,27 @@ function autoScroll(obj, tr_bz) {
 /*
  * 填充下拉列表 with id=>value;包括全部选项
  */
-function getSelects(data, selectval, element,defaultVal) {
+function getSelects(data, selectval, element,defaultVal,valName) {
 	defaultVal=defaultVal||"";	
 	var strs = "<option value="+defaultVal+">全部</option>";
 	$(element).html("");
 	$.each(data, function(index, value) {
-		if (selectval == value.id || selectval == value.name) {
-			strs += "<option value=" + value.id + " selected='selected'" + ">"
-					+ value.name + "</option>";
-		} else {
-			strs += "<option value=" + value.id + ">" + value.name
-					+ "</option>";
+		if(valName=="name"){
+			if (selectval == value.id || selectval == value.name) {
+				strs += "<option value=" + value.name + " selected='selected'" + ">"
+						+ value.name + "</option>";
+			} else {
+				strs += "<option value=" + value.name + ">" + value.name
+						+ "</option>";
+			}
+		}else{
+			if (selectval == value.id || selectval == value.name) {
+				strs += "<option value=" + value.id + " selected='selected'" + ">"
+						+ value.name + "</option>";
+			} else {
+				strs += "<option value=" + value.id + ">" + value.name
+						+ "</option>";
+			}
 		}
 	});
 	$(element).append(strs);
@@ -79,7 +89,7 @@ function getSelects(data, selectval, element,defaultVal) {
 /*
  * 填充下拉列表 with id=>value;不包括全部选项
  */
-function getSelects_noall(data, selectval, element,defaultVal) {
+function getSelects_noall(data, selectval, element,defaultVal,valName) {
 	//defaultVal=defaultVal||"";
 	var strs ="";
 	if(defaultVal!=undefined){
@@ -88,12 +98,22 @@ function getSelects_noall(data, selectval, element,defaultVal) {
 	
 	$(element).html("");
 	$.each(data, function(index, value) {
-		if (selectval == value.id || selectval == value.name) {
-			strs += "<option value=" + value.id + " selected='selected'>"
-					+ value.name + "</option>";
-		} else {
-			strs += "<option value=" + value.id + ">" + value.name
-					+ "</option>";
+		if(valName=="name"){
+			if (selectval == value.id || selectval == value.name) {
+				strs += "<option value=" + value.name + " selected='selected'" + ">"
+						+ value.name + "</option>";
+			} else {
+				strs += "<option value=" + value.name + ">" + value.name
+						+ "</option>";
+			}
+		}else{
+			if (selectval == value.id || selectval == value.name) {
+				strs += "<option value=" + value.id + " selected='selected'" + ">"
+						+ value.name + "</option>";
+			} else {
+				strs += "<option value=" + value.id + ">" + value.name
+						+ "</option>";
+			}
 		}
 	});
 	$(element).append(strs);
@@ -101,18 +121,28 @@ function getSelects_noall(data, selectval, element,defaultVal) {
 /*
  * 填充下拉列表 with id=>value;不包括全部选项
  */
-function getSelects_empty(data, selectval, element,defaultVal) {
+function getSelects_empty(data, selectval, element,defaultVal,valName) {
 	//var strs = "<option value=''>请选择</option>";
 	defaultVal=defaultVal||"";	
 	var strs = "<option value="+defaultVal+">请选择</option>";
 	$(element).html("");
 	$.each(data, function(index, value) {
-		if (selectval == value.id || selectval == value.name) {
-			strs += "<option value=" + value.id + " selected='selected'>"
-					+ value.name + "</option>";
-		} else {
-			strs += "<option value=" + value.id + ">" + value.name
-					+ "</option>";
+		if(valName=="name"){
+			if (selectval == value.id || selectval == value.name) {
+				strs += "<option value=" + value.name + " selected='selected'" + ">"
+						+ value.name + "</option>";
+			} else {
+				strs += "<option value=" + value.name + ">" + value.name
+						+ "</option>";
+			}
+		}else{
+			if (selectval == value.id || selectval == value.name) {
+				strs += "<option value=" + value.id + " selected='selected'" + ">"
+						+ value.name + "</option>";
+			} else {
+				strs += "<option value=" + value.id + ">" + value.name
+						+ "</option>";
+			}
 		}
 	});
 	$(element).append(strs);
@@ -153,7 +183,7 @@ function getBusTypeSelect(elementId, selectVal, selectType) {
 /*
  * 工厂下拉列表 selectType:noall,empty,''
  */
-function getFactorySelect(elementId, selectVal, selectType,defaultVal) {
+function getFactorySelect(elementId, selectVal, selectType,defaultVal,valName) {
 	$.ajax({
 		url : "common!getFactorySelect.action",
 		dataType : "json",
@@ -164,11 +194,11 @@ function getFactorySelect(elementId, selectVal, selectType,defaultVal) {
 		},
 		success : function(response) {
 			if (selectType == 'noall') {
-				getSelects_noall(response, selectVal, elementId,defaultVal);
+				getSelects_noall(response, selectVal, elementId,defaultVal,valName);
 			} else if (selectType == 'empty') {
-				getSelects_empty(response, selectVal, elementId,defaultVal);
+				getSelects_empty(response, selectVal, elementId,defaultVal,valName);
 			} else {
-				getSelects(response, selectVal, elementId,defaultVal);
+				getSelects(response, selectVal, elementId,defaultVal,valName);
 			}
 		}
 	})
@@ -177,7 +207,7 @@ function getFactorySelect(elementId, selectVal, selectType,defaultVal) {
 /*
  * 工厂下拉列表 selectType:noall,empty,''
  */
-function getAuthorityFactorySelect(elementId, selectVal, selectType,defaultVal) {
+function getAuthorityFactorySelect(elementId, selectVal, selectType,defaultVal,valName) {
 	var href = window.location.href;
 	var url = href.substring(href.lastIndexOf('/'), href.length);
 	var ii = url.indexOf('?');
@@ -200,23 +230,36 @@ function getAuthorityFactorySelect(elementId, selectVal, selectType,defaultVal) 
 		},
 		success : function(response) {
 			if (selectType == 'empty') {
-				getSelects_empty(response, selectVal, elementId,defaultVal);
+				getSelects_empty(response, selectVal, elementId,defaultVal,valName);
 			} else if (selectType == 'noall') {
-				getSelects_noall(response, selectVal, elementId,defaultVal);
+				getSelects_noall(response, selectVal, elementId,defaultVal,valName);
 			} else {
 				var strs = '';
 				$(elementId).html("");
 				var allIds = '';
 				$.each(response, function(index, value) {
-					allIds += value.id + ",";
-					if (selectVal == value.id || selectVal == value.name) {
-						strs += "<option value=" + value.id
-								+ " selected='selected'" + ">" + value.name
-								+ "</option>";
-					} else {
-						strs += "<option value=" + value.id + ">" + value.name
-								+ "</option>";
+					if(valName=="name"){
+						allIds += value.name + ",";
+						if (selectVal == value.id || selectVal == value.name) {
+							strs += "<option value=" + value.name
+									+ " selected='selected'" + ">" + value.name
+									+ "</option>";
+						} else {
+							strs += "<option value=" + value.name + ">" + value.name
+									+ "</option>";
+						}
+					}else{
+						allIds += value.id + ",";
+						if (selectVal == value.id || selectVal == value.name) {
+							strs += "<option value=" + value.id
+									+ " selected='selected'" + ">" + value.name
+									+ "</option>";
+						} else {
+							strs += "<option value=" + value.id + ">" + value.name
+									+ "</option>";
+						}
 					}
+					
 				});
 				strs = "<option value='" + allIds + "'>全部</option>" + strs;
 				$(elementId).append(strs);
@@ -421,24 +464,37 @@ function getPartsSelect(elementId, submitId, fn_backcall) {
 /*
  * 订单编号模糊查询 submitId： 用于提交的元素的id
  */
-function getOrderNoSelect(elementId, submitId, fn_backcall, bustype) {
+function getOrderNoSelect(elementId, submitId, fn_backcall, bustype,factory) {
 	if (!bustype) {
 		bustype = "";
 	}
+	if(!factory){
+		factory="";
+	}
 	var orderlist;
-	$(elementId).typeahead({
+	//alert($(elementId).next().html())
+	//alert(factory);
+	$(elementId).typeahead({		
 		source : function(input, process) {
-			$.get("common!getOrderFuzzySelect.action", {
-				"conditionMap.busType" : bustype,
-				"conditionMap.orderNo" : input
-			}, function(data) {
-				orderlist = data;
-				var results = new Array();
-				$.each(data, function(index, value) {
-					results.push(value.orderNo);
-				})
-				return process(results);
-			}, 'json');
+			var data={
+					"conditionMap.busType":bustype,
+					"conditionMap.orderNo":input,
+					"conditionMap.factory":factory
+			};		
+			return $.ajax({
+				url:"common!getOrderFuzzySelect.action",
+				dataType : "json",
+				type : "get",
+				data : data,
+				success: function (data) { 
+					orderlist = data;
+					var results = new Array();
+					$.each(data, function(index, value) {
+						results.push(value.orderNo);
+					})
+					return process(results);
+				}
+			});
 		},
 		items : 30,
 		highlighter : function(item) {
@@ -475,6 +531,7 @@ function getOrderNoSelect(elementId, submitId, fn_backcall, bustype) {
 	});
 }
 
+
 /*
  * 查号模糊查询 submitId： 用于提交的元素的id
  */
@@ -497,6 +554,20 @@ function getBusNumberSelect(elementId, submitId, fn_backcall) {
 		matcher : function(item) {
 			// alert(this.query);
 			return true;
+		},
+		updater : function(item) {
+			$.each(busNumberlist, function(index, value) {
+				if (value.bus_number == item) {
+					selectId = value.order_id;
+					if (typeof (fn_backcall) == "function") {
+						fn_backcall(value);
+					}
+				}
+			})
+			// alert(submitId);
+			$(elementId).attr("order_id", selectId);
+			//$(submitId).val(selectId);
+			return item;
 		}
 	});
 }
@@ -593,7 +664,7 @@ function getWorkshopSelect_Key(elementId, selectVal) {
 /*
  * 车间下拉列表 selectType:'',noall,empty
  */
-function getWorkshopSelect(elementId, selectVal, selectFactory, selectType) {
+function getWorkshopSelect(elementId, selectVal, selectFactory, selectType,valName) {
 	$.ajax({
 		url : "common!getWorkshopSelect.action",
 		dataType : "json",
@@ -606,11 +677,11 @@ function getWorkshopSelect(elementId, selectVal, selectFactory, selectType) {
 		},
 		success : function(response) {
 			if (selectType == 'noall') {
-				getSelects_noall(response, selectVal, elementId,"0");
+				getSelects_noall(response, selectVal, elementId,"0",valName);
 			} else if (selectType == 'empty') {
-				getSelects_empty(response, selectVal, elementId,"0");
+				getSelects_empty(response, selectVal, elementId,"0",valName);
 			} else {
-				getSelects(response, selectVal, elementId,"0");
+				getSelects(response, selectVal, elementId,"0",valName);
 			}
 		}
 	})
@@ -640,7 +711,7 @@ function getWorkshopSelect_Org(elementId, selectVal, selectFactory, selectType) 
 		}
 	})
 }
-function getWorkshopSelect_Auth(elementId, selectVal, selectFactory, selectType){
+function getWorkshopSelect_Auth(elementId, selectVal, selectFactory, selectType,valName){
 	var href = window.location.href;
 	var url = href.substring(href.lastIndexOf('/'), href.length);
 	var ii = url.indexOf('?');
@@ -664,11 +735,11 @@ function getWorkshopSelect_Auth(elementId, selectVal, selectFactory, selectType)
 		},
 		success : function(response) {
 			if (selectType == 'noall') {
-				getSelects_noall(response, selectVal, elementId,null);
+				getSelects_noall(response, selectVal, elementId,null,valName);
 			} else if (selectType == 'empty') {
-				getSelects_empty(response, selectVal, elementId,null);
+				getSelects_empty(response, selectVal, elementId,null,valName);
 			} else {
-				getSelects(response, selectVal, elementId,null);
+				getSelects(response, selectVal, elementId,null,valName);
 			}
 		}
 	})
@@ -1454,7 +1525,7 @@ function compareTime(beginTime,endTime){
 function isContain(staff,staffarr){
 	var flag=false;
 	$.each(staffarr,function(index,obj){
-		if(obj.staffId==staff.staffId){
+		if(obj.staff_id==staff.staff_id){
 			flag=true;
 			return;
 		}
@@ -1510,3 +1581,41 @@ function getQueryString(name) {
 	if (r != null) return decodeURI(r[2]); return null; 
 	} 
 
+function numAdd(num1, num2) {
+	var baseNum, baseNum1, baseNum2;
+	try {
+	baseNum1 = num1.toString().split(".")[1].length;
+	} catch (e) {
+	baseNum1 = 0;
+	}
+	try {
+	baseNum2 = num2.toString().split(".")[1].length;
+	} catch (e) {
+	baseNum2 = 0;
+	}
+	baseNum = Math.pow(10, Math.max(baseNum1, baseNum2));
+	return (num1 * baseNum + num2 * baseNum) / baseNum;
+	}; 
+
+//使用公用邮箱发送邮件	
+function sendEmail(mailTo,cc,title,thead,tbdatalist,content){
+		$.ajax({
+			url : "common!sendEmail.action",
+			dataType : "json",
+			data : {
+				"mailTo":mailTo,
+				"cc":cc,
+				"title":title,
+				"thead":thead,
+				"tbdatalist":tbdatalist,
+				"content":content
+			},
+			type:"post",
+			error : function(response) {
+				//alert(response.message)
+			},
+			success : function(response) {
+				
+			}
+		})
+	}

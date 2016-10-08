@@ -43,7 +43,7 @@
 					<form id="form" class="well form-search">
 						<table>
 							<tr>
-								<td>派工单号</td>
+								<td>派工流水号</td>
 								<td>申请日期</td>
 								<td>状态</td>
 								<td>制作工厂</td>
@@ -65,8 +65,8 @@
 								<td><select name="" id="status"
 									class="input-small carType">
 										<option value='all'>全部</option>
-										<option value='0'>已创建</option>
-										<option value='2'>已分配</option>
+										<!-- <option value='0'>已创建</option>
+										<option value='2'>已分配</option> -->
 										<option value='3'>已评估</option>
 										<option value='5'>已完成</option>
 										<option value='6'>已驳回</option>
@@ -89,13 +89,13 @@
 						class="table table-bordered ">
 						<thead>
 							<tr>
-								<th >派工单号</th>
+								<th >派工流水号</th>
 								<th >工单号</th>
 								<th width='300px'>作业原因/内容</th>
 								<th >总数<br/>量</th>
 								<th >已完成<br/>数量</th>
 								<th >产量</th>
-								<th >单工<br/>时</th>
+								<th >工<br/>时</th>
 								<th >所需<br/>人力</th>
 								<th >总工<br/>时</th>
 								<th >录入<br/>总工时</th>

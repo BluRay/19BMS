@@ -12,9 +12,11 @@ $(document).ready(function(){
 		
 		getWorkshopSelect_Auth("#workshop", defaultWorkshop, selectFactory, "");
 		var workshop = $("#workshop").val();
-		getChildGroupSelect("#group", workshop, defaultWorkgourp, "",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
+		//getChildGroupSelect("#group", workshop, defaultWorkgourp, "",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
+		getChildOrgSelect("#group", workshop, "", "");
 		var group = $("#group").val();
-		getChildGroupSelect("#subgroup", group, defaultTeam, "",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),$('#group').find("option:selected").text());
+		//getChildGroupSelect("#subgroup", group, defaultTeam, "",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),$('#group').find("option:selected").text());
+		getChildOrgSelect("#subgroup", group, "", "");
 		
 		var LSTR_ndate=new Date(); 
 		var LSTR_MM=LSTR_ndate.getMonth()+1;
@@ -38,19 +40,22 @@ $(document).ready(function(){
 	$("#factory").change(function() {
 		var selectFactory = $("#factory :selected").text();
 		getWorkshopSelect_Auth("#workshop", null,selectFactory, "");
-		getChildGroupSelect("#group", workshop, "","",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
+		//getChildGroupSelect("#group", workshop, "","",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
+		getChildOrgSelect("#group", workshop, "", "");
 		$("#subgroup").html("<option value=''>全部</option>");
 	});
 	// 车间切换事件
 	$("#workshop").change(function() {
 		var workshop = $("#workshop").val();
-		getChildGroupSelect("#group", workshop, "","",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
+		//getChildGroupSelect("#group", workshop, "","",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
+		getChildOrgSelect("#group", workshop, "", "");
 		$("#subgroup").html("<option value=''>全部</option>");
 	});
 	// 班组切换事件
 	$("#group").change(function() {
 		var group = $("#group").val();
-		getChildGroupSelect("#subgroup", group, "", "",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),$('#group').find("option:selected").text());
+		//getChildGroupSelect("#subgroup", group, "", "",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),$('#group').find("option:selected").text());
+		getChildOrgSelect("#subgroup", group, "", "");
 	});
 	// 选定小班组查询人员列表
 	$("#subgroup").change(function() {
@@ -90,12 +95,14 @@ $(document).ready(function(){
 // 日期切换事件
 function startdatechange(){
 		var workshop = $("#workshop").val();
-		getChildGroupSelect("#group", workshop, "","",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
+		getChildOrgSelect("#group", workshop, "", "");
+		//getChildGroupSelect("#group", workshop, "","",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
 		$("#subgroup").html("<option value=''>全部</option>");
 }	
 function enddatechange(){
 		var workshop = $("#workshop").val();
-		getChildGroupSelect("#group", workshop, "","",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
+		getChildOrgSelect("#group", workshop, "", "");
+		//getChildGroupSelect("#group", workshop, "","",$('#date_start').val(),$('#date_end').val(),$('#factory').find("option:selected").text(),$('#workshop').find("option:selected").text(),null);
 		$("#subgroup").html("<option value=''>全部</option>");
 }	
 
@@ -164,6 +171,7 @@ function ajaxQuery(targetPage,queryAll){
 		    					$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(count).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.bus_number).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.standard_price).appendTo(tr);
+			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.bonus).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.plant_org).appendTo(tr);	
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.workshop_org).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.workgroup_org).appendTo(tr);
@@ -173,7 +181,7 @@ function ajaxQuery(targetPage,queryAll){
 		    				var piece_info = piece_Arr[i];	//"1688377,肖松辉,电器调试组,1,1.5,0.00"
 		    				var piece_info_arr = piece_info.split(",");
 		    				//$("<td style=\"padding-left:0px;padding-right:0px\" />").html(piece_info).appendTo(tr);
-		    				for(var j=0;j<piece_info_arr.length;j++){
+		    				for(var j=0;j<piece_info_arr.length;j++){		    				
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html(piece_info_arr[j]).appendTo(tr);
 		    				}
 		    				$(warp).append(tr);
@@ -242,7 +250,8 @@ function ajaxQuery(targetPage,queryAll){
 	    	    		var piece_Arr = piece_str.split("|");
 	                	//获取当前车号的参与人数，统计‘|’次数
 	    	    		var sum_ppay=0;
-	    	    		var bus_count = 0;	    	    		
+	    	    		var bus_count = 0;	
+	    	    		var bonus_count=0;
 	    	    		for (var i=0;i<piece_Arr.length-1;i++){
 	    	    			var tr = $("<tr />");
 		    				if(i==0){
@@ -254,16 +263,20 @@ function ajaxQuery(targetPage,queryAll){
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.workgroup_org).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.team_org).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.job).appendTo(tr);
-			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.distribution).appendTo(tr);
+			    				/*$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.distribution).appendTo(tr);*/
 		    				}
 		    				var piece_info = piece_Arr[i];	//"K8-SB-2015-2457,2016-01-04,1,0,bus_count"
 		    				var piece_info_arr = piece_info.split(",");
 		    				//$("<td style=\"padding-left:0px;padding-right:0px\" />").html(piece_info).appendTo(tr);
 		    				for(var j=0;j<piece_info_arr.length;j++){
-		    					if(j==3){
+		    					if(j==4){
 		    						$("<td style=\"padding-left:0px;padding-right:0px\" />").html(changeTwoDecimal(piece_info_arr[j])).appendTo(tr);
 		    						sum_ppay+=parseFloat(piece_info_arr[j]);
-		    					}else if(j==4){
+		    					}else if(j==6){
+		    						bonus_count += parseFloat(piece_info_arr[j]);
+		    						$("<td style=\"padding-left:0px;padding-right:0px\" />").html(piece_info_arr[j]).appendTo(tr);
+		    					}
+		    					else if(j==7){
 		    						bus_count += parseFloat(piece_info_arr[j]);
 		    					}else{
 		    						$("<td style=\"padding-left:0px;padding-right:0px\" />").html(piece_info_arr[j]).appendTo(tr);
@@ -277,20 +290,21 @@ function ajaxQuery(targetPage,queryAll){
 		    				
 		    				if(i==piece_Arr.length-2){	//增加合计栏
 		    					var tr = $("<tr />");
-		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("合计").appendTo(tr);
+		    					$("<td style=\"padding-left:0px;padding-right:0px;font-weight:bold\" />").html("合计").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
+		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);	    					
+		    					$("<td style=\"padding-left:0px;padding-right:0px;font-weight:bold\" />").html(bus_count).appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
-		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html(bus_count).appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
+		    					$("<td style=\"padding-left:0px;padding-right:0px;font-weight:bold\" />").html(changeTwoDecimal(sum_ppay)).appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
-		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html(changeTwoDecimal(sum_ppay)).appendTo(tr);
-		    					 
+		    					$("<td style=\"padding-left:0px;padding-right:0px;font-weight:bold\" />").html(bonus_count).appendTo(tr);
 		    					if(queryAll=='all'){
 		    						$(warp).append(tr);					    			
 					    		}else

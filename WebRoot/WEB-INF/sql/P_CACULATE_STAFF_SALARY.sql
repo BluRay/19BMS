@@ -79,7 +79,7 @@ BEGIN
 		select vp.staff_number,sum(vp.bonus) bonus_total,sum(vp.bus_count) piece_total,round(ifnull(sum(vp.ppay_total),0),2) piece_pay_total 
 		from (select vp1.staff_number,vp1.bus_count,vp1.bonus,sum(vp1.ppay) ppay_total  from BMS_PIECE_PAY_CAL vp1
 		where 1=1 and vp1.staff_number in (''',query_staff_numbers,''') and vp1.factory=''',factory,''' and find_in_set(vp1.workshop,''',workshop,''')>0
-		and substr(vp1.work_date,1,7)=''',q_month,'''
+		and substr(vp1.work_date,1,7)=''',q_month,''' and vp1.status in (''1'',''3'')
 		group by vp1.staff_number,vp1.bus_number) vp 
 		group by vp.staff_number') ;
 	set @vsql=v_sql;
@@ -103,7 +103,7 @@ BEGIN
 		select vw.staff_number,substr(vw.work_date,1,7) month,sum(vw.work_hour) wwh_total,round(ifnull(sum(vw.wpay),0),2) wait_pay_total
 		from BMS_WAIT_PAY_CAL vw
 		where 1=1 and substr(vw.work_date,1,7)=''',q_month,''' and vw.staff_number in (''',query_staff_numbers,''')
-		and vw.factory=''',factory,''' and find_in_set(vw.workshop,''',workshop,''')>0
+		and vw.factory=''',factory,''' and find_in_set(vw.workshop,''',workshop,''')>0 and vw.status in (''1'',''3'')
 		group by vw.staff_number,substr(vw.work_date,1,7)');
 	set @vsql=v_sql;
 	prepare  stmt from @vsql;

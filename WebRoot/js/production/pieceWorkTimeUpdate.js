@@ -1,6 +1,7 @@
 var swhlist = [];
-var swhupdatelist = [];
-
+var updateCond={};
+var select_workshop="";
+var status_arr={'1':'已审批','2':'已驳回','3':'已锁定'}
 $(document)
 		.ready(
 				function() {
@@ -31,7 +32,11 @@ $(document)
 											 * ajaxQuery($("#cur").attr("page"));
 											 * //generateTb(swhlist); } }
 											 */
-											var orgId = $(this).attr("orgId");
+											//var orgId = $(this).attr("orgId");
+											var factory=$(tr).data("factory");
+											var workshop=$(tr).data("workshop");
+											var workgroup=$(tr).data("workgroup");
+											var team=$(tr).data("team");
 											var bus_number = $(this).attr(
 													"bus_number");
 											var work_date = $(this)
@@ -41,13 +46,15 @@ $(document)
 											var conditions = {
 												"busNumber" : bus_number,
 												"workDate" : work_date,
-												"orgId" : orgId
+												"factory" : factory,
+												"workshop":workshop,
+												"workgroup":workgroup,
+												"team":team
+												
 											};
 											if (confirm("确认删除该车辆的工时数据？")) {
-												ajaxDelete(JSON
-														.stringify(conditions));
-												ajaxQuery($("#cur")
-														.attr("page"));
+												ajaxDelete(JSON.stringify(conditions));
+												ajaxQuery($("#cur").attr("page"));
 												// generateTb(swhlist);
 											}
 										} else {
@@ -59,12 +66,11 @@ $(document)
 												'swhid' : swhid
 											};
 											if (confirm("确认删除该条数据？")) {
-												ajaxDelete(JSON
-														.stringify(swh_obj));
+												//ajaxDelete(JSON.stringify(swh_obj));
 												swhlist.splice(index, 1);
-												ajaxQuery($("#cur")
-														.attr("page"));
-												// generateTb(swhlist);
+					
+												//ajaxQuery($("#cur").attr("page"));
+												generateTb(swhlist,select_workshop);
 											}
 										}
 									})
@@ -79,48 +85,37 @@ $(document)
 								}
 							})
 					// 补贴车输入值校验
-					$(".bonus")
-							.live(
-									"change",
-									function(e) {
+					$(".bonus").live( "change", function(e) {
+										var tr = $(e.target).closest("tr");
+										var bus_number=$(tr).data("bus_number");
+										var rows=$("#bus_"+bus_number).attr("rowspan");
+										var first_tr=$("#bus_"+bus_number).parent("tr");
+										var first_index=parseInt($(first_tr).data("swhlist_index"));
 										var bonus_num = $(this).val();
-										var bus_number = $(this).attr(
-												"bus_number");
+										var bus_number = $(this).attr("bus_number");
 
 										bonus_num = isNaN(parseFloat(bonus_num)) ? 0
 												: parseFloat(bonus_num);
 										var ids = $(this).attr("ids");
-
+										var index = parseInt($(tr).data("swhlist_index"));
 										var conditions = "{bus_number:'"
 												+ bus_number + "',bonus:'"
 												+ bonus_num + "',ids:'" + ids
+												+"',workshop:'"+select_workshop
 												+ "'}";
 										if (!const_float_validate.test(bonus_num)) {
 											alert("请输入数字！");
 											$(this).val("");
-										} else if (confirm("确认修改？")) {
-											$
-													.ajax({
-														url : "pieceWorkTime!updateBonus.action",
-														dataType : "json",
-														async : false,
-														type : "get",
-														data : {
-															"conditions" : conditions
-														},
-														success : function(
-																response) {
-															alert(response.message);
-														}
-													})
-										}
+										} else{
+											for(var i=first_index;i<(first_index+rows);i++){
+												swhlist[i].bonus = bonus_num;
+												swhlist[i].status='1';
+												}	
+											}
+											
 									});
 					// 查询事件
 					$("#btnQuery").click(function() {
-						/*
-						 * if($("#work_date").val().trim().length==0){
-						 * alert("请选择操作日期!"); }else
-						 */
 						ajaxQuery(1);
 					});
 					// 参与度验证是否数字
@@ -129,6 +124,10 @@ $(document)
 									"change",
 									function(e) {
 										var tr = $(e.target).closest("tr");
+										var bus_number=$(tr).data("bus_number");
+										var rows=$("#bus_"+bus_number).attr("rowspan");
+										var first_tr=$("#bus_"+bus_number).parent("tr");
+										var first_index=parseInt($(first_tr).data("swhlist_index"));
 										var participation = $(this).val();
 										var index = parseInt($(tr).data(
 												"swhlist_index"));
@@ -159,35 +158,38 @@ $(document)
 											$(this).val(old_value);
 										} else if (old_value != participation) {
 											swhlist[index].participation = participation;
-											var staff = {};
-											staff.id = swhlist[index].id;
-											staff.participation = swhlist[index].participation;											
-											swhupdatelist.push(staff);
+											for(var i=first_index;i<(first_index+rows);i++){
+												swhlist[i].status='1';
+												
+												}	
 										}
 									});
-					// 参与度验证是否数字
+					//修改分配金额
 					$(".distribution")
 							.live(
 									"change",
 									function(e) {
 										var tr = $(e.target).closest("tr");
+										var bus_number=$(tr).data("bus_number");
+										var rows=$("#bus_"+bus_number).attr("rowspan");
+										var first_tr=$("#bus_"+bus_number).parent("tr");
+										var first_index=parseInt($(first_tr).data("swhlist_index"));
 										var distribution = $(this).val();
 										var index = parseInt($(tr).data(
 												"swhlist_index"));
 										var old_value = $(this).attr(
 												"old_value");
-										var const_par_validate = /^0(\.[0-9]*)?$|^1(\.[0]*)?$/;// 浮点数正则表达式
+										//var const_par_validate = /^0(\.[0-9]*)?$|^1(\.[0]*)?$/;// 浮点数正则表达式
 										
-										if (!const_par_validate
+										if (!const_float_validate
 												.test(distribution)) {
-											alert("参与度必须是介于0到1之间的数字！");
+											alert("分配金额必须是数字！");
 											$(this).val(old_value);
 										} else if (old_value != distribution) {
-											swhlist[index].distribution = distribution;
-											var staff = {};
-											staff.id = swhlist[index].id;
-											staff.distribution = swhlist[index].distribution;											
-											swhupdatelist.push(staff);
+											swhlist[index].distribution = distribution;	
+											for(var i=first_index;i<=(first_index+rows);i++){
+												swhlist[i].status='1';
+												}
 										}
 									});
 					// 复选框全选、反选
@@ -199,10 +201,14 @@ $(document)
 					});
 					// 保存修改
 					$("#btnSave").click(function() {
-						// alert(JSON.stringify(swhupdatelist));
-						if (swhupdatelist.length > 0) {
-							ajaxSave(JSON.stringify(swhupdatelist));
+						var flag=validateDistribution();
+						if(!flag){
+							alert("分配金额之和必须等于班组承包单价！");
+						}else{
+							ajaxSave(JSON.stringify(swhlist),"",JSON.stringify(updateCond));
+							ajaxQuery(1);
 						}
+						
 
 					});
 				});
@@ -268,8 +274,13 @@ function ajaxQuery(targetPage) {
 	var workshop = "";
 	var workgroup = "";
 	var subgroup = "";
+	var team="";
 	var nodes = zTreeObj.getSelectedNodes();
 	var treeNode = nodes[0];
+	if(treeNode.org_type != '6'){
+		alert("请选择小班组！");
+		return false;
+	}
 
 	if (treeNode.name != '无数据权限' || treeNode.id != '0') {
 		if (treeNode.org_type == '1' || treeNode.org_type == '2') {
@@ -298,9 +309,19 @@ function ajaxQuery(targetPage) {
 			}
 			if (treeNode.org_type == '6') {
 				subgroup = treeNode.id;
+				team=treeNode.displayName;
 			}
 			treeNode = treeNode.getParentNode();
 		}
+		updateCond.factory=factory;
+		updateCond.workshop=workshop;
+		updateCond.workgroup=workgroup;
+		updateCond.team=team;
+		updateCond.busNumber=$("#bus_number").val();
+		updateCond.startDate=$("#wdate_start").val();
+		updateCond.endDate=$("#wdate_end").val();
+		
+		
 		$(".divLoading").addClass("fade in").show();
 		var conditions = "{orgId:'" + subgroup + /*
 													 * "',workDate:'" +
@@ -316,27 +337,32 @@ function ajaxQuery(targetPage) {
 			async : false,
 			type : "get",
 			data : {
-				"conditions" : conditions,
+				"conditions" : conditions/*,
 				"pager.pageSize" : 20,
-				"pager.curPage" : targetPage || 1
+				"pager.curPage" : targetPage || 1*/
 			},
 			success : function(response) {
 				swhlist = response.dataList;
-				generateTb(swhlist);
+				generateTb(swhlist,workshop);
 				$(".divLoading").hide();
-				$("#total").html(response.pager.totalCount);
+			/*	$("#total").html(response.pager.totalCount);
 				$("#total").attr("total", response.pager.totalCount);
 				$("#cur").attr("page", response.pager.curPage);
 				$("#cur").html(
 						"<a href=\"#\">" + response.pager.curPage + "</a>");
-				$("#pagination").show();
+				$("#pagination").show();*/
 			}
 		});
 	}
 
 }
 
-function generateTb(swhlist) {
+function generateTb(swhlist,workshop) {
+	if(workshop=='自制件'){
+		$("#lable_workhour").css("display","");
+	}else{
+		$("#lable_workhour").css("display","none");
+	}
 	$("#tb_workhour").html("");
 	var last_bus_number = "";
 	var last_workorg = "";
@@ -344,6 +370,7 @@ function generateTb(swhlist) {
 	var busNumberId = "";
 	var checkboxId = "";
 	var workorgId = "";
+	var priceId="";
 	var workdateId = "";
 	var bonusInputId = "";
 	var busDelId = "";
@@ -353,7 +380,7 @@ function generateTb(swhlist) {
 			.each(
 					swhlist,
 					function(index, swh) {
-						var disabled = (swh.status == '已锁定' || swh.status == '已审批') ? 'disabled'
+						var disabled = (swh.STATUS == '3' ||swh.STATUS == '1') ? 'disabled'
 								: "";
 						// alert(disabled);
 						var tr = $("<tr />");
@@ -378,12 +405,18 @@ function generateTb(swhlist) {
 								&& workorg == last_workorg) {
 							var rowspan = parseInt($(workorgId).attr("rowspan"));
 							$(workorgId).attr("rowspan", rowspan + 1);
+							$(priceId).attr("rowspan", rowspan + 1);
 						} else {
 							$(
 									"<td id='workorg_" + mergecount1
 											+ "' rowspan=1/>").html(workorg)
 									.appendTo(tr);
+							$(
+									"<td id='price_" + mergecount1
+											+ "' rowspan=1/>").html(swh.standard_price)
+									.appendTo(tr);
 							workorgId = "#workorg_" + mergecount1;
+							priceId="#price_"+mergecount1;
 							mergecount1++;
 
 						}
@@ -418,9 +451,8 @@ function generateTb(swhlist) {
 										"<td id='wdel_" + mergecount2
 												+ "' rowspan=1/>")
 										.html(
-												"<button type=\"button\" orgId='"
-														+ swh.org_id
-														+ "' bus_number='"
+												"<button type=\"button\" "
+														+ " bus_number='"
 														+ swh.bus_number
 														+ "' class=\"close\" aria-label=\"Close\" del='all' rel=\"tooltip\" title='删除' ><span aria-hidden=\"true\">×</span></button>")
 										.appendTo(tr);
@@ -446,15 +478,18 @@ function generateTb(swhlist) {
 						$("<td />").html(swh.staff_number).appendTo(tr);
 						$("<td />").html(swh.staff_name).appendTo(tr);
 						$("<td />").html(swh.job).appendTo(tr);
-						$("<td />")
-								.html(
-										"<input class=\"work_hour\" type='text' style=\"border:1;width:50px;text-align:center;font-size: 12px\" "
-												+ disabled
-												+ " value='"
-												+ swh.participation
-												+ "' old_value='"
-												+ swh.participation + "'>")
-								.appendTo(tr);
+						if(workshop=='自制件'){
+							$("<td />")
+							.html(
+									"<input class=\"work_hour\" type='text' style=\"border:1;width:50px;text-align:center;font-size: 12px\" "
+											+ disabled
+											+ " value='"
+											+ swh.participation
+											+ "' old_value='"
+											+ swh.participation + "'>")
+							.appendTo(tr);
+						}
+						
 						$("<td />")
 						.html(
 								"<input class=\"distribution\" type='text' style=\"border:1;width:50px;text-align:center;font-size: 12px\" "
@@ -464,15 +499,18 @@ function generateTb(swhlist) {
 										+ "' old_value='"
 										+ (swh.distribution==undefined?"":swh.distribution) + "'>")
 						.appendTo(tr);
+						
+					/*	$("<td />").html(swh.ppay||"").appendTo(tr);
+						*/
 						/*$("<td />")
 						.html(swh.distribution==undefined?"":swh.distribution)
 						.appendTo(tr);*/
 						$("<td />")
 								.html(swh.team_org + "-" + swh.workgroup_org)
 								.appendTo(tr);
-						$("<td />").html(swh.status).appendTo(tr);
-						$("<td />").html(swh.approver).appendTo(tr);
-						$("<td />").html(swh.approve_date).appendTo(tr);
+						$("<td />").html(status_arr[swh.status]).appendTo(tr);
+						/*$("<td />").html(swh.approver).appendTo(tr);
+						$("<td />").html(swh.approve_date).appendTo(tr);*/
 						if (disabled == 'disabled') {
 							$("<td />").html("").appendTo(tr);
 						} else
@@ -486,6 +524,10 @@ function generateTb(swhlist) {
 						$(tr).data("swhid", swh.id);
 						$(tr).data("swhlist_index", index);
 						$(tr).data("bus_number", swh.bus_number);
+						$(tr).data("factory", swh.factory);
+						$(tr).data("workshop", swh.workshop);
+						$(tr).data("workgroup", swh.workgroup);
+						$(tr).data("team", swh.team);
 						last_bus_number = swh.bus_number;
 						last_workdate = swh.work_date;
 						last_workorg = workorg;
@@ -511,20 +553,21 @@ function ajaxDelete(conditions) {
 	})
 }
 // 保存
-function ajaxSave(conditions) {
+function ajaxSave(conditions,whflag,updateCond) {
 
 	$.ajax({
 		url : "pieceWorkTime!updateWorkHourInfo.action",
 		dataType : "json",
 		type : "post",
+		async:false,
 		data : {
 			"conditions" : conditions,
-			"whflag" : "update"
+			"whflag" : whflag,
+			"updateCond":updateCond
 		},
 		success : function(response) {
 			if (response.success) {
 				alert(response.message);
-				ajaxQuery(1);
 			} else {
 				alert(response.message);
 			}
@@ -536,8 +579,50 @@ function zTreeBeforeClick(treeId, treeNode, clickFlag) {
 }
 
 function zTreeOnClick(event, treeId, treeNode) {
+	if(treeNode.org_type == '4'){
+		select_workshop=treeNode.displayName;
+	}
+	if(treeNode.org_type == '5'){
+		select_workshop=treeNode.getParentNode().displayName;
+	}
+	if(treeNode.org_type == '6'){
+		select_workshop=treeNode.getParentNode().getParentNode().displayName;
+	}
 	if (treeNode.name != '无数据权限' || treeNode.id != '0') {
 		ajaxQuery(1);
 	}
 
 };
+
+/**
+ * 校验每一台车每天所有人的分配金额之和是否等于班组承包单价
+ */
+function validateDistribution(){
+	var flag=true;
+	var standar_price_arr={};
+	var total_distribution_arr={};
+	var last_bus_number="";
+	var last_work_date="";
+	var arr_count=0;
+ 
+	for(var i in swhlist){
+		
+		if(swhlist[i].bus_number!=last_bus_number||swhlist[i].work_date!=last_work_date){
+			standar_price_arr[arr_count]=parseFloat(swhlist[i].standard_price);
+			total_distribution_arr[arr_count]=parseFloat(swhlist[i].distribution);
+			arr_count++;
+		}else{
+			total_distribution_arr[arr_count-1]=numAdd(total_distribution_arr[arr_count-1],parseFloat(swhlist[i].distribution));
+		}
+		last_bus_number=swhlist[i].bus_number;
+		last_work_date=swhlist[i].work_date;		
+	}
+	
+	for(var j in standar_price_arr){
+		if(standar_price_arr[j]!=total_distribution_arr[j]){
+			flag=false;
+			return false;
+		}
+	}
+	return flag;
+}

@@ -690,25 +690,3 @@ function getReasonTypeSelect_new() {
 		}
 	});
 }
-
-function sendEmail(mailTo,cc,title,thead,tbdatalist){
-	$.ajax({
-		url : "common!sendEmail.action",
-		dataType : "json",
-		data : {
-			"mailTo":mailTo,
-			"cc":cc,
-			"title":title,
-			"thead":thead,
-			"tbdatalist":tbdatalist
-		},
-		type:"post",
-		async : false,
-		error : function(response) {
-			alert(response.message)
-		},
-		success : function(response) {
-			
-		}
-	})
-}

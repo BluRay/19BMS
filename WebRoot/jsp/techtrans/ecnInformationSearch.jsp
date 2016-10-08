@@ -127,7 +127,7 @@
 								<th>订单</th>
 								<th>切换方式</th>
 								<th>技改工厂</th>
-								<th>车间</th>
+								<th>技改车间</th>
 								<th>单车总工时</th>
 								<th>技改台数</th>
 								<!-- <th>已分配台数</th> -->
@@ -184,6 +184,7 @@
 								<th>确认时间</th>
 								<th>技改单编号</th>
 								<th>技改工厂</th>
+								<th>技改车间</th>
 								<th>切换方式</th>
 								<th>技改台数</th>
 <!-- 								<th>已完成</th>
@@ -227,6 +228,7 @@
             </tbody>
         </table>
     	<input type="hidden" id="selectBusNumber_factoryId_view" /> 
+    	<input type="hidden" id="selectBusNumber_workshop_view" /> 
     	<input type="hidden" id="selectBusNumber_taskId_view" />
     	<input type="hidden" id="selectBusNumber_orderId_view" />
     	<input type="hidden" id="selectBusNumber_switch_mode_view" />

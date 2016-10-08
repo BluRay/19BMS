@@ -1,5 +1,7 @@
 var swhlist=[];
 var swhupdatelist=[];
+var select_workshop="";
+var status_arr={'1':'已审批','2':'已驳回','3':'已锁定'}
 $(document).ready(function(){
 	initPage();
 	
@@ -60,7 +62,7 @@ $(document).ready(function(){
 		
 		conditions.factory=factory;
 		conditions.workshop=workshop;
-		conditions.month=month_start;
+		//conditions.month=month_start;
 		var edit_list=getSelectList();
 		if(edit_list.length>0){
 			ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"verify");
@@ -72,10 +74,10 @@ $(document).ready(function(){
 		var month_start=$("#wdate_start").val().substring(0,7);
 		var month_end=$("#wdate_end").val().substring(0,7);
 		//alert(month_start);
-		if(month_start!=month_end){
+	/*	if(month_start!=month_end){
 			alert("起始日期和结束日期只能处于同一月份！");
 			return false;
-		}
+		}*/
 		var conditions={};
 		var factory = "";
 		var workshop = "";
@@ -116,7 +118,9 @@ $(document).ready(function(){
 		var edit_list=getSelectList();
 		if(edit_list.length>0){
 			ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"reject");
+			//sendEmail(mailTo,cc,title,thead,tbdatalist)
 		}
+		
 		
 	});
 });
@@ -160,7 +164,7 @@ function initPage(){
 //获取选中的checkbox
 function getSelectList(){
 	var boxList=$("#tb_workhour :checked");
-	var swhList=[];
+	var selectList=[];
 	if(boxList.length==0){
 		alert("请选择至少一个车号");
 	}
@@ -170,17 +174,23 @@ function getSelectList(){
 		//alert(swhids);
 		swhids=swhids.substring(0,swhids.length-1);
 		var swhidlist=swhids.split(",");
-		$.each(swhidlist,function(index,swhid){
-			var obj={};
-			obj.id=swhid;
-			swhList.push(obj);
+		$.each(swhidlist,function(index,swhlist_index){
+			var obj=swhlist[swhlist_index];
+			//obj.id=swhid;
+			selectList.push(obj);
 		});
 		
 	});
-	return swhList;
+	return selectList;
 }
 
 function ajaxQuery(targetPage){
+	$("#tb_workhour").html("");
+	if(select_workshop==""){
+		alert("请选择车间！");
+		return false;
+	}
+	
 	var factory = "";
 	var workshop = "";
 	var workgroup = "";
@@ -250,6 +260,11 @@ function ajaxQuery(targetPage){
 }
 
 function generateTb(swhlist){
+	if(select_workshop=='自制件'){
+		$("#lable_workhour").css("display","");
+	}else{
+		$("#lable_workhour").css("display","none");
+	}
 	$("#tb_workhour").html("");	
 	var last_bus_number = "";
 	var last_workorg="";
@@ -258,6 +273,7 @@ function generateTb(swhlist){
 	var busNumberId = "";
 	var checkboxId = "";
 	var workorgId="";
+	var priceId="";
 	var workdateId = "";
 	var bonusInputId = "";
 	var mergecount1=0;
@@ -271,13 +287,13 @@ function generateTb(swhlist){
 			var rowspan=parseInt($(busNumberId).attr("rowspan"));
 			$(busNumberId).attr("rowspan",rowspan+1);
 			$(checkboxId).attr("rowspan",rowspan+1);
-			swhids+=swh.id+",";
+			swhids+=index+",";
 			$(checkboxId).attr("swhids",swhids);
 		}else{
 			busNumberId="#bus_"+swh.bus_number;
 			checkboxId="#chk_"+swh.bus_number;
 			var bonus_num = parseFloat(swh.bonus);
-			swhids=swh.id+",";
+			swhids=index+",";
 			$("<td id='chk_"+swh.bus_number+"' rowspan=1 swhids="+swhids+"/>").html("<input type='checkbox' >").appendTo(tr);
 			$("<td id='bus_" + swh.bus_number + "' rowspan=1/>").html(swh.bus_number).appendTo(tr);
 							
@@ -288,10 +304,14 @@ function generateTb(swhlist){
 			var rowspan = parseInt($(workorgId).attr(
 			"rowspan"));
 			$(workorgId).attr("rowspan", rowspan + 1);
+			$(priceId).attr("rowspan", rowspan + 1);
 		}else{
 			$("<td id='workorg_" + mergecount1 + "' rowspan=1/>")
 			.html(workorg).appendTo(tr);
+			$("<td id='price_" + mergecount1 + "' rowspan=1/>")
+			.html(swh.standard_price).appendTo(tr);
 			workorgId="#workorg_"+mergecount1;
+			priceId="#price_"+mergecount1;
 			mergecount1++;				
 		}	
 		
@@ -323,12 +343,19 @@ function generateTb(swhlist){
 		$("<td />").html(swh.staff_number).appendTo(tr);
 		$("<td />").html(swh.staff_name).appendTo(tr);
 		$("<td />").html(swh.job).appendTo(tr);
-		$("<td />").html(swh.participation).appendTo(tr);
+		if(select_workshop=='自制件'){
+			$("<td />").html(swh.participation).appendTo(tr);
+		}		
 		$("<td />").html(swh.distribution==undefined?"":swh.distribution).appendTo(tr);
+		$("<td />").html(swh.ppay==undefined?"":swh.ppay).appendTo(tr);
 		$("<td />").html(swh.workgroup_org+"-"+swh.team_org).appendTo(tr);
-		$("<td />").html(swh.status).appendTo(tr);
-		$("<td />").html(swh.approver).appendTo(tr);
-		$("<td />").html(swh.approve_date).appendTo(tr);
+		$("<td />").html(status_arr[swh.status]).appendTo(tr);
+		/*$("<td />").html(swh.approver).appendTo(tr);*/
+		if(select_workshop=='自制件'){
+			$("<td />").html(swh.edit_date).appendTo(tr);
+		}else
+			$("<td />").html(swh.approve_date).appendTo(tr);
+		
 		$("#tb_workhour").append(tr);
 		$(tr).data("swhid",swh.id);
 		$(tr).data("swhlist_index",index);
@@ -347,11 +374,12 @@ function ajaxUpdate(swhlist,conditions,whflag) {
 		async : false,
 		data : {
 			"conditions" : swhlist,
+			"updateCond":conditions,
 			"whflag":whflag
 		},
 		success : function(response) {
 			if (response.success) {
-				ajaxCaculateSalary(conditions);
+				//ajaxCaculateSalary(conditions);
 				alert(response.message);
 				ajaxQuery(targetPage);
 				$("#checkall").attr("checked",false);
@@ -387,6 +415,16 @@ function zTreeBeforeClick(treeId, treeNode, clickFlag) {
 }
 
 function zTreeOnClick(event, treeId, treeNode) {
+	select_workshop="";
+	if(treeNode.org_type == '4'){
+		select_workshop=treeNode.displayName;
+	}
+	if(treeNode.org_type == '5'){
+		select_workshop=treeNode.getParentNode().displayName;
+	}
+	if(treeNode.org_type == '6'){
+		select_workshop=treeNode.getParentNode().getParentNode().displayName;
+	}
 	if(treeNode.name!='无数据权限'||treeNode.id!='0'){
 		ajaxQuery(1);
 	}

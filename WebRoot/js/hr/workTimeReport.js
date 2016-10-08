@@ -161,7 +161,7 @@ function ajaxQuery(targetPage,queryAll){
     	    	    		$("<td rowspan=5 style=\"padding-left:0px;padding-right:0px\"/>").html(count).appendTo(tr);
     	    				$("<td rowspan=5 style=\"padding-left:0px;padding-right:0px\"/>").html(staff.staff_number).appendTo(tr);
     	    				$("<td rowspan=5 style=\"padding-left:0px;padding-right:0px\" />").html(staff.staff_name).appendTo(tr);
-    	    				$("<td rowspan=5 style=\"padding-left:0px;padding-right:0px\" />").html(staff.skill_parameter).appendTo(tr);
+    	    				//$("<td rowspan=5 style=\"padding-left:0px;padding-right:0px\" />").html(staff.skill_parameter).appendTo(tr);
     	    			}
         				switch(i){
         					case 0: //计件

@@ -179,6 +179,7 @@
 								<th>技改任务</th>
 								<th>技改单编号</th>
 								<th>技改工厂</th>
+								<th>技改车间</th>
 								<th>切换方式</th>
 								<th>技改台数</th>
 			<!-- 					<th>已完成</th>
@@ -222,6 +223,7 @@
             </tbody>
         </table>
     	<input type="hidden" id="selectBusNumber_factoryId_view" /> 
+    	<input type="hidden" id="selectBusNumber_workshop_view" /> 
     	<input type="hidden" id="selectBusNumber_taskId_view" />
     	<input type="hidden" id="selectBusNumber_ecnNumber_view" />
     	<input type="hidden" id="selectBusNumber_orderId_view" />
@@ -249,7 +251,7 @@
     	<table id="selectBusNumber_table" style="table-layout:fixed;font-size:12px" class="table table-bordered table-striped">
 			<thead>
                 <tr>
-                	<th style="width: 50px;text-align: center;"><input type="checkbox" id="selectBusNumber_checkall">OK</th>
+                	<th style="width: 50px;text-align: center;"><input type="checkbox" id="selectBusNumber_checkall"></th>
                 	<th style="text-align:center;" width="60px">序号</th>
                 	<th style="text-align:center;">车号</th>
                     <th style="text-align:center;">生产工厂</th>
@@ -263,6 +265,7 @@
             </tbody>
         </table>
     	<input type="hidden" id="selectBusNumber_factoryId" /> 
+    	<input type="hidden" id="selectBusNumber_workshop" /> 
     	<input type="hidden" id="selectBusNumber_taskId" />
     	<input type="hidden" id="selectBusNumber_ecnNumber" />
     	<input type="hidden" id="selectBusNumber_orderId" />

@@ -98,7 +98,7 @@ a:hover{ text-decoration:none;}
 									class="input-small"
 									onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" />
 								</td>
-								<td colspan=2 width="80px" style="text-align: right">临时派工单号/作业内容：</td>
+								<td colspan=2 width="80px" style="text-align: right">派工流水号/作业内容：</td>
 								<td width="160px"><input type="text" id="reason_content"
 									class="input-medium" placeholder="" /></td>
 								<td width="80px" style="text-align: right">工号/姓名：</td>
@@ -149,7 +149,7 @@ a:hover{ text-decoration:none;}
 						class="exp-table table">
 						<thead style="background-color: rgb(225, 234, 240)" class="table-bordered">
 							<tr>
-								<td>派工单</td>
+								<td>派工流水号</td>
 								<td>总工时</td>
 								<td>总费用</td>
 								<td>操作日期</td>
@@ -185,7 +185,7 @@ a:hover{ text-decoration:none;}
 								<td>工厂</td>
 							<!-- 	<td>技能系数</td> -->
 								<td>操作日期</td>
-								<td>工单号</td>
+								<td>派工流水号</td>
 								<td>工单总工时</td>
 								<td>操作工时</td>
 								<td>有效工时</td>

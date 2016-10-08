@@ -46,13 +46,21 @@
 			<form id="form" class="well form-search form-inline" style="margin: 0px;padding: 8px;">
 							<table >
 								<tr>
+								<td width="60px" style="text-align:right;display:none" id="order_label">订单：</td>
+								<td width="130px" id="order_input" style="display:none">
+									<input type="text" style="width:130px" id="order_number" class="input-medium"/>
+								</td>
 								<td width="60px" style="text-align:right" id="bus_label">车号：</td>
 								<td width="160px" id="bus_input">
 									<input type="text" id="bus_number" class="input-medium"/>
+								</td>
+								<td width="60px" style="text-align:right;display:none" id="c_bus_label" >自编号：</td>
+								<td width="160px" id="c_bus_input" style="display:none">
+									<input type="text" id="c_bus_number" class="input-medium" placeholder="如：K7-CS_0001-0010"/>
 								</td>									
 								<td width="80px" style="text-align:right">操作日期：</td>
 								<td>
-									<input type="text" id="mta_wdate" style="background-color:#ffffff;cursor:initial" class="input-medium" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:new Date(),onpicked:function(){ajaxGetDist()}})" readonly/>
+									<input type="text" id="mta_wdate" style="background-color:#ffffff;cursor:initial;width:100px" class="input-medium" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:new Date(),onpicked:function(){ajaxGetDist()}})" readonly/>
 								</td>
 								<td width="80px" style="text-align:right" id="bus_label">补贴车：</td>	
 								<td width="50px" id="bus_input">
@@ -82,8 +90,9 @@
 							<td >工号</td>
 							<td >姓名</td>
 							<td >岗位</td>
-							<td id="td_part">参与度</td>
-							<td >分配比例</td>
+							 <td id="td_part" style="display:none">工时</td> 
+							<td >分配金额</td>
+							<td >承包单价</td>
 							<td >小班组</td>
 							<td >班组</td>
 							<td >车间</td>

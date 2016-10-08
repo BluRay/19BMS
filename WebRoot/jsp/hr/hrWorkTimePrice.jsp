@@ -54,8 +54,8 @@
 							</td>
 							<td width="80px" style="text-align: right">工厂：</td>
 							<td width="100px"><select id="factory" class="input-small"></select></td>
-							<td width="80px" style="text-align: right">技能系数：</td>
-							<td width="100px"><input type="text" id="skillParameter" placeholder="技能系数..." class="input-small"></input></td>
+							<!-- <td width="80px" style="text-align: right">技能系数：</td>
+							<td width="100px"><input type="text" id="skillParameter" placeholder="技能系数..." class="input-small"></input></td> -->
 							<td width="80px" style="text-align: right">开始日期：</td>
 							<td><input type="text" id="stratDate" class="input-small" placeholder="请选择日期..." onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" /></td>
 							<td width="80px" style="text-align: right">结束日期：</td>
@@ -92,7 +92,7 @@
 								<th style="width:60px">序号</th>
 								<td>工时类型</td>
 								<td>生产工厂</td>
-								<td>技能系数</td>
+								<!-- <td>技能系数</td> -->
 								<td>工时单价</td>
 								<td>开始日期</td>
 								<td>结束日期</td>
@@ -134,12 +134,12 @@
 								</select>
 			                </div>
 			            </div>
-			            <div class="control-group">
+			         <!--    <div class="control-group">
 			                <label class="control-label" for="newSkillParameter">*&nbsp;技能系数</label>
 			                <div class="controls">
 			                    <input type="text" id="newSkillParameter" placeholder="技能系数..." class="input-medium" />
 			                </div>
-			            </div>
+			            </div> -->
 			            <div class="control-group">
 			                <label class="control-label" for="newPrice">*&nbsp;工时单价/节拍</label>
 			                <div class="controls">
@@ -196,12 +196,12 @@
 								</select>
 			                </div>
 			            </div>
-			            <div class="control-group">
+			         <!--    <div class="control-group">
 			                <label class="control-label" for="newSkillParameter">*&nbsp;技能系数</label>
 			                <div class="controls">
 			                    <input type="text" id="editSkillParameter" placeholder="技能系数..." class="input-medium" />
 			                </div>
-			            </div>
+			            </div> -->
 			            <div class="control-group">
 			                <label class="control-label" for="newPrice">*&nbsp;工时单价/节拍</label>
 			                <div class="controls">

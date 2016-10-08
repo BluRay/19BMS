@@ -60,10 +60,10 @@
 								</td>
 								<td  style="text-align:right">状态：</td>
 								<td >
-									<select id="hour_status" class="input-medium" style='width:100px'>
-										<option value='0'>已维护</option>
+									<select id="hour_status" class="input-medium" style='width:100px' disabled>										
 										<option value='1'>已审批</option>
-										<option value='2'>已驳回</option>
+										<option value='2' selected>已驳回</option>
+										<option value='3'>已锁定</option>
 									</select>
 								</td>
 								<td><input type="button" class="btn btn-primary" id="btnQuery" value="查询" style="margin-left: 2px;"></input>
@@ -72,7 +72,8 @@
 								</tr>
 							</table>
 						</form>
-					<div id="pagination"
+						<br/>
+					<%-- <div id="pagination"
 					class="pagination pagination-small pagination-right"
 					style="display: none;">
 					<ul>
@@ -86,7 +87,7 @@
 						<li id="next" class="nextPage"><a href="#">&gt;</a></li>
 						<li id="last"><a href="#">»</a></li>
 					</ul>
-				</div>		
+				</div> --%>		
 						<input type="hidden" id="d_workshop" value="<s:property value='user.workshop_org' />">
 						<input type="hidden" id="d_workgroup" value="<s:property value='user.workgroup_org' />">
 						<input type="hidden" id="d_team" value="<s:property value='user.team_org' />">
@@ -101,19 +102,21 @@
 							<tr>
 					<!-- 		<td ><input type="checkbox" id="checkall"></td> -->
 							<td >车号</td>
-							<td>操作班组</td>							
+							<td>操作班组</td>	
+							<td>承包单价</td>						
 							<td></td>							
 							<td>操作日期</td>
 							<td>补贴车</td>
 							<td>工号</td>
 							<td >姓名</td>
 							<td >岗位</td>
-							<td >参与度</td>
-							<td >分配比例</td>
+							<td id="lable_workhour" style="display:none">工时</td>
+							<td >分配金额</td>
+						<!-- 	<td >计件工资</td> -->
 							<td >班组</td>
 							<td >状态</td>
-							<td >审核人</td>
-							<td >审核时间</td>
+							<!-- <td >审核人</td>
+							<td >审核时间</td> -->
 							<td style="width: 30px;"></td>
 							</tr>
 							</thead>

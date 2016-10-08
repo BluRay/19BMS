@@ -166,6 +166,16 @@ $(document).ready(function () {
 			$(span).html((index+1));
 		});
 	});
+	//选择技改类型，当技改类型为DCN设计变更时，单车总工时输入框可输入，否则为disabled
+	$("#new_ecn_type,#edit_ecn_type").change(function(e){
+		//alert($(e.target).find("option:selected").text());
+		if($(e.target).find("option:selected").text()!="DCN设计变更"){
+			$(".total_hour").attr("disabled",false);
+		}else{
+			$(".total_hour").attr("disabled",true);
+		}
+	});
+	
 	// 新增技改实施范围
 	$(".addFactoryOrder").live('click',function (e) {
 		// 取得事件table的tbody
@@ -198,6 +208,24 @@ $(document).ready(function () {
 			var taskNumberInput = $(trs).eq(index).children('td').eq(3).children('input');
 			if($(switchModeRadio).val() != null && $(switchModeRadio).val() == 0){
 				// 给技改数量赋值
+				if(!orderInput.attr('orderQty')){
+					$.ajax({
+					    url: "ecnDocument!getFactoryOrderQty.action",
+					    dataType: "json",
+						type: "get",
+					    data: {
+					    	"order_id": $(orderInput).attr("order_id"),
+					    	"factory_id": $(factionSelect).val()
+					    },
+					    success:function(response){
+					    	// alert(response.data[0].production_qty);
+							// 给技改数量赋值
+					    	$(orderInput).attr("orderQty",response.data[0].production_qty);
+							$(taskNumberInput).val(response.data[0].production_qty);
+					    	// $.each(response.data,function(index,value){
+					    }
+					});
+				}else
 				$(taskNumberInput).val(orderInput.attr('orderQty'));
 				$(taskNumberInput).attr("disabled",true);
 			}else{
@@ -316,6 +344,22 @@ $(document).ready(function () {
 	});
 	
 	/**
+	 * 变更点数 校验
+	 */
+	$("#new_changed_point").live("input",function(e){
+		if(!const_float_validate.test($(e.target).val())&&$(e.target).val()!=""){
+			alert("变更点数只能为数字！");
+			$(e.target).val("")
+		}
+	});
+	$("#edit_changed_point").live("input",function(e){
+		if(!const_float_validate.test($(e.target).val())&&$(e.target).val()!=""){
+			alert("变更点数只能为数字！");
+			$(e.target).val("")
+		}
+	});
+	
+	/**
 	 * 车间工时change事件绑定
 	 */
 	$(".ecn_workshop_time").live("change",function(e){
@@ -368,18 +412,38 @@ function getAllTask(type){
 			}else{
 				taskJson.switch_mode = $(switchModeRadio).val();
 			}
+			//变更类型
+			var changeTypeChx=$(trs).eq(2).children('td').eq(1).children('input:checked');
+			var changeType="";
+			$.each(changeTypeChx,function(index,chx){
+				changeType+=$(chx).val()+",";
+			});
+			var changeOrderNo=$(trs).eq(2).children('td').eq(1).children("input").eq(2).val();
+			if(changeType.indexOf("顾客变更")>=0){
+			
+				if(changeOrderNo.trim().length==0){
+					alert("技改任务"+(index+1)+"未填写变更单号！");
+					flag = false;
+					return false;
+				}
+			}
+			taskJson.change_type=changeType;
+			taskJson.change_order_no=changeOrderNo||"";
+			//alert(changeType);
 			// 总工时
-			var total_hoursInput = $(trs).eq(2).children('td').eq(1).children('input');
-			if($(total_hoursInput).val().trim() == ''){
-				// flag = false;
-				// alert("技改任务"+(index+1)+"的单车总工时为空，请输入单车总工时!");
+			var total_hoursInput = $(trs).eq(3).children('td').eq(1).children('input');
+			if($(total_hoursInput).val().trim() != ''&&$("#"+type+"_ecn_type :selected").text()!="DCN设计变更"){				
 				taskJson.total_hours = $(total_hoursInput).val();
+			}else if($(total_hoursInput).val().trim() == ''&&$("#"+type+"_ecn_type :selected").text()!="DCN设计变更"){				
+				flag = false;
+				alert("技改任务"+(index+1)+"的单车总工时为空，请输入单车总工时!");
+				return false;
 			}else{
-				taskJson.total_hours = $(total_hoursInput).val();
+				taskJson.total_hours = "";
 			}
 			
 			//技改车间/工时
-			var task_timeTable_tbody=$(trs).eq(3).children('td').eq(1).children('table').children('tbody').children('tr');
+	/*		var task_timeTable_tbody=$(trs).eq(3).children('td').eq(1).children('table').children('tbody').children('tr');
 			var task_time =[];
 			task_timeTable_tbody.each(function(index){
 				var unit_time_input=$(this).children('td').eq(1).children('input');//单车工时输入框
@@ -399,7 +463,7 @@ function getAllTask(type){
 					task_time.push(ecn_time_obj);
 				}
 			});
-			taskJson.ecn_time=task_time;
+			taskJson.ecn_time=task_time;*/
 			
 			// 技改范围
 			var taskAreaTable_tbody = $(trs).eq(4).children('td').eq(1).children('table').children('tbody').children('tr');
@@ -534,6 +598,7 @@ function ajaxEdit(ecnId){
 				$("#edit_ecn_document_date").val(ecnDocument.ecn_document_date);
 				$("#edit_gcy_contacts").val(ecnDocument.gcy_contacts);
 				$("#edit_gy_contacts").val(ecnDocument.gy_contacts);
+				$("#edit_changed_point").val(ecnDocument.changed_point);
 				if(ecnDocument.tecn_flag == 1){
 					$("#edit_tecn_flag").attr('checked',true);
 				}else{
@@ -628,10 +693,21 @@ function ajaxView(ecnId){
 
 // 新增技改任务
 function addTask(fDiv,type,ecnTask,workshop_time_html){
+	ecnTask = ecnTask || {};
 	var tasklist=($("#"+type+"_tab").find("li"));
+	var ecnType=$("#"+type+"_ecn_type :selected").text();
+	var totalHourDisable=ecnType=="DCN设计变更"?"disabled":"";
 	var taskNum=tasklist.length;
 	var index=taskNum-1;
 	var active_flag="active";
+	var cbox1_checked="";
+	var cbox2_checked="";	
+	if(ecnTask.change_type&&ecnTask.change_type.indexOf("顾客变更")>=0){
+		cbox2_checked="checked";
+	}
+	if(ecnTask.change_type&&ecnTask.change_type.indexOf("重大变更")>=0){
+		cbox1_checked="checked";
+	}
 	$("#"+type+"_tab").find("li").removeClass("active");
 	$(fDiv).find("div").removeClass("active");
 /*	if(taskNum==1){
@@ -641,7 +717,7 @@ function addTask(fDiv,type,ecnTask,workshop_time_html){
 	//alert(workshop_time_html);
 	// alert(type);
 	// alert(taskNum);
-	ecnTask = ecnTask || {};
+	
 	var tabli="<li role='presentation' class='"+active_flag+"'><a href='#"+type+"_task"+taskNum+"' data-toggle='tab' style='font-size: 14px; color: #333;display:inline-block'><span>任务"+taskNum+"</span>"
 			+"&nbsp;&nbsp;<i class='fa fa-remove' style='cursor: pointer;color: rgb(218, 208, 208);display:inline-block' onclick='javascript:{if (confirm(\"确认删除该任务？\"))removeTask(this,\""+type+"\")}'></i></a></li>";
 	if(type=='view'){
@@ -662,20 +738,23 @@ function addTask(fDiv,type,ecnTask,workshop_time_html){
 						    	'<tr>'+
 						    		'<td style="width: 120px;"> <label class="control-label" for="">*&nbsp;&nbsp;切换方式</label> </td>';
 						    		if(ecnTask.switch_mode == 0){
-						    			paramHtml+= '<td> <input checked="checked" value="0" class="radio changeRadio" type="radio"  name="radio'+type+taskNum+'" title="全部切换"/>全部切换<input value="1" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="立即切换"/>立即切换 </td>';
+						    			paramHtml+= '<td> <input checked="checked" value="0" style=\"margin: 0px 0 0\" class="radio changeRadio" type="radio"  name="radio'+type+taskNum+'" title="全部切换"/><span>全部切换</span><input value="1" style=\"margin: 0px 0 0\" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="立即切换"/><span>立即切换</span> </td>';
 						    		}else if(ecnTask.switch_mode == 1){
-						    			paramHtml+= '<td> <input value="0" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="全部切换"/>全部切换 <input checked="checked" value="1" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="立即切换"/>立即切换 </td>';
+						    			paramHtml+= '<td> <input value="0" style=\"margin: 0px 0 0\" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="全部切换"/><span>全部切换</span> <input checked="checked" value="1" style=\"margin: 0px 0 0\" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="立即切换"/><span>立即切换</span> </td>';
 						    		}else{
-						    			paramHtml+= '<td> <input value="0" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="全部切换"/>全部切换 <input value="1" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="立即切换"/>立即切换</label> </td>';
+						    			paramHtml+= '<td> <input value="0" style=\"margin: 0px 0 0\" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="全部切换"/><span>全部切换 </span><input value="1" style=\"margin: 0px 0 0\" class="radio changeRadio" type="radio" name="radio'+type+taskNum+'" title="立即切换"/><span>立即切换</span> </td>';
 						    		}
 						    		paramHtml+='</tr>'+
+						    		'<tr><td style=\"width: 120px;\"><label class=\"control-label\">*&nbsp;&nbsp;变更类型</label></td>'+
+									'<td><input value=\"重大变更\" style=\"margin: 0px 0 0\" class=\"radio\"  type=\"checkbox\"'+cbox1_checked+' name=\"'+type+'_change_type'+taskNum+'\" />重大变更 '+
+									'<input value=\"顾客变更\"  style=\"margin: 0px 0 0\" class=\"radio\"  type=\"checkbox\"'+cbox2_checked+' name=\"'+type+'_change_type'+taskNum+'\" />顾客变更&nbsp;&nbsp;&nbsp;&nbsp;<input class=\"input-medium\" type=\"text\" placeholder="请输入变更单号" value=\"'+(ecnTask.change_order_no||'')+'\"></td></tr>'+					    		
 							    '<tr><td style="width: 120px;"> <label class="control-label" for="">&nbsp;&nbsp;单车总工时</label> </td>'+
-						    		'<td><input type="text" style="width: 80px;" value="'+(ecnTask.total_hours||'')+'" disabled/>&nbsp;&nbsp;小时</td></tr>'+
-						    	'<tr><td style=\"vertical-align: top; padding-top: 10px; width: 120px;\">技改车间/工时</td>'+
+						    		'<td><input type="text" class="total_hour" style="width: 80px;" value="'+(ecnTask.total_hours||'')+'"'+totalHourDisable+'/>&nbsp;&nbsp;小时</td></tr>'+
+						    	/*'<tr><td style=\"vertical-align: top; padding-top: 10px; width: 120px;\">技改车间/工时(H)</td>'+
 						    	'<td><table style=\"margin-left: 0px;margin-top:5px; width: 60%;\" class=\"table table-condensed\">'+
 								'<thead><tr><th class=\"col-sm-2\">车间</th><th class=\"col-sm-7\">单车工时</th><th></th></tr>'+
-								'</thead><tbody class="exp-table">'+workshop_time_html+'</tbody></table></td></tr>'+
-						    	'<tr><td style="vertical-align: top;width: 120px;">技改实施范围</td>'+
+								'</thead><tbody class="exp-table">'+workshop_time_html+'</tbody>workshop_time_html+'</table></td></tr>'+
+*/						    	'<tr><td style="vertical-align: top;width: 120px;">技改实施范围</td>'+
 						    		'<td>'+
 						    			'<table style="margin-left:0px;margin-top:-5px;width: 80%;" class="exp-table table">'+
 									         '<thead>'+
@@ -815,15 +894,22 @@ function getWorkshopTimeInfo(taskid,type){
 			alert(response.message)
 		},
 		success : function(response) {
+			var tr_h="<thead><tr>";
+			var tr_b="<tbody><tr>";
 			$.each(response.data, function(index, value) {
-				var tr="<tr ><td style='height:30px'>"+value.workshop_name+"</td><td><input class='ecn_workshop_time' type='text' workshop_id='"+value.workshopid+
-						"' value='"+value.unit_time+"' task_id='"+value.ecn_task_id+"' ecn_time_id='"+value.id+"'><td>H</td></tr>";
+				/*var tr="<tr ><td style='height:30px'>"+value.workshop_name+"</td><td><input class='ecn_workshop_time' type='text' workshop_id='"+value.workshopid+
+						"' value='"+value.unit_time+"' task_id='"+value.ecn_task_id+"' ecn_time_id='"+value.id+"'><td>H</td></tr>";*/
 				/*if(type="view"){
 					tr="<tr ><td style='height:30px'>"+value.workshop_name+"</td><td><input class='workshop' type='text' workshop_id='"+value.id+
 					"' value='"+value.unit_time+"' task_id='"+value.ecn_task_id+"' disabled><td>H</td></tr>";
 				}*/
-				html+=tr;
+				tr_h+="<td class=\"col-sm-2\">"+value.workshop_name+"</td>"
+				tr_b+="<td style='height:30px'><input class='ecn_workshop_time' style='width:50px;text-align:center' type='text' workshop_id='"+value.workshopid+
+					"' value='"+value.unit_time+"' task_id='"+value.ecn_task_id+"' ecn_time_id='"+value.id+"'>";
 			})			
+			tr_h+="</tr></thead>";
+			tr_b+="</tr></tbody>";
+			html=tr_h+tr_b;
 		}	
 	})
 	return html;

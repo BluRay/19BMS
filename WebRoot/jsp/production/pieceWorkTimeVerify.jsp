@@ -59,20 +59,20 @@
 								</td>
 								<td  style="text-align:right">状态：</td>
 								<td >
-									<select id="hour_status" class="input-medium" style='width:100px'>
+									<select id="hour_status" class="input-medium" style='width:100px' disabled>
 										<option value='0'>已维护</option>
-										<option value='1'>已审批</option>
+										<option value='1' selected>已审批</option>
 										<option value='2'>已驳回</option>
 									</select>
 								</td>
 								<td><input type="button" class="btn btn-primary" id="btnQuery" value="查询" style="margin-left: 2px;"></input>
-									<input type="button" class="btn btn-success" id="btnVerify" value="批准" style="margin-left: 2px;"></input> 
+									<!-- <input type="button" class="btn btn-success" id="btnVerify" value="批准" style="margin-left: 2px;"></input>  -->
 									<input type="button" class="btn btn-danger" id="btnReject" value="驳回" style="margin-left: 2px;"></input>
 								</td>
 								</tr>
 							</table>
 						</form>
-					<div id="pagination"
+				<%-- 	<div id="pagination"
 					class="pagination pagination-small pagination-right"
 					style="display: none;">
 					<ul>
@@ -86,12 +86,12 @@
 						<li id="next" class="nextPage"><a href="#">&gt;</a></li>
 						<li id="last"><a href="#">»</a></li>
 					</ul>
-				</div>
+				</div> --%>
 						<input type="hidden" id="d_workshop" value="<s:property value='user.workshop_org' />">
 						<input type="hidden" id="d_workgroup" value="<s:property value='user.workgroup_org' />">
 						<input type="hidden" id="d_team" value="<s:property value='user.team_org' />">
 					<%-- 	<div><div style="width: 200px; display: inline-table;"><h5 class="section-head">计件工时</h5></div><span style="float:right;margin: 10px 20px;color:green" class="read_hours"></span></div> --%>
-					
+						<br/>
 						<div style="height:400px;overflow:auto">
 							<div style="display: none;position:fixed;z-index:999;margin-top:150px;margin-left:500px" class="divLoading" >
                                 <span><i class="fa fa-spinner fa-spin fa-4x" style="height:1em;"></i></span>
@@ -101,18 +101,20 @@
 							<tr>
 					 		<td ><input type="checkbox" id="checkall"></td> 
 							<td >车号</td>
-							<td>操作班组</td>														
+							<td>操作班组</td>
+							<td>承包单价</td>															
 							<td>操作日期</td>
 							<td>补贴车</td>
 							<td>工号</td>
 							<td >姓名</td>
 							<td >岗位</td>
-							<td >参与度</td>
-							<td >分配比例</td>
+							<td id="lable_workhour">工时</td>
+							<td >分配金额</td>
+							<td >计件工资</td>
 							<td >班组</td>
 							<td >状态</td>
-							<td >审核人</td>
-							<td >审核时间</td>
+						<!-- 	<td >审核人</td>-->
+							<td >录入时间</td> 
 							</tr>
 							</thead>
 							<tbody class="exp-table" id="tb_workhour">

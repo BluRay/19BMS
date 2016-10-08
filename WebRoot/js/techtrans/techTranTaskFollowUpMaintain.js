@@ -48,6 +48,7 @@ $(document).ready(function () {
 	$("#btn_single_bus_num_query").click (function () {
 		var order_id = $("#selectBusNumber_orderId").val();
 		var factory_id = $("#selectBusNumber_factoryId").val();
+		var workshop = $("#selectBusNumber_workshop").val();
 		var task_id = $("#selectBusNumber_taskId").val();
 		var bus_num_s = $("#bus_num_start").val();
 		var bus_num_e = $("#bus_num_end").val();
@@ -55,20 +56,21 @@ $(document).ready(function () {
 		var ecn_number = $("#selectBusNumber_ecnNumber").val();
 		var status = $("#selectBusNumber_status").val();
 		var ecn_id = $("#selectBusNumber_ecn_id").val();
-		updatecarstate(ecn_id,order_id,factory_id,task_id,switch_mode,ecn_number,bus_num_s,bus_num_e,null);
+		updatecarstate(ecn_id,order_id,factory_id,task_id,switch_mode,ecn_number,bus_num_s,bus_num_e,null,workshop);
 	});
 	
 	//车辆技改信息查询
 	$("#btn_single_bus_num_query_view").click (function () {
 		var order_id = $("#selectBusNumber_orderId_view").val();
 		var factory_id = $("#selectBusNumber_factoryId_view").val();
+		var workshop=$("#selectBusNumber_workshop_view").val();
 		var task_id = $("#selectBusNumber_taskId_view").val();
 		var bus_num_s = $("#bus_num_start_view").val();
 		var bus_num_e = $("#bus_num_end_view").val();
 		var switch_mode = $("#selectBusNumber_switch_mode_view").val();
 		var ecn_number = $("#selectBusNumber_ecnNumber_view").val();
 		var status = $("#selectBusNumber_status_view").val();
-		viewcarstate(order_id,factory_id,task_id,switch_mode,ecn_number,status,bus_num_s,bus_num_e);
+		viewcarstate(order_id,factory_id,task_id,switch_mode,ecn_number,status,bus_num_s,bus_num_e,workshop);
 	});
 	
 	//单任务跟进，结果提交
@@ -349,11 +351,11 @@ function ajaxQuery(targetPage){
     			$("<td />").html(value.already).appendTo(tr);
     			$("<td />").html(value.noalready).appendTo(tr);
     			if(value.taskstatus=='0'){
-    				$("<td />").html("<i name='edit' class=\"fa fa-pencil\" style=\"cursor: pointer;text-align: center;\" onclick='updatecarstate("+value.ecn_id+","+value.order_id+","+value.factory_id+","+value.ecn_task_id+","+value.switch_mode+","+value.ecn_number+",null,null,"+value.noalready+")'></i>").appendTo(tr);
+    				$("<td />").html("<i name='edit' class=\"fa fa-pencil\" style=\"cursor: pointer;text-align: center;\" onclick=\"updatecarstate('"+value.ecn_id+"','"+value.order_id+"','"+value.factory_id+"','"+value.ecn_task_id+"','"+value.switch_mode+"','"+value.ecn_number+"',null,null,'"+value.noalready+"','"+value.key_name+"')\"></i>").appendTo(tr);
     			}else if(value.taskstatus=='1'){
     				$("<td />").html("&nbsp;").appendTo(tr);
     			}
-    			$("<td />").html("<i name='edit' class=\"fa fa-search\" style=\"cursor: pointer;text-align: center;\" onclick='viewcarstate("+value.order_id+","+value.factory_id+","+value.ecn_task_id+","+'1'+","+value.ecn_number+","+'1'+")'></i>").appendTo(tr);
+    			$("<td />").html("<i name='edit' class=\"fa fa-search\" style=\"cursor: pointer;text-align: center;\" onclick='viewcarstate("+value.order_id+","+value.factory_id+","+value.ecn_task_id+","+'1'+","+value.ecn_number+","+'1,'+"null,null,\""+value.key_name+"\")'></i>").appendTo(tr);
     			if(value.photo=='0'){
     				$("<td />").html("<i name='edit' class=\"fa fa-pencil\" style=\"cursor: pointer;text-align: center;\" onclick='picupload("+value.ecn_task_id+")'></i>").appendTo(tr);
     			}else if(value.photo=='1'){
@@ -385,9 +387,10 @@ function ajaxQuery(targetPage){
  * @param bus_num_s
  * @param bus_num_e
  */
-function updatecarstate(ecn_id,order_id,factory_id,task_id,switch_mode,ecn_number,bus_num_s,bus_num_e,noalredy_num){
+function updatecarstate(ecn_id,order_id,factory_id,task_id,switch_mode,ecn_number,bus_num_s,bus_num_e,noalredy_num,workshop){
 	$("#selectBusNumber_orderId").val(order_id);
 	$("#selectBusNumber_factoryId").val(factory_id);
+	$("#selectBusNumber_workshop").val(workshop);
 	$("#selectBusNumber_taskId").val(task_id);
 	$("#selectBusNumber_switch_mode").val(switch_mode);
 	$("#selectBusNumber_ecnNumber").val(ecn_number);
@@ -396,7 +399,7 @@ function updatecarstate(ecn_id,order_id,factory_id,task_id,switch_mode,ecn_numbe
 
 	/*if(switch_mode=='0'){*/
 		//全部切换
-		getBusNumberByOrder(order_id,factory_id,task_id,switch_mode,ecn_number,bus_num_s,bus_num_e,noalredy_num);
+		getBusNumberByOrder(order_id,factory_id,task_id,switch_mode,ecn_number,bus_num_s,bus_num_e,noalredy_num,workshop);
 	/*}else{
 		//立即切换
 		$.ajax({
@@ -449,9 +452,10 @@ function updatecarstate(ecn_id,order_id,factory_id,task_id,switch_mode,ecn_numbe
  * @param bus_num_s
  * @param bus_num_e
  */
-function viewcarstate(order_id,factory_id,task_id,switch_mode,ecn_number,status,bus_num_s,bus_num_e){
+function viewcarstate(order_id,factory_id,task_id,switch_mode,ecn_number,status,bus_num_s,bus_num_e,workshop){
 	$("#selectBusNumber_orderId_view").val(order_id);
 	$("#selectBusNumber_factoryId_view").val(factory_id);
+	$("#selectBusNumber_workshop_view").val(workshop);
 	$("#selectBusNumber_taskId_view").val(task_id);
 	$("#selectBusNumber_switch_mode_view").val(switch_mode);
 	$("#selectBusNumber_ecnNumber_view").val(ecn_number);
@@ -467,6 +471,7 @@ function viewcarstate(order_id,factory_id,task_id,switch_mode,ecn_number,status,
 		type: "post",
 	    data: {
 	    	"factory_id":factory_id,
+	    	"workshop":workshop,
 	    	"ecn_task_id":task_id,
 	    	"order_id":order_id,
 	    	"ecn_switch_mode":switch_mode,
@@ -506,7 +511,7 @@ function viewcarstate(order_id,factory_id,task_id,switch_mode,ecn_number,status,
  * @param bus_num_s
  * @param bus_num_e
  */
-function getBusNumberByOrder(order_id,factory_id,task_id,switch_mode,ecn_number,bus_num_s,bus_num_e,noalready_num){
+function getBusNumberByOrder(order_id,factory_id,task_id,switch_mode,ecn_number,bus_num_s,bus_num_e,noalready_num,workshop){
 	$.ajax({
 		url: "ecnDocumentTask!getEcnTaskBusNumber.action",
 		dataType: "json",
@@ -514,6 +519,7 @@ function getBusNumberByOrder(order_id,factory_id,task_id,switch_mode,ecn_number,
 			   "ecn_task_id" : task_id,
 			   "task_detail_status" :'0',
 			   "factory_id":factory_id,
+			   "workshop":workshop,
 			   "bus_num_start" : bus_num_s,
 			   "bus_num_end" : bus_num_e
 		},
@@ -556,6 +562,7 @@ function getBusNumberByOrder(order_id,factory_id,task_id,switch_mode,ecn_number,
  */
 function updateDetailState(){
 	var factory_id = $("#selectBusNumber_factoryId").val();
+	var workshop=$("#selectBusNumber_workshop").val();
 	var task_id = $("#selectBusNumber_taskId").val();
 	var ecn_number = $("#selectBusNumber_ecnNumber").val();
 	var order_id = $("#selectBusNumber_orderId").val();
@@ -598,6 +605,7 @@ function updateDetailState(){
 				"ecn_id":ecn_id,
 				"task_id":task_id,
 				"factory_id":factory_id,
+				"workshop":workshop,
 				"order_id":order_id,
 				"ecn_number":ecn_number,
 				"bus_number_list" : JSON.stringify(bus_number_list),
@@ -789,6 +797,7 @@ function singlebusnoQuery(){
     			$("<td />").html(value.task_content).appendTo(tr);
     			$("<td />").html(value.ecn_document_number).appendTo(tr);
     			$("<td />").html(value.factory_name).appendTo(tr);
+    			$("<td />").html(value.workshop).appendTo(tr);
     			if(value.switch_mode == '0'){
     				$("<td />").html("全部切换").appendTo(tr);
     			}else{
@@ -802,7 +811,7 @@ function singlebusnoQuery(){
     			}
     			$("<td />").html(already).appendTo(tr);
     			$("<td />").html(value.ecn_number-already).appendTo(tr);*/
-    			$("<td />").html("<i name='edit' class=\"fa fa-search\" style=\"cursor: pointer;text-align: center;\" onclick='viewcarstate("+value.ecn_order_id+","+value.ecn_factory_id+","+value.id+","+'1'+","+value.ecn_number+","+'1'+")'></i>").appendTo(tr);
+    			$("<td />").html("<i name='edit' class=\"fa fa-search\" style=\"cursor: pointer;text-align: center;\" onclick='viewcarstate("+value.ecn_order_id+","+value.ecn_factory_id+","+value.id+","+"1"+","+value.ecn_number+","+"1"+",null,null,\""+value.workshop+"\")'></i>").appendTo(tr);
     			$("<td />").html("<i name='edit' class=\"fa fa-search\" style=\"cursor: pointer;text-align: center;\" onclick='picupquery("+value.id+")'></i>").appendTo(tr);
     			tr.data("factory_id",value.ecn_factory_id);
     			tr.data("task_id",value.id);

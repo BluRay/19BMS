@@ -144,7 +144,7 @@
 										<th style="text-align:center;width:150px">身份证</th>
 										<th style="text-align:center;width:90px">入厂时间</th>
 										<th style="text-align:center;width:45px">级别</th>
-										<th style="text-align:center;width:65px">技能系数</th>
+										<!-- <th style="text-align:center;width:65px">技能系数</th> -->
 										<th style="text-align:center;width:65px">计资方式</th>
 										<th style="text-align:center;width:90px">工厂/部门</th>
 										<th style="text-align:center;width:80px">科室</th>

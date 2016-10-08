@@ -7,7 +7,11 @@ var status_arr = {
 	"5" : "已完成",
 	"6" : "已驳回"
 };
+var unit_arr={'工装制作类':'计划科','工位器具类':'计划科','计划类':'计划科',
+		'工艺类':'工艺科','品质类':'品质科','设备制作类':'设备科','综合类':'综合科','售后类':'售后科'
+};
 $(document).ready(function() {
+
 	initPage();
 
 	// 点击查询
@@ -15,66 +19,116 @@ $(document).ready(function() {
 		var targetPage = $("#cur").attr("page") || 1;
 		ajaxQuery(targetPage);
 	});
+	
+	$("#new_order_type").change(function(){
+		if($(this).val()=='其他类型'){
+			$("#new_duty_unit").attr("readonly",false);
+		}else{
+			$("#new_duty_unit").val(unit_arr[$(this).val()]).attr("readonly",true);
+		}
+	});
+	$("#edit_order_type").change(function(){
+		if($(this).val()=='其他类型'){
+			$("#edit_duty_unit").attr("readonly",false);
+		}else{
+			$("#edit_duty_unit").val(unit_arr[$(this).val()]).attr("readonly",true);
+		}
+	});
+	
 	// 点击新增
 	$("#btnAdd").live("click", function() {
 		emptyModal();
+		$("#newRecordForm")[0].reset();
 		$("#newModal").modal("show");
 	});
 	// 确认新增
 	$("#btnConfirm").live("click", function() {
+	/*	var validate=$("#newRecordForm").validate();
+		alert(validate);
+		if(!validate){
+			return false;
+		}*/
 		var applyId = $("#applierId").val();
+		var launcher=$("#launcher").val();
+		var factory=$("#new_factory :selected").text();
+		var workshop=$("#new_workshop").val();
 		var reason = $("#reason").val();
 		var totalQty = $("#totalQty").val();
-		var assignerId= $("#assignerCardNo").attr("assignerId");
-		var dutyUnit= $('#duty_unit').val();
+		var orderType= $("#new_order_type :selected").text();
+		var dutyUnit= $('#new_duty_unit').val();		
 		dutyUnit=dutyUnit==null?"":dutyUnit;
+		var head_launch=$("#new_head_launch").val();
+		var acceptor=$("#new_acceptor").val();
+		var acceptorSign=$("#new_acceptor_sign").val();
 		//alert(dutyUnit);
 		var factory=$("#new_factory :selected").text();
 		var workshop=$("#new_workshop :selected").text();
+		
+		if(acceptor!=acceptorSign){
+			alert("验收人和验收人签字不一致！");
+			return false;
+		}else		
+			//$("#newRecordForm").submit();
+			
+		$("#newRecordForm").ajaxSubmit({
+			type:'post',
+			url:'tempOrder!createOrder.action',
+			dataType:'json',
+			data:{
+			},
+			beforeSubmit:function(){
+				return 	$("#newRecordForm").valid();
+			},
+			success:function(response){
+				alert(response.message);
+				ajaxQuery();
+			}		
+		});
+			
 		 //alert(duty_unit);
-		if (reason.trim().length == 0) {
+		/*if (reason.trim().length == 0) {
 			alert("作业原因/内容不能为空！");
 		} else if (totalQty.trim().length == 0) {
 			alert("总数量不能为空！");
 		} else if (!const_int_validate.test(totalQty)) {
 			alert("总数量只能是整数！");
-		} else if(assignerId==undefined){
-			alert("请输入工单分配人！");
-		}else if (assignerId != undefined && assignerId.trim().length == 0) {
-			alert("请输入有效的工单分配人！");
-		}/* else if (assignerId == $("#applierId").val()) {
-			alert("工单分配人和申请人不能为同一人！");
-		}*/ else if(factory=='请选择'){
+		}  else if(factory=='请选择'){
 			alert("制作工厂不能为空！");
 		}else if(workshop=='请选择'){
 			alert("制作车间不能为空！");
-		}/*else if(!dutyUnit){
+		}else if(!dutyUnit){
 			alert("责任单位不能为空！");
-		}*/else
-			ajaxAdd(applyId, reason, totalQty, assignerId,factory,workshop,dutyUnit==null?"":dutyUnit);
+		}else
+			ajaxAdd(applyId, reason, totalQty, assignerId,factory,workshop,dutyUnit==null?"":dutyUnit);*/
 	});
 	// 编辑
 	$(".fa-pencil").live("click", function(e) {
 		var tr = $(e.target).parent("td").parent("tr");
-		var tds = $(e.target).parent("td").siblings();
-		var id = $(tr).data("id");
-		var assignerCardNo = $(tr).data("assignerCardNo");
-		var assignerId = $(tr).data("assignerId");
-		var assigner = $(tr).data("assigner");
-		var duty_list=[];
-		if($(tr).data("dutyUnit")!=undefined){
-			duty_list=$(tr).data("dutyUnit").split(",");
-		}		
-		$("#editModal").data("id", id);
-		$("#edit_reason").val($(tds[1]).html()); 
-		$("#edit_totalQty").val($(tds[3]).html());
-		$("#edit_assignerCardNo").val(assignerCardNo);
-		$("#edit_assignerCardNo").attr("assignerId", assignerId);
-		$("#edit_assigner").html(assigner);
-		getFactorySelect("#edit_factory",$(tds[7]).html(), "empty","");
-		getWorkshopSelect("#edit_workshop", $(tds[8]).html(), $("#edit_factory").val(), "empty");
-		$('#edit_duty_unit').multiselect('deselectAll');
-		$('#edit_duty_unit').multiselect('select', duty_list);
+		var tmpOrder=$(tr).data("tempOrder");
+		$("#editModal").data("id", tmpOrder.id);
+		$("#orderId").val(tmpOrder.id);
+		$("#edit_launcher").val(tmpOrder.order_launcher);
+		$("#edit_reason").val(tmpOrder.reason_content);
+		$("#edit_totalQty").val(tmpOrder.total_qty);
+		getFactorySelect("#edit_factory",tmpOrder.factory, "empty","","name");
+		getWorkshopSelect("#edit_workshop", tmpOrder.workshop, $("#edit_factory").val(), "empty","name");
+		
+		$("#edit_factory").val(tmpOrder.factory).attr("readonly",true);
+		$("#edit_workshop").val(tmpOrder.workshop);
+		$('#edit_order_type').val(tmpOrder.order_type);
+		$("#edit_duty_unit").val(tmpOrder.duty_unit);
+		$("#edit_head_launch").val(tmpOrder.head_launch_unit);
+		$("#edit_acceptor").val(tmpOrder.acceptor);
+		$("#edit_labor").val(tmpOrder.labors);
+		$("#edit_singlehour").val(tmpOrder.single_hour);
+		$("#edit_assesor").val(tmpOrder.assesor);
+		$("#edit_assessVerifier").val(tmpOrder.assess_verifier);
+		$("#edit_cost_transfer").val(tmpOrder.is_cost_transfer);
+		//$('#edit_duty_unit').multiselect('select', duty_list);
+		$("#edit_cost_signer").val(tmpOrder.cost_unit_signer);
+		$("#edit_sap_order").val(tmpOrder.sap_order);
+		$("#edit_order_serial").val(tmpOrder.order_serial_no);
+		$("#edit_acceptor_sign").val(tmpOrder.acceptor);
 		$("#editModal").modal("show");
 	})
 	$(".fa-times").live("click", function(e) {
@@ -99,32 +153,17 @@ $(document).ready(function() {
 	});
 	// 确认编辑
 	$("#btnEditConfirm").live("click", function(e) {
-		var orderId = $("#editModal").data("id");
-		var assignerId = $("#edit_assignerCardNo").attr("assignerId");
-		var reason = $("#edit_reason").val();
-		var totalQty = $("#edit_totalQty").val();
-		var dutyUnit= $('#edit_duty_unit').val();
-		dutyUnit=dutyUnit==null?"":dutyUnit;
-		var factory=$("#edit_factory :selected").text();
-		var workshop=$("#edit_workshop :selected").text();
-		if (reason.trim().length == 0) {
-			alert("作业原因/内容不能为空！");
-		} else if (totalQty.trim().length == 0) {
-			alert("总数量不能为空！");
-		} else if (!const_int_validate.test(totalQty)) {
-			alert("总数量只能整数！");
-		} else if (assignerId != undefined && assignerId.trim().length == 0) {
-			alert("请输入有效的工单分配人！");
-		} /*else if (assignerId == $("#edit_applierId").val()) {
-			alert("工单分配人和申请人不能为同一人！");
-		}*/else if(factory=='请选择'){
-			alert("制作工厂不能为空！");
-		}else if(workshop=='请选择'){
-			alert("制作车间不能为空！");
-		}/*else if(!dutyUnit){
-			alert("责任单位不能为空！");
-		}*/ else
-			ajaxEdit(orderId, reason, totalQty, assignerId,factory,workshop,dutyUnit);
+		var acceptor=$("#edit_acceptor").val();
+		var acceptorSign=$("#edit_acceptor_sign").val();
+		if(acceptor!=acceptorSign){
+			alert("验收人和验收人签字不一致！");
+			return false;
+		}
+		var flag=$("#editRecordForm").valid();
+		if(flag){
+			ajaxEdit();
+		}
+			
 	});
 	// 输入审批人工号带出审批人信息
 	$("#edit_assignerCardNo,#assignerCardNo").change(function(e) {
@@ -157,16 +196,16 @@ $(document).ready(function() {
 					workshopEleId="#edit_workshop";
 				}
 				getWorkshopSelect_Auth(workshopEleId, null,
-						selectFactory, "empty");
+						selectFactory, "empty","name");
 			});
 
 });
 function initPage() {
 	getKeysSelect("DUTY_UNIT_TEMP_ORDER", "", "#duty_unit,#edit_duty_unit","noall","keyName");
 	
-	$('#duty_unit,#edit_duty_unit').multiselect({
-		/* buttonWidth : '350px', */
-		/* numberDisplayed : 3, */
+/*	$('#duty_unit,#edit_duty_unit').multiselect({
+		 buttonWidth : '350px', 
+		 numberDisplayed : 3, 
 		buttonText : function(options, select) {
 			if (options.length === 0) {
 				return '请选择 <b class="caret"></b>';
@@ -189,9 +228,9 @@ function initPage() {
 		},
 		dropUp: true,
 		maxHeight:200
-	});
-	getAuthorityFactorySelect("#new_factory", "", "empty","");
-	getWorkshopSelect_Auth("#new_workshop", "", $("#new_factory :selected").text(), "empty");
+	});*/
+	getAuthorityFactorySelect("#new_factory", "", "empty","","name");
+	getWorkshopSelect_Auth("#new_workshop", "", $("#new_factory :selected").text(), "empty","name");
 	// alert($("#tempOrder").find(".treemenu").html());
 	$("#tempOrder").find(".treemenu").addClass("collapsed");
 	$("#tmp_order").addClass("in");
@@ -226,8 +265,6 @@ function ajaxQuery(targetPage) {
 							.each(
 									response.dataList,
 									function(index, value) {
-										var tmpOrderNum = value.tmp_order_num == undefined ? ""
-												: value.tmp_order_num;
 										var reasonContent = value.reason_content == undefined ? ""
 												: value.reason_content;
 										var sapOrder = value.sap_order == undefined ? ""
@@ -238,18 +275,12 @@ function ajaxQuery(targetPage) {
 												: value.single_hour;
 										var labors = value.labors == undefined ? ""
 												: value.labors;
-										var totalHour = value.total_hours == undefined ? ""
-												: value.total_hours;
+										var totalHour = parseFloat(value.total_qty)*parseFloat(value.single_hour) 
 										var stauts = value.status == undefined ? ""
 												: status_arr[value.status];
 										var applyDate = value.apply_date == undefined ? ""
 												: value.apply_date;
-										var assigner = value.assigner == undefined ? ""
-												: value.assigner;
-										var assignerCardNo = value.card_number == undefined ? ""
-												: value.card_number;
-										var assignerId = value.assigner_id == undefined ? ""
-												: value.assigner_id;
+									
 
 										var tr = $("<tr />");
 										$("<td />")
@@ -257,35 +288,35 @@ function ajaxQuery(targetPage) {
 														"<a href=\"javascript:void(window.open('tempOrder!tempOrderInfoPage.action?tempOrderId="
 																+ value.id
 																+ "','newwindow','width=700,height=600,toolbar= no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,top=150,left=280'))\" style='cusor:pointer'>"
-																+ tmpOrderNum
+																+ value.order_serial_no
 																+ "</a>")
 												.appendTo(tr);
-										$("<td />").html(reasonContent)
-												.appendTo(tr);
-										$("<td />").html(sapOrder).appendTo(tr);
-										$("<td />").html(totalQty).appendTo(tr);
-										$("<td />").html(singleHour).appendTo(
-												tr);
-										$("<td />").html(labors).appendTo(tr);
-										$("<td />").html(totalHour)
-												.appendTo(tr);
-										$("<td />").html(value.factory)
-										.appendTo(tr);
-										$("<td />").html(value.workshop)
-										.appendTo(tr);
-										$("<td />").html(value.duty_unit==undefined?"":value.duty_unit)
-										.appendTo(tr);
-										$("<td />").html(value.applier)
-												.appendTo(tr);
-										$("<td />").html(applyDate)
-												.appendTo(tr);
-										$("<td />").html(stauts).appendTo(tr);
-										if (stauts == '已创建') {
+										$("<td />").html(value.factory).appendTo(tr);
+										$("<td />").html(value.workshop).appendTo(tr);
+										$("<td />").html(value.order_launcher).appendTo(tr);
+										$("<td />").html(value.sap_order).appendTo(tr);
+										$("<td />").html(reasonContent).appendTo(tr);
+										$("<td />").html(value.total_qty).appendTo(tr);
+										$("<td />").html(value.single_hour).appendTo(tr);
+										$("<td />").html(value.labors).appendTo(tr);
+										$("<td />").html(totalHour.toFixed(2)).appendTo(tr);
+										$("<td />").html(value.assesor).appendTo(tr);
+										$("<td />").html(value.assess_verifier).appendTo(tr);
+										$("<td />").html(value.acceptor).appendTo(tr);
+										$("<td />").html(value.order_type).appendTo(tr);
+										$("<td />").html(value.duty_unit).appendTo(tr);
+										if (stauts == '已评估'&&!value.workhour_total) {
 											$("<td />")
 													.html(
 															"<i name='edit' rel=\"tooltip\" title='编辑' class=\"fa fa-pencil\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;<i name='edit' rel=\"tooltip\" title='删除' class=\"fa fa-times\" style=\"cursor: pointer\"></i>")
 													.appendTo(tr);
-										} else {
+										} else if(stauts == '已驳回'){
+											$("<td />")
+											.html(
+													"<i name='edit' rel=\"tooltip\" title='编辑' class=\"fa fa-pencil\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;")
+											.appendTo(tr);
+										}
+										else {
 											$("<td />").html("").appendTo(tr);
 										}
 										
@@ -295,12 +326,9 @@ function ajaxQuery(targetPage) {
 												"<i name='edit' rel=\"tooltip\" title='编辑' class=\"fa fa-pencil\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;")
 										.appendTo(tr);*/
 										$("#tableResult tbody").append(tr);
-										$(tr).data("id", value.id);
-										$(tr).data("assignerCardNo",
-												assignerCardNo);
-										$(tr).data("assignerId", assignerId);
-										$(tr).data("assigner", assigner);
-										$(tr).data("dutyUnit",value.duty_unit==undefined?"":value.duty_unit)
+										$(tr).data("id", value.id);								
+										$(tr).data("tempOrder",value);	
+										
 									});
 					$("#tableResult").show();
 					$("#total").html(response.pager.totalCount);
@@ -339,18 +367,18 @@ function ajaxAdd(applyId, reason, totalQty, assignerId,factory,workshop,dutyUnit
 	});
 }
 
-function ajaxEdit(orderId, reason, totalQty, assignerId,factory,workshop,dutyUnit) {
-	var reason_fixed = reason.replace(/\r\n/g, "<br>").replace(/\n/g, "<br>");
+function ajaxEdit() {
+	/*var reason_fixed = reason.replace(/\r\n/g, "<br>").replace(/\n/g, "<br>");*/
 	var targetPage = $("#cur").attr("page") || 1;
-	var conditions = "{orderId:" + orderId + ",reason:'" + reason_fixed
+	/*var conditions = "{orderId:" + orderId + ",reason:'" + reason_fixed
 			+ "',totalQty:'" + totalQty + "',assignerId:" + assignerId+
-			",factory:'"+factory+"',workshop:'"+workshop+"',dutyUnit:'"+dutyUnit + "'}";
-	$.ajax({
+			",factory:'"+factory+"',workshop:'"+workshop+"',dutyUnit:'"+dutyUnit + "'}";*/
+	$("#editRecordForm").ajaxSubmit({
 		url : "tempOrder!updateOrder.action",
 		dataType : "json",
 		type : "post",
 		data : {
-			"conditions" : conditions
+			
 		},
 		success : function(response) {
 			if (response.success) {

@@ -7,9 +7,11 @@ $(document).ready(function(){
 			$("#reason_detail").val("");
 			$("#reason_detail").attr("disabled",true);
 			$("#waitReasonModal").modal("show");
+			$("#duty_unit").attr("readonly",true);
 		}else{
 			$("#reason_detail").val("");
 			$("#reason_detail").attr("disabled",false);
+			$("#duty_unit").attr("readonly",false);
 		}
 	});
 	$(".work_hour").live("keydown",function(event){
@@ -67,17 +69,18 @@ $(document).ready(function(){
 		$(e.target).closest("tr").remove();
 	});
 	//参与度验证是否数字
-	$(".work_hour") .live("change",function(e){		
+	$(".work_hour") .live("input",function(e){		
 			var tr=$(e.target).closest("tr");
 			var workHour=$(this).val();
-			var staffNum=$(tr).find(".card_num").val();										
+			var staffNum=$(tr).find(".card_num").val();	
+			var record_hour=0;
 			/*var conditions="{staffNum:'"+staffNum+"',workDate:'"+
 				$("#mta_wdate").val()+"'}";
 			var sfwlist=ajaxGetStaffWorkHours(conditions);
 			if($("#mta_wdate").val().trim().length>0&&sfwlist.length>0){
 				alert("不能重复维护工时！");
 				$(tr).remove();
-			}else*/ if(!const_float_validate.test(workHour)){
+			}else*/ if(!const_float_validate.test(workHour)&&workHour!=""){
 				alert("等待工时只能是数字！");
 				$(this).val("");
 			}else if(!const_float_validate_one.test(workHour)){
@@ -89,6 +92,13 @@ $(document).ready(function(){
 			}else if(workHour*10%5!=0){
 				alert("等待工时录入以半小时为单位，例如：1.0,1.5,2.0！");
 				$(this).val("");
+			}else{		
+				var hour_inputs=$(".work_hour");
+				$.each(hour_inputs,function(index,input){
+					var hour=Number($(input).val())||0;
+					record_hour=numAdd(record_hour,hour);
+				});
+				$("#record_hour").html(record_hour+"H");
 			}
 	});
 	// 分配比例检验是否数字
@@ -112,10 +122,11 @@ $(document).ready(function(){
 	});
 	//选择停线原因，并填入具体原因框，置灰
 	$("#btnConfirm").click(function(){
-		var radio=$('input:radio[name="exp_radio"]:checked');
+		var radio=$('input:radio[name="exp_radio"]:checked');		
 		var reason=$(radio).val()=='undefined'?'':$(radio).val();
 		//alert(reason);
 		var tr=$(radio).parent().parent();
+		var duty_unit=$(tr).children("td").eq(8).html();
 		var start_time=$(tr).data("start_time")==undefined?"":$(tr).data("start_time");
 		var finish_time=$(tr).data("finish_time")==undefined?"":$(tr).data("finish_time");
 		if(reason==undefined){
@@ -124,6 +135,7 @@ $(document).ready(function(){
 			$("#waitReasonModal").modal("hide");
 			$("#tableException tbody").html("");
 			$("#reason_detail").val(reason);
+			$("#duty_unit").val(duty_unit).attr("readonly",true);
 			$("#reason_detail").data("start_time",start_time);
 			$("#reason_detail").data("finish_time",finish_time);
 			$("#reason_detail").attr("disabled",true);
@@ -153,6 +165,7 @@ $(document).ready(function(){
 		}
 		var busNumber=$("#bus_number").val();
 		var workDate=$("#mta_wdate").val();
+		var dutyUnit=$("#duty_unit").val();
 		var stafflist = [];
 		var saveFlag=true;
 		var start_time=$("#reason_detail").data("start_time");
@@ -179,13 +192,29 @@ $(document).ready(function(){
 			alert("等待日期必须在‘"+start_time+"’与 ‘"+finish_time+"’之间！");
 		}else if(reasonDetail.trim().length==0){
 			alert("请填写具体原因！");
+		}else if(dutyUnit.trim().length==0){
+			alert("请填写责任部门！");
+			return false;
 		}
 		else{
+			var standard_price=ajaxGetStandardPrice();
+			if(standard_price==0){
+				saveFlag=false;
+				alert("未维护等待工时单价！");
+				return false;
+			}		
 			$.each(inputlist,
 					function(index, input) {						
 						var tr = $(input).closest( "tr");
 						var staffId=$(input).attr("staffId");											
 						var workHour=$(tr).find(".work_hour").val();
+						var staff_number=$(tr).find(".card_num").val();
+						var staff_name=$(tr).find(".staff_name").html();
+						var job=$(tr).find(".staff_post").html();
+						var team_org=$(tr).find(".staff_subgroup").html();
+						var workgroup_org=$(tr).find(".staff_group").html();
+						var workshop_org=$(tr).find(".staff_workshop").html();
+						var factory_org=$(tr).find(".staff_factory").html();
 						var distribution=$(tr).find(".distribution").val();
 						var tds = $(tr).children("td");
 						var whereabouts=$(tr).find(".whereabouts").val();
@@ -199,14 +228,25 @@ $(document).ready(function(){
 							staff.workshop = workshop;
 							staff.workgroup=workgroup;
 							staff.team=team;
-							staff.workDate=workDate;
-							staff.staffId=staffId;
+							staff.work_date=workDate;
+							staff.staff_id=staffId;
+							staff.staff_number=staff_number;
+							staff.staff_name=staff_name;
+							staff.job=job;
+							staff.plant_org=factory_org;
+							staff.workshop_org=workshop_org;
+							staff.workgroup_org=workgroup_org;
+							staff.team_org=team_org;
 							staff.subgroupId=org;
-							staff.workHour=workHour;
-							staff.waitReason=$("#waitReason").val();
-							staff.detailReason=reasonDetail;
+							staff.work_hour=workHour;
+							staff.wait_reason=$("#waitReason").val();
+							staff.detail_reason=reasonDetail;
 							staff.whereabouts=whereabouts;
-							staff.distribution=distribution;
+							staff.duty_unit=dutyUnit;
+							staff.wpay=parseFloat(standard_price)*parseFloat(workHour)
+							//staff.distribution=distribution;
+							staff.price=standard_price;
+							staff.status='0';
 							if(!isContain(staff,stafflist)){
 								stafflist.push(staff);
 							}else{
@@ -215,6 +255,7 @@ $(document).ready(function(){
 								return false;
 							}			
 						}
+
 						if(workHour==''||workHour.trim().length==0){
 							saveFlag=false;
 							alert("等待工时不能为空！");
@@ -236,6 +277,9 @@ $(document).ready(function(){
 							return false;
 						}	*/
 				});
+			if(!saveFlag){
+				return false;
+			}
 			var conditions = "{staffNum:'"+ staffNumlist + "',workDate:'"+ $("#mta_wdate").val()+ "'}";	
 			var sfwlist = ajaxGetStaffWorkHours(conditions);
 			if (sfwlist.length > 0) {
@@ -244,18 +288,15 @@ $(document).ready(function(){
 				alert("不能重复维护工时！");
 				return false;
 			}
-			
-			if(!saveFlag){
-				return false;
-			}
+
 			/*
 			 * 判断分配比例之和是否等于1
 			 */
-			if(total_distribution.toFixed(3)!=1){
+	/*		if(total_distribution.toFixed(3)!=1){
 				saveFlag = false;
 				alert("分配比例之和必须等于1！");
 				return false;
-			}
+			}*/
 			if(saveFlag&&stafflist.length>0){
 				ajaxSave(JSON.stringify(stafflist));
 			}else{
@@ -339,10 +380,10 @@ function addWorkHourItem(staffId,cardNo, staffName, staffPost, workHour, subgrou
 			.html(
 					"<input class='input-small work_hour' style='text-align:center;width:50px;margin-bottom: 0px;' type='text' value="
 							+ workHour + " >H").appendTo(tr);
-	$("<td />")
+/*	$("<td />")
 	.html(
 			"<input class='input-small distribution' id='dist_"+staffId+"' style='text-align:center;width:50px;margin-bottom: 0px;' type='text' value="
-					+ distribution + " >").appendTo(tr);
+					+ distribution + " >").appendTo(tr);*/
 	$("<td  />").html("<input class='whereabouts' style='text-align:center;width:100%;margin-bottom: 0px;' type='text' >").appendTo(tr);
 	$("<td class='staff_subgroup' />").html(subgroup).appendTo(tr);
 	$("<td class='staff_group' />").html(group).appendTo(tr);
@@ -527,3 +568,33 @@ function zTreeOnClick(event, treeId, treeNode) {
 		});
 	}
 };
+
+function ajaxGetStandardPrice(){
+	var price=0;
+	var factory = "";
+	var workDate=$("#mta_wdate").val();
+	var nodes = zTreeObj.getSelectedNodes();
+	var treeNode = nodes[0];
+	while (treeNode!=null){
+		if(treeNode.org_type == '1'||treeNode.org_type == '2'){
+			factory = treeNode.displayName;
+		}		
+		treeNode = treeNode.getParentNode();
+	}
+
+	$.ajax({
+		type : "get",// 使用get方法访问后台
+		dataType : "json",// 返回json格式的数据
+		url : "common!getBasePrice.action",
+		async :false,
+		data : {
+			"factory" : factory,
+			"workDate":workDate,
+			"type":"4"
+		},
+		success : function(response) {			
+			price = response.length==0?0:response[0].price;
+		}
+	})
+	return price;
+}

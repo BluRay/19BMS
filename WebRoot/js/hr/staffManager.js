@@ -147,7 +147,7 @@ function ajaxQuery(targetPage){
 	    				$("<td />").html(staff.identity_card).appendTo(tr);
 	    				$("<td />").html(staff.factory_incoming_date).appendTo(tr);
 	    				$("<td />").html(staff.staff_level).appendTo(tr);
-	    				$("<td />").html(staff.skill_parameter).appendTo(tr);
+	    				/*$("<td />").html(staff.skill_parameter).appendTo(tr);*/
 	    				$("<td />").html(staff.salary_type).appendTo(tr);
 	    				$("<td />").html(staff.plant_org).appendTo(tr);
 	    				$("<td />").html(staff.dept_org).appendTo(tr);

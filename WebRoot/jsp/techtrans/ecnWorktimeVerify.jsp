@@ -174,6 +174,7 @@
             </tbody>
         </table>
     	<input type="hidden" id="selectBusNumber_factoryId_view" /> 
+    	<input type="hidden" id="selectBusNumber_workshop_view" /> 
     	<input type="hidden" id="selectBusNumber_taskId_view" />
     	<input type="hidden" id="selectBusNumber_orderId_view" />
     	<input type="hidden" id="selectBusNumber_switch_mode_view" />

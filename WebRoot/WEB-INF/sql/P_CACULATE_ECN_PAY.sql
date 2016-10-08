@@ -62,7 +62,7 @@ BEGIN
 	#select query_org_ids;
 
     set v_sql=concat('create TEMPORARY  TABLE staff_hours_count select h1.* from BMS_HR_STAFF_HOURS h1 left join BMS_HR_STAFF s on h1.staff_id=s.id 
-		where h1.ecn_task_id in (''',query_ecn_task_ids,''')  and h1.hour_type=''3'' and substr(h1.work_date,1,7)=''',q_month,''' and h1.status in (''1'',''3'') ');
+		where h1.ecn_task_id in (''',query_ecn_task_ids,''')  and h1.factory=''',q_factory,''' and h1.workshop=''',q_workshop,'''  and h1.hour_type=''3'' and substr(h1.work_date,1,7)=''',q_month,''' and h1.status in (''1'',''3'') ');
 	set @vsql=v_sql;
 	#select @vsql;
 	prepare  stmt from @vsql;
@@ -77,24 +77,28 @@ BEGIN
 	#left join BMS_HR_STAFF_UPDATE_RECORD r on h.staff_id=r.staff_id  and r.type='skill_parameter' and substr(r.edit_date,1,7)<=substr(h.work_date,1,7)
 	#and r.edit_date=(select max(r1.edit_date) from BMS_HR_STAFF_UPDATE_RECORD r1 where h.staff_id=r1.staff_id  and r1.type='skill_parameter' and substr(r1.edit_date,1,7)<=substr(h.work_date,1,7))
 	join BMS_ECN_TASK t on h.ecn_task_id=t.id
-	where h.hour_type='3' and h.status in('1','3') and h.work_hour>0 and h.factory=q_factory and h.workshop=q_workshop
-	group by t.id,substr(h.work_date,1,7);
+	where h.hour_type='3' and h.status in('1','3') and h.work_hour>0
+	group by t.id,h.workshop,substr(h.work_date,1,7);
 
 	drop TEMPORARY TABLE IF EXISTS ECN_BUS_TOTAL;
 	create TEMPORARY TABLE  ECN_BUS_TOTAL as
-	select count(distinct td.bus_number) ecn_bus_total ,t.id,t.task_number,t.task_content,substr(td.confirmor_date,1,7) work_month
+	select count(distinct td.bus_number) ecn_bus_total ,t.id,t.task_number,t.task_content,substr(td.confirmor_date,1,7) work_month,td.workshop
 	from BMS_ECN_TASK_DETAIL td
+	left join BMS_BASE_FACTORY f on td.factory_id=f.id 
 	join BMS_ECN_TASK t on td.ecn_task_id=t.id
-	where td.status='1'
-	group by t.id,substr(td.confirmor_date,1,7);
+	where td.status='1' and f.factory_name=q_factory
+	group by t.id,td.workshop,substr(td.confirmor_date,1,7);
 
 	
 	#删除计件工资计算表中对应工厂车间月份下的记录
 	delete from BMS_ECN_PAY_CAL  where factory=q_factory and workshop=q_workshop and work_date like concat(q_month,'%');	
 	#向计件工资计算表中插入工资记录	
 	insert into BMS_ECN_PAY_CAL 
-		select NULL,s.staff_number,s.name staff_name,s.job,s.plant_org,s.workshop_org,s.workgroup_org,s.team_org,r.new_value skill_parameter,p.price,ROUND((h.work_hour/tmp.total_real_hour)*tmp2.ecn_bus_total*t1.unit_time,2) work_hour,h.work_hour real_work_hour,
-		h.work_date,t.task_number,t.id task_id,t1.unit_time total_hours,t.task_content,d.id document_id,d.ecn_document_number,t.ecn_number,h.factory,h.dept,h.workshop,h.workgroup,h.team
+	select NULL,s.staff_number,s.name staff_name,s.job,s.plant_org,s.workshop_org,s.workgroup_org,s.team_org,r.new_value skill_parameter,p.price,
+		case when tmp.total_real_hour<(tmp2.ecn_bus_total*t1.unit_time)*0.8 then  round((h.work_hour/(tmp.total_real_hour))*(tmp.total_real_hour*1.2),4) 
+		else  round((h.work_hour/tmp.total_real_hour)*tmp2.ecn_bus_total*t1.unit_time,4) end as work_hour,
+		h.work_hour real_work_hour,
+		h.work_date,t.task_number,t.id task_id,t1.unit_time*tmp2.ecn_bus_total total_hours,t.task_content,d.id document_id,d.ecn_document_number,t.ecn_number,h.factory,h.dept,h.workshop,h.workgroup,h.team
 	from staff_hours_count h
 	left join BMS_HR_STAFF s on s.id=h.staff_id 
 	left join BMS_HR_STAFF_UPDATE_RECORD r on h.staff_id=r.staff_id and r.type='skill_parameter' and substr(r.edit_date,1,7)<=substr(h.work_date,1,7)
@@ -103,11 +107,11 @@ BEGIN
 	left join BMS_ECN_TIME t1 on t.id=t1.ecn_task_id 
 	and t1.workshop_id=(select k.id from BMS_BASE_KEY k 
 		WHERE k.key_name=q_workshop )
-	left join BMS_ECN_DOCUMENT d on t.ecn_order_id=d.id
+	left join BMS_ECN_DOCUMENT d on t.ecn_id=d.id
 	left join BMS_HR_BASE_PRICE p on  p.factory=h.factory and p.type='3' and h.work_date>=p.start_date and h.work_date<=p.end_date
 		and p.edit_date=(select max(p1.edit_date) from BMS_HR_BASE_PRICE p1 where p1.factory=p.factory and p1.type=p.type and h.work_date>=p1.start_date and h.work_date<=p1.end_date)
 	left join ECN_HOUR_TOTAL tmp on tmp.id=t.id and substr(h.work_date,1,7)=tmp.work_month
-	left join ECN_BUS_TOTAL tmp2 on t.id=tmp2.id and substr(h.work_date,1,7)=tmp2.work_month
+	left join ECN_BUS_TOTAL tmp2 on t.id=tmp2.id and substr(h.work_date,1,7)=tmp2.work_month and tmp2.workshop=h.workshop
 	where h.hour_type='3' and h.status in('1','3') and h.work_hour>0 and h.factory=q_factory and h.workshop=q_workshop;
 	
 	set cal_status=1;

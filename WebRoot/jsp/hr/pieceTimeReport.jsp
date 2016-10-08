@@ -94,8 +94,8 @@
 						</td>
 						<td width="80px" style="text-align:right">统计日期：</td>
 						<td width="220px">
-							<input type="text" id="date_start" style="width:100px" class="input-medium" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',onpicked:function(){startdatechange();}})"/> - 
-							<input type="text" id="date_end" style="width:100px" class="input-medium" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',onpicked:function(){enddatechange();}})"/>
+							<input type="text" id="date_start" style="width:100px" class="input-medium" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',})"/> - 
+							<input type="text" id="date_end" style="width:100px" class="input-medium" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',})"/>
 						</td>
 						<td></td>
 						<td></td>
@@ -133,20 +133,21 @@
 						<table id="attendanceTable" style="text-align:center;font-size:12px;table-layout:fixed;" class="table table-bordered table-striped" > <!--  -->
 							<thead>
 								<tr id="">
-									<th style="text-align:center;width:20px;padding-left:0px;padding-right:0px">序号</th>
-									<th style="text-align:center;width:40px;padding-left:0px;padding-right:0px">车号</th>
-									<th style="text-align:center;width:15px;padding-left:0px;padding-right:0px">单价</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">工厂</th>
-									<th style="text-align:center;width:20px;padding-left:0px;padding-right:0px">车间</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">班组</th>
-									<th style="text-align:center;width:40px;padding-left:0px;padding-right:0px">小班组</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">操作日期</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">工号</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">姓名</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">岗位</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">参与度</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">分配比例</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">计件工资</th>
+									<th style="text-align:center;width:40px;padding-left:0px;padding-right:0px">序号</th>
+									<th style="text-align:center;width:120px;padding-left:0px;padding-right:0px">车号</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">承包单价</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">补贴车</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">工厂</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">车间</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">班组</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">小班组</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">操作日期</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">工号</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">姓名</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">岗位</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">工时</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">分配金额</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">计件工资</th>
 									
 								</tr>
 							</thead>
@@ -163,7 +164,8 @@
 									<tr id="">
 									<th style="text-align:center;padding-left:0px;padding-right:0px">序号</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">车号</th>
-									<th style="text-align:center;padding-left:0px;padding-right:0px">单价</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">承包单价</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">补贴车</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">工厂</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">车间</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">班组</th>
@@ -172,12 +174,12 @@
 									<th style="text-align:center;padding-left:0px;padding-right:0px">工号</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">姓名</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">岗位</th>
-									<th style="text-align:center;padding-left:0px;padding-right:0px">参与度</th>
-									<th style="text-align:center;padding-left:0px;padding-right:0px">分配比例</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">工时</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">分配金额</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">计件工资</th>
 									
 								</tr>
-								</tr>
+								
 							</thead>
 							<tbody>	
 							</tbody>
@@ -199,13 +201,14 @@
 									<th style="text-align:center;width:20px;padding-left:0px;padding-right:0px">车间</th>
 									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">班组</th>
 									<th style="text-align:center;width:40px;padding-left:0px;padding-right:0px">小班组</th>
-									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">岗位</th>
-									<th style="text-align:center;width:20px;padding-left:0px;padding-right:0px">分配比例</th>
+									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">岗位</th>									
 									<th style="text-align:center;width:45px;padding-left:0px;padding-right:0px">车号</th>
 									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">操作日期</th>
-									<th style="text-align:center;width:20px;padding-left:0px;padding-right:0px">参与度</th>
+									<th style="text-align:center;width:20px;padding-left:0px;padding-right:0px">分配金额</th>
+									<th style="text-align:center;width:20px;padding-left:0px;padding-right:0px">工时</th>
 									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">计件工资</th>
-									
+									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">承包单价</th>
+									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px">补贴车</th>
 								</tr>
 							</thead>
 							<tbody>	
@@ -225,13 +228,14 @@
 									<th style="text-align:center;padding-left:0px;padding-right:0px">车间</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">班组</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">小班组</th>
-									<th style="text-align:center;padding-left:0px;padding-right:0px">岗位</th>
-									<th style="text-align:center;padding-left:0px;padding-right:0px">分配比例</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">岗位</th>									
 									<th style="text-align:center;padding-left:0px;padding-right:0px">车号</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">操作日期</th>
-									<th style="text-align:center;padding-left:0px;padding-right:0px">参与度</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">分配金额</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">工时</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">计件工资</th>
-									
+									<th style="text-align:center;padding-left:0px;padding-right:0px">承包单价</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">补贴车</th>
 								</tr>
 							</thead>
 							<tbody>	

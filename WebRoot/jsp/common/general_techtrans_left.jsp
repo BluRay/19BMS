@@ -26,6 +26,11 @@ opacity:0
 				<i class="fa fa-share-alt fw"></i><span class="text">技改任务分配</span>
 			</a>
 		</li>
+		<li id="techtransTime">
+			<a href="ecnDocumentTask!taskTimeMaintain.action" class="js-sub-menu-toggle">
+				<i class="fa fa-share-alt fw"></i><span class="text">技改车间工时分配</span>
+			</a>
+		</li>
 		<li id="techtransFollow">
 			<a href="ecnDocumentTask!taskFollowUpMaintain.action" class="js-sub-menu-toggle">
 				<i class="fa fa-check-square-o fw"></i><span class="text">技改跟进</span>
