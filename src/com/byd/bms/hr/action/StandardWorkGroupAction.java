@@ -16,6 +16,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.struts2.ServletActionContext;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -149,7 +150,7 @@ public class StandardWorkGroupAction extends BaseAction<Object>{
 	 * @throws UnsupportedEncodingException
 	 */
 	public String updateWorkGroup() throws UnsupportedEncodingException{
-		
+		transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
 		transactionTemplate.execute(new TransactionCallbackWithoutResult(){
 
 			@Override

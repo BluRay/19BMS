@@ -78,6 +78,7 @@ public interface IPlanDao {
 	public int insertBusTransferLog(PlanBusTransfer busTransfer);
 	public int updateBusTransferLog(PlanBusTransfer busTransfer);
 	public List<Map<String,String>> getBusInfo(String busNumber);
+	public List<String> selectBusByMotorVin(PlanVIN vin); //根据VIN/左右电机查询车号，校验是否重复绑定
 	
 	public int getVinCountByYear(String year_code);
 	

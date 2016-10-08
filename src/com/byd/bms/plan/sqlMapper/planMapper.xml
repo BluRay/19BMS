@@ -243,7 +243,7 @@
 		insert into BMS_PLAN_BUS_NUMBER (bus_serial_number,bus_number,creator_id,creat_date,print_sign,printer_id,print_date,print_times)
 		VALUES(
 		(select a.sn from (SELECT IFNULL(max(bus_serial_number) +1,CONCAT(#{year},'0001')) AS sn FROM BMS_PLAN_BUS_NUMBER WHERE left(bus_serial_number,4) = #{year}) a),
-		(CONCAT(#{bus_code},'-',#{order_code},'-',#{year},'-',LPAD(#{num},4,'0'))),
+		(CONCAT(#{bus_code},'-',#{order_code},'-',#{year},'-',LPAD(#{num},5,'0') )),
 		#{creator_id},#{creat_date},#{print_sign},#{printer_id},#{print_date},#{print_times}
 		)
 		]]>
@@ -646,6 +646,9 @@
 		WHERE bus_number=#{bus_number}
 		]]>
 	</update>
+	<select id="selectBusByMotorVin" parameterType="com.byd.bms.plan.entity.PlanVIN" resultType="String">
+		select distinct bus_number from BMS_PLAN_BUS where vin=#{vin} or left_motor_number=#{left_motor_number} or right_motor_number=#{right_motor_number}
+	</select>
 	<update id="updatePlanBusStatus" parameterType="map">
 		<![CDATA[
 		UPDATE BMS_PLAN_BUS SET status=#{status} 
@@ -1283,8 +1286,10 @@
 	</update>
 	<select id="getBusInfoByBusNo" parameterType="Map"
 		resultType="com.byd.bms.plan.entity.PlanBus">
-		select * from BMS_PLAN_BUS where bus_number=#{busNo} and
-		order_id=#{orderId}
+		select b.*,f.factory_name from BMS_PLAN_BUS b 
+		left join BMS_BASE_FACTORY f on b.factory_id=f.id		
+		where b.bus_number=#{busNo} and
+		b.order_id=#{orderId}
 	</select>
 	<select id="getBusToolList" resultType="Map">
 		select name,quantity,unit

@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 
@@ -22,7 +23,7 @@ public class LoginAction extends BaseAction<BmsBaseUser>{
 		//System.out.println("userName:" + user.getUsername() + "\n"+ "password:" + user.getPassword());
 		@SuppressWarnings("rawtypes")
 		List list = loginDao.getUser(user.getUsername());
-		String password=user.getPassword().isEmpty()?"":user.getPassword();
+		String password=StringUtils.isEmpty(user.getPassword())?"":user.getPassword();
 		//String encryptedPwd;
 		try {
 			//encryptedPwd = MD5Util.getEncryptedPwd(password);

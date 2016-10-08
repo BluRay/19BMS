@@ -294,9 +294,9 @@
 		<if test="workTimeType==5 ">
 			AND p.type=5
 		</if>
-		<if test="skillParameter!='' ">
+		<!-- <if test="skillParameter!='' ">
 			AND p.skillParameter = #{skillParameter}
-		</if>
+		</if> -->
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
 		</if>
@@ -331,9 +331,9 @@
 		<if test="workTimeType==5 ">
 			AND type=5
 		</if>
-		<if test="skillParameter!='' ">
+	<!-- 	<if test="skillParameter!='' ">
 			AND skillParameter = #{skillParameter}
-		</if>
+		</if> -->
 
 	</select>
 	<insert id="addWorkTimePrice" useGeneratedKeys="true"
@@ -484,17 +484,141 @@
 		SELECT h.* FROM BMS_HR_BASE_STANDARD_HOUR_PRICE h
 		WHERE h.org_id = #{org_id}
 		AND h.bus_type = #{bus_type_id}
-		AND h.month = #{month}
+		AND h.team = #{small_workgroup}
+		AND h.order_id = #{order_id}
 		AND h.deleted = '0'
 	</select>
+	
+	<!-- 根据工厂、车间、班组、小班组、订单查询班组承包单价 -->
+	<select id="queryWorkgroupPrice" parameterType="Map"
+		resultType="Map">
+		SELECT h.* FROM BMS_HR_WORKGROUP_PRICE h
+		WHERE h.deleted = '0'
+		<if test="factory !=null and factory !=''">
+			AND h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			AND h.workshop = #{workshop}
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			AND h.workgroup = #{workgroup}
+		</if>
+		<if test="small_workgroup !=null and small_workgroup !=''">
+			AND h.team=#{small_workgroup}
+		</if>
+		<if test="order_id !=null and order_id !=''">
+			AND h.order_id=#{order_id}
+		</if>
+		<if test="effective_date !=null and effective_date !=''">
+			AND h.effective_date =#{effective_date}
+		</if>
+	</select>
+	
+	<!--新增班组承包单价 -->
+	<insert id="addWorkgroupPrice" parameterType="List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			INSERT INTO
+			BMS_HR_WORKGROUP_PRICE(order_id,standard_price,editor_id,edit_date,effective_date,factory,workshop,workgroup
+			<if test="item.small_workgroup!=null">
+				,team
+			</if>
+			)
+			VALUES(#{item.order_id},#{item.standard_price},#{item.editor_id},#{item.edit_date},#{item.effective_date},#{item.factory},#{item.workshop},#{item.workgroup}
+			<if test="item.small_workgroup!=null">
+				,#{item.small_workgroup}
+			</if>
+			)
+		</foreach>
+
+	</insert>
+	<!--修改班组承包单价 -->
+	<update id="updateWorkgroupPrice" parameterType="List">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_HR_WORKGROUP_PRICE
+			SET standard_price = #{item.standard_price},editor_id = #{item.editor_id},edit_date =
+			#{item.edit_date},effective_date=#{effective_date}
+			WHERE id = #{item.id}
+		</foreach>
+	</update>
+	
+	<select id="getWorkgroupPriceList" parameterType="Map" resultType="Map">
+		select p.id,p.factory,p.workshop,p.workgroup,p.team,p.standard_price stand_price,u.username editor,
+		p.edit_date,concat(o.order_no,' ',o.order_name,t.internal_name,' ',o.order_qty,'台') as order_desc,p.effective_date
+		from BMS_HR_WORKGROUP_PRICE p
+		left join BMS_ORDER o on o.id=p.order_id
+		left join BMS_BASE_BUS_TYPE t on t.id=o.bus_type_id
+		left join BMS_BASE_USER u on u.id=p.editor_id
+		where 1=1
+		<if test="factory !=null and factory !=''">
+			and p.factory =#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and p.workshop =#{workshop}
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and p.workgroup =#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and p.team =#{team}
+		</if>
+		<if test="effctiveDateStart !=null and effctiveDateStart !=''">
+			and p.effective_date >=#{effctiveDateStart}
+		</if>
+		<if test="effctiveDateEnd !=null and effctiveDateEnd !=''">
+			and p.effective_date &lt;=#{effctiveDateEnd}
+		</if>
+		<if test="orderId !=null and orderId !=''">
+			and p.order_id =#{orderId}
+		</if>
+		order by p.factory,p.workshop,p.workgroup,p.team,p.order_id,p.edit_date desc
+		<if test="offset!=null">
+		 LIMIT #{offset} ,#{pageSize} 
+	</if>
+	</select>	
+	
+	<select id="getWorkgroupPriceCount" parameterType="Map" resultType="int">
+		select count(id) from BMS_HR_WORKGROUP_PRICE
+		where 1=1
+		<if test="factory !=null and factory !=''">
+			and factory =#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and workshop =#{workshop}
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and workgroup =#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and team =#{team}
+		</if>
+		<if test="orderId !=null and orderId !=''">
+			and order_id =#{orderId}
+		</if>
+		<if test="effctiveDateStart !=null and effctiveDateStart !=''">
+			and effective_date >=#{effctiveDateStart}
+		</if>
+		<if test="effctiveDateEnd !=null and effctiveDateEnd !=''">
+			and effective_date &lt;=#{effctiveDateEnd}
+		</if>
+	</select>	
+
+	
+	
+	
 
 
 	<select id="getPieceTimeReportList2" resultType="Map" parameterType='Map'>	
 		SELECT
-		staff_number,staff_name,job,plant_org,workshop_org,workgroup_org,team_org,distribution,GROUP_CONCAT(bus_number,',',work_date,',',participation,',',ppay,',',CONCAT(bus_count,'|')
+		staff_number,staff_name,job,plant_org,workshop_org,workgroup_org,team_org,GROUP_CONCAT(bus_number,',',work_date,',',distribution,',',ifnull(participation,''),',',ppay,',',standard_price,',',bonus,',',CONCAT(bus_count,'|')
 		separator '') AS 'piece_str'
 		FROM BMS_PIECE_PAY_CAL
-		WHERE work_date >= #{date_start} AND work_date &lt;= #{date_end}
+		WHERE work_date >= #{date_start} AND work_date &lt;= #{date_end} and status in('1','3')
 		<if test="list.size !=0">
 			AND staff_number IN
 			<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
@@ -528,7 +652,7 @@
 	staff_number,staff_name,job,workshop_org,workgroup_org,team_org,skill_parameter,GROUP_CONCAT(bus_number,',',work_date,',',participation,',',CONCAT(ppay,'|')
 	separator '') AS 'piece_str'
 	FROM BMS_PIECE_PAY_CAL
-	WHERE work_date >= #{date_start} AND work_date &lt;= #{date_end}
+	WHERE work_date >= #{date_start} AND work_date &lt;= #{date_end} and status in('1','3')
 	AND factory = #{factory}
 	<if test="list.size !=0">
 			AND staff_number IN
@@ -608,8 +732,8 @@
 	</select>
 	
 	<select id="getPieceTimeReportBusList" resultType="String" parameterType='Map' >
-	SELECT DISTINCT bus_number FROM BMS_HR_STAFF_HOURS h 
-	LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id
+	SELECT DISTINCT bus_number FROM BMS_PIECE_PAY_CAL h 
+<!-- 	LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id -->
 	WHERE h.factory = #{factory} 	
 	<if test="workshop !=null and workshop !=''">
 		AND find_in_set(h.workshop,#{workshop})>0
@@ -624,10 +748,9 @@
 		AND UPPER(bus_number) = #{bus_number}
 	</if>
 	<if test="staff_number!=''">
-		AND (s.staff_number = #{staff_number} OR s.name = #{staff_number})
+		AND (h.staff_number = #{staff_number} OR h.staff_name = #{staff_number})
 	</if>
-	AND hour_type = '1'
-	AND h.`status` IN('1', '3') AND participation>0
+	AND h.`status` IN('1', '3')
 	AND h.work_date >= #{date_start} AND h.work_date &lt;= #{date_end}
 	<if test="offset!=null">
 		LIMIT #{offset} ,#{pageSize} 
@@ -635,8 +758,8 @@
 	</select>
 	
 	<select id="getPieceTimeReportBusListCount" resultType="int" parameterType='Map' >
-	SELECT count(DISTINCT h.bus_number) FROM BMS_HR_STAFF_HOURS h
-	LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id
+	SELECT count(DISTINCT h.bus_number) FROM BMS_PIECE_PAY_CAL h
+	<!-- LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id -->
 	WHERE h.factory = #{factory} 	
 	<if test="workshop !=null and workshop !=''">
 		AND find_in_set(h.workshop,#{workshop})>0
@@ -651,18 +774,17 @@
 		AND UPPER(bus_number) = #{bus_number}
 	</if>
 	<if test="staff_number!=''">
-		AND (s.staff_number = #{staff_number} OR s.name = #{staff_number})
+		AND (h.staff_number = #{staff_number} OR h.staff_name = #{staff_number})
 	</if>
-	AND hour_type = '1'
-	AND h.`status` IN('1', '3') AND participation>0
+	AND h.`status` IN('1', '3') 
 	AND h.work_date >= #{date_start} AND h.work_date &lt;= #{date_end}
 	</select>
 	
 	<select id="getPieceTimeReportList" resultType="Map" parameterType='Map' >
-	SELECT bus_number,standard_price,work_date,factory as plant_org,workshop as workshop_org,workgroup as workgroup_org,team as team_org,
-	GROUP_CONCAT(staff_number,',',staff_name,',',IFNULL(job,'-'),',',participation,',',ifnull(distribution,''),',',CONCAT(ROUND(ppay,2),'|') separator '') AS 'piece_str'
+	SELECT bus_number,standard_price,work_date,factory as plant_org,workshop as workshop_org,workgroup as workgroup_org,team as team_org,standard_price,bonus,
+	GROUP_CONCAT(staff_number,',',staff_name,',',IFNULL(job,'-'),',',ifnull(participation,''),',',ifnull(distribution,''),',',CONCAT(ROUND(ppay,2),'|') separator '') AS 'piece_str'
 	FROM BMS_PIECE_PAY_CAL 
-	WHERE work_date >= #{date_start} AND  work_date &lt;= #{date_end}
+	WHERE work_date >= #{date_start} AND  work_date &lt;= #{date_end} and status in('1','3')
 	AND factory = #{factory}
 	<if test="list.size !=0">
 		AND bus_number IN
@@ -694,6 +816,7 @@
 	(SELECT bus_number,work_date,plant_org,workshop_org,workgroup_org,team_org,
 	GROUP_CONCAT(staff_number,',',staff_name,',',team_org,',',participation,',',ifnull(skill_parameter,''),',',CONCAT(ROUND(ppay,2),'|') separator '') AS 'piece_str'
 	FROM BMS_PIECE_PAY_CAL WHERE work_date >= #{date_start} AND  work_date &lt;= #{date_end}
+	and status in('1','3')
 	<if test="factory!='全部'">
 		AND factory = #{factory}
 	</if>
@@ -1110,7 +1233,7 @@
 
 	<select id="getWaitManHourList" resultType="Map" parameterType='Map'>
 		SELECT * FROM BMS_WAIT_PAY_CAL w WHERE w.work_date LIKE
-		CONCAT('%',#{waitmanhourdate},'%')
+		CONCAT('%',#{waitmanhourdate},'%') and w.status in('1','3')
 		<if test="factory!='全部'">
 			AND w.factory = #{factory}
 		</if>
@@ -2360,9 +2483,9 @@
 	<!-- 获技改工时统计list技改单维度 -->
 	<select id="getEcnReportData" parameterType="Map" resultType="Map">
 		select distinct ecn_document_number,
-		CONCAT(task_id,'.',task_content) as task,
-		total_hours*ecn_number as totalhours,
-		total_hours*ecn_number*price as totalprice,
+		CONCAT(task_id,'.',task_content) as task,workshop,
+		total_hours as totalhours,
+		total_hours*price as totalprice,
 		work_date,
 		staff_number,
 		staff_name,
@@ -2370,10 +2493,10 @@
 		workshop_org,
 		workgroup_org,
 		team_org,
-		round(work_hour,2) as work_hour,
-		round(price*work_hour,2) as salary,
+		round(work_hour,4) as work_hour,
+		round(price*work_hour,4) as salary,
 		plant_org,
-		round(real_work_hour,2) as real_work_hour
+		round(real_work_hour,4) as real_work_hour
 		from BMS_ECN_PAY_CAL
 		where
 		1=1
@@ -2432,10 +2555,10 @@
 		workshop_org,
 		workgroup_org,
 		team_org,
-		round(work_hour,2) as work_hour,
-		round(price*work_hour,2) as salary,
+		round(work_hour,4) as work_hour,
+		round(price*work_hour,4) as salary,
 		plant_org,
-		round(real_work_hour,2) as real_work_hour
+		round(real_work_hour,4) as real_work_hour
 		from BMS_ECN_PAY_CAL
 		where
 		1=1
@@ -2496,7 +2619,7 @@
 
 	<!-- 获额外工时统计list技改单维度 -->
 	<select id="getTmpReportData" parameterType="Map" resultType="Map">
-		select distinct tmp_order_num,
+		select distinct order_serial_no tmp_order_num,
 		total_hours as totalhours,
 		total_hours*price as totalprice,
 		work_date,
@@ -2543,16 +2666,16 @@
 		</if>
 		<if test="reason_content !=null and reason_content !=''">
 			<![CDATA[
-			and (reason_content like CONCAT('%',#{reason_content},'%') OR tmp_order_num like CONCAT('%',#{reason_content},'%'))
+			and (reason_content like CONCAT('%',#{reason_content},'%') OR order_serial_no like CONCAT('%',#{reason_content},'%'))
 			]]>
 		</if>
 		order by
-		tmp_order_num desc,
+		order_serial_no desc,
 		work_date asc
 	</select>
 	<!-- 获额外工时统计list人员维度 -->
 	<select id="getTmpReportData1" parameterType="Map" resultType="Map">
-		select distinct tmp_order_num,
+		select distinct order_serial_no tmp_order_num,
 		total_hours as totalhours,
 		total_hours*price as totalprice,
 		work_date,
@@ -2609,11 +2732,12 @@
 	
 	<!-- added by xjw 删除对应生效日期下员工分配信息 -->
 	<delete id="deleteStaffDistribution" parameterType="Map">
-		delete from BMS_HR_STAFF_DISTRIBUTION where effective_date=#{effectiveDate}
+		delete from BMS_HR_STAFF_DISTRIBUTION where effective_date=#{effective_date}
 		and staff_number in
 		<foreach collection="stafflist" item="staff" open="(" separator="," close=")">
 			#{staff}
 		</foreach>
+		and order_id=#{order_id}
 	</delete>
 	
 	<!-- added by xjw 保存对应生效日期下员工分配信息 -->
@@ -2622,16 +2746,19 @@
 			SELECT
 			LAST_INSERT_ID()
 		</selectKey>
-		insert into BMS_HR_STAFF_DISTRIBUTION (staff_number,effective_date,distribution,editor,edit_date)
+		insert into BMS_HR_STAFF_DISTRIBUTION (factory,workshop,workgroup,team,staff_number,order_id,distribution,editor,edit_date,effective_date)
 		values
 		<foreach collection="list" item="item" index="index" separator=",">
-			(#{item.staff_number},#{item.effective_date},#{item.distribution},#{item.editor},#{item.edit_date})
+			(#{item.factory},#{item.workshop},#{item.workgroup},#{item.team},#{item.staff_number},#{item.order_id},#{item.distribution},#{item.editor},#{item.edit_date},#{item.effective_date})
 		</foreach>
 	</insert>
 	
 	<select id="getStaffDistribution" parameterType="Map" resultType="Map">
-		SELECT s.plant_org factory,s.workshop_org workshop,s.workgroup_org workgroup,s.team_org team,s.staff_number,s.name staff_name,d.distribution,d.effective_date,d.editor,d.edit_date 
+		SELECT d.factory,d.workshop,d.workgroup,d.team,s.staff_number,
+		s.name staff_name,d.distribution,d.effective_date,d.editor,d.edit_date,concat(o.order_no,' ',o.order_name,t.internal_name,' ',o.order_qty,'台') order_desc 
 		FROM BMS_HR_STAFF_DISTRIBUTION d
+		left join BMS_ORDER o on d.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on t.id=o.bus_type_id
 		LEFT JOIN BMS_HR_STAFF s on s.staff_number=d.staff_number
 		where 1=1
 		<if test="effctiveDateStart !=null and effctiveDateStart !=''">
@@ -2641,21 +2768,24 @@
 			and d.effective_date &lt;=#{effctiveDateEnd}
 		</if>
 		<if test="factory !=null and factory !=''">
-			and s.plant_org =#{factory}
+			and d.factory =#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
-			and s.workshop_org =#{workshop}
+			and d.workshop =#{workshop}
 		</if>
 		<if test="workgroup !=null and workgroup !=''">
-			and s.workgroup_org =#{workgroup}
+			and d.workgroup =#{workgroup}
 		</if>
 		<if test="team !=null and team !=''">
-			and s.team_org =#{team}
+			and d.team =#{team}
+		</if>
+		<if test="order_id !=null and order_id !=''">
+			and d.order_id =#{order_id}
 		</if>
 		<if test="staff !=null and staff !=''">
 			and (s.name like concat(#{staff},'%') or s.staff_number like concat(#{staff},'%'))
 		</if>
-		order by s.plant_org,s.team_org,d.effective_date,s.staff_number
+		order by d.factory,d.team,d.order_id,d.edit_date desc,s.staff_number
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
 		</if>
@@ -2667,27 +2797,43 @@
 		LEFT JOIN BMS_HR_STAFF s on s.staff_number=d.staff_number
 		where 1=1
 		<if test="effctiveDateStart !=null and effctiveDateStart !=''">
-			and d.effective_date >=#{effctiveDateStart}
+			and d.edit_date >=#{effctiveDateStart}
 		</if>
 		<if test="effctiveDateEnd !=null and effctiveDateEnd !=''">
-			and d.effective_date &lt;=#{effctiveDateEnd}
+			and d.edit_date &lt;=#{effctiveDateEnd}
 		</if>
 		<if test="factory !=null and factory !=''">
-			and s.plant_org =#{factory}
+			and d.factory =#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
-			and s.workshop_org =#{workshop}
+			and d.workshop =#{workshop}
 		</if>
 		<if test="workgroup !=null and workgroup !=''">
-			and s.workgroup_org =#{workgroup}
+			and d.workgroup =#{workgroup}
 		</if>
 		<if test="team !=null and team !=''">
-			and s.team_org =#{team}
+			and d.team =#{team}
+		</if>
+		<if test="order_id !=null and order_id !=''">
+			and d.order_id =#{order_id}
 		</if>
 		<if test="staff !=null and staff !=''">
 			and (s.name like concat(#{staff},'%') or s.staff_number like concat(#{staff},'%'))
 		</if>
-		order by s.plant_org,s.team_org,s.staff_number;
+		
+	</select>
+	
+	<!-- 校验工号、姓名是否匹配 -->
+	<select id="checkIsValidStaff" parameterType="map" resultType="int">
+		select count(id) from BMS_HR_STAFF where staff_number=#{staff_number} and name=#{staff_name}
+	</select>
+	
+	<select id="getWorkgroupPrice" parameterType="map" resultType="double">
+		SELECT ifnull(standard_price,0) FROM BMS_HR_WORKGROUP_PRICE
+		where concat(factory,'-',workshop,'-',workgroup,'-',team)=#{workgroup}
+		and order_id=#{order_id} and effective_date&lt;=#{effective_date}
+		order by effective_date desc 
+		limit 1
 	</select>
 </mapper> 
 

@@ -260,6 +260,7 @@ public class PlanAction extends BaseAction<Object> {
 			
 			lineCount = 0;
 			BufferedReader br2 = new BufferedReader(new FileReader(file));
+			
 			while ((line = br2.readLine()) != null) {
 				logger.info("---->验证通过开始更新数据库" + lineCount);
 				if (lineCount > 0){
@@ -272,9 +273,26 @@ public class PlanAction extends BaseAction<Object> {
 					vin.setCreat_date(creatTime);
 					vin.setBus_number(vinArray[4]);
 					
-					planDao.updatePlanVin(vin);
-					//如果用户填了车号，需同步更新【BMS_PLAN_BUS】
-					if(vinArray[4]!="")planDao.updatePlanBus(vin);
+					//校验VIN、左右电机号是否重复绑定
+					List<String> busList=planDao.selectBusByMotorVin(vin);
+					if(busList==null){
+						//如果用户填了车号，需同步更新【BMS_PLAN_BUS】
+						if(vinArray[4]!=""){
+							planDao.updatePlanBus(vin);
+						}else
+							planDao.updatePlanVin(vin);
+					}else if(busList.size()==1&&vin.getBus_number().equals(busList.get(0))){
+						//如果用户填了车号，需同步更新【BMS_PLAN_BUS】
+						if(vinArray[4]!=""){
+							planDao.updatePlanBus(vin);
+						}else
+							planDao.updatePlanVin(vin);
+					}else{
+						out.print("导入的VIN号："+vin.getVin()+",左/右电机号："+vin.getLeft_motor_number()+"/"+vin.getRight_motor_number()+"不能重复绑定，请检查后重新上传！<a href=\"javascript:history.back();\">返回</a>");
+						return null;
+					}
+					
+					
 				}
 				lineCount++;
 			}			

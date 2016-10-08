@@ -147,6 +147,10 @@ public class EcnDocumentAction extends BaseAction<BmsEcnDocument>{
 					ecnDocument.setTecn_flag(new String(request.getParameter("new_tecn_flagValue").getBytes("UTF-8"),"UTF-8"));
 					ecnDocument.setEditor_id(userid);
 					ecnDocument.setEdit_date(curTime);
+					/**
+					 * added by xjw 160920 新增字段： 变更点数
+					 */
+					ecnDocument.setChanged_point(request.getParameter("new_changed_point"));
 					
 				   	// 把上传的文件放到指定的路径下  
 			    	String path = ServletActionContext.getServletContext().getRealPath("/file/upload/ecn/");
@@ -209,8 +213,11 @@ public class EcnDocumentAction extends BaseAction<BmsEcnDocument>{
 				    		String task_content = taskJSON.getString("task_content");
 				    		String switch_mode = taskJSON.getString("switch_mode");
 				    		String total_hours = taskJSON.getString("total_hours");
+				    		String change_type=taskJSON.getString("change_type");
+							String change_order_no=taskJSON.getString("change_order_no");
+							
 				    		JSONArray task_areaJSONArray = taskJSON.getJSONArray("task_area");
-							JSONArray ecn_timeArray=taskJSON.getJSONArray("ecn_time");
+							//JSONArray ecn_timeArray=taskJSON.getJSONArray("ecn_time");
 				    		for (int j = 0; j < task_areaJSONArray.size(); j++){
 				    			JSONObject taskAreaJSON = task_areaJSONArray.getJSONObject(j);
 				    			int ecn_order_id = Integer.parseInt(taskAreaJSON.getString("ecn_order_id"));
@@ -227,10 +234,12 @@ public class EcnDocumentAction extends BaseAction<BmsEcnDocument>{
 								ecnTask.setEcn_number(ecn_number);
 								ecnTask.setCreat_date(curTime);
 								ecnTask.setTotal_hours(total_hours);
+								ecnTask.setChange_type(change_type);
+								ecnTask.setChange_order_no(change_order_no);
 								ecnDocumentDao.addEcnTask(ecnTask);
 								
 								//获取返回的task id插入BMS_ECN_TIME表数据
-								int ecn_task_id=ecnTask.getId();
+								/*int ecn_task_id=ecnTask.getId();
 								for(int k=0;k<ecn_timeArray.size();k++){
 									JSONObject ecnTimeJSON = ecn_timeArray.getJSONObject(k);
 									int workshop_id=Integer.parseInt(ecnTimeJSON.getString("workshop_id"));
@@ -242,7 +251,7 @@ public class EcnDocumentAction extends BaseAction<BmsEcnDocument>{
 									pmap.put("unit_time", unit_time);
 									pmap.put("unit", unit);
 									ecnDocumentDao.addEcnTime(pmap);
-								}
+								}*/
 				    		}
 				    	}
 						JSONObject json = Util.dataListToJson(true,"新增成功",null);
@@ -302,7 +311,10 @@ public class EcnDocumentAction extends BaseAction<BmsEcnDocument>{
 					ecnDocument.setTecn_flag(new String(request.getParameter("edit_tecn_flagValue").getBytes("UTF-8"),"UTF-8"));
 					ecnDocument.setEditor_id(userid);
 					ecnDocument.setEdit_date(curTime);
-					
+					/**
+					 * added by xjw 160920 新增字段： 变更点数
+					 */
+					ecnDocument.setChanged_point(request.getParameter("edit_changed_point"));
 				   	// 把上传的文件放到指定的路径下  
 			    	String path = ServletActionContext.getServletContext().getRealPath("/file/upload/ecn/");
 			    	// 写到指定的路径中  
@@ -386,8 +398,10 @@ public class EcnDocumentAction extends BaseAction<BmsEcnDocument>{
 				    		String task_content = taskJSON.getString("task_content");
 				    		String switch_mode = taskJSON.getString("switch_mode");
 				    		String total_hours = taskJSON.getString("total_hours");
+				    		String change_type=taskJSON.getString("change_type");
+							String change_order_no=taskJSON.getString("change_order_no");
 				    		JSONArray task_areaJSONArray = taskJSON.getJSONArray("task_area");
-				    		JSONArray ecn_timeArray=taskJSON.getJSONArray("ecn_time");
+				    		//JSONArray ecn_timeArray=taskJSON.getJSONArray("ecn_time");
 				    		for (int j = 0; j < task_areaJSONArray.size(); j++){
 				    			JSONObject taskAreaJSON = task_areaJSONArray.getJSONObject(j);
 				    			int task_id = Integer.parseInt(taskAreaJSON.getString("ecn_task_id"));
@@ -406,11 +420,13 @@ public class EcnDocumentAction extends BaseAction<BmsEcnDocument>{
 								ecnTask.setEcn_number(ecn_number);
 								ecnTask.setCreat_date(curTime);
 								ecnTask.setTotal_hours(total_hours);
+								ecnTask.setChange_type(change_type);
+								ecnTask.setChange_order_no(change_order_no);
 																
 								if(task_id!=0){
 									ecnTask.setId(task_id);
 									ecnDocumentDao.editEcnTask(ecnTask);
-									for(int k=0;k<ecn_timeArray.size();k++){
+								/*	for(int k=0;k<ecn_timeArray.size();k++){
 										JSONObject ecnTimeJSON = ecn_timeArray.getJSONObject(k);
 										int ecn_time_id=Integer.parseInt(ecnTimeJSON.getString("id"));
 										int workshop_id=Integer.parseInt(ecnTimeJSON.getString("workshop_id"));
@@ -428,11 +444,11 @@ public class EcnDocumentAction extends BaseAction<BmsEcnDocument>{
 											ecnDocumentDao.addEcnTime(pmap);
 										}
 										
-									}
+									}*/
 								}else{
 									ecnDocumentDao.addEcnTask(ecnTask);
 									//获取返回的task id插入BMS_ECN_TIME表数据								
-									int ecn_task_id=ecnTask.getId();
+									/*int ecn_task_id=ecnTask.getId();
 									for(int k=0;k<ecn_timeArray.size();k++){
 										JSONObject ecnTimeJSON = ecn_timeArray.getJSONObject(k);
 										int workshop_id=Integer.parseInt(ecnTimeJSON.getString("workshop_id"));
@@ -444,7 +460,7 @@ public class EcnDocumentAction extends BaseAction<BmsEcnDocument>{
 										pmap.put("unit_time", unit_time);
 										pmap.put("unit", unit);
 										ecnDocumentDao.addEcnTime(pmap);
-									}
+									}*/
 								}
 				    		}
 				    	}

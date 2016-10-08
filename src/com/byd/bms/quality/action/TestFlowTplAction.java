@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -156,6 +157,7 @@ public class TestFlowTplAction extends BaseAction<Object>{
 		tplHeader.setEditorId(user_id);
 		String version=Util.format(new Date(), "yyyyMMddHms");
 		tplHeader.setVersion(version);
+		transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
 		transactionTemplate.execute(new TransactionCallbackWithoutResult(){
 
 			@Override
@@ -254,7 +256,10 @@ public class TestFlowTplAction extends BaseAction<Object>{
 			 TestFlowTplDetailBean detail=(TestFlowTplDetailBean) JSONObject.toBean(object, TestFlowTplDetailBean.class);
 			 tplDetailList.add(detail);
 		}
-		qualityDao.updateTestFlowTplHeader(tplHeader);
+		if(tplHeader!=null){
+			qualityDao.updateTestFlowTplHeader(tplHeader);
+		}
+		
 		int i=qualityDao.updateTestFlowTplDetail(tplDetailList);
 		if(i>0){
 			result.put("success", true);

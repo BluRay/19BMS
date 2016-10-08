@@ -46,9 +46,17 @@ public interface IEcnTaskDao {
 	//单任务跟进-车辆明细状态更新
 	public int updatetaskdetailstate(String taskdetailid,String detailstate,Integer userid,String curtime);
 	//查询任务在所有车辆明细是否均已经完成
-	public List<BmsEcnTaskDetail> queryTaskCompleteIsOK(String taskid);
+	public List<BmsEcnTaskDetail> queryTaskCompleteIsOK(Map<String, Object> m);
 	//更新任务状态
-	public int updateTaskState(String taskid);
+	public int updateTaskState(Map<String, Object> tskmap);
+	/**
+	 * added by xjw 160922
+	 * 更新任务状态（车间维度） 
+	 * @param tskmap
+	 * @return
+	 */
+	public int updateWorkshopTaskState(Map<String, Object> tskmap);
+	
 	//为技改任务表插入图片路径 
 	public int updateEcnTaskPicSrc(String taskid,String oldpath,String newpath);
 	public List<BmsEcnTask> getTaskDetail(String taskid);
@@ -71,5 +79,6 @@ public interface IEcnTaskDao {
 	public int deleteWorkHourInfo(Map<String, String> conditionMap);
 	//计算技改工资
 	public void caculateEcnSalary(Map<String, Object> conditionMap);
-
+	//更新技改任务
+	public int updateEcnTask(Map<String, Object> conditionMap);
 }	

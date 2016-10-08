@@ -265,4 +265,54 @@ public interface IHrDao {
 	 */
 	public int getStaffDistributionCount(Map<String, Object> conditionMap);
 	
+	/**
+	 * added by xjw 16/08/24
+	 * 根据工厂、车间、班组、小班组、订单 查询 班组承包单价信息
+	 * @param map
+	 * @return
+	 */
+	public Map<String,Object> queryWorkgroupPrice(Map<String, Object> map);
+	/**
+	 * added by xjw 16/08/24
+	 * 批量插入班组承包单价信息
+	 * @param addList
+	 * @return
+	 */
+	public int addWorkgroupPrice(List<Map<String, Object>> addList);
+	/**
+	 * added by xjw 16/08/24	
+	 * 批量更新班组承包单价信息
+	 * @param upDateList
+	 * @return
+	 */
+	public int updateWorkgroupPrice(List<Map<String, Object>> upDateList);
+	/**
+	 * added by xjw 16/08/24	
+	 * 根据条件查询班组承包单价信息列表
+	 * @param cMap
+	 * @return
+	 */
+	public List getWorkgroupPriceList(Map<String, Object> cMap);
+	/**
+	 * added by xjw 16/08/24	
+	 * 根据条件查询班组承包单价信息数
+	 * @param cMap
+	 * @return
+	 */
+	public int getWorkgroupPriceCount(Map<String, Object> cMap1);  
+	
+	/**
+	 * 校验工号、姓名是否匹配
+	 * @param cMap
+	 * @return
+	 */
+	public int checkIsValidStaff(Map<String, Object> cMap);
+	
+	/**
+	 * 根据工厂、车间、班组、小班组、订单查询班组承包单价
+	 * @param pmap
+	 * @return
+	 */
+	public Double getWorkgroupPrice(Map<String, Object> pmap);
+	
 }

@@ -3,6 +3,7 @@
 <configuration>
 	<typeAliases>
 		<typeAlias alias="BmsBus" type="com.byd.bms.production.entity.BmsBus"/>
+		<typeAlias alias="tempOrder" type="com.byd.bms.production.entity.BmsTempOrder"/>
 	</typeAliases>
 	<mappers>
 		<mapper resource="com/byd/bms/production/sqlMapper/productionMapper.xml"/>

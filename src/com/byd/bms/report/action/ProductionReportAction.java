@@ -124,7 +124,7 @@ public class ProductionReportAction extends BaseAction<Object> {
 			conditionMap.put(key, jo.get(key));
 		}
 		//获取工厂车间列表
-		List<Map<String, String>> workshopList=commDao.getWorkshopSelect(Integer.parseInt((String) conditionMap.get("factoryId")));
+		List<Map<String, String>> workshopList=commDao.getWorkshopSelect((String) conditionMap.get("factoryId"));
 		List<String> itemList=new ArrayList<String>();
 		for(Map<String,String> m:workshopList){
 			itemList.add(m.get("name"));

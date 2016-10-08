@@ -32,6 +32,10 @@
 			<result name="monitorworkshop_assembly">/jsp/production/monitorBoardAssembly.jsp</result>
 			<result name="monitorworkshop_welding">/jsp/production/monitorBoardWelding_2.jsp</result>
 			<result type="json"><param name="root">result</param></result>
+			<!-- add by xjw 160815 -->
+			<result name="battery">/jsp/production/productionBattery.jsp</result>
+			<result name="voltage">/jsp/production/productionVoltage.jsp</result>
+			<result name="spring">/jsp/production/productionSpring.jsp</result>
 		</action>
 		<!-- 临时派工单 -->
 		<action name="tempOrder" class="tempOrderAction">

@@ -86,7 +86,8 @@
 			<result name="ecnSearch">/jsp/techtrans/ecnInformationSearch.jsp</result>
 			<result name="worktimeMaintain">/jsp/techtrans/ecnWorkTimeMaintain.jsp</result>
 			<result name="worktimeVerify">/jsp/techtrans/ecnWorktimeVerify.jsp</result>	
-			<result name="ecnWorkTimeInfoPage">/jsp/techtrans/ecnWorkTimeInfo.jsp</result>			
+			<result name="ecnWorkTimeInfoPage">/jsp/techtrans/ecnWorkTimeInfo.jsp</result>
+			<result name="taskTimeMaintain">/jsp/techtrans/techTranTaskTimeMtn.jsp</result>			
 		</action>
 		<action name="swrNotice" class="swrNoticeAction">
 			<result name="maintain">/jsp/techtrans/swrNoticeMaintain.jsp</result>

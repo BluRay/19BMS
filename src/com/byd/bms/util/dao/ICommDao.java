@@ -17,7 +17,7 @@ public interface ICommDao {
 	public List<Map<String,String>> getOrderConfigSelect(Map<String, Object> conditionMap);
 	public List<Map<String,String>> getOrderSelect(int busTypeId);
 	public List<Map<String,String>> getPartsSelect(String parts);
-	public List<Map<String,String>> getWorkshopSelect(int factoryId);
+	public List<Map<String,String>> getWorkshopSelect(String factoryId);
 	public List<Map<String,String>> getLineSelect(int workshopId);
 	public List<Map<String,String>> getFrequencySelect();
 	public List<Map<String,String>> getTestToolsSelect();
@@ -76,4 +76,16 @@ public interface ICommDao {
 	public List<Map<String,String>> getVinList(Map<String, Object> conditionMap);
 	public List getRoleAuthorityList(Map<String,Object> cmap);
 	public List getBusVehicleType(String busType); //根据车型查询车身型号列表
+	/**
+	 * added by xjw 16/08/29 获取班组承包单价
+	 * @param conditionMap
+	 * @return
+	 */
+	public List<Map<String,String>> getWorkgroupPrice(Map<String, Object> conditionMap);
+	/**
+	 * added by xjw 16/09/07 获取标准工时单价
+	 * @param conditionMap
+	 * @return
+	 */
+	public List<Map<String,String>> getBasePrice(Map<String, Object> conditionMap);
 }

@@ -22,6 +22,8 @@ public class BmsEcnTaskDetail {
 	/**技改工厂**/
 	private String factoryID;
 	private String factory_name;
+	/**技改车间**/
+	private String workshop;
 	/**技改状态**/
 	private String status;
 	/**确认人**/
@@ -105,5 +107,11 @@ public class BmsEcnTaskDetail {
 	}
 	public void setOrder_id(String order_id) {
 		this.order_id = order_id;
+	}
+	public String getWorkshop() {
+		return workshop;
+	}
+	public void setWorkshop(String workshop) {
+		this.workshop = workshop;
 	}
 }

@@ -72,8 +72,8 @@ public class WaitWorkTimeAction extends BaseAction<Object> {
 		List<Map<String,Object>> swh_list=new ArrayList<Map<String,Object>>();
 		for(int i=0;i<jsonArray.size();i++){
 			 JSONObject object = (JSONObject)jsonArray.get(i);		
-			 object.put("editorId", user.getId());
-			 object.put("editDate", createTime);
+			 object.put("editor_id", user.getId());
+			 object.put("edit_date", createTime);
 			Map<String, Object> map = (Map<String, Object>) object;
 			swh_list.add(map);
 		}
@@ -110,25 +110,25 @@ public class WaitWorkTimeAction extends BaseAction<Object> {
 		for(int i=0;i<jsonArray.size();i++){
 			 JSONObject object = (JSONObject)jsonArray.get(i);
 			 if("verify".equals(whflag)){
-				 object.put("approverId", user.getId());
-				 object.put("approveDate", createTime);
+				 //object.put("editor_id", user.getId());
+				 //object.put("edit_date", createTime);
 				 object.put("status", "1");
 				 object.put("actionType", "verify");
 			 }else if("reject".equals(whflag)){
-				 object.put("approverId", user.getId());
-				 object.put("approveDate", createTime);
+				 //object.put("editor_id", user.getId());
+				 //object.put("edit_date", createTime);
 				 object.put("status", "2");
 				 object.put("actionType", "reject");
 			 }else{
-				 object.put("editorId", user.getId());
-				 object.put("editDate", createTime);
+				 object.put("editor_id", user.getId());
+				 object.put("edit_date", createTime);
 			 }
 			 		 
 			Map<String, Object> map = (Map<String, Object>) object;
 			swh_list.add(map);
 		}
 		try{
-			int i=productionDao.batchUpdateWorkHour(swh_list);
+			int i=productionDao.batchUpdateWaitPay(swh_list);
 			result.put("success", true);
 		    result.put("message", "保存成功");
 		}catch(Exception e){
@@ -165,7 +165,7 @@ public class WaitWorkTimeAction extends BaseAction<Object> {
 			String key=(String) it.next();
 			conditionMap.put(key, jo.get(key));
 		}
-		int i=productionDao.deleteWorkHourInfo(conditionMap);
+		int i=productionDao.deleteWaitHourInfo(conditionMap);
 		if(i>0){
 			result.put("success", true);
 		    result.put("message", "删除成功");

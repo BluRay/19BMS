@@ -245,10 +245,13 @@ public class CommonAction extends BaseAction<Object> {
 	public String getOrderFuzzySelect() {
 		String[] orderNoList = (String[]) conditionMap.get("orderNo");
 		String[] busTypeList = (String[]) conditionMap.get("busType");
+		String[] factoryList=(String[]) conditionMap.get("factory");
 		String orderNo = orderNoList == null ? "" : orderNoList[0];
 		String busType = busTypeList == null ? "" : busTypeList[0];
+		String factory=factoryList==null?"":factoryList[0];
 		conditionMap.put("orderNo", orderNo);
 		conditionMap.put("busType", busType);
+		conditionMap.put("factory",factory);
 		selectList = commDao.getOrderFuzzySelect(conditionMap);
 
 		return SUCCESS;
@@ -303,8 +306,9 @@ public class CommonAction extends BaseAction<Object> {
 	 */
 	public String getWorkshopSelect() {
 		HttpServletRequest request = ServletActionContext.getRequest();
-		int factoryId = StringUtils.isEmpty(request.getParameter("factoryId")) ? 0
-				: Integer.parseInt(request.getParameter("factoryId"));
+		/*int factoryId = StringUtils.isEmpty(request.getParameter("factoryId")) ? 0
+				: Integer.parseInt(request.getParameter("factoryId"));*/
+		String factoryId=StringUtils.isEmpty(request.getParameter("factoryId"))?"":request.getParameter("factoryId");
 		selectList = commDao.getWorkshopSelect(factoryId);
 
 		return SUCCESS;
@@ -816,6 +820,8 @@ public class CommonAction extends BaseAction<Object> {
 		conditionMap.put("workgroup", request.getParameter("workgroup"));
 		conditionMap.put("subgroup", request.getParameter("subgroup"));
 		conditionMap.put("workDate", request.getParameter("workDate"));
+		conditionMap.put("order_id", request.getParameter("order_id"));
+		conditionMap.put("hourType", request.getParameter("hourType"));
 		selectList = commDao.queryStaffInfo(conditionMap);
 		return SUCCESS;
 	}
@@ -1043,7 +1049,7 @@ public class CommonAction extends BaseAction<Object> {
 		String mailTo= request.getParameter("mailTo");
 		String cc=request.getParameter("cc");
 		String mainTitle=request.getParameter("title");		
-		
+		String content=request.getParameter("content");
 		
 		request.setCharacterEncoding("UTF-8");
 		// 邮件模块
@@ -1067,11 +1073,12 @@ public class CommonAction extends BaseAction<Object> {
 		EmailSender emailSender = new EmailSender();
 		emailSender.setTo(mailTo);
 		emailSender.setCc(cc);
-		emailSender.getParam().put("content", "");
+		emailSender.getParam().put("content", content);
 		emailSender.getParam().put("subtitle", "");
 		emailSender.getParam().put("factory", "");
 		emailSender.getParam().put("maintitle", mainTitle);
 		emailSender.setSubject(mainTitle);
+		emailSender.setContent(content);
 		
 		emailSender.setMerge(true);
 		
@@ -1108,6 +1115,33 @@ public class CommonAction extends BaseAction<Object> {
 		
 		mss.send(emailSender);
 		
+		return SUCCESS;
+	}
+	
+	
+	public String getWorkgroupPrice() throws UnsupportedEncodingException{
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		conditionMap = new HashMap<String, Object>();
+		conditionMap.put("workDate", request.getParameter("workDate"));
+		conditionMap.put("order_id", request.getParameter("order_id"));
+		conditionMap.put("factory", request.getParameter("factory"));
+		conditionMap.put("workshop", request.getParameter("workshop"));
+		conditionMap.put("workgroup", request.getParameter("workgroup"));
+		conditionMap.put("team", request.getParameter("team"));
+		
+		selectList=commDao.getWorkgroupPrice(conditionMap);
+		return SUCCESS;
+	}
+	
+	public String getBasePrice() throws UnsupportedEncodingException{	
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		conditionMap = new HashMap<String, Object>();
+		conditionMap.put("workDate", request.getParameter("workDate"));
+		conditionMap.put("factory", request.getParameter("factory"));	
+		conditionMap.put("type", request.getParameter("type"));
+		selectList=commDao.getBasePrice(conditionMap);
 		return SUCCESS;
 	}
 }

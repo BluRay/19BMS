@@ -17,6 +17,15 @@ public class BmsEcnTask {
 	private String task_content;
 	/**切换方式**/
 	private String switch_mode;
+	/**
+	 * added by xjw 160920 变更类型
+	 */
+	private String change_type;
+	/**
+	 * added by xjw 160920 顾客变更单号
+	 */
+	private String change_order_no;
+	
 	private int ecn_order_id;
 	private String order_no;
 	private int order_qty;
@@ -123,6 +132,18 @@ public class BmsEcnTask {
 	}
 	public void setCreat_date(String creat_date) {
 		this.creat_date = creat_date;
+	}
+	public String getChange_type() {
+		return change_type;
+	}
+	public void setChange_type(String change_type) {
+		this.change_type = change_type;
+	}
+	public String getChange_order_no() {
+		return change_order_no;
+	}
+	public void setChange_order_no(String change_order_no) {
+		this.change_order_no = change_order_no;
 	}
 	
 }

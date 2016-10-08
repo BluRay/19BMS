@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -810,7 +811,7 @@ public class StaffAction extends BaseAction<Object>{
 	}
 	/**
 	 * added by xjw on 20160623 导入员工计件分配比例数据
-	 * 判断一个小班组下所有人员分配比例之和是否等于1，不满足则报错
+	 * 判断一个小班组下所有人员分配比例之和是否<=1，不满足则报错
 	 * @return
 	 * @throws UnsupportedEncodingException 
 	 */
@@ -824,15 +825,12 @@ public class StaffAction extends BaseAction<Object>{
 		boolean success = true;
 		
 		JSONObject jo=JSONObject.fromObject(conditions);
+		String orderId=jo.getString("orderId");
 		String effectiveDate=jo.getString("effectiveDate");
-		
 		//datalist:保存数据封装
 		List<Map<String,Object>> datalist=new ArrayList<Map<String,Object>>();
 		//staff number 列表
-		List<String> stafflist=new ArrayList<String>();
-		Map<String,Object> cdmap=new HashMap<String,Object>();
-		cdmap.put("effectiveDate", effectiveDate);
-		
+		List<String> stafflist=new ArrayList<String>();		
 		
 		//disMap： 保存小班组维度员工的分配比例汇总数据，用以判断一个小班组下所有人员分配比例之和是否等于1
 		Map<String,Object> disMap=new HashMap<String,Object>();
@@ -851,6 +849,7 @@ public class StaffAction extends BaseAction<Object>{
 			dataType.put("2", excelModel.CELL_TYPE_STRING);
 			dataType.put("3", excelModel.CELL_TYPE_STRING);
 			dataType.put("4", excelModel.CELL_TYPE_NUMERIC);
+			dataType.put("5", excelModel.CELL_TYPE_STRING);
 			dataType.put("6", excelModel.CELL_TYPE_NUMERIC);
 			excelModel.setDataType(dataType);
 			excelModel.setPath(fileFileName);
@@ -861,45 +860,101 @@ public class StaffAction extends BaseAction<Object>{
     		
     		ExcelTool extl=new ExcelTool();
     		extl.readExcel(is, excelModel);//将文件数据读取到excelModel中
-    		
+    		List<String> headers=excelModel.getHeader();
+			if(!headers.get(0).equals("工厂")||!headers.get(1).equals("车间")||
+					!headers.get(2).equals("班组")||!headers.get(3).equals("小班组")||
+					!headers.get(4).equals("工号")||!headers.get(5).equals("姓名")||
+					!headers.get(6).equals("分配金额")){
+				Exception e=new Exception("请使用下载的模板导入！");
+				throw e;			
+			}
     		//遍历excel数据，将分配比例按小班组汇总保存到disMap中
     		String last_factory="";
     		String last_workshop="";
     		String last_workgroup="";
     		String last_team="";
     		
+    		int rowcount=2;
     		for(Object[] data:excelModel.getData()){
     			String factory=data[0].toString();
     			String workshop=data[1].toString();
     			String workgroup=data[2].toString();
     			String team=data[3].toString();
     			String staffNumber=data[4].toString();
-    			double dist_val=Double.parseDouble(data[6].toString());
+    			String staffName=data[5].toString();
+    			BigDecimal dist_val=new BigDecimal(data[6].toString());
+    			
+    			//double dist_val=Double.parseDouble(data[6].toString());
     			String mapKey=factory+"-"+workshop+"-"+workgroup+"-"+team;
-    			if(disMap.get(mapKey)!=null){
-    				double map_val=(double)disMap.get(mapKey);
-    				disMap.put(mapKey, map_val+dist_val);
-    			}else{
-    				disMap.put(mapKey, dist_val);
-    			}
+    			
     			Map<String,Object> dmap=new HashMap<String,Object>();
+    			dmap.put("factory", factory);
+    			dmap.put("workshop", workshop);
+    			dmap.put("workgroup", workgroup);
+    			dmap.put("team", team);
     			dmap.put("staff_number", staffNumber);
-    			dmap.put("effective_date", effectiveDate);
-    			dmap.put("distribution", dist_val);
+    			dmap.put("staff_name", staffName);
+    			dmap.put("order_id", orderId);
+    			dmap.put("distribution", dist_val.toString());
     			dmap.put("editor", getUser().getDisplay_name());
     			dmap.put("edit_date", Util.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+    			dmap.put("effective_date", effectiveDate);
+    			
+    			Map<String,Object> info=new HashMap<String,Object>();
+    			info.put("factory", factory);
+    			info.put("workshop", workshop);
+    			info.put("workgroup", workgroup);
+    			info.put("small_workgroup", team);
+    			//校验用户填写的工厂、车间、班组、小班组、车型 信息是否正确
+				Map orgMap =  orgDao.getOrgInfo(info);
+				if(null == orgMap){
+					//用户填写的工厂、车间、班组、小班组信息有误
+					success = false;
+					throw new Exception("第"+rowcount+"行信息有误，请核实组织结构信息是否正确后重新导入！");
+				}
+    			//校验工号姓名是否匹配
+    			if(hrDao.checkIsValidStaff(dmap)==0){
+    				success=false;
+    				message="工号“"+staffNumber+"”和姓名“"+staffName+"”不匹配！";
+    				throw new Exception(message);
+    				//break;
+    			}else{
+    				if(disMap.get(mapKey)!=null){
+        				BigDecimal map_val=new BigDecimal((String)disMap.get(mapKey));
+        				disMap.put(mapKey, (dist_val.add(map_val)).toString());
+        			}else{
+        				disMap.put(mapKey, dist_val.toString());
+        			}
+    			}
     			datalist.add(dmap);
     			stafflist.add(staffNumber);
+    			rowcount++;
     		}
     		
     		//封装cdmap用以删除对应生效日期内的需要导入员工的分配信息
+    		Map<String,Object> cdmap=new HashMap<String,Object>();
+    		cdmap.put("order_id", orderId);
     		cdmap.put("stafflist", stafflist);
+    		cdmap.put("effective_date", effectiveDate);
     		
     		for(String m_key:disMap.keySet()){
-    			if((double)disMap.get(m_key)>1){
+    	  		//查询班组承包单价，校验导入的班组成员单价之和是否等于班组承包单价
+    			Map<String,Object> pmap=new HashMap<String,Object>();
+    			pmap.put("order_id", orderId);
+    			pmap.put("workgroup", m_key);
+    			pmap.put("effective_date", effectiveDate);
+    			
+    			Double total_price=hrDao.getWorkgroupPrice(pmap);
+    			total_price=total_price==null?0:total_price;
+    			if(total_price==0){
     				success=false;
-    				message=m_key+"分配比例和值超过了100%,请修改后重新导入";
-    				break;
+    				message=m_key+"未维护班组承包单价,请维护后重新导入！";
+    				throw new Exception(message);
+    			}
+    			if(Double.parseDouble((String)disMap.get(m_key))!=total_price){
+    				success=false;
+    				message=m_key+"分配金额和值不等于该班组承包单价"+total_price+",请修改后重新导入！";
+    				throw new Exception(message);
     			}
     		}
 			
@@ -915,7 +970,7 @@ public class StaffAction extends BaseAction<Object>{
 			
 		}catch (Exception e) {
 			success = false;
-			message += "用户信息上传出错："+e.getMessage();
+			message = "用户信息上传出错："+e.getMessage();
 			System.out.println("用户信息上传出错："+e.getMessage());
 		} finally{
 			JSONObject json = Util.dataListToJson(success, message, null, null);

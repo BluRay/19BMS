@@ -13,6 +13,7 @@
 			<result name="rewardsCollect">/jsp/hr/hrRewardsCollect.jsp</result>
 			<result name="waitmanhourStatistic">/jsp/hr/waitmanhourStatistic.jsp</result>
 			<result name="workTimePrice">/jsp/hr/hrWorkTimePrice.jsp</result>
+			<result name="workgroupPrice">/jsp/hr/workgroupPrice.jsp</result>
 		</action>
 		<action name="standardWorkGroup" class="standardWorkGroupAction">
 			<result name="index">/jsp/hr/standardWorkGroup.jsp</result>

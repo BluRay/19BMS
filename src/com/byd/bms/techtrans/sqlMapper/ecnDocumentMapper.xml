@@ -119,14 +119,14 @@
 			SELECT LAST_INSERT_ID()
 		</selectKey>
 		INSERT INTO BMS_ECN_DOCUMENT(ecn_type,ecn_document_number,ecn_document_date,subject,ecn_document_file,
-		tecn_flag,responsible_organization,changed_bom,gcy_contacts,gy_contacts,editor_id,edit_date) 
+		tecn_flag,responsible_organization,changed_bom,changed_point,gcy_contacts,gy_contacts,editor_id,edit_date) 
 		VALUES(#{ecn_type},#{ecn_document_number},#{ecn_document_date},#{subject},#{ecn_document_file},#{tecn_flag},#{responsible_organization},
-		#{changed_bom},#{gcy_contacts},#{gy_contacts},#{editor_id},#{edit_date})
+		#{changed_bom},#{changed_point},#{gcy_contacts},#{gy_contacts},#{editor_id},#{edit_date})
 	</insert>
 	<update id="editEcnDocument"  parameterType="com.byd.bms.techtrans.entity.BmsEcnDocument">
 		UPDATE BMS_ECN_DOCUMENT SET 
 		ecn_type = #{ecn_type},ecn_document_number = #{ecn_document_number},ecn_document_date = #{ecn_document_date},subject = #{subject},tecn_flag=#{tecn_flag}
-		,responsible_organization = #{responsible_organization},gcy_contacts=#{gcy_contacts},gy_contacts=#{gy_contacts},
+		,responsible_organization = #{responsible_organization},gcy_contacts=#{gcy_contacts},gy_contacts=#{gy_contacts},changed_point=#{changed_point},
 		<if test="ecn_document_file!=null">
 			ecn_document_file=#{ecn_document_file},
 		</if> 
@@ -150,9 +150,9 @@
 		<selectKey resultType="int" keyProperty="id" order="AFTER">
 			SELECT LAST_INSERT_ID()
 		</selectKey>
-		INSERT INTO BMS_ECN_TASK(ecn_id,task_number,task_content,switch_mode,total_hours,ecn_order_id,ecn_factory_id,ecn_number,creat_date) 
+		INSERT INTO BMS_ECN_TASK(ecn_id,task_number,task_content,switch_mode,total_hours,ecn_order_id,ecn_factory_id,ecn_number,creat_date,change_type,change_order_no) 
 		VALUES(#{ecn_id},#{task_number},#{task_content},#{switch_mode},#{total_hours},#{ecn_order_id},#{ecn_factory_id},
-		#{ecn_number},#{creat_date})
+		#{ecn_number},#{creat_date},#{change_type},#{change_order_no})
 	</insert>
 	
 	<!-- 新增ECN_TIME表数据 -->
@@ -172,7 +172,7 @@
 	<update id="editEcnTask"  parameterType="com.byd.bms.techtrans.entity.BmsEcnTask">
 		UPDATE BMS_ECN_TASK SET 
 		ecn_id = #{ecn_id},task_number = #{task_number},task_content = #{task_content},switch_mode = #{switch_mode},total_hours = #{total_hours},ecn_order_id = #{ecn_order_id},
-		ecn_factory_id = #{ecn_factory_id},ecn_number = #{ecn_number},creat_date =#{creat_date}
+		ecn_factory_id = #{ecn_factory_id},ecn_number = #{ecn_number},creat_date =#{creat_date},change_type=#{change_type},change_order_no=#{change_order_no}
 		WHERE id = #{id}
 	</update>
 	

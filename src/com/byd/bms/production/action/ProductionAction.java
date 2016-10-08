@@ -181,6 +181,25 @@ public class ProductionAction extends BaseAction<Object>{
 		return "certification";
 	}
 	
+	/*
+	 * ADDED BY XJW 160815  维护车辆电池容量页面
+	 */
+	public String productionBattery(){
+		return "battery";
+	}
+	/*
+	 * ADDED BY XJW 160815 维护车辆额定电压页面 
+	 */
+	public String productionVoltage(){
+		return "voltage";
+	}
+	/*
+	 * ADDED BY XJW 160805 维护车辆弹簧片数页面
+	 */
+	public String productionSpring(){
+		return "spring";
+	}
+	
 	public Pager getPager() {
 		return pager;
 	}
@@ -2694,6 +2713,65 @@ public class ProductionAction extends BaseAction<Object>{
 		}
 		out.print(json);
 		return null;
+	}
+	
+	/**
+	 * 查询车辆列表
+	 * @return
+	 * @throws UnsupportedEncodingException 
+	 */
+	public String getBusList() throws UnsupportedEncodingException{
+		result=new HashMap<String, Object>();
+		HttpServletRequest request= ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");		
+		PrintWriter out = null;
+		Map<String,Object> queryMap=new HashMap<String,Object>();
+		if (request.getParameter("factory_id")!= null) queryMap.put("factory_id", request.getParameter("factory_id"));
+		if (request.getParameter("order_no")!= null) queryMap.put("order_no", request.getParameter("order_no"));
+		if (request.getParameter("bus_type_id")!= null) queryMap.put("bus_type_id", request.getParameter("bus_type_id"));
+		if (request.getParameter("bus_number")!= null) queryMap.put("bus_number", request.getParameter("bus_number"));
+		if (pager != null){
+			queryMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());
+			queryMap.put("pageSize", pager.getPageSize());
+		}
+		List datalist=new ArrayList();
+		datalist=productionDao.queryBusList(queryMap);
+		int totalCount = productionDao.queryBusListCount(queryMap);
+		pager.setTotalCount(totalCount);
+		
+		result.put("dataList", datalist);
+		result.put("pager", pager);
+		return SUCCESS;
+	}
+	
+	public String editBusInfo() throws IOException{
+		result=new HashMap<String, Object>();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String curTime = df.format(new Date());
+		int userid=getUser().getId();
+		logger.info("---->ProductionAction::editBusInfo " + curTime + " " + userid);
+		JSONObject jo = JSONObject.fromObject(conditions);
+		Map<String, Object> conditionMap = new HashMap<String, Object>();	
+		for (Iterator it = jo.keys(); it.hasNext();) {
+			String key = (String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		
+		if (conditionMap.get("all_bus").equals("1")){
+			//修改全部车号
+			productionDao.updateBusInfoByOrder(conditionMap);
+		}else{
+			String new_bus_number=(String) conditionMap.get("bus_number");
+			String[] busNumberList = new_bus_number.split("\n");
+			conditionMap.put("bus_number", busNumberList);
+			productionDao.updateBusInfoByBusNumber(conditionMap);
+		}
+		
+		result.put("success", true);
+		result.put("message", "操作成功");
+		return SUCCESS;
 	}
 	
 }

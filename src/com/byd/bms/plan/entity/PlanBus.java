@@ -8,6 +8,7 @@ package com.byd.bms.plan.entity;
 public class PlanBus {
 	private int id;
 	private int factory_id;
+	private String factory_name;
 	private String bus_number;
 	private String status;
 	private int order_id;
@@ -139,6 +140,12 @@ public class PlanBus {
 	}
 	public void setDispatch_date(String dispatch_date) {
 		this.dispatch_date = dispatch_date;
+	}
+	public String getFactory_name() {
+		return factory_name;
+	}
+	public void setFactory_name(String factory_name) {
+		this.factory_name = factory_name;
 	}
 
 

@@ -17,6 +17,7 @@ import org.apache.commons.lang.xwork.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.byd.bms.production.dao.IProductionDao;
+import com.byd.bms.production.entity.BmsTempOrder;
 import com.byd.bms.util.Util;
 import com.byd.bms.util.action.BaseAction;
 import com.byd.bms.util.entity.BmsBaseUser;
@@ -33,6 +34,7 @@ public class TempOrderAction extends BaseAction<Object> {
 	private String whflag;//工时操作类型 verify、reject
 	private String tempOrderId;
 	private String tempOrderStaus; //状态: 0已创建  2 已分配 3 已评估 4 已验收 5 已完成'
+	private BmsTempOrder tempOrder;
 	
 	public Pager getPager() {
 		return pager;
@@ -76,6 +78,12 @@ public class TempOrderAction extends BaseAction<Object> {
 	public void setTempOrderStaus(String tempOrderStaus) {
 		this.tempOrderStaus = tempOrderStaus;
 	}
+	public BmsTempOrder getTempOrder() {
+		return tempOrder;
+	}
+	public void setTempOrder(BmsTempOrder tempOrder) {
+		this.tempOrder = tempOrder;
+	}
 	/**
 	 * 临时派工单创建界面
 	 * @return
@@ -101,7 +109,7 @@ public class TempOrderAction extends BaseAction<Object> {
 			System.out.println(key);
 			conditionMap.put(key, jo.get(key));
 		}
-		conditionMap.put("userId", user.getId());
+		conditionMap.put("applier", user.getDisplay_name());
 		conditionMap.put("offset",(pager.getCurPage() - 1) * pager.getPageSize());
 		conditionMap.put("pageSize", pager.getPageSize());
 		result.put("dataList", productionDao.getTmpOrderList(conditionMap));
@@ -116,9 +124,10 @@ public class TempOrderAction extends BaseAction<Object> {
 	 */
 	public String createOrder(){
 		result=new HashMap<String,Object>();
-		JSONObject jo=JSONObject.fromObject(conditions);
+		String applier=getUser().getDisplay_name();
+		//JSONObject jo=JSONObject.fromObject(conditions);
 		String createTime=Util.format(new Date(), "yyyy-MM-dd HH:mm:ss");
-		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		/*Map<String,Object> conditionMap=new HashMap<String,Object>();
 		for(Iterator it=jo.keys();it.hasNext();){
 			String key=(String) it.next();
 			System.out.println(key);
@@ -133,8 +142,19 @@ public class TempOrderAction extends BaseAction<Object> {
 		}else{
 			orderNo+=""+series;
 		}
-		conditionMap.put("orderNo",orderNo);
-		int i=productionDao.insertTmpOrder(conditionMap);
+		conditionMap.put("orderNo",orderNo);*/
+		long time=new Date().getTime();
+		String orderNo="T"+Util.format(new Date(), "yyyyMMdd");
+		int series=Integer.parseInt(productionDao.getOrderSeriesByDate(Util.format(new Date(), "yyyy-MM-dd")))+1; 
+		if(series<10){
+			orderNo+="0"+series;
+		}else{
+			orderNo+=""+series;
+		}
+		tempOrder.setApplier(applier);
+		tempOrder.setApply_date(createTime);
+		tempOrder.setTmp_order_no(orderNo);
+		int i=productionDao.insertTmpOrder(tempOrder);
 		if(i>0){
 			result.put("success", true);
 		    result.put("message", "新增成功");
@@ -150,19 +170,19 @@ public class TempOrderAction extends BaseAction<Object> {
 	 */
 	public String updateOrder(){
 		result=new HashMap<String,Object>();
-		JSONObject jo=JSONObject.fromObject(conditions);
-		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		Map<String,Object> cmap=new HashMap<String,Object>();
-		for(Iterator it=jo.keys();it.hasNext();){
+		//JSONObject jo=JSONObject.fromObject(conditions);
+		/*Map<String,Object> conditionMap=new HashMap<String,Object>();
+		Map<String,Object> cmap=new HashMap<String,Object>();*/
+		/*for(Iterator it=jo.keys();it.hasNext();){
 			String key=(String) it.next();
 			System.out.println(key);
 			conditionMap.put(key, jo.get(key));
-		}
-		int i=productionDao.updateTmpOrder(conditionMap);
-		cmap.putAll(conditionMap);
+		}*/
+		int i=productionDao.updateTmpOrder(tempOrder);
+		/*cmap.putAll(conditionMap);
 		cmap.put("workDate", Util.format(new Date(), "yyyy-MM-dd"));
 		cmap.put("recorder", getUser().getDisplay_name());
-		productionDao.saveTmpOrderProcedure(cmap);
+		productionDao.saveTmpOrderProcedure(cmap);*/
 		if(i>0){
 			result.put("success", true);
 		    result.put("message", "更新成功");
@@ -171,6 +191,34 @@ public class TempOrderAction extends BaseAction<Object> {
 		    result.put("message", "更新失败");
 		}
 		return SUCCESS;	
+	}
+	//更新工单进度
+	public String updateOrderProcedure(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
+			System.out.println(key);
+			conditionMap.put(key, jo.get(key));
+		}
+		conditionMap.put("workDate", Util.format(new Date(), "yyyy-MM-dd"));
+		conditionMap.put("recorder", getUser().getDisplay_name());
+		int i=productionDao.saveTmpOrderProcedure(conditionMap);
+		tempOrder=new BmsTempOrder();
+		tempOrder.setId((int)conditionMap.get("orderId"));
+		tempOrder.setFinished_qty(String.valueOf(conditionMap.get("finishedQty")));
+		tempOrder.setStatus((String) conditionMap.get("status"));
+		
+		productionDao.updateTmpOrder(tempOrder);
+		if(i>0){
+			result.put("success", true);
+		    result.put("message", "更新成功");
+		}else{
+			result.put("success", false);
+		    result.put("message", "更新失败");
+		}
+		return SUCCESS;
 	}
 	/**
 	 * 临时订单删除
@@ -415,13 +463,13 @@ public class TempOrderAction extends BaseAction<Object> {
 		for(int i=0;i<jsonArray.size();i++){
 			 JSONObject object = (JSONObject)jsonArray.get(i);
 			 if("verify".equals(whflag)){
-				 object.put("approverId", user.getId());
-				 object.put("approveDate", createTime);
+				 object.put("approver_id", user.getId());
+				 object.put("approve_date", createTime);
 				 object.put("status", "1");
 				 object.put("actionType", "verify");
 			 }else if("reject".equals(whflag)){
-				 object.put("approverId", user.getId());
-				 object.put("approveDate", createTime);
+				 object.put("approver_id", user.getId());
+				 object.put("approve_date", createTime);
 				 object.put("status", "2");
 				 object.put("actionType", "reject");
 			 }else{
@@ -435,7 +483,7 @@ public class TempOrderAction extends BaseAction<Object> {
 		}
 		 Map<String,Object> m=new HashMap<String,Object>();
 		 m.put("tempOrderId", tempOrderId);
-		 m.put("auditorId", user.getId());
+		 m.put("auditor", user.getDisplay_name());
 		 m.put("auditDate", createTime);
 		 if("verify".equals(tempOrderStaus)){
 			 productionDao.verifyOrder(m);

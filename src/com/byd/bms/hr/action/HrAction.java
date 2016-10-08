@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 
 import com.byd.bms.hr.dao.IHrDao;
+import com.byd.bms.hr.dao.IOrgDao;
 import com.byd.bms.hr.entity.BmsHrStaff;
 import com.byd.bms.util.Util;
 import com.byd.bms.util.action.BaseAction;
@@ -40,7 +42,8 @@ public class HrAction extends BaseAction<Object>{
 	private File file;					//获取上传文件
     private String fileFileName;		//获取上传文件名称
     private String fileContentType;		//获取上传文件类型    
-	
+    private String conditions;	
+    
 	public IHrDao getHrDao() {
 		return hrDao;
 	}
@@ -49,7 +52,14 @@ public class HrAction extends BaseAction<Object>{
 	}
 
 	private Pager pager;
+	private IOrgDao orgDao;
 	
+	public IOrgDao getOrgDao() {
+		return orgDao;
+	}
+	public void setOrgDao(IOrgDao orgDao) {
+		this.orgDao = orgDao;
+	}
 	public Pager getPager() {
 		return pager;
 	}
@@ -73,7 +83,14 @@ public class HrAction extends BaseAction<Object>{
 	}
 	public void setFileContentType(String fileContentType) {
 		this.fileContentType = fileContentType;
+	}	
+	public String getConditions() {
+		return conditions;
 	}
+	public void setConditions(String conditions) {
+		this.conditions = conditions;
+	}
+	
 	
 	public String index(){
 		return "index";
@@ -1020,6 +1037,190 @@ public class HrAction extends BaseAction<Object>{
 			out.flush();
 			out.close();
 		}
+		return null;
+	}
+	
+	/**
+	 * added by xjw 16/08/24 
+	 * 班组承包单价页面
+	 * @return
+	 */
+	public String workgroupPrice(){
+		
+		return "workgroupPrice";
+	}
+	/**
+	 * added by xjw 16/08/24
+	 * 导入班组承包单价
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public String uploadWorkgroupPrice() throws UnsupportedEncodingException{
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+		String result = "";
+		boolean success = true;
+		JSONObject jo=JSONObject.fromObject(conditions);
+		String orderId=jo.getString("orderId");
+		String effective_date=jo.getString("effective_date");
+		try {
+			out = response.getWriter();
+			/**
+			 * 创建excel对象类
+			 */
+			ExcelModel excelModel =new ExcelModel();
+			excelModel.setReadSheets(1);
+			
+			excelModel.setStart(1);
+			Map<String,Integer> dataType = new HashMap<String,Integer>();
+			dataType.put("0", ExcelModel.CELL_TYPE_STRING);
+			dataType.put("1", ExcelModel.CELL_TYPE_STRING);
+			dataType.put("2", ExcelModel.CELL_TYPE_STRING);
+			dataType.put("3", ExcelModel.CELL_TYPE_STRING);
+			dataType.put("4", ExcelModel.CELL_TYPE_NUMERIC);
+
+			excelModel.setDataType(dataType);
+			excelModel.setPath(fileFileName);
+			
+			/**
+			 * 读取输入流中的excel文件，并且将数据封装到ExcelModel对象中
+			 */
+    		InputStream is = new FileInputStream(file);
+    		
+			ExcelTool excelTool = new ExcelTool();
+			excelTool.readExcel(is, excelModel);
+			List<String> headers=excelModel.getHeader();
+			if(!headers.get(0).equals("工厂")||!headers.get(1).equals("车间")||
+					!headers.get(2).equals("班组")||!headers.get(3).equals("小班组")||!headers.get(4).equals("承包单价")){
+				Exception e=new Exception("请使用下载的模板导入！");
+				throw e;			
+			}
+			/**
+			 * 解析excelModel中的data
+			 */
+			List<Map<String, Object>> addList = new ArrayList<Map<String,Object>>();
+			List<Map<String, Object>> upDateList = new ArrayList<Map<String,Object>>();
+			int user_id=getUser().getId();
+			String createTime=Util.format(new Date(), "yyyy-MM-dd");
+			int i = 1;
+			int dataFlag = 0;
+			for(Object[] data : excelModel.getData()){
+				++i;
+				Map<String, Object> info = new HashMap<String, Object>();
+				String factory = data[0].toString().trim(); 
+				info.put("factory", factory);
+				info.put("workshop", data[1] == null?null:data[1].toString().trim());
+				info.put("workgroup", data[2] == null?null:data[2].toString().trim());
+				info.put("small_workgroup", data[3] == null?null:data[3].toString().trim());
+				info.put("standard_price", data[4] == null?null:data[4].toString().trim());
+				info.put("editor_id", user_id);
+				info.put("edit_date", createTime);
+				info.put("effective_date", effective_date);
+				info.put("order_id", orderId);
+				
+				//校验用户填写的工厂、车间、班组、小班组、车型 信息是否正确
+				Map orgMap =  orgDao.getOrgInfo(info);
+				if(null == orgMap){
+					++dataFlag;
+					//用户填写的工厂、车间、班组、小班组信息有误
+					success = false;
+					result = result+i;
+					break;
+				}else{
+					info.put("org_id", orgMap.get("id"));
+					//根据工厂、车间、班组、小班组、订单、日期查询标准工时和单价
+					Map<String,Object> map = hrDao.queryWorkgroupPrice(info);
+					
+					if(null != map && Integer.parseInt(map.get("id").toString()) >0){
+						//修改
+						info.put("id", map.get("id"));
+						upDateList.add(info);
+					}else{
+						addList.add(info);
+					}					
+				}
+			}
+			if(dataFlag>0){
+				result = result+"行数据输入的工厂、车间、班组或小班组信息有误，请确认组织结构是否存在！\n";
+			}
+			if(success && addList.size()>0){
+				//批量新增标准工时/单价
+				hrDao.addWorkgroupPrice(addList);
+				result =  "导入成功！";
+			}
+			if(success && upDateList.size()>0){
+				//批量修改标准工时/单价
+				hrDao.updateWorkgroupPrice(upDateList);
+				result =  "导入成功！";
+			}
+		} catch (Exception e) {
+			success = false;
+			result = "班组承包单价上传出错："+e.getMessage();
+			System.out.println("班组承包单价上传出错："+e.getMessage());
+		} finally{
+			JSONObject json = Util.dataListToJson(success, result, null, null);
+			out.print(json);
+			out.flush();
+			out.close();
+		}
+		return null;
+	}
+	
+	/**
+	 * added by xjw 16/08/24
+	 * 查询班组承包单价列表信息
+	 * @return
+	 * @throws UnsupportedEncodingException 
+	 */
+	public String getWorkgroupPriceList() throws UnsupportedEncodingException{
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+		boolean success=true;
+		String message="";
+		List list=null;
+		Map<String, String> page_map=new HashMap<String,String>();
+		Map<String,Object> cMap=new HashMap<String,Object>();
+		Map<String,Object> cMap1=new HashMap<String,Object>();
+		
+		JSONObject jo=JSONObject.fromObject(conditions);
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
+			cMap.put(key,jo.get(key));
+			cMap1.put(key,jo.get(key));
+		}
+		if (pager != null){
+			cMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());
+			cMap.put("pageSize", pager.getPageSize());
+		}
+		
+		int totalCount=0;
+		try{
+			out=response.getWriter();
+			list=hrDao.getWorkgroupPriceList(cMap);
+			totalCount=hrDao.getWorkgroupPriceCount(cMap1);
+			if (pager != null){
+				pager.setTotalCount(totalCount);						
+				page_map.put("totalCount", String.valueOf(pager.getTotalCount()));
+				page_map.put("curPage", String.valueOf(pager.getCurPage()));
+				page_map.put("pageSize", String.valueOf(pager.getPageSize()));
+			}
+			
+		}catch(Exception e){
+			success = false;
+			message += "系统异常："+e.getMessage();
+		}finally{
+			JSONObject json = Util.dataListToJson(success, message, list, page_map);
+			out.print(json);
+			out.flush();
+			out.close();
+		}
+		
 		return null;
 	}
 

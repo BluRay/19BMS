@@ -23,6 +23,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.xwork.StringUtils;
 import org.apache.struts2.ServletActionContext;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -104,6 +105,9 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 		if (request.getParameter("status") != null)
 			conditionMap.put("status", new String(request
 					.getParameter("status").getBytes("UTF-8"), "UTF-8"));
+		if (request.getParameter("ecn_type") != null)
+			conditionMap.put("ecn_type", new String(request
+					.getParameter("ecn_type").getBytes("UTF-8"), "UTF-8"));
 		if (pager != null) {
 			conditionMap.put("offset",
 					(pager.getCurPage() - 1) * pager.getPageSize());
@@ -269,7 +273,22 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 				try {
 					String addList = request.getParameter("addList");
 					String deleteList = request.getParameter("deleteList");
-
+					
+					/** start 
+					 * added by xjw 160921
+					 * 更新技改任务表（BMS_ECN_TASK）中对应任务的总工时
+					 * **/
+					String unit_time_total=request.getParameter("unit_time_total");
+					String ecn_task_id=request.getParameter("ecn_task_id");
+					Map<String, Object> conditionMap=new HashMap<String,Object>();
+					conditionMap.put("total_hours", unit_time_total);
+					conditionMap.put("ecn_task_id", ecn_task_id);
+					conditionMap.put("status","3");
+					if(!StringUtils.isEmpty(ecn_task_id)){
+						ecnDocumentTaskDao.updateEcnTask(conditionMap);
+					}
+					/** end **/
+					
 					// 删除的
 					List ecn_time_id_list = new ArrayList();
 					JSONArray deleteListJSONArray = JSONArray
@@ -295,7 +314,7 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 						String time_taskid = taskJSON.getString("time_taskid");
 						String workshopid = taskJSON.getString("workshopid");
 						String unit = taskJSON.getString("unit");
-						String unit_time = taskJSON.getString("unit_time");
+						String unit_time = taskJSON.getString("unit_time");						
 
 						BmsEcnTime ecnTime = new BmsEcnTime();
 						ecnTime.setEcn_task_id(time_taskid);
@@ -358,6 +377,8 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 		map.put("ecn_task_id", ecn_task_id);
 		int factory_id=Integer.parseInt(request.getParameter("factory_id"));
 		map.put("factory_id", factory_id);
+		String workshop=request.getParameter("workshop");
+		map.put("workshop", workshop);
 		String bus_num_start = request.getParameter("bus_num_start");
 		if (bus_num_start != null && bus_num_start.trim() != "") {
 			bus_num_start = StringUtils.leftPad(bus_num_start, 4, "0");
@@ -399,6 +420,11 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 					"factory_id",
 					new String(request.getParameter("factory_id").getBytes(
 							"ISO8859-1"), "UTF-8"));
+		if (request.getParameter("workshop") != null)
+			conditionMap.put(
+					"workshop",
+					new String(request.getParameter("workshop").getBytes(
+							"UTF-8"), "UTF-8"));
 		if (request.getParameter("ecn_task_id") != null)
 			conditionMap.put(
 					"ecn_task_id",
@@ -634,6 +660,12 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 					String task_id = request.getParameter("task_id");
 					String factory_id = request.getParameter("factory_id");
 					String order_id = request.getParameter("order_id");
+					String workshop=request.getParameter("workshop");
+					
+					Map<String,Object> tskmap=new HashMap<String,Object>();
+					tskmap.put("taskid", task_id);
+					tskmap.put("workshop", workshop);
+					
 					int ecn_number = Integer.parseInt(request
 							.getParameter("ecn_number"));
 					String bus_number_list = request
@@ -662,6 +694,7 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 						ecnTaskDetail.setFactoryID(factory_id);
 						ecnTaskDetail.setOrder_id(order_id);
 						ecnTaskDetail.setBus_number(bus_number);
+						ecnTaskDetail.setWorkshop(workshop);
 						ecnTaskDetail.setStatus("1");
 						ecnTaskDetail.setConfirmor_id(String.valueOf(userid));
 						ecnTaskDetail.setConfirmor_date(curTime);
@@ -690,10 +723,11 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 					// 判断taskid下所有的车辆明细是否已经完成
 					List datalist = new ArrayList();
 					datalist = ecnDocumentTaskDao
-							.queryTaskCompleteIsOK(task_id);
+							.queryTaskCompleteIsOK(tskmap);
 					if (datalist.size() == ecn_number) {
-						ecnDocumentTaskDao.updateTaskState(task_id);
-						resultMessage = "此技改任务下所有车辆均已跟进完成，技改任务关闭！";
+						ecnDocumentTaskDao.updateWorkshopTaskState(tskmap);
+						resultMessage = "此技改任务下所有车辆均已跟进完成，技改任务关闭！";						
+						ecnDocumentTaskDao.updateTaskState(tskmap);
 						// 更新技改单状态
 						ecnDocumentTaskDao.updateEcnDocument(ecn_id);
 					} else {
@@ -909,6 +943,7 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 								.getString("task_detail_id"));
 						String task_id = object.getString("task_id");
 						String factory_id = object.getString("factory_id");
+						String workshop=object.getString("workshop");
 						String order_id = object.getString("order_id");
 						int ecn_number = Integer.parseInt(object
 								.getString("ecn_number"));
@@ -943,13 +978,15 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 						for (int i = 0; i < allList.size(); i++) {
 							// 判断taskid下所有的车辆明细是否已经完成
 							List datalist = new ArrayList();
+							Map<String,Object> m=new HashMap<String,Object>();
+							m.put("taskid", allList.get(i).getEcn_task_id());
+							m.put("workshop", allList.get(i).getWorkshop());
 							datalist = ecnDocumentTaskDao
-									.queryTaskCompleteIsOK(allList.get(i)
-											.getEcn_task_id());
+									.queryTaskCompleteIsOK(m);
 							if (datalist.size() == allList.get(i)
 									.getEcn_number()) {
-								ecnDocumentTaskDao.updateTaskState(allList.get(
-										i).getEcn_task_id());
+								
+								ecnDocumentTaskDao.updateTaskState(m);
 							}
 						}
 					}
@@ -1264,7 +1301,15 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
+	/**
+	 * 技改车间工时分配页面
+	 * @return
+	 */
+	public String taskTimeMaintain(){
+		
+		return "taskTimeMaintain";
+	}
+	
 	public String getConfigStr1() {
 		return configStr1;
 	}
@@ -1402,6 +1447,7 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 	}
 
 	public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
+		transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
 		this.transactionTemplate = transactionTemplate;
 	}
 

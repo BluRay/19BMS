@@ -437,6 +437,7 @@
 	</bean>
 	<bean id="hrAction" class="com.byd.bms.hr.action.HrAction" scope="prototype">
 		<property name="hrDao" ref="hrDao"></property>
+		<property name="orgDao" ref="orgDao"></property>
 	</bean>
 	<bean id="standardWorkGroupAction" class="com.byd.bms.hr.action.StandardWorkGroupAction" scope="prototype">
 		<property name="hrDao" ref="hrDao"></property>

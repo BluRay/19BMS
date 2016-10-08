@@ -41,6 +41,8 @@ public class BmsEcnDocument {
 	
 	private List ecn_task_list;
 	
+	private String changed_point;
+	
 	public List getEcn_task_list() {
 		return ecn_task_list;
 	}
@@ -144,4 +146,11 @@ public class BmsEcnDocument {
 	public void setChanged_bom(String changed_bom) {
 		this.changed_bom = changed_bom;
 	}
+	public String getChanged_point() {
+		return changed_point;
+	}
+	public void setChanged_point(String changed_point) {
+		this.changed_point = changed_point;
+	}
+	
 }

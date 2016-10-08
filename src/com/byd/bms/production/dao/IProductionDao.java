@@ -9,6 +9,7 @@ import com.byd.bms.production.entity.BmsProductionHours;
 import com.byd.bms.production.entity.BmsProductionPartsFinish;
 import com.byd.bms.production.entity.BmsProductionWorkshopSupply;
 import com.byd.bms.production.entity.BmsScan;
+import com.byd.bms.production.entity.BmsTempOrder;
 
 public interface IProductionDao {
 	public BmsBus getBmsBusInfo(Map<String,Object> queryMap);
@@ -80,6 +81,10 @@ public interface IProductionDao {
 	public int updateProductionDateByOrder(Map<String,Object> queryMap);
 	public int updateProductionDateByBusNumber(Map<String,Object> queryMap);
 	//add by wuxiao end
+	
+	//add by xjw 查询车辆列表
+	public List<Map<String,String>> queryBusList(Map<String,Object> queryMap);	
+	public int queryBusListCount(Map<String, Object> queryMap);
 	
 	public List<Map<String,String>> getBusSeatsList(Map<String,Object> queryMap);
 	public int getBusSeatsListCount(Map<String,Object> queryMap);
@@ -207,16 +212,16 @@ public interface IProductionDao {
 	public Map<String,String> queryTempOrderInfo(String tempOrderId);
 	/**
 	 * 新增临时派工单
-	 * @param conditionMap
+	 * @param tempOrder
 	 * @return
 	 */
-	public int insertTmpOrder(Map<String, Object> conditionMap);
+	public int insertTmpOrder(BmsTempOrder tempOrder);
 	/**
 	 * 更改临时派工单
-	 * @param conditionMap
+	 * @param tempOrder
 	 * @return
 	 */
-	public int updateTmpOrder(Map<String, Object> conditionMap);
+	public int updateTmpOrder(BmsTempOrder tempOrder);
 	/**
 	 * 获取某一天临时派工单最大流水
 	 * @param conditionMap
@@ -328,8 +333,9 @@ public interface IProductionDao {
 	/**
 	 * 保存临时派工单进度信息
 	 * @param cmap
+	 * @return 
 	 */
-	public void saveTmpOrderProcedure(Map<String, Object> cmap);
+	public int saveTmpOrderProcedure(Map<String, Object> cmap);
 	/**
 	 * @author xjw
 	 * @method 根据临时派工单Id查询该工单产量维护明细
@@ -394,5 +400,55 @@ public interface IProductionDao {
 	 * @param conditionMap
 	 */
 	public String caculateWaitSalary(Map<String, Object> conditionMap);
-
+	
+	public void updateBusInfoByOrder(Map<String, Object> conditionMap);
+	
+	public void updateBusInfoByBusNumber(Map<String, Object> conditionMap);
+	
+	/**
+	 * added by xjw 16/08/30 
+	 * 保存计件工资信息（班组承包制）
+	 * @param swh_list
+	 * @return
+	 */
+	public int savePieceSalaryInfo(List<Map<String, Object>> swh_list);
+	/**
+	 * added by xjw 16/09/01 
+	 * 批量更新BMS_PIECE_PAY_CAL表数据
+	 * @param swh_list
+	 * @return
+	 */
+	public int batchUpdatePiecePay(List<Map<String, Object>> swh_list);
+	/**
+	 * added by xjw 16/09/01 
+	 * 删除BMS_PIECE_PAY_CAL表数据
+	 * @param condMap
+	 * @return
+	 */
+	public int deletePiecePay(Map<String, Object> condMap);
+	/**
+	 * added by xjw 16/09/02 
+	 * 计件工时审核页面批量删除BMS_PIECE_PAY_CAL表数据，根据swh_list数据中的factory,workshop,workgroup,team,bus_number,work_date
+	 * @param swh_list
+	 */
+	public void batchDeletePiecePay(List<Map<String, Object>> swh_list);
+	/**
+	 * added by xjw 16/09/08 
+	 * 等待工时审核页面批量删除BMS_WAIT_PAY_CAL表数据
+	 * @param swh_list
+	 */
+	public int batchUpdateWaitPay(List<Map<String, Object>> swh_list);
+	/**
+	 * added by xjw 16/09/08 
+	 * 等待工时修改页面删除BMS_WAIT_PAY_CAL表数据
+	 * @param conditionMap
+	 */
+	public int deleteWaitHourInfo(Map<String, Object> conditionMap);
+	/**
+	 * added by xjw 16/09/23
+	 * 临时派工单查询派工流水号是否存在
+	 * @param conditionMap
+	 * @return
+	 */
+	public int querySerialNoCount(Map<String, Object> conditionMap);
 }
