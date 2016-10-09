@@ -899,7 +899,7 @@
 		staff_name,s.plant_org,s.workshop_org,s.workgroup_org,s.team_org,s.job,h.work_date,
 		case h.status when '0' then '已维护' when '1' then '已审批' when '2' then
 		'已驳回' else '已锁定' end as status,u.username
-		editor,h.edit_date,u1.username approver,h.approve_date
+		editor,h.edit_date,u1.username approver,h.approve_date,u.email
 		from
 		BMS_HR_STAFF_HOURS h
 		left join BMS_BASE_ORG o on h.org_id=o.id

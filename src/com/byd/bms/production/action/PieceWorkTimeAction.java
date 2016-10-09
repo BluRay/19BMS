@@ -225,7 +225,9 @@ public class PieceWorkTimeAction extends BaseAction<Object> {
 				 sb.append(object.getString("bus_number"));
 				 sb.append(",");
 			 }
-	
+			 object.put("editor_id", user.getId());
+			 object.put("edit_date", createTime);
+			 
 			 if("verify".equals(whflag)){
 				 object.put("approver_id", user.getId());
 				 object.put("approve_date", createTime);
@@ -238,7 +240,7 @@ public class PieceWorkTimeAction extends BaseAction<Object> {
 				 object.put("status", "2");
 				 object.put("actionType", "verify");
 			 }
-			 	 
+			 
 			Map<String, Object> map = (Map<String, Object>) object;
 			swh_list.add(map);
 		}

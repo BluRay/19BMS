@@ -199,7 +199,7 @@
 	</select>
 	
 	<select id="getOrderProgress" parameterType="Map" resultType="Map">
-		SELECT o.id as 'order_id',o.order_no,o.order_name,t.bus_type_code,o.order_qty,f.production_qty,a.area,a.id AS 'factory_id',
+		SELECT o.id as 'order_id',o.order_no,o.order_name,t.bus_type_code,o.order_qty,sum(f.production_qty) production_qty,a.area,a.id AS 'factory_id',
 		(SELECT SUM(p.quantity) FROM BMS_PD_WORKSHOP_SUPPLY p WHERE p.order_id = o.id AND p.factory_id = f.factory_id AND supply_workshop ='自制件' AND receive_workshop ='部件') as zzj_offline_count,
 		(SELECT SUM(p.online_real_qty) FROM BMS_PD_PARTS_PLAN_FINISH p WHERE p.order_id = o.id AND p.factory_id = f.factory_id AND p.parts_id=194) as parts_online_count,
 		(SELECT SUM(p.offline_real_qty) FROM BMS_PD_PARTS_PLAN_FINISH p WHERE p.order_id = o.id AND p.factory_id = f.factory_id AND p.parts_id=194) as parts_offline_count,
@@ -233,13 +233,14 @@
 		<if test="order_id!=null">
 			and o.id = #{order_id} 
 		</if>
+		group by f.order_id,f.factory_id
 		ORDER BY o.id DESC
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize} 
 		</if>
 	</select>
 	<select id="getOrderProgressCount" parameterType="Map" resultType="int">
-		SELECT count(o.id) FROM BMS_FACTORY_ORDER f 
+		SELECT count(distinct o.id) FROM BMS_FACTORY_ORDER f 
 		LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 
 		LEFT JOIN BMS_ORDER o ON f.order_id = o.id
 		LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1

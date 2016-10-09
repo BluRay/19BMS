@@ -542,7 +542,7 @@
 			separator=";">
 			UPDATE BMS_HR_WORKGROUP_PRICE
 			SET standard_price = #{item.standard_price},editor_id = #{item.editor_id},edit_date =
-			#{item.edit_date},effective_date=#{effective_date}
+			#{item.edit_date},effective_date=#{item.effective_date}
 			WHERE id = #{item.id}
 		</foreach>
 	</update>
