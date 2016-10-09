@@ -2,6 +2,7 @@ var pageSize =20;
 var timeConfigCount = 0;
 var ready_hour=0;
 var edit_list=[];
+var swhlist=[];
 $(document).ready(function () {	
 	initPage();
 	// 工厂切换事件
@@ -31,7 +32,7 @@ $(document).ready(function () {
 		var workshop=$(tr).data("workshop");
 		//var conditions = "{ecnTaskId:'" + $(tr).data("ecnTaskId") + "'}";
 		var conditions="{ecnTaskId:'"+$(tr).data("ecnTaskId")+"',workMonth:'"+workMonth+"',factory:'"+factory+"',workshop:'"+workshop+"'}";
-		var swhlist = ajaxGetStaffWorkHours(conditions);
+		swhlist = ajaxGetStaffWorkHours(conditions);
 		generateWorkhourTb(swhlist,true);
 		$("#checkall").attr("checked",false);
 		$("#edit_orderNo").html(orderNo);
@@ -51,7 +52,7 @@ $(document).ready(function () {
 		var workshop=$("#editModal").data("workshop");
 		//var conditions = "{ecnTaskId:'" + $(tr).data("ecnTaskId") + "'}";
 		var conditions="{ecnTaskId:'"+$("#editModal").data("ecnTaskId")+"',workMonth:'"+$("#edit_workDate").val()+"',factory:'"+factory+"',workshop:'"+workshop+"'}";
-		var swhlist = ajaxGetStaffWorkHours(conditions);
+		swhlist = ajaxGetStaffWorkHours(conditions);
 		generateWorkhourTb(swhlist,true);
 	});
 	//复选框全选、反选
@@ -83,18 +84,32 @@ $(document).ready(function () {
 		ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"verify",$("#editModal").data("ecnTaskId"),orderStaus);
 		$("#editModal").modal("hide");
 	});
-	
 	// 驳回
 	$("#btnReject").click(function() {
+		
+		$("#reasonModal").modal("show");		
+	});
+	//输入驳回原因确认后驳回
+	$("#btnMtaSave").click(function() {
 		var workDate=$("#edit_workDate").val();
 		var conditions={};
 		conditions.factory=$("#editModal").data("factory");
 		conditions.workshop=$("#editModal").data("workshop");
 		conditions.workMonth=workDate;
 		var edit_list=getSelectList();
-		if(edit_list.length>0)
-		ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"reject",$("#editModal").data("ecnTaskId"),"reject");
-		$("#editModal").modal("hide");
+		if(!edit_list){
+			return false;
+		}
+		var rejectReason=$("#reject_reason").val();
+		if(rejectReason){
+			if(edit_list.length>0){
+				ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"reject",$("#editModal").data("ecnTaskId"),"reject",rejectReason);
+				$("#editModal").modal("hide");
+			}			
+		}else{
+			alert("请输入驳回原因！");
+		}
+		
 	});
 
 	
@@ -622,14 +637,16 @@ function getSelectList(){
 	$.each(boxList,function(index,box){
 		var obj={};
 		var tr=$(box).closest("tr");
-		var swhid=$(tr).data("id");
-		obj.id=swhid;
+		//var swhid=$(tr).data("id");
+		//obj.id=swhid;
+		var swhindex=$(tr).data("swhindex");
+		obj=swhlist[swhindex];
 		swhList.push(obj);
 	});
 	return swhList;
 }
 
-function ajaxUpdate(swhlist,conditions,whflag,ecnTaskId,taskStaus) {
+function ajaxUpdate(datalist,conditions,whflag,ecnTaskId,taskStaus,rejectReason) {
 	var targetPage = $("#cur").attr("page") || 1;
 	$.ajax({
 		url : "ecnDocumentTask!updateWorkHourInfo.action",
@@ -637,11 +654,33 @@ function ajaxUpdate(swhlist,conditions,whflag,ecnTaskId,taskStaus) {
 		async:false,
 		type : "post",
 		data : {
-			"conditions" : swhlist,
+			"conditions" : datalist,
 			"whflag":whflag
 		},
 		success : function(response) {
 			if (response.success) {
+				if(whflag=='reject'){
+					var emaillist=[];
+					var dlist=JSON.parse(datalist);
+					$.each(dlist,function(i,swh){
+						var obj={};
+						obj['工号']=swh.staff_number;
+						obj['姓名']=swh.staff_name;
+						obj['岗位']=swh.job;
+						obj['额外工时']=swh.work_hour;
+						obj['小班组']=swh.team_org;
+						obj['班组']=swh.workgroup_org;
+						obj['车间']=swh.workshop_org;
+						obj['工厂']=swh.plant_org;
+						obj['操作日期']=swh.work_date;
+						emaillist.push(obj);
+					})
+					var tbhead='工号,姓名,岗位,额外工时,小班组,班组,车间,工厂,操作日期';
+					//alert(JSON.stringify(emaillist))
+					sendEmail(dlist[0].email,'',"技改单"+$("#edit_orderNo").html()+$("#editModal").data("factory")+$("#editModal").data("workshop")+'车间技改工时信息驳回',tbhead,JSON.stringify(emaillist),rejectReason)
+					$("#reasonModal").modal("hide");
+				}	
+				
 				ajaxCaculateSalary(conditions);
 				alert(response.message);
 				ajaxQuery(targetPage);
@@ -696,6 +735,7 @@ function generateWorkhourTb(swhlist,caculate) {
 		$("<td />").html(swh.status).appendTo(tr);
 		$("#workhour_list").append(tr);
 		$(tr).data("id", swh.id);
+		$(tr).data("swhindex", index);
 		$(tr).data("status", swh.status);
 		if(caculate){
 			ready_hour += parseFloat(swh.work_hour);

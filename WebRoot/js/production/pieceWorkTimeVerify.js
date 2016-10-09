@@ -71,13 +71,18 @@ $(document).ready(function(){
 	});
 	// 驳回
 	$("#btnReject").click(function() {
+		$("#reasonModal").modal("show");
+		
+	});
+	//输入驳回原因确认后驳回
+	$("#btnMtaSave").click(function() {
 		var month_start=$("#wdate_start").val().substring(0,7);
 		var month_end=$("#wdate_end").val().substring(0,7);
 		//alert(month_start);
 	/*	if(month_start!=month_end){
 			alert("起始日期和结束日期只能处于同一月份！");
 			return false;
-		}*/
+		}*/		
 		var conditions={};
 		var factory = "";
 		var workshop = "";
@@ -115,9 +120,15 @@ $(document).ready(function(){
 		conditions.factory=factory;
 		conditions.workshop=workshop;
 		conditions.month=month_start;
+		
 		var edit_list=getSelectList();
+		var rejectReason=$("#reject_reason").val();
+		if(!rejectReason){
+			alert("请输入驳回原因！");
+			return false;		
+		}
 		if(edit_list.length>0){
-			ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"reject");
+			ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"reject",rejectReason);
 			//sendEmail(mailTo,cc,title,thead,tbdatalist)
 		}
 		
@@ -247,12 +258,12 @@ function ajaxQuery(targetPage){
 				swhlist = response.dataList;
 				generateTb(swhlist);
 				$(".divLoading").hide();
-				$("#total").html(response.pager.totalCount);
+				/*$("#total").html(response.pager.totalCount);
 				$("#total").attr("total", response.pager.totalCount);
 				$("#cur").attr("page", response.pager.curPage);
 				$("#cur").html(
 						"<a href=\"#\">" + response.pager.curPage + "</a>");
-				$("#pagination").show();
+				$("#pagination").show();*/
 			}
 		});
 	}
@@ -365,7 +376,7 @@ function generateTb(swhlist){
 	});
 }
 //批准、驳回
-function ajaxUpdate(swhlist,conditions,whflag) {
+function ajaxUpdate(swhlist,conditions,whflag,rejectReason) {
 	var targetPage = $("#cur").attr("page") || 1;
 	$.ajax({
 		url : "pieceWorkTime!updateWorkHourInfo.action",
@@ -380,6 +391,35 @@ function ajaxUpdate(swhlist,conditions,whflag) {
 		success : function(response) {
 			if (response.success) {
 				//ajaxCaculateSalary(conditions);
+				if(whflag=='reject'){
+					var emaillist=[];
+					var datalist=JSON.parse(swhlist);
+					var conditionobj=JSON.parse(conditions);
+					$.each(datalist,function(i,swh){
+						var obj={};
+						obj['车号']=swh.bus_number;
+						obj['操作班组']=swh.workgroup+"-"+swh.team;
+						obj['承包单价']=swh.standard_price;
+						obj['操作日期']=swh.work_date;
+						obj['补贴车']=swh.bonus;
+						obj['工号']=swh.staff_number;
+						obj['姓名']=swh.staff_name;
+						obj['岗位']=swh.job;
+						obj['分配金额']=swh.distribution;
+						obj['工时']=swh.participation;
+						obj['计件工资']=swh.ppay;
+						obj['班组']=swh.workgroup_org+"-"+swh.team_org;
+						
+						emaillist.push(obj);
+					})
+					var tbhead='车号,操作班组,承包单价,操作日期,补贴车,工号,姓名,岗位,分配金额,计件工资,班组';
+					if(conditionobj.workshop=='自制件'){
+						tbhead='车号,操作班组,承包单价,操作日期,补贴车,工号,姓名,岗位,工时,分配金额,计件工资,班组';
+					}
+					//alert(JSON.stringify(emaillist))
+					sendEmail(datalist[0].email,'',conditionobj.factory+conditionobj.workshop+"车间"+'计件工时信息驳回',tbhead,JSON.stringify(emaillist),rejectReason)
+					$("#reasonModal").modal("hide");
+				}
 				alert(response.message);
 				ajaxQuery(targetPage);
 				$("#checkall").attr("checked",false);

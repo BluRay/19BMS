@@ -67,15 +67,15 @@ $(document).ready(function() {
 			alert("请选择操作月份！");
 			return false;
 		}
-		var swhlist=ajaxGetStaffWorkHours(conditions);
-		if(swhlist.length==0){
+		workhour_list=ajaxGetStaffWorkHours(conditions);
+		if(workhour_list.length==0){
 			$("#btnVerify").attr("disabled",true);
 			$("#btnReject").attr("disabled",true);
 		}else{
 			$("#btnVerify").attr("disabled",false);
 			$("#btnReject").attr("disabled",false);
 		}
-		generateWorkhourTb(swhlist,true);
+		generateWorkhourTb(workhour_list,true);
 	});
 	//复选框全选、反选
 	$("#checkall").click(function(){
@@ -307,7 +307,7 @@ function getSelectList(){
 		var obj={};
 		var tr=$(box).closest("tr");
 		var listindex=parseInt($(tr).data("swhlist_index"));
-		//alert(workhour_list[listindex].staff_name);
+		alert(workhour_list[listindex].staff_name);
 		var swhid=$(tr).data("id");
 		obj=workhour_list[listindex];
 		/*obj.id=swhid;
@@ -352,6 +352,7 @@ function ajaxUpdate(swhlist,conditions,whflag,tempOrderId,orderStatus,rejectReas
 					})
 					//alert(JSON.stringify(emaillist))
 					sendEmail(datalist[0].email,'',"派工流水号"+$("#edit_orderNo").html()+'额外工时信息驳回','工号,姓名,岗位,额外工时,小班组,班组,车间,工厂,操作日期',JSON.stringify(emaillist),rejectReason)
+					$("#reasonModal").modal("hide");
 				}
 				ajaxQuery(targetPage);
 			} else {

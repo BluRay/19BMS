@@ -121,7 +121,32 @@
 							</tbody>
 							</table>
 						</div>
-			
+					
+					<div class="modal fade" id="reasonModal" tabindex="-1" role="dialog" unselectable="on" onselectstart="return false;"
+					aria-hidden="true" style="display: none; -moz-user-select:-moz-none;width: 400px;left:50%">
+					<div class="modal-header">
+						<!-- <button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">×</button> -->
+						<h3>驳回原因</h3>
+					</div>
+					<div class="modal-body" style="margin-bottom: -20px;">
+						
+						<div class="control-group">
+							<table >
+								<tr>
+								<td width="80px" style="text-align:right">驳回原因：</td>
+								<td width="280px">
+									<textarea rows="2" id="reject_reason" style="width:280px"></textarea>
+								</td>								
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-primary" id="btnMtaSave">确认</button>
+						<button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>					
+					</div>
+					</div>
 				</div>
 			</div>
 		</div>
