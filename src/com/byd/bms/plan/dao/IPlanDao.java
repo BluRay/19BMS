@@ -51,7 +51,7 @@ public interface IPlanDao {
 	public int insertPlanBusNumber(PlanBusNumber busNumber);
 	public int insertPlanBus(PlanBus bus);
 	
-	public BmsFactoryOrder getFactoryOrderInfo(Map<String,Object> queryMap);
+	public int getFactoryOrderInfo(Map<String,Object> queryMap);
 	public PlanBusNumber checkBusNumber(Map<String,Object> queryMap);
 	public int getMaxNumByOrderNo(String order_no);
 	public int updateFactoryOrderBusCount(Map<String,Object> queryMap);

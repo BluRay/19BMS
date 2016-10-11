@@ -451,4 +451,11 @@ public interface IProductionDao {
 	 * @return
 	 */
 	public int querySerialNoCount(Map<String, Object> conditionMap);
+	/**
+	 * added by xjw 16/10/10
+	 * 根据派工单流水号查询临时派工单
+	 * @param order_serial_no
+	 * @return orderId
+	 */
+	public int queryTempOrderBySeries(String order_serial_no);
 }

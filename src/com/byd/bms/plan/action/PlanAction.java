@@ -2594,13 +2594,13 @@ public class PlanAction extends BaseAction<Object> {
 		
 		int vinCount = Integer.valueOf(request.getParameter("vinCount"));
 		
-		BmsFactoryOrder factoryOrder = new BmsFactoryOrder();
-		factoryOrder = planDao.getFactoryOrderInfo(conditionMap);
-		logger.info("---->factoryOrder production_qty = " + factoryOrder.getProduction_qty() + " id = " + factoryOrder.getId());
+		//BmsFactoryOrder factoryOrder = new BmsFactoryOrder();
+		int factoryOrderQty = planDao.getFactoryOrderInfo(conditionMap);
+		//logger.info("---->factoryOrder production_qty = " + factoryOrder.getProduction_qty() + " id = " + factoryOrder.getId());
 		//查询 指定工厂下指定订单 已生成的VIN数
 		int totalCount=planDao.getPlanVinCount(conditionMap);
 		logger.info("---->已产生的VIN号数 = " + totalCount);
-		int genVinCount = factoryOrder.getProduction_qty() - totalCount;
+		int genVinCount = factoryOrderQty - totalCount;
 		if(genVinCount <= 0){
 			JSONObject json = Util.dataListToJson(false,"该订单的VIN号已经全部生成！",null,null);
 			try {

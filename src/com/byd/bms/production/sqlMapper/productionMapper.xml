@@ -3070,6 +3070,10 @@
 		parameterType="Map" resultType="String">
 		call P_CACULATE_TMP_SALLARY(#{factory},#{workshop},'','',#{workMonth});
 	</select>
+	
+	<select id="queryTempOrderBySeries" parameterType="String" resultType="int">
+		select ifnull(max(id),0) from BMS_PD_TMP_ORDER where order_serial_no=#{order_serial_no}
+	</select>
 	<!-- 临时派工单模块 end -->
 
 	<!-- 计件工时 start -->

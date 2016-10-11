@@ -154,14 +154,21 @@ public class TempOrderAction extends BaseAction<Object> {
 		tempOrder.setApplier(applier);
 		tempOrder.setApply_date(createTime);
 		tempOrder.setTmp_order_no(orderNo);
-		int i=productionDao.insertTmpOrder(tempOrder);
-		if(i>0){
-			result.put("success", true);
-		    result.put("message", "新增成功");
-		}else{
+		//派工流水号唯一性校验
+		int order_id=productionDao.queryTempOrderBySeries(tempOrder.getOrder_serial_no());
+		if(order_id!=0){
 			result.put("success", false);
-		    result.put("message", "新增失败");
-		}
+		    result.put("message", "派工流水号"+tempOrder.getOrder_serial_no()+"已经存在！");
+		}else{
+			int i=productionDao.insertTmpOrder(tempOrder);
+			if(i>0){
+				result.put("success", true);
+			    result.put("message", "新增成功");
+			}else{
+				result.put("success", false);
+			    result.put("message", "新增失败");
+			}
+		}	
 		return SUCCESS;		
 	}
 	/**
@@ -178,18 +185,26 @@ public class TempOrderAction extends BaseAction<Object> {
 			System.out.println(key);
 			conditionMap.put(key, jo.get(key));
 		}*/
-		int i=productionDao.updateTmpOrder(tempOrder);
-		/*cmap.putAll(conditionMap);
-		cmap.put("workDate", Util.format(new Date(), "yyyy-MM-dd"));
-		cmap.put("recorder", getUser().getDisplay_name());
-		productionDao.saveTmpOrderProcedure(cmap);*/
-		if(i>0){
-			result.put("success", true);
-		    result.put("message", "更新成功");
-		}else{
+		//派工流水号唯一性校验
+		int order_id=productionDao.queryTempOrderBySeries(tempOrder.getOrder_serial_no());
+		if(order_id!=tempOrder.getId()&&order_id!=0){
 			result.put("success", false);
-		    result.put("message", "更新失败");
+		    result.put("message", "派工流水号"+tempOrder.getOrder_serial_no()+"已经存在！");
+		}else{
+			int i=productionDao.updateTmpOrder(tempOrder);
+			/*cmap.putAll(conditionMap);
+			cmap.put("workDate", Util.format(new Date(), "yyyy-MM-dd"));
+			cmap.put("recorder", getUser().getDisplay_name());
+			productionDao.saveTmpOrderProcedure(cmap);*/
+			if(i>0){
+				result.put("success", true);
+			    result.put("message", "更新成功");
+			}else{
+				result.put("success", false);
+			    result.put("message", "更新失败");
+			}
 		}
+		
 		return SUCCESS;	
 	}
 	//更新工单进度
