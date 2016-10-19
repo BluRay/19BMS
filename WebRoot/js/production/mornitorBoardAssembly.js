@@ -2,7 +2,9 @@ var ScrollTime;
 var boardInfo;
 var timeInfo;
 var exceptionInfo;
+var factory_p;
 $(document).ready(function() {
+	factory_p=getQueryString("factory")||"";
 	ajaxQueryBoardInfo();
 	showClock();
 	ajaxQueryExceptionInfo();
@@ -26,10 +28,11 @@ function intervalExceptionInfo() {
 }
 
 function ajaxQueryExceptionInfo() {
+	//alert(factory_p)
 	$.ajax({
 		url : "common!getIndexOrderInfo.action",
 		type : "post",
-		data : {},
+		data : {'factory_id':factory_p},
 		async : false,
 		dataType : "json",
 		success : function(response) {
@@ -55,7 +58,7 @@ function ajaxQueryBoardInfo() {
 			.ajax({
 				url : "common!getIndexOrderInfo.action",
 				type : "post",
-				data : {},
+				data : {'factory_id':factory_p},
 				async : false,
 				dataType : "json",
 				success : function(response) {

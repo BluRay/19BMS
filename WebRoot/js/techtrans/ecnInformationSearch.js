@@ -9,7 +9,7 @@ $(document).ready(function () {
 		getAuthorityFactorySelect("#search_factory", "", "");
 		getWorkshopSelect_Auth("#search_workshop", null, $("#search_factory :selected").text(), "")
 		//getWorkshopSelect_Key("#search_workshop", "");
-		$("#taskstatus").val("0");
+		//$("#taskstatus").val("0");
 		getOrderNoSelect("#order_no","#orderId");
 		ajaxQuery();
 	};

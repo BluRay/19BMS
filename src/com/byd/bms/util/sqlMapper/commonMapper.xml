@@ -835,4 +835,125 @@
 		limit 1
 	</select>
 	
+	<select id="queryProductionIndexData" parameterType="Map" resultType="Map">
+	<![CDATA[
+		select CONCAT('焊装','上线') process_node,count(b.bus_number) process_num, l.line
+		from BMS_PLAN_BUS b 
+		left join BMS_BASE_PROCESS p on b.latest_process_id=p.id
+		left join BMS_BASE_LINE l on l.id=p.line_id
+		where b.welding_online_date <=CONCAT(#{curDate},' 17:10:00') 
+		and b.welding_online_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+		and b.factory_id=#{factoryId}
+		group by l.line
+		union all
+		select CONCAT('焊装','下线') process_node,count(b.bus_number) process_num,l.line
+				from BMS_PLAN_BUS b 
+				left join BMS_BASE_PROCESS p on b.latest_process_id=p.id
+				left join BMS_BASE_LINE l on l.id=p.line_id
+				where b.welding_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+				and b.welding_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+				and b.factory_id=#{factoryId}
+				group by l.line
+		union all
+		select CONCAT('涂装','上线') process_node,count(b.bus_number) process_num, l.line
+				from BMS_PLAN_BUS b 
+				left join BMS_BASE_PROCESS p on b.latest_process_id=p.id
+				left join BMS_BASE_LINE l on l.id=p.line_id
+				where b.painting_online_date <=CONCAT(#{curDate},' 17:10:00') 
+				and b.painting_online_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+				and b.factory_id=#{factoryId}
+				group by l.line
+		union all
+		select CONCAT('涂装','下线') process_node,count(b.bus_number) process_num, l.line
+				from BMS_PLAN_BUS b 
+				left join BMS_BASE_PROCESS p on b.latest_process_id=p.id
+				left join BMS_BASE_LINE l on l.id=p.line_id
+				where b.painting_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+				and b.painting_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+				and b.factory_id=#{factoryId}
+				group by l.line
+		union all
+		select CONCAT('底盘','上线') process_node,count(b.bus_number) process_num, l.line
+				from BMS_PLAN_BUS b 
+				left join BMS_BASE_PROCESS p on b.latest_process_id=p.id
+				left join BMS_BASE_LINE l on l.id=p.line_id
+				where b.chassis_online_date <=CONCAT(#{curDate},' 17:10:00') 
+				and b.chassis_online_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+				and b.factory_id=#{factoryId}
+				group by l.line
+		union all
+		select CONCAT('底盘','下线') process_node,count(b.bus_number) process_num, l.line
+				from BMS_PLAN_BUS b 
+				left join BMS_BASE_PROCESS p on b.latest_process_id=p.id
+				left join BMS_BASE_LINE l on l.id=p.line_id
+				where b.chassis_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+				and b.chassis_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+				and b.factory_id=#{factoryId}
+				group by l.line
+		union all
+		select CONCAT('总装','上线') process_node,count(b.bus_number) process_num, l.line
+				from BMS_PLAN_BUS b 
+				left join BMS_BASE_PROCESS p on b.latest_process_id=p.id
+				left join BMS_BASE_LINE l on l.id=p.line_id
+				where b.assembly_online_date <=CONCAT(#{curDate},' 17:10:00') 
+				and b.assembly_online_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+				and b.factory_id=#{factoryId}
+				group by l.line
+		union all
+		select CONCAT('总装','下线') process_node,count(b.bus_number) process_num, l.line
+				from BMS_PLAN_BUS b 
+				left join BMS_BASE_PROCESS p on b.latest_process_id=p.id
+				left join BMS_BASE_LINE l on l.id=p.line_id
+				where b.assembly_offline_date <=CONCAT(#{curDate},' 17:10:00') 
+				and b.assembly_offline_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+				and b.factory_id=#{factoryId}
+				group by l.line
+		union all
+		select '入库' process_node,count(b.bus_number) process_num,'' line
+				from BMS_PLAN_BUS b 		
+				where b.warehousing_date <=CONCAT(#{curDate},' 17:10:00') 
+				and b.warehousing_date >CONCAT(date_add(#{curDate},interval '-1' DAY),' 17:10:00') 
+				and b.factory_id=#{factoryId}
+		union all
+		SELECT 'WIP_WP' process_code,count(b.bus_number) process_num,'' line
+				FROM BMS_PLAN_BUS b
+				left
+				join BMS_ORDER o on b.order_id=o.id
+				where b.factory_id=#{factoryId}
+				and b.welding_offline_date is not null and b.painting_online_date is null
+		union all
+		SELECT 'WIP_PC' process_code,count(b.bus_number) process_num,'' line
+				FROM BMS_PLAN_BUS b
+				left
+				join BMS_ORDER o on b.order_id=o.id
+				where b.factory_id=#{factoryId}
+				and b.painting_offline_date is not null and b.chassis_online_date is null
+		union all
+		SELECT 'WIP_CA' process_code,count(b.bus_number) process_num,'' line
+				FROM BMS_PLAN_BUS b
+				left join BMS_ORDER o on b.order_id=o.id
+				where b.factory_id=#{factoryId}
+				and b.chassis_offline_date is not null and b.assembly_online_date is null
+		union all
+		SELECT  '焊装在制' process_code,COUNT(id) AS process_num,'' line 
+				FROM BMS_PLAN_BUS
+				WHERE factory_id = #{factoryId}
+				AND welding_online_date IS NOT NULL AND welding_offline_date IS NULL
+		union all
+		SELECT  '涂装在制' process_code,COUNT(id) AS process_num,'' line 
+				FROM BMS_PLAN_BUS
+				WHERE factory_id = #{factoryId}
+				AND painting_online_date IS NOT NULL AND painting_offline_date IS NULL
+		union all
+		SELECT  '底盘在制' process_code,COUNT(id) AS process_num,'' line 
+				FROM BMS_PLAN_BUS
+				WHERE factory_id = #{factoryId}
+				AND chassis_online_date IS NOT NULL AND chassis_offline_date IS NULL
+		union all
+		SELECT  '总装在制' process_code,COUNT(id) AS process_num,'' line 
+				FROM BMS_PLAN_BUS
+				WHERE factory_id = #{factoryId}
+				AND assembly_online_date IS NOT NULL AND assembly_offline_date IS NULL	
+		]]>			
+	</select>
 </mapper>

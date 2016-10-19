@@ -2708,6 +2708,9 @@
 				<if test="workgroup !=null and workgroup !='' and workgroup !='请选择'">
 					and h.workgroup=#{workgroup}
 				</if>
+				<if test="team !=null and team !='' and team !='请选择'">
+					and h.team=#{team}
+				</if>
 				<if test="staffNum !=null and staffNum !=''">
 					and find_in_set(h.staff_number,#{staffNum})>0
 				</if>
@@ -2809,6 +2812,9 @@
 				</if>
 				<if test="workgroup !=null and workgroup !='' and workgroup !='请选择'">
 					and h.workgroup=#{workgroup}
+				</if>
+				<if test="team !=null and team !='' and team !='请选择'">
+					and h.team=#{team}
 				</if>
 				<if test="orgId !=null and orgId !=''">
 					and h.org_id=#{orgId}
@@ -3466,4 +3472,14 @@
 		</foreach>
 	</update>
 	
+	<!-- 根据工厂、车间查询线别工序列表 -->
+	<select id="queryLineProcessList" parameterType="Map" resultType="Map">
+		SELECT p.line_id,l.line line_name,l.workshop_id,w.workshop_name,w.factory_id,f.factory_name,concat('[',group_concat('{"id":',p.id,',"code":"',p.process_code,'","monitor_flag":"',p.monitory_point_flag,'","name":"',p.process_name,'"}' order by p.id),']') process_list
+		FROM BMS_BASE_PROCESS p
+		LEFT JOIN BMS_BASE_LINE l ON p.line_id=l.id
+		LEFT JOIN BMS_BASE_WORKSHOP w on w.id=l.workshop_id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=w.factory_id
+		where f.factory_name=#{factory} and w.workshop_name=#{workshop} and p.delete_flag='0'
+		group by p.line_id
+	</select>
 </mapper>

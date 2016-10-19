@@ -404,7 +404,7 @@ $(document).ready(function () {
 		getAuthorityFactorySelect("#search_factory", "", "noall");
 		getWorkshopSelect_Auth("#search_workshop", null, $("#search_factory :selected").text(), "");
 		getOrderNoSelect("#order_no","#orderId");
-		$("#taskstatus").val("0");
+		//$("#taskstatus").val("0");
 		ajaxQuery(1);
 	};
 	

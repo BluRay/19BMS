@@ -458,4 +458,11 @@ public interface IProductionDao {
 	 * @return orderId
 	 */
 	public int queryTempOrderBySeries(String order_serial_no);
+	/**
+	 * added by xjw 16/10/11
+	 * 根据工厂、车间查询线别工序列表
+	 * @param conditionMap
+	 * @return
+	 */
+	public List queryLineProcessList(Map<String,Object> conditionMap);
 }

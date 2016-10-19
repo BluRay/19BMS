@@ -92,7 +92,7 @@
 									</td>
 									<td>
 										<select  class="input-medium carType" id="taskstatus">
-											<option ></option>
+											<option value="">全部</option>
 											<option value="1">已完成</option>
 											<option value="0">未完成</option>
 										</select>

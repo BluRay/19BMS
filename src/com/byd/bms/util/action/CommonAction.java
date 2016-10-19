@@ -1144,4 +1144,39 @@ public class CommonAction extends BaseAction<Object> {
 		selectList=commDao.getBasePrice(conditionMap);
 		return SUCCESS;
 	}
+	
+	public String getProductionIndexData(){
+		HttpServletRequest request = ServletActionContext.getRequest();
+		PrintWriter out = null;
+		JSONObject resultJson = null;
+		try {
+			request.setCharacterEncoding("UTF-8");
+			HttpServletResponse response = ServletActionContext.getResponse();
+			response.setContentType("text/html;charset=utf-8");
+			BmsBaseUser user = getUser();
+			String factoryId = "";
+			// factoryId=this.factoryId.equals("")?String.valueOf(user.getFactory_id()):this.factoryId;
+			if (this.factoryId == null || this.factoryId.equals("")) {
+				factoryId = String.valueOf(user.getFactory_id());
+			} else {
+				factoryId = this.factoryId;
+			}
+
+			Map<String, Object> resultMap = new HashMap<String, Object>();
+			Map<String, Object> conditionMap = new HashMap<String, Object>();
+			
+			String curdate = Util.format(new Date(), "yyyy-MM-dd");
+			conditionMap.put("factoryId", factoryId);
+			conditionMap.put("curDate", curdate);
+			
+			resultMap.put("dataList", commDao.queryProductionIndexData(conditionMap));		
+			resultMap.put("factoryId", factoryId);
+			resultJson = JSONObject.fromObject(resultMap);
+			out = response.getWriter();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		out.print(resultJson);
+		return null;
+	}
 }

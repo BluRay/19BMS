@@ -1594,7 +1594,9 @@ function numAdd(num1, num2) {
 	baseNum2 = 0;
 	}
 	baseNum = Math.pow(10, Math.max(baseNum1, baseNum2));
-	return (num1 * baseNum + num2 * baseNum) / baseNum;
+	
+	//alert((num1 * baseNum +"+"+ num2 * baseNum));
+	return ((num1 * baseNum + num2 * baseNum) / baseNum).toFixed(2);
 	}; 
 
 //使用公用邮箱发送邮件	

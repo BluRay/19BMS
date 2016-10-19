@@ -3,7 +3,7 @@ $(document).ready(function () {
 	initPage();
 	function initPage(){
 		//alert(accAdd(Number("0.7"),Number("0.2")));
-		$("#status").val("0");
+		//$("#status").val("0");
 		
 		//getFactorySelect();
 		getAuthorityFactorySelect("#search_factory", "", "noall");

@@ -2,10 +2,12 @@ var ScrollTime;
 var boardInfo;
 var timeInfo;
 var exceptionInfo;
+var factory_p;
 $(document).ready(function() {
-	ajaxQueryBoardInfo();
+	factory_p=getQueryString("factory")||"";
+	ajaxQueryBoardInfo(factory_p);
 	showClock();
-	ajaxQueryExceptionInfo();
+	ajaxQueryExceptionInfo(factory_p);
 	intervalTimeInfo();
 	interValBoardInfo();
 	intervalExceptionInfo();
@@ -25,11 +27,11 @@ function intervalExceptionInfo() {
 	exceptionInfo = setInterval("ajaxQueryExceptionInfo()", 1000 * 60 * 5);
 }
 
-function ajaxQueryExceptionInfo() {
+function ajaxQueryExceptionInfo(factory_p) {
 	$.ajax({
 		url : "common!getIndexOrderInfo.action",
 		type : "post",
-		data : {workshop:"焊装",factoryId:""},
+		data : {workshop:"焊装",factoryId:factory_p},
 		async : false,
 		dataType : "json",
 		success : function(response) {
@@ -49,13 +51,13 @@ function ajaxQueryExceptionInfo() {
 	})
 }
 
-function ajaxQueryBoardInfo() {
+function ajaxQueryBoardInfo(factory_p) {
 	// alert("boardinfo");
 	$
 			.ajax({
 				url : "common!getIndexOrderInfo.action",
 				type : "post",
-				data : {workshop:"焊装",factoryId:""},
+				data : {workshop:"焊装",factoryId:factory_p},
 				async : false,
 				dataType : "json",
 				success : function(response) {

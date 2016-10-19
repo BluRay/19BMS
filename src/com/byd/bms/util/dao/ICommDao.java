@@ -88,4 +88,12 @@ public interface ICommDao {
 	 * @return
 	 */
 	public List<Map<String,String>> getBasePrice(Map<String, Object> conditionMap);
+	/**
+	 * added by xjw 16/10/14
+	 * 查询生产首页数据
+	 * @param conditionMap
+	 * @return
+	 */
+	public List queryProductionIndexData(Map<String, Object> conditionMap);
+	
 }

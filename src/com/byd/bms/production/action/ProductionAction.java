@@ -108,6 +108,10 @@ public class ProductionAction extends BaseAction<Object>{
 		return "index";
 	}
 	
+	public String executionindex(){
+		return "executionindex";
+	}
+	
 	public String exceptionindex(){
 		return "exceptionindex";
 	}
@@ -2771,6 +2775,20 @@ public class ProductionAction extends BaseAction<Object>{
 		
 		result.put("success", true);
 		result.put("message", "操作成功");
+		return SUCCESS;
+	}
+	
+	
+	public String getLineProcessList(){
+		result=new HashMap<String, Object>();
+		JSONObject jo = JSONObject.fromObject(conditions);
+		Map<String, Object> conditionMap = new HashMap<String, Object>();	
+		for (Iterator it = jo.keys(); it.hasNext();) {
+			String key = (String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		result.put("dataList", productionDao.queryLineProcessList(conditionMap));
+		
 		return SUCCESS;
 	}
 	

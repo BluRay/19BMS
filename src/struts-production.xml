@@ -6,7 +6,8 @@
 	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
 	<package name="productionModel" extends="json-default" >
 		<action name="production" class="productionAction">
-			<result name="index">/jsp/production/productionIndex.jsp</result>
+			<result name="index">/jsp/production/productionIndex_1.jsp</result>
+			<result name="executionindex">/jsp/production/executionIndex.jsp</result>
 			<result name="exceptionindex">/jsp/production/productionExceptionIndex.jsp</result>
 			<result name="execution">/jsp/production/productionExecution.jsp</result>
 			<result name="exception">/jsp/production/productionException.jsp</result>

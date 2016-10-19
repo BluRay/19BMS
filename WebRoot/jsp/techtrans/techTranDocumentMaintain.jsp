@@ -103,7 +103,7 @@
 										class="input-medium revise" placeholder="请输入主题..."
 										id="subject" /></td>
 									<td><select class="input-medium carType" id="status">
-											<option></option>
+											<option value="">全部</option>
 											<option value="1">已完成</option>
 											<option value="0">未完成</option>
 									</select></td>

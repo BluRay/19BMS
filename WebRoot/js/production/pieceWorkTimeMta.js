@@ -136,7 +136,12 @@ $(document)
 					});
 					$(".work_hour").live("keydown",function(event){
 						if (event.keyCode == "13") {								
-							$(this).parent().parent().next().find(".work_hour").focus();
+							$(this).parent().parent().next().find(".work_hour").focus().select();
+						}
+					})
+					$(".distribution").live("keydown",function(event){
+						if (event.keyCode == "13") {								
+							$(this).parent().parent().next().find(".distribution").focus().select();
 						}
 					})
 					
@@ -230,10 +235,10 @@ $(document)
 											var distribution = $(this).val();
 											var staffNum = $(tr).find(".card_num")
 													.val();
-											//var const_par_validate= /^0(\.[0-9]*)?$|^1(\.[0]*)?$/;//浮点数正则表达式
+											var const_par_validate= /^[0-9]+[0-9]*\.?[0-9]?[0-9]?$/;//浮点数正则表达式
 											
-											if (!const_float_validate.test(distribution)&&distribution.trim().length>0) {
-												alert("分配金额必须为数字！");
+											if (!const_par_validate.test(distribution)&&distribution.trim().length>0) {
+												alert("分配金额必须为数字,且最多两位小数！");
 												$(this).val("");
 											}							
 									
@@ -338,9 +343,10 @@ $(document)
 												var workshop_org=$(tr).find(".staff_workshop").html();
 												var factory_org=$(tr).find(".staff_factory").html();
 												var participation = $(tr).find(".work_hour").val();
-												var distribution=parseFloat($(tr).find(".distribution").val());
+												var distribution=Number($(tr).find(".distribution").val());
 												total_distribution=numAdd(total_distribution,distribution);
 												//total_distribution+=Number(distribution)
+												//alert(total_distribution)
 												if (staffId != undefined
 														&& staffId
 																.trim().length > 0/*&&participation !=0*/) {
@@ -398,8 +404,8 @@ $(document)
 										}
 							var conditions = "{staffNum:'"+ staffNumlist
 												+ "',busNumber:'"+ busNumber
-												+"',workshop:'"+workshop
-												+ "'}";	
+												+"',workshop:'"+workshop+"',team:'"
+												+ team+"'}";	
 											var sfwlist = ajaxGetStaffWorkHours(conditions);
 											//alert(sfwlist[0].id);
 											if (sfwlist.length > 0) {

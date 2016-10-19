@@ -19,9 +19,9 @@
 		<li class="active"><a href="#" class="js-sub-menu-toggle"> <i
 				class="fa fa-dashboard fa-fw"></i><span class="text">生产模块菜单</span>
 		</a></li>
-		<li id="orderMaintain"><a href="production!index.action"
+		<li id="orderMaintain"><a href="production!executionindex.action"
 			class="js-sub-menu-toggle"> <i class="fa fa-list-ul fa-fw"></i><span
-				class="text">生产执行</span>
+				class="text">生产扫描</span>
 		</a></li>
 		<li id="orderReview"><a href="production!exceptionindex.action"
 			class="js-sub-menu-toggle"> <i

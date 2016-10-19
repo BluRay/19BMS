@@ -10,7 +10,7 @@ $(document).ready(function () {
 		getWorkshopSelect_Auth("#search_workshop", null, $("#search_factory :selected").text(), "")
 		//getWorkshopSelect_Key("#search_workshop", "");
 		getOrderNoSelect("#order_no","#orderId");
-		$("#taskstatus").val("0");
+		//$("#taskstatus").val("0");
 		ajaxQuery(1);
 	};
 	// 工厂切换事件

@@ -187,7 +187,7 @@
 	</update>
 	
 	<select id="getEcnTaskList" parameterType="Map" resultType="com.byd.bms.techtrans.entity.BmsEcnTask">
-		SELECT t.*,o.order_no,f.production_qty order_qty FROM BMS_ECN_DOCUMENT d 
+		SELECT t.*,o.order_no,sum(f.production_qty) order_qty FROM BMS_ECN_DOCUMENT d 
 		LEFT JOIN BMS_ECN_TASK t ON d.id = t.ecn_id 
 		LEFT JOIN BMS_ORDER o ON t.ecn_order_id = o.id 
 		LEFT JOIN BMS_FACTORY_ORDER f ON t.ecn_order_id = f.order_id AND t.ecn_factory_id = f.factory_id
@@ -195,6 +195,7 @@
 		<if test="ecn_id!=null and ecn_id !=''">
 			and d.id = #{ecn_id}
 		</if>
+		group by t.id,t.ecn_factory_id
 		order by t.task_number 
 	</select>
 	

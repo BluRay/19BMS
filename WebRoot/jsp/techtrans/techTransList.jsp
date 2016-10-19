@@ -96,7 +96,7 @@
 									 <input type="text" class="Wdate" style="height:30px;background-color: white;width:120px" name="endDate" placeholder="结束日期..." id="endDate" onClick="WdatePicker({el:'endDate',dateFmt:'yyyy-MM-dd'});"/></td>
 								<td>
 										<select style="width:100px;" class="input-medium carType" id="taskstatus">
-											<option ></option>
+											<option value="">全部</option>
 											<option value="1">已完成</option>
 											<option value="0">未完成</option>
 										</select>

@@ -3,6 +3,7 @@ $(document).ready(function(){
 	initPage();
 	
 	function initPage(){
+		pageSize=5;
 		getAuthorityFactorySelect("#factory", "", "noall");
 		getBusNumberSelect('#bus_number');
 		var selectFactory = $("#factory :selected").text();
