@@ -1094,7 +1094,8 @@
 		group by p1.order_id,k.key_name
 		) p on p.key_name=record.key_name and p.order_id=record.order_id
 		left join BMS_BASE_KEY k on record.key_name=k.key_name
-		where ifnull(record.total_qty,0) !=record.production_qty 
+		where (ifnull(record.total_qty,0) !=record.production_qty 
+		or (ifnull(record.total_qty,0) =record.production_qty and record.real_qty !=0) )
 		<if test="workshop !=null and workshop !=''">
 			and record.key_name like concat(#{workshop},'%')
 		</if>		
