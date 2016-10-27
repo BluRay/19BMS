@@ -15,7 +15,7 @@ $(document).ready(function () {
 		//获取系统时间 
 		var LSTR_ndate=new Date(); 
 		var LSTR_MM=LSTR_ndate.getMonth()+1;
-		LSTR_MM=LSTR_MM > 10?LSTR_MM:("0"+LSTR_MM);
+		LSTR_MM=parseInt(LSTR_MM) >= 10?LSTR_MM:("0"+LSTR_MM);
 		$("#staff_month").val(LSTR_ndate.getFullYear() + "-" + LSTR_MM);
 		
 		var jobType = $("#job_type").val();

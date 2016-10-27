@@ -5,6 +5,10 @@ $(document).ready(function () {
 		ajaxQuery();
 	},1000*60*5);
 	
+	$("#search_factory").live("change",function(){
+		ajaxQuery();
+	});
+	
 	function initPage(){
 		getAuthorityFactorySelect("#search_factory", "", "noall");
 		user_staff = getStaffInfo1();		//add by wuxiao 获取当前用户员工信息 2016/4/22
@@ -13,6 +17,29 @@ $(document).ready(function () {
 	
 })
 	function ajaxQuery(){
+		$("#node-online-w-a").html("");
+		$("#node-online-w-b").html("");
+		$("#node-offline-w-a").html("");
+		$("#node-offline-w-b").html("");
+		$("#node-online-p").html("");
+		$("#node-offline-p").html("");
+		$("#node-online-b-a").html("");
+		$("#node-online-b-b").html("");
+		$("#node-offline-b-a").html("");
+		$("#node-offline-b-b").html("");
+		$("#node-online-a-a").html("");
+		$("#node-online-a-b").html("");
+		$("#node-offline-a-a").html("");
+		$("#node-offline-a-b").html("");
+		$("#node-warehouse").html("");
+		$("#node-prod-w").html("");
+		$("#node-prod-p").html("");
+		$("#node-prod-b").html("");
+		$("#node-prod-a").html("");
+		$("#node-wip-1").html("");
+		$("#node-wip-2").html("");
+		$("#node-wip-3").html("");
+	
 		var factoryId=$("#search_factory").val();
 		$.ajax({
 			type : "get",// 使用get方法访问后台
@@ -25,70 +52,71 @@ $(document).ready(function () {
 			success : function(response) {
 				if(response.dataList){
 					$.each(response.dataList,function(i,data){
+						
 						if(data.process_node=='焊装上线'){
-							if(data.line.indexOf('A')>0){
+							if(data.line.indexOf('A')>=0){
 								$("#node-online-w-a").html(data.process_num);
 							}
-							if(data.line.indexOf('B')>0){
+							if(data.line.indexOf('B')>=0){
 								$("#node-online-w-b").html(data.process_num);
 							}
 						}
 						if(data.process_node=='焊装下线'){
-							if(data.line.indexOf('A')>0){
+							if(data.line.indexOf('A')>=0){
 								$("#node-offline-w-a").html(data.process_num);
 							}
-							if(data.line.indexOf('B')>0){
+							if(data.line.indexOf('B')>=0){
 								$("#node-offline-w-b").html(data.process_num);
 							}
 						}
 						
 						if(data.process_node=='涂装上线'){
-							if(data.line.indexOf('A')>0){
-								$("#node-online-p-a").html(data.process_num);
+							if(data.line.indexOf('A')>=0){
+								$("#node-online-p").html(data.process_num);
 							}
-							if(data.line.indexOf('B')>0){
-								$("#node-offline-p-b").html(data.process_num);
-							}
+							/*if(data.line.indexOf('B')>=0){
+								$("#node-online-p").html(data.process_num);
+							}*/
 						}
 						if(data.process_node=='涂装下线'){
-							if(data.line.indexOf('A')>0){
-								$("#node-offline-p-a").html(data.process_num);
+							if(data.line.indexOf('A')>=0){
+								$("#node-offline-p").html(data.process_num);
 							}
-							if(data.line.indexOf('B')>0){
+							/*if(data.line.indexOf('B')>=0){
 								$("#node-offline-p-b").html(data.process_num);
-							}
+							}*/
 						}
 						
 						if(data.process_node=='底盘上线'){
-							if(data.line.indexOf('A')>0){
-								$("#node-online-p-a").html(data.process_num);
+							if(data.line.indexOf('A')>=0){
+								$("#node-online-b-a").html(data.process_num);
 							}
-							if(data.line.indexOf('B')>0){
-								$("#node-offline-p-b").html(data.process_num);
+							if(data.line.indexOf('B')>=0){
+								$("#node-online-b-b").html(data.process_num);
 							}
 						}
 						if(data.process_node=='底盘下线'){
-							if(data.line.indexOf('A')>0){
-								$("#node-offline-p-a").html(data.process_num);
+							if(data.line.indexOf('A')>=0){
+								$("#node-offline-b-a").html(data.process_num);
 							}
-							if(data.line.indexOf('B')>0){
-								$("#node-offline-p-b").html(data.process_num);
+							if(data.line.indexOf('B')>=0){
+								$("#node-offline-b-b").html(data.process_num);
 							}
 						}
 						
 						if(data.process_node=='总装上线'){
-							if(data.line.indexOf('A')>0){
+							if(data.line.indexOf('A')>=0){
 								$("#node-online-a-a").html(data.process_num);
 							}
-							if(data.line.indexOf('B')>0){
-								$("#node-offline-a-b").html(data.process_num);
+							if(data.line.indexOf('B')>=0){
+								$("#node-online-a-b").html(data.process_num);
 							}
 						}
 						if(data.process_node=='总装下线'){
-							if(data.line.indexOf('A')>0){
+							if(data.line.indexOf('A')>=0){
 								$("#node-offline-a-a").html(data.process_num);
 							}
-							if(data.line.indexOf('B')>0){
+							if(data.line.indexOf('B')>=0){
 								$("#node-offline-a-b").html(data.process_num);
 							}
 						}
@@ -148,7 +176,7 @@ function monitorFoward(workshop){
 	window.location.href='production!monitorworkshop.action?workshop='+workshop+'&factory='+$("#search_factory").val();
 }
 
-function imgFoward(name){
+function imgFoward(name,workshop){
 	if(name=='铭牌'){
 		window.location.href='production!showNameplatePrint.action';
 	}
@@ -169,5 +197,8 @@ function imgFoward(name){
 	}
 	if(name=='座位数'){
 		window.location.href='production!busseats.action';
+	}
+	if(name=='在制'){
+		window.location.href="production!productionsearch.action?workshop="+workshop+"&factory="+$("#search_factory").val();
 	}
 }

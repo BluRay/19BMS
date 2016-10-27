@@ -16,6 +16,7 @@
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/tableHtmlPaste.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 <script type="text/javascript" src="js/production/pieceWorkTimeMta.js"></script>
 <style type="text/css">
@@ -33,7 +34,7 @@
 	<%@ include file="../common/head.jsp"%>
 	<%@ include file="../common/general_production_left.jsp"%>
 	<!-- main -->
-	<div class="content-wrapper " unselectable="on" onselectstart="return false;" style="-moz-user-select:-moz-none;">
+	<div class="content-wrapper " >
 		<div id="bodymain" class="offhead">
 			<div id="bodyright" class="offset2">
 				<!-- Main -->
@@ -91,7 +92,9 @@
 							<td >姓名</td>
 							<td >岗位</td>
 							 <td id="td_part" style="display:none">工时</td> 
-							<td >分配金额</td>
+							<td >分配金额
+								<i id="dstcopy" data-original-title="粘贴整列" name="edit" rel="tooltip" title="" class="fa fa-files-o" style="cursor: pointer;color:blue"></i>
+							</td>
 							<td >承包单价</td>
 							<td >小班组</td>
 							<td >班组</td>

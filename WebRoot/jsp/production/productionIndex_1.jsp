@@ -206,29 +206,29 @@
 	                  <div title="焊装B线上线数" id="node-online-w-b" class="node-rgl-2 node-online-w-b" ></div>
 	                  <div title="焊装A线下线数" id="node-offline-w-a" class="node-rgl-2 node-offline-w-a" ></div>
 	                  <div title="焊装B线下线数" id="node-offline-w-b" class="node-rgl-2 node-offline-w-b" ></div>
-	                  <div title="焊装在制数" class="node-rgl-3 node-prod-w" >在制：<span id="node-prod-w" style="color:red"></span></div>
+	                  <div title="焊装在制数" class="node-rgl-3 node-prod-w" onclick="imgFoward('在制','焊装')">在制：<span id="node-prod-w" style="color:red"></span></div>
 	                  
-	                  <div title="" class="node-rgl-4 node-wip-1" >WIP<br/><span id="node-wip-1" style="color:red"></span></div>
+	                  <div title="" class="node-rgl-4 node-wip-1" onclick="imgFoward('在制','焊装')">WIP<br/><span id="node-wip-1" style="color:red"></span></div>
 	                  
 	                  <div title="涂装A线上线数" id="node-online-p" class="node-rgl-2 node-online-p" ></div>
 	                  <div title="涂装A线下线数" id="node-offline-p" class="node-rgl-2 node-offline-p" ></div>
-	                  <div title="涂装在制数"  class="node-rgl-3 node-prod-p" >在制：<span id="node-prod-p" style="color:red"></span></div> 
+	                  <div title="涂装在制数"  class="node-rgl-3 node-prod-p" onclick="imgFoward('在制','涂装')">在制：<span id="node-prod-p" style="color:red"></span></div> 
 	                  
-	                  <div title="" class="node-rgl-4 node-wip-2" >WIP<br/><span id="node-wip-2" style="color:red"></span></div>
+	                  <div title="" class="node-rgl-4 node-wip-2" onclick="imgFoward('在制','涂装')">WIP<br/><span id="node-wip-2" style="color:red"></span></div>
 	                  
 	                  <div title="底盘A线上线数" id="node-online-b-a" class="node-rgl-2 node-online-b-a" ></div>
 	                  <div title="底盘B线上线数" id="node-online-b-b" class="node-rgl-2 node-online-b-b" ></div>
 	                  <div title="底盘A线下线数" id="node-offline-b-a" class="node-rgl-2 node-offline-b-a" ></div>
 	                  <div title="底盘B线下线数" id="node-offline-b-b" class="node-rgl-2 node-offline-b-b" ></div>
-	                  <div title="底盘在制数"  class="node-rgl-3 node-prod-b" >在制：<span id="node-prod-b" style="color:red"></span></div>
+	                  <div title="底盘在制数"  class="node-rgl-3 node-prod-b" onclick="imgFoward('在制','底盘')">在制：<span id="node-prod-b" style="color:red"></span></div>
 	                  
-	                  <div title=""  class="node-rgl-4 node-wip-3" >WIP<br/><span id="node-wip-3" style="color:red"></span></div>
+	                  <div title=""  class="node-rgl-4 node-wip-3" onclick="imgFoward('在制','底盘')">WIP<br/><span id="node-wip-3" style="color:red"></span></div>
 	                  
 	                  <div title="总装A线上线数" id="node-online-a-a" class="node-rgl-2 node-online-a-a" ></div>
 	                  <div title="总装B线上线数" id="node-online-a-b" class="node-rgl-2 node-online-a-b" ></div>
 	                  <div title="总装A线下线数" id="node-offline-a-a" class="node-rgl-2 node-offline-a-a" ></div>
 	                  <div title="总装B线下线数" id="node-offline-a-b" class="node-rgl-2 node-offline-a-b" ></div>
-	                  <div title="总装在制数"  class="node-rgl-3 node-prod-a" >在制：<span id="node-prod-a" style="color:red"></span></div>
+	                  <div title="总装在制数"  class="node-rgl-3 node-prod-a" onclick="imgFoward('在制','总装')">在制：<span id="node-prod-a" style="color:red"></span></div>
 	                  
 	                  <div title="入库数" id="node-warehouse" class="node-rgl-2 node-warehouse" ></div>
 	                  

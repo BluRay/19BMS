@@ -441,7 +441,7 @@ a:hover {
 								<td style="width: 9%; height: 50px"><a
 									href="order!ordersearch.action" class="overlink">订单</a></td>
 								<td style="width: 9%; height: 50px"><a
-									href="plan!index.action" class="overlink">计划</a></td>
+									href="plan!plansearch.action" class="overlink">计划</a></td>
 								<td style="width: 9%; height: 50px"><a
 									href="production!index.action" class="overlink">生产</a></td>
 								<td style="width: 9%; height: 50px"><a

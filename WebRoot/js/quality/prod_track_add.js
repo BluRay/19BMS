@@ -126,39 +126,40 @@ $(document).ready(function() {
 	//保存数据
 	$("#btnSave").click(function(){
 		var requiredInputs=$("#saveForm").find(".required");
+		var workshopName=$("#input_workshop :selected").text();
 		var submitFlag=true;
 		$.each(requiredInputs,function(index,input){
-			if($(input).attr("partName")=='VIN编码'){			
+			if($(input).attr("partName")=='VIN编码'&&workshopName=='底盘'){			
 				if($(input).val().trim().length==0){
 					alert("请输入VIN编码!");
 					submitFlag=false;
 					return false;
 				}
-				if(busInfo.vin!=$(input).val()){
+				if(busInfo.vin!=$(input).val()&&workshopName=='底盘'){
 					alert("输入的VIN编码与绑定的VIN编码不一致！");
 					submitFlag=false;
 					return false;
 				}	
 			}
-			if($(input).attr("partName")=='左电机号'){			
+			if($(input).attr("partName")=='左电机号'&&workshopName=='底盘'){			
 				if($(input).val().trim().length==0){
 					alert("请输入左电机号!");
 					submitFlag=false;
 					return false;
 				}
-				if(busInfo.left_motor_number!=$(input).val()){
+				if(busInfo.left_motor_number!=$(input).val()&&workshopName=='底盘'){
 					alert("输入的左电机号与绑定的左电机号不一致！");
 					submitFlag=false;
 					return false;
 				}
 			}
-			if($(input).attr("partName")=='右电机号'){			
+			if($(input).attr("partName")=='右电机号'&&workshopName=='底盘'){			
 				if($(input).val().trim().length==0){
 					alert("请输入右电机号!");
 					submitFlag=false;
 					return false;
 				}
-				if(busInfo.right_motor_number!=$(input).val()){
+				if(busInfo.right_motor_number!=$(input).val()&&workshopName=='底盘'){
 					alert("输入的右电机号与绑定的右电机号不一致！");
 					submitFlag=false;
 					return false;

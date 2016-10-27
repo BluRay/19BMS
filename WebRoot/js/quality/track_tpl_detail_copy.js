@@ -196,10 +196,21 @@ $(document).ready(function(){
 	});
 	//保存模板更改
 	$("#btnSaveTplDetail").live("click",function(){
+		var flag=true;
+		$.each(detaillist,function(index,detail){
+			if(detail.partsId==''||detail.partsId=='0'){
+				$("#parts_"+index).val("").attr("placeholder","请输入有效零部件！").css("color","red");
+				flag=false;
+			}
+			if(detail.processNo==''){
+				$("#processName_"+index).val("").attr("placeholder","请输入有效工序！").css("color","red");
+				flag=false;
+			}
+		});
 		var busTypeId=isNaN(parseInt($("#input_busType").val()))?0:parseInt($("#input_busType").val());
 		var orderId=isNaN(parseInt($("#input_order").val()))?0:parseInt($("#input_order").val());
 		var configId=isNaN(parseInt($("#input_config").val()))?0:parseInt($("#input_config").val());
-		var flag=true;	
+			
 		if(busTypeId==0){
 			alert("必须选择车型！");
 			flag=false;

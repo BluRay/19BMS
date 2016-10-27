@@ -222,15 +222,21 @@ $(document).ready(
 					ctx.closePath();
 				}
 				//得到点击的坐标  
-				function getEventPosition(ev){  
+				function getEventPosition(event){  
 				    var x, y;  
-				    if (ev.layerX || ev.layerX == 0) {  
+				   /* if (ev.layerX || ev.layerX == 0) {  
 				        x = ev.layerX;  
 				        y = ev.layerY;  
 				    }else if (ev.offsetX || ev.offsetX == 0) { // Opera  
 				        x = ev.offsetX;  
 				        y = ev.offsetY;  
-				    }  
+				    }  */
+				    var e = event || window.event;
+		            var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+		            var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+		            var x = e.pageX || e.clientX + scrollX;
+		            var y = e.pageY || e.clientY + scrollY;
+			
 				    return {x: x, y: y};  
 				}  
 				
@@ -241,9 +247,11 @@ $(document).ready(
 					mTop = $(canvas).offset().top;
 				    sTop = $(window).scrollTop();
 				    var cvs_top = mTop - sTop;
-				    //alert(mTop);
+				    //alert("cvs_left:"+cvs_left+"/mTop:"+mTop+"/sTop:"+sTop);
+
 				    var r={};
 					$.each(rect_list,function(i,rect){
+						//alert(x+"/"+((rect.x+cvs_left+30)));
 						if(x>=(rect.x+cvs_left+30)&&x<=(rect.x+cvs_left+30)+recw&&y>=(rect.y+cvs_top)&&y<=(rect.y+cvs_top)+rech){
 							 r=rect;
 							 return;

@@ -4,7 +4,28 @@ $(document)
 		.ready(
 				function() {
 					initPage();
+					$("#dstcopy").live("click",function(){
+						//$(".distribution :eq(0)").focus();
+						$(".distribution :eq(0)").css("display","none");
+						$("#copy_paste").val($(".distribution :eq(0)").val()).css("display","").css("background-color","rgb(191, 237, 245)").select();
+						$(".distribution").css("background-color","rgb(191, 237, 245)");
+					});
 					
+					$("#copy_paste").live("paste",function(e){
+						 setTimeout(function(){
+							 var copy_text=$(e.target).val();
+							 $(e.target).val("");
+							 var dist_list=copy_text.split(" ");
+							 $(".distribution :eq(0)").css("display","");
+								$("#copy_paste").css("display","none");
+							 $.each(dist_list,function(i,value){
+								 $(".distribution :eq("+i+")").val(value);								 
+							 });
+							 $(".distribution").css("background-color","white");
+							 //alert(dist_list.length);
+							 //alert(copy_text);
+						 },1);
+					});
 					var busNumberlist;
 					
 					$("#bus_number").live("input",function(){
@@ -42,7 +63,7 @@ $(document)
 										// alert(staff.id);
 									addWorkHourItem(staff.id, staff.staff_number, staff.name,
 												staff.job, "", staff.team_org, staff.workgroup_org,
-												staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution)
+												staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index)
 									});
 								}
 							})
@@ -120,7 +141,7 @@ $(document)
 								// alert(staff.id);
 							addWorkHourItem(staff.id, staff.staff_number, staff.name,
 										staff.job, "", staff.team_org, staff.workgroup_org,
-										staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution)
+										staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index)
 							});
 							return item;
 						}
@@ -466,7 +487,7 @@ function initPage() {
 }
 
 function addWorkHourItem(staffId, cardNo, staffName, staffPost, workHour,
-		subgroup_org, group_org, workshop_org, factory_org,skillParameter,distribution) {
+		subgroup_org, group_org, workshop_org, factory_org,skillParameter,distribution,index) {
 	cardNo = cardNo || "";
 	cardNoDisabled = "";
 	if (cardNo.trim().length > 0) {
@@ -497,10 +518,18 @@ function addWorkHourItem(staffId, cardNo, staffName, staffPost, workHour,
 						+ workHour + " >").appendTo(tr);
 	}
 	
+	if(index>0){
+		$("<td />")
+		.html(
+				"<input class='input-small distribution' id='dist_"+staffId+"' style='text-align:center;margin-bottom: 0px;' type='text' value="
+						+distribution+  " >").appendTo(tr);
+	}else
 	$("<td />")
 	.html(
 			"<input class='input-small distribution' id='dist_"+staffId+"' style='text-align:center;margin-bottom: 0px;' type='text' value="
-					+distribution+  " >").appendTo(tr);
+					+distribution+  " >"+
+			"<input type='text' id='copy_paste' class='input-small' style='text-align:center;margin-bottom: 0px;display:none'>"		
+		).appendTo(tr);
 	
 	$("<td class='workgroup_price' />").html(workgroup_price).appendTo(tr);	
 	$("<td class='staff_subgroup' />").html(subgroup_org).appendTo(tr);
@@ -652,7 +681,7 @@ function ajaxGetDist(){
 		// alert(staff.id);
 	addWorkHourItem(staff.id, staff.staff_number, staff.name,
 				staff.job, "", staff.team_org, staff.workgroup_org,
-				staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution)
+				staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index)
 	});
 }
 

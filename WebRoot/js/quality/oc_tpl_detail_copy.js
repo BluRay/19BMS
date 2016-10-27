@@ -176,12 +176,21 @@ $(document).ready(function(){
 	});*/
 	//保存模板更改
 	$("#btnSaveTplDetail").live("click",function(){
+		var saveflg=true;
+		$.each(detaillist,function(index,detail){
+			if(detail.partsId==''||detail.partsId=='0'){
+				$("#parts_"+index).val("").attr("placeholder","请输入有效零部件！").css("color","red");
+				saveflg=false;
+			}
+		});
 		var orderId=isNaN(parseInt($("#input_order").val()))?0:parseInt($("#input_order").val());
 		var busTypeId=isNaN(parseInt($("#input_busType").val()))?0:parseInt($("#input_busType").val());
 		var configId=isNaN(parseInt($("#input_config").val()))?0:parseInt($("#input_config").val());
 		if(busTypeId==0){
 			alert("必须选择车型！");
-		}else{
+			saveflg=false;
+		}
+		if(saveflg){
 			$.ajax({
 				url: "ocTpl!addTplDetailCopy.action",
 				type:"post",
@@ -208,12 +217,14 @@ $(document).ready(function(){
 	//零部件输入事件绑定，更新detaillist对应数据
 	$(".parts").live("click",function(e){
 		var c_elementId=$(this).attr("id");
+		var parts_name=$(this).val();
 		getPartsSelect("#"+c_elementId,"",function(obj){
-			//alert(obj.id);
+			//alert(parts_name);
 			var tds=$(e.target).parent("td").siblings();
 			var c_recordId=parseInt($(tds[1]).attr("recordId"));
 			detaillist[c_recordId].partsId=parseInt(obj.id);
-			detaillist[c_recordId].parts=obj.name;	
+			detaillist[c_recordId].parts=obj.name||parts_name;	
+		
 		});
 	});
 	//供应商输入事件绑定，更新detaillist对应数据
@@ -263,7 +274,8 @@ function generateTable(workshop){
 				.html(value.sequence).appendTo(tr);
 				$("<td />").attr("recordId",index)
 				.attr("partsId",value.partsId)
-				.html("<input style='border:0;width:100%'class='parts' value='"+(value.parts==undefined?"":value.parts)+"' id='parts_"+index+"'>").appendTo(tr);
+				.html("<input style='border:0;width:100%;' class='parts' value='"+(value.parts==undefined?"":value.parts)+
+						"' id='parts_"+index+"'>").appendTo(tr);
 				
 				$("<td />").attr("recordId",index)
 				.attr("partsNo",value.partsNo)

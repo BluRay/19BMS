@@ -439,8 +439,22 @@ function getPartsSelect(elementId, submitId, fn_backcall) {
 			}, 'json');
 		},
 		matcher : function(item) {
-			// alert(this.query);
+			//alert(item)
+			var selectId = "";
+			$.each(partslist, function(index, value) {
+				if (value.name == item) {
+					selectId = value.id;
+					if (typeof (fn_backcall) == "function") {
+						fn_backcall(value);
+					}
+				}
+			})
+
+			// alert(selectId);
+			$(elementId).attr("parts_id", selectId);
+			$(submitId).val(selectId);
 			return true;
+			
 		},
 		items : 30,
 		updater : function(item) {
@@ -512,6 +526,17 @@ function getOrderNoSelect(elementId, submitId, fn_backcall, bustype,factory) {
 		},
 		matcher : function(item) {
 			// alert(this.query);
+			$.each(orderlist, function(index, value) {
+				if (value.orderNo == item) {
+					selectId = value.id;
+					if (typeof (fn_backcall) == "function") {
+						fn_backcall(value);
+					}
+				}
+			})
+			// alert(submitId);
+			$(elementId).attr("order_id", selectId);
+			$(submitId).val(selectId);
 			return true;
 		},
 		updater : function(item) {
@@ -583,7 +608,7 @@ function getProcessSelect(elementId, workshop, fn_backcall) {
 				"conditionMap.workshop" : workshop,
 				"conditionMap.processName" : input
 			}, function(data) {
-				partslist = data;
+				processlist = data;
 				var results = new Array();
 				$.each(data, function(index, value) {
 					results.push(value.process_name);
@@ -592,13 +617,21 @@ function getProcessSelect(elementId, workshop, fn_backcall) {
 			}, 'json');
 		},
 		matcher : function(item) {
-			// alert(this.query);
+			var selectId = "";
+			$.each(processlist, function(index, value) {
+				if (value.process_name == item) {
+					selectId = value.id;
+					if (typeof (fn_backcall) == "function") {
+						fn_backcall(value);
+					}
+				}
+			})
 			return true;
 		},
 		items : 30,
 		updater : function(item) {
 			var selectId = "";
-			$.each(partslist, function(index, value) {
+			$.each(processlist, function(index, value) {
 				if (value.process_name == item) {
 					selectId = value.id;
 					if (typeof (fn_backcall) == "function") {

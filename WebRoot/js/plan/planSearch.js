@@ -86,6 +86,35 @@ function getSearch(){
     		$("#tablePlan tbody").html("");
     		var last_order="";
     		var orderTd="";
+    		var tplan_zzj=0;
+    		var treal_zzj=0;
+    		var tplan_bjon=0;
+    		var treal_bjon=0;
+    		var tplan_bjoff=0;
+    		var treal_bjoff=0;
+    		
+    		var tplan_hzon=0;
+    		var treal_hzon=0;
+    		var tplan_hzoff=0;
+    		var treal_hzoff=0;
+    		
+    		var tplan_tzon=0;
+    		var treal_tzon=0;
+    		var tplan_tzoff=0;
+    		var treal_tzoff=0;
+    		
+    		var tplan_dpon=0;
+    		var treal_dpon=0;
+    		var tplan_dpoff=0;
+    		var treal_dpoff=0;
+    		
+    		var tplan_zzon=0;
+    		var treal_zzon=0;
+    		var tplan_zzoff=0;
+    		var treal_zzoff=0;
+    		
+    		var tplan_rk=0;
+    		var treal_rk=0;
     		$.each(response.data,function (index,value) {
     			var tr = $("<tr id= '"+value.id+"'/>");  			
     			if(last_order==value.order_desc){
@@ -109,8 +138,71 @@ function getSearch(){
 /*    			$("<td style=\"text-align:center;\" />").html(rate_amend_qty).appendTo(tr);*/
     			$("<td style=\"text-align:center;\" />").html(value.total_qty).appendTo(tr);
     			last_order=value.order_desc;
-    			$("#tablePlan tbody").append(tr);	    			
+    			$("#tablePlan tbody").append(tr);	
+
+        		tplan_zzj+=(value.key_name=='自制件下线'?parseInt(value.total_plan_qty):0);
+        		treal_zzj+=(value.key_name=='自制件下线'?parseInt(value.real_qty):0);
+        		tplan_bjon+=(value.key_name=='部件上线'?parseInt(value.total_plan_qty):0);
+        		treal_bjon+=(value.key_name=='部件上线'?parseInt(value.real_qty):0);
+        		tplan_bjoff+=(value.key_name=='部件下线'?parseInt(value.total_plan_qty):0);
+        		treal_bjoff+=(value.key_name=='部件下线'?parseInt(value.real_qty):0);       		
+        		tplan_hzon+=(value.key_name=='焊装上线'?parseInt(value.total_plan_qty):0);
+        		treal_hzon+=(value.key_name=='焊装上线'?parseInt(value.real_qty):0);
+        		tplan_hzoff+=(value.key_name=='焊装下线'?parseInt(value.total_plan_qty):0);
+        		treal_hzoff+=(value.key_name=='焊装下线'?parseInt(value.real_qty):0);        		
+        		tplan_tzon+=(value.key_name=='涂装上线'?parseInt(value.total_plan_qty):0);
+        		treal_tzon+=(value.key_name=='涂装上线'?parseInt(value.real_qty):0);
+        		tplan_tzoff+=(value.key_name=='涂装下线'?parseInt(value.total_plan_qty):0);
+        		treal_tzoff+=(value.key_name=='涂装下线'?parseInt(value.real_qty):0);       		
+        		tplan_dpon+=(value.key_name=='底盘上线'?parseInt(value.total_plan_qty):0);
+        		treal_dpon+=(value.key_name=='底盘上线'?parseInt(value.real_qty):0);
+        		tplan_dpoff+=(value.key_name=='底盘下线'?parseInt(value.total_plan_qty):0);
+        		treal_dpoff+=(value.key_name=='底盘下线'?parseInt(value.real_qty):0);
+        		tplan_zzon+=(value.key_name=='总装上线'?parseInt(value.total_plan_qty):0);
+        		treal_zzon+=(value.key_name=='总装上线'?parseInt(value.real_qty):0);
+        		tplan_zzoff+=(value.key_name=='总装下线'?parseInt(value.total_plan_qty):0);
+        		treal_zzoff+=(value.key_name=='总装下线'?parseInt(value.real_qty):0);
+        		tplan_rk+=(value.key_name=='入库'?parseInt(value.total_plan_qty):0);
+        		treal_rk+=(value.key_name=='入库'?parseInt(value.real_qty):0);
+    			
     		});
+    		
+    		$("#tr_zzj").find("td").eq("1").html(tplan_zzj);
+    		$("#tr_zzj").find("td").eq("2").html(treal_zzj);
+    		$("#tr_zzj").find("td").eq("3").html(tplan_zzj==0?"-":(Math.round(treal_zzj/tplan_zzj * 10000) / 100.00 + "%"));
+    		$("#tr_bjon").find("td").eq("1").html(tplan_bjon);
+    		$("#tr_bjon").find("td").eq("2").html(treal_bjon);
+    		$("#tr_bjon").find("td").eq("3").html(tplan_bjon==0?"-":(Math.round(treal_bjon/tplan_bjon * 10000) / 100.00 + "%"));
+    		$("#tr_bjoff").find("td").eq("1").html(tplan_bjoff);
+    		$("#tr_bjoff").find("td").eq("2").html(treal_bjoff);
+    		$("#tr_bjoff").find("td").eq("3").html(tplan_bjoff==0?"-":(Math.round(treal_bjoff/tplan_bjoff * 10000) / 100.00 + "%")); 		
+    		$("#tr_hzon").find("td").eq("1").html(tplan_hzon);
+    		$("#tr_hzon").find("td").eq("2").html(treal_hzon);
+    		$("#tr_hzon").find("td").eq("3").html(tplan_hzon==0?"-":(Math.round(treal_hzon/tplan_hzon * 10000) / 100.00 + "%"));
+    		$("#tr_hzoff").find("td").eq("1").html(tplan_hzoff);
+    		$("#tr_hzoff").find("td").eq("2").html(treal_hzoff);
+    		$("#tr_hzoff").find("td").eq("3").html(tplan_hzoff==0?"-":(Math.round(treal_hzoff/tplan_hzoff * 10000) / 100.00 + "%"));
+    		$("#tr_tzon").find("td").eq("1").html(tplan_tzon);
+    		$("#tr_tzon").find("td").eq("2").html(treal_tzon);
+    		$("#tr_tzon").find("td").eq("3").html(tplan_tzon==0?"-":(Math.round(treal_tzon/tplan_tzon * 10000) / 100.00 + "%"));
+    		$("#tr_tzoff").find("td").eq("1").html(tplan_tzoff);
+    		$("#tr_tzoff").find("td").eq("2").html(treal_tzoff);
+    		$("#tr_tzoff").find("td").eq("3").html(tplan_tzoff==0?"-":(Math.round(treal_tzoff/tplan_tzoff * 10000) / 100.00 + "%"));
+    		$("#tr_dpon").find("td").eq("1").html(tplan_dpon);
+    		$("#tr_dpon").find("td").eq("2").html(treal_dpon);
+    		$("#tr_dpon").find("td").eq("3").html(tplan_dpon==0?"-":(Math.round(treal_dpon/tplan_dpon * 10000) / 100.00 + "%"));
+    		$("#tr_dpoff").find("td").eq("1").html(tplan_dpoff);
+    		$("#tr_dpoff").find("td").eq("2").html(treal_dpoff);
+    		$("#tr_dpoff").find("td").eq("3").html(tplan_dpoff==0?"-":(Math.round(treal_dpoff/tplan_dpoff * 10000) / 100.00 + "%"));
+    		$("#tr_zzon").find("td").eq("1").html(tplan_zzon);
+    		$("#tr_zzon").find("td").eq("2").html(treal_zzon);
+    		$("#tr_zzon").find("td").eq("3").html(tplan_zzon==0?"-":(Math.round(treal_zzon/tplan_zzon * 10000) / 100.00 + "%"));
+    		$("#tr_zzoff").find("td").eq("1").html(tplan_zzoff);
+    		$("#tr_zzoff").find("td").eq("2").html(treal_zzoff);
+    		$("#tr_zzoff").find("td").eq("3").html(tplan_zzoff==0?"-":(Math.round(treal_zzoff/tplan_zzoff * 10000) / 100.00 + "%"));
+    		$("#tr_rk").find("td").eq("1").html(tplan_rk);
+    		$("#tr_rk").find("td").eq("2").html(treal_rk);
+    		$("#tr_rk").find("td").eq("3").html(tplan_rk==0?"-":(Math.round(treal_rk/tplan_rk * 10000) / 100.00 + "%"));
 	    }
 	});
 }

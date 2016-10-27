@@ -70,6 +70,93 @@
     <li id="planSearchDetail"><a class="queryUse" href="#planSearchDetail" data-toggle="tab">计划达成明细</a></li>
 </ul>
 <div id="planSearchResultdiv">
+<p  style="padding-top:20px;font-weight:bold">车间计划达成：</p>
+<table id="tablePlan_total" style="table-layout:fixed;font-size:12px;text-align:center" class="table table-bordered table-striped">
+	<thead>
+         <tr id='0'>
+        	<th style="text-align:center;">生产车间</th>
+            <th style="text-align:center;">计划数量</th>
+            <th style="text-align:center;">实际完成量</th>
+            <th style="text-align:center;">实际达成率</th>
+        </tr>
+    </thead>
+	<tbody>
+		<tr id="tr_zzj">
+			<td>自制件下线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_bjon">
+			<td>部件上线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_bjoff">
+			<td>部件下线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_hzon">
+			<td>焊装上线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_hzoff">
+			<td>焊装下线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_tzon">
+			<td>涂装上线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_tzoff">
+			<td>涂装下线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_dpon">
+			<td>底盘上线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_dpoff">
+			<td>底盘下线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_zzon">
+			<td>总装上线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_zzoff">
+			<td>总装下线</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="tr_rk">
+			<td>入库</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+
+<p  style="padding-top:20px;font-weight:bold">订单计划达成：</p>
 <table id="tablePlan" style="table-layout:fixed;font-size:12px" class="table table-bordered table-striped">
 	<thead>
          <tr id='0'>

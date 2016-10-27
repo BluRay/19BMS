@@ -103,7 +103,8 @@ $(document).ready(function(){
 			var tds=$(e.target).parent("td").siblings();
 			var c_recordId=parseInt($(tds[1]).attr("recordId"));
 			detaillist[c_recordId].partsId=parseInt(obj.id);
-			detaillist[c_recordId].parts=obj.parts;	
+			detaillist[c_recordId].parts=obj.parts;
+			
 		});
 	});
 	//供应商输入事件绑定，更新detaillist对应数据
@@ -126,22 +127,32 @@ $(document).ready(function(){
 	});	
 	//保存模板更改
 	$("#btnSaveTplDetail").live("click",function(){
-		$.ajax({
-			url: "ocTpl!updateTplDetail.action",
-			type:"post",
-			dataType: "json",
-			data: {
-				"detailList":JSON.stringify(detaillist)
-			},
-			async: false,
-			error: function () {alertError();},
-			success: function (response) {	
-				alert(response.message);
-					if(response.success){
-						window.open("ocTpl!index.action","_self");
-					}
+		var saveflg=true;
+		$.each(detaillist,function(index,detail){
+			if(detail.partsId==''||detail.partsId=='0'){
+				$("#parts_"+index).val("").attr("placeholder","请输入有效零部件！").css("color","red");
+				saveflg=false;
 			}
-		})
+		});
+		if(saveflg){
+			$.ajax({
+				url: "ocTpl!updateTplDetail.action",
+				type:"post",
+				dataType: "json",
+				data: {
+					"detailList":JSON.stringify(detaillist)
+				},
+				async: false,
+				error: function () {alertError();},
+				success: function (response) {	
+					alert(response.message);
+						if(response.success){
+							window.open("ocTpl!index.action","_self");
+						}
+				}
+			})
+		}
+		
 	});
 })
 function generateTable(workshop){

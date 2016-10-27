@@ -15,7 +15,7 @@ $(document).ready(function () {
 		var LSTR_ndate=new Date(); 
 		var LSTR_MM=LSTR_ndate.getMonth()+1;
 		var LSTR_DD=LSTR_ndate.getDate(); 
-		LSTR_MM=LSTR_MM > 10?LSTR_MM:("0"+LSTR_MM);
+		LSTR_MM=LSTR_MM >= 10?LSTR_MM:("0"+LSTR_MM);
 		$("#staff_date").val(getPreMonth(LSTR_ndate.getFullYear() + "-" + LSTR_MM + "-01"));
 		
 		var jobType = $("#job_type").val();

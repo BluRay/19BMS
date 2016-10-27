@@ -33,7 +33,7 @@ function getAccessIp(){
 						<a href="order!ordersearch.action" data-toggle="tooltip" data-placement="bottom" title="<s:text name="order"/>"><i class="fa fa-list-alt"></i>&nbsp;<s:text name="order"></s:text></a>
 					</li>
 					<li id="headTechnologyLi">
-						<a href="plan!index.action" data-toggle="tooltip" data-placement="bottom" title="计划"><i class="fa fa-calendar"></i>&nbsp;计划</a>
+						<a href="plan!plansearch.action" data-toggle="tooltip" data-placement="bottom" title="计划"><i class="fa fa-calendar"></i>&nbsp;计划</a>
 					</li>
 					<li id="headAssemblyLi">
 						<a href="production!index.action" data-toggle="tooltip" data-placement="bottom" title="生产"><i class="fa fa-gears"></i>&nbsp;生产</a>
