@@ -23,21 +23,24 @@ $(document).ready(
 				
 				canvas.onclick=function(e){
 					var p=getEventPosition(e);
-					//alert(p.y);
+					//alert(p.x+"/"+p.y);
 					var x=p.x;
 					var y=p.y;
 					
 					var rect=getRect(x,y);
-					if(rect.code){
+					//alert(rect.x+"/"+rect.y);
+					if(rect.code&&rect.monitorFlag=='1'){
 						//alert(rect.name);
 						window.location.href="production!execution.action?factory_id="+rect.factoryId+
 						"&workshop_id="+rect.workshopId+"&line_id="+rect.lineId+"&process_id="+rect.processId
+					}else{
+						alert("该节点未配置为扫描节点！");
 					}
 					
 				}
 				
 				$("#search_factory").change(function(){
-					getWorkshopSelect_Auth("#search_workshop", "", $("#search_factory :selected").text(), "noall","");
+					getWorkshopSelect_Auth2("#search_workshop", "", $("#search_factory :selected").text(), "noall","");
 					rect_list=[];
 					line_process=ajaxGetLineProcess();
 					bgX = 50;//起始X坐标 重置
@@ -60,7 +63,7 @@ $(document).ready(
 					workshop_p=getQueryString("workshop")||"";
 					//alert(workshop_p);
 					getAuthorityFactorySelect("#search_factory", "", "noall");
-					getWorkshopSelect_Auth("#search_workshop", workshop_p, $("#search_factory :selected").text(), "noall","");
+					getWorkshopSelect_Auth2("#search_workshop", workshop_p, $("#search_factory :selected").text(), "noall","");
 					line_process=ajaxGetLineProcess();
 					drawCanvas(line_process);
 				}				
@@ -121,7 +124,7 @@ $(document).ready(
 						
 					})
 					//alert(Math.ceil(line_height/6));
-					$(canvas).attr("height",cvs_height+Math.ceil(line_height/6));
+					$(canvas).attr("height",cvs_height+Math.ceil(line_height/6)+bgY);
 					$.each(lineList,function(index,line){
 						drawLineProcess(line.name, line.processlist);
 					})
@@ -184,6 +187,7 @@ $(document).ready(
 					rect.workshopId=process.workshopId;
 					rect.lineId=process.lineId;
 					rect.factoryId=process.factoryId;
+					rect.monitorFlag=process.monitor_flag;
 					rect_list.push(rect);
 					ctx.closePath();
 
@@ -247,12 +251,12 @@ $(document).ready(
 					mTop = $(canvas).offset().top;
 				    sTop = $(window).scrollTop();
 				    var cvs_top = mTop - sTop;
-				    //alert("cvs_left:"+cvs_left+"/mTop:"+mTop+"/sTop:"+sTop);
+				   // alert("cvs_left:"+cvs_left+"/mTop:"+mTop+"/sTop:"+sTop);
 
 				    var r={};
 					$.each(rect_list,function(i,rect){
 						//alert(x+"/"+((rect.x+cvs_left+30)));
-						if(x>=(rect.x+cvs_left+30)&&x<=(rect.x+cvs_left+30)+recw&&y>=(rect.y+cvs_top)&&y<=(rect.y+cvs_top)+rech){
+						if(x>=(rect.x+cvs_left+30)&&x<=(rect.x+cvs_left+30)+recw&&y>=(rect.y+cvs_top+sTop)&&y<=(rect.y+cvs_top+sTop)+rech){
 							 r=rect;
 							 return;
 						}

@@ -23,7 +23,7 @@
 			class="js-sub-menu-toggle"> <i class="fa fa-list-ul fa-fw"></i><span
 				class="text">生产扫描</span>
 		</a></li>
-		<li id="orderReview"><a href="production!exceptionindex.action"
+		<li id="orderReview"><a href="production!exception.action"
 			class="js-sub-menu-toggle"> <i
 				class="fa fa-exclamation-circle fw"></i><span class="text">异常登记</span>
 		</a></li>

@@ -87,11 +87,11 @@
 							</tr>
 							<tr>
 								<th>
-									<select disabled="disabled" name="exec_factory" id="exec_factory" class="input-small">
+									<select name="exec_factory" id="exec_factory" class="input-small">
 						            </select>
 					            </th>
 								<th>
-									<select disabled="disabled" name="exec_workshop" id="exec_workshop" class="input-small">
+									<select name="exec_workshop" id="exec_workshop" class="input-small">
 						            </select>
 					            </th>
 								<th>

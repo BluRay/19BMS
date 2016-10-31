@@ -69,7 +69,8 @@ public interface ICommDao {
 	public String getTempoBydate(String date);
 	public String getWorkshopAuth(Map<String, Object> conditionMap);
 	public List<Map<String,String>> getWorkshopSelectOrgAuth(Map<String, Object> conditionMap);//根据权限从ORG表获取车间下拉列表
-	
+	public List<Map<String,String>> getWorkshopSelectAuth(Map<String, Object> conditionMap);//根据权限从workshop表获取车间下拉列表
+  	
 	public List<Map<String,Object>> queryStaffHoursUnloading(String work_date); 	//查询上上月工时数据进行转存
 	public int delStaffHoursUnloading(String work_date);	//转存为excel后删除上上月工时数据
 	public List<Map<String,String>> getBusNumberByVin(Map<String, Object> conditionMap);//根据vin码查询BusNumber

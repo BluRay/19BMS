@@ -13,7 +13,14 @@ $(document).ready(function () {
 		}else{
 			$("#exec_onoff").show();
 		}		
-		getFactorySelect();
+		//getFactorySelect();
+		getAuthorityFactorySelect("#exec_factory", "", "noall");
+		getWorkshopSelect_Auth2("#exec_workshop", "", $("#exec_factory :selected").text(), "noall","");
+		getAllLineSelect();
+		//$("#exec_line").val(Request("line_id"));
+		getAllProcessSelect();
+		//$("#exec_process").val(Request("process_id"));
+		getProcessInfo($("#exec_process").val());
 	};
 	
 	function resetPage () {
@@ -208,6 +215,9 @@ $(document).ready(function () {
 		$("#exec_workshop").empty();
 		if($("#exec_factory").val() !=''){
 			getAllWorkshopSelect();
+			getAllLineSelect();
+			getAllProcessSelect();
+			getProcessInfo($("#exec_process").val());
 		}
 	});
 	
@@ -215,6 +225,8 @@ $(document).ready(function () {
 		$("#exec_line").empty();
 		if($("#exec_workshop").val() !=''){
 			getAllLineSelect();
+			getAllProcessSelect();
+			getProcessInfo($("#exec_process").val());
 		}
 	});
 	
@@ -222,6 +234,7 @@ $(document).ready(function () {
 		$("#exec_process").empty();
 		if($("#exec_line").val() !=''){
 			getAllProcessSelect();
+			getProcessInfo($("#exec_process").val());
 		}
 	});
 	

@@ -5,8 +5,11 @@ $(document).ready(function () {
 	
 	function initPage(){
 		getFactorySelect();
+		getReasonTypeSelect();
+		getBusType();
 		getOrderNoSelect("#search_order_no","#orderId");
-		getOrderNoSelect("#order_no_list","#orderId",function(obj){
+		
+	/*	getOrderNoSelect("#order_no_list","#orderId",function(obj){
 			var order_li="<li class=\"search-choice\"><span>"+
 			obj.orderNo+"</span><button type=\"button\" class=\"close rmorder\" title=\"删除\" style=\"font-size: 16px;\" aria-label=\"Close\">"+
 			"<span aria-hidden=\"true\">×</span></button></li>";
@@ -16,10 +19,73 @@ $(document).ready(function () {
 			$("#order_area").show();
 			orderlist.push(obj.orderNo);
 			orderDescList.push(obj.orderNo+" "+obj.name + " " + obj.busType +" "+ obj.orderQty+"台 ");
-		});
-		getReasonTypeSelect();
-		getBusType();
+		},$("#newPause_bus_type :selected").text(),newPause_factory,"area");*/
+		
 	}
+	$("#order_no_list").typeahead({
+		source : function(input, process) {
+			var bustype=$("#newPause_bus_type :selected").text();
+			var factory=$("#newPause_factory :selected").text()=="请选择"?"":$("#newPause_factory :selected").text();
+			
+			var data={
+					"conditionMap.busType":bustype,
+					"conditionMap.orderNo":input,
+					"conditionMap.factory":factory
+			};		
+			return $.ajax({
+				url:"common!getOrderFuzzySelect.action",
+				dataType : "json",
+				type : "get",
+				data : data,
+				success: function (data) { 
+					orderlist = data;
+					var results = new Array();
+					$.each(data, function(index, value) {
+						results.push(value.orderNo);
+					})
+					return process(results);
+				}
+			});
+		},
+		items : 30,
+		highlighter : function(item) {
+			var order_name = "";
+			var bus_type = "";
+			var order_qty = "";
+			$.each(orderlist, function(index, value) {
+				if (value.orderNo == item) {
+					order_name = value.name;
+					bus_type = value.busType;
+					order_qty = value.orderQty + "台";
+				}
+			})
+			return item + "  " + order_name + " " + bus_type + order_qty;
+		},
+		matcher : function(item) {
+			return true;
+		},
+		updater : function(item) {
+			$.each(orderlist, function(index, value) {
+				if (value.orderNo == item) {
+					selectId = value.id;
+					var order_li="<li class=\"search-choice\"><span>"+
+					value.orderNo+"</span><button type=\"button\" class=\"close rmorder\" title=\"删除\" style=\"font-size: 16px;\" aria-label=\"Close\">"+
+					"<span aria-hidden=\"true\">×</span></button></li>";
+					
+					$("#order_area ul").append(order_li);
+					$("#order_no_list").hide();
+					$("#order_area").show();
+					orderlist.push(value.orderNo);
+					orderDescList.push(value.orderNo+" "+value.name + " " + value.busType +" "+ value.orderQty+"台 ");
+				}
+			})
+			// alert(submitId);
+			$(elementId).attr("order_id", selectId);
+			$(submitId).val(selectId);
+			return item;
+		}	
+	});
+	
 	$("#btnAdd").click (function () {
 		orderlist=[];
 		orderDescList=[];

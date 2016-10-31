@@ -478,7 +478,8 @@ function getPartsSelect(elementId, submitId, fn_backcall) {
 /*
  * 订单编号模糊查询 submitId： 用于提交的元素的id
  */
-function getOrderNoSelect(elementId, submitId, fn_backcall, bustype,factory) {
+function getOrderNoSelect(elementId, submitId, fn_backcall, bustype,factory,areaflg) {
+	areaflg=areaflg||"";
 	if (!bustype) {
 		bustype = "";
 	}
@@ -525,6 +526,9 @@ function getOrderNoSelect(elementId, submitId, fn_backcall, bustype,factory) {
 			return item + "  " + order_name + " " + bus_type + order_qty;
 		},
 		matcher : function(item) {
+			if(areaflg=="area"){
+				return true;
+			}
 			// alert(this.query);
 			$.each(orderlist, function(index, value) {
 				if (value.orderNo == item) {
@@ -777,6 +781,48 @@ function getWorkshopSelect_Auth(elementId, selectVal, selectFactory, selectType,
 		}
 	})
 }
+/**
+ * 获取车间权限列表（workshop表）
+ * @param elementId
+ * @param selectVal
+ * @param selectFactory
+ * @param selectType
+ * @param valName
+ */
+function getWorkshopSelect_Auth2(elementId, selectVal, selectFactory, selectType,valName){
+	var href = window.location.href;
+	var url = href.substring(href.lastIndexOf('/'), href.length);
+	var ii = url.indexOf('?');
+	if (ii > 0) {
+		url = url.substring(0, ii);
+	}
+	var is= url.indexOf('#');
+	if (is > 0) {
+		url = url.substring(0, is);
+	}
+	$.ajax({
+		url : "common!getWorkshopSelectAuth.action",
+		dataType : "json",
+		data : {
+			"factory" : selectFactory,
+			"url":url
+		},
+		async : false,
+		error : function() {
+			alertError();
+		},
+		success : function(response) {
+			if (selectType == 'noall') {
+				getSelects_noall(response, selectVal, elementId,null,valName);
+			} else if (selectType == 'empty') {
+				getSelects_empty(response, selectVal, elementId,null,valName);
+			} else {
+				getSelects(response, selectVal, elementId,null,valName);
+			}
+		}
+	})
+}
+
 /*
  * 班组下拉列表
  */

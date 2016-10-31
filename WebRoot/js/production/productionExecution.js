@@ -287,6 +287,16 @@ $(document).ready(function () {
             return false;
         }
     });
+    //输入车号后，切换监控点，当选择的为J01时弹出vin校验
+    $("#exec_process").live("change",function(){
+    	var bus_number=$('#vinText').attr("value");
+    	if(bus_number&&bus_number!=''&&$("#exec_process :selected").text()=='J01'){
+    		$("#btnSubmit").attr("disabled","disabled");
+    		ajaxValidate();
+    	}else{
+    		$("#btnSubmit").removeAttr("disabled");
+    	}
+    });
     
     $("#btnSubmit").click(function() {
         if(!($("#btnSubmit").hasClass("disabled"))){

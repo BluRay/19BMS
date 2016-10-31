@@ -655,6 +655,19 @@
 		left join BMS_BASE_ROLE_AUTHORITY a on r.role_id=a.role_id
 		where r.workshop !='' and u.id=#{userId} and a.url =#{url}
 	</select>
+	
+	<select id="getWorkshopSelectAuth" parameterType="Map"
+		resultType="Map">
+		select w.id,w.workshop_name name
+		from BMS_BASE_USER u
+		left join BMS_BASE_USER_ROLE r on r.user_id=u.id
+		left join BMS_BASE_ROLE_AUTHORITY a on r.role_id=a.role_id
+		left join BMS_BASE_WORKSHOP w on find_in_set(w.workshop_name,r.workshop)>0
+		left join BMS_BASE_FACTORY f on w.factory_id=f.id
+		where r.workshop !='' and u.id=#{userId} and a.url =#{url} and f.factory_name=#{factory}
+		
+	</select>
+	
 	<select id="getWorkshopSelectOrgAuth" parameterType="Map"
 		resultType="Map">
 		select o.*
