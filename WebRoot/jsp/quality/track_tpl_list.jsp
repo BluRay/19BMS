@@ -33,6 +33,7 @@
 							<td>车型</td>
 							<td>订单</td>
 							<td>配置</td>
+							<td>车间</td>
 							<td></td>
 						</tr>
 						<tr>
@@ -44,6 +45,10 @@
 							<td><select name="" id="input_config"
 								class="input-medium carType">
 							</select></td>
+							<td>
+								<select name="" id="input_workshop" class="input-medium carType">
+								</select>
+							</td>
 							<td><input type="button" class="btn btn-primary"
 								id="btnQuery" value="查询" style="margin-left: 2px;"></input></td>							
 						</tr>
@@ -57,6 +62,7 @@
 							<th>车型</th>
 							<th>订单</th>
 							<th>配置</th>
+							<th>车间</th>
 							<th>版本号</th>
 							<th>备注</th>
 							<th>维护人</th>

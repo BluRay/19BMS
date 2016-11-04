@@ -50,7 +50,7 @@ public interface IQualityDao {
 	public List<TrackTplHeaderBean> getTrackTplHeaderList(Map<String, Object> conditionMap);
 	public int getTrackTplHeaderTotalCount(Map<String, Object> conditionMap);
 	public TrackTplHeaderBean getTrackTplHeader(int tplHeaderId);
-	public List<TrackTplDetailBean> getTrackTplDetailList(int tplHeaderId);
+	public List<TrackTplDetailBean> getTrackTplDetailList(Map<String, Object> conditionMap);
 	public int updateTrackTplDetail(List<TrackTplDetailBean> tplDetailList);
 	public int insertTrackTplDetail(List<TrackTplDetailBean> tplDetailList);
 	public int insertTrackTplHeader(TrackTplHeaderBean tplHeader);
@@ -60,7 +60,7 @@ public interface IQualityDao {
 	public int insertOrderConfigTplDetail(List<OrderConfigTplDetailBean> tplDetailList);
 	public List<OrderConfigTplHeaderBean> getOrderConfigTplHeaderList(Map<String, Object> conditionMap);
 	public int getOrderConfigTplHeaderTotalCount(Map<String, Object> conditionMap);
-	public List<OrderConfigTplDetailBean> getOrderConfigTplDetailList(int tplHeaderId);
+	public List<OrderConfigTplDetailBean> getOrderConfigTplDetailList(Map<String, Object> conditionMap);
 	public int insertOrderConfigTplHeader(OrderConfigTplHeaderBean tplHeader);
 	//品质标准
 	public int insertStdRecord(QCStdRecordBean stdRecord);
@@ -98,7 +98,7 @@ public interface IQualityDao {
 	public int getProdTrackHeaderCount(Map<String, Object> conditionMap);
 	public int insertProdTrack(List<ProdTrackBean> prodTrackList);
 	public int updateProdTrack(List<ProdTrackBean> prodTrackList);
-	public List<TrackTplHeaderBean> getTrackTplHeaderByBusNo(String busNo);
+	public List<TrackTplHeaderBean> getTrackTplHeaderByBusNo(Map<String, Object> cMap);
 	public List<TrackTplDetailBean> getTrackTplDetails(Map<String,Object> coditionMap);//tplHeaderId,workshopId
 	public Map<String,Object> getFactoryByBusNo(String busNo);
 	//订单配置与一致性录入
@@ -107,7 +107,7 @@ public interface IQualityDao {
 	public int getOrderConfigHeaderCount(Map<String, Object> conditionMap);
 	public int insertOrderConfig(List<OrderConfigBean> prodTrackList);
 	public int updateOrderConfig(List<OrderConfigBean> prodTrackList);
-	public List<OrderConfigTplHeaderBean> getOcTplHeaderByBusNo(String busNo);
+	public List<OrderConfigTplHeaderBean> getOcTplHeaderByBusNo(Map<String, Object> cMap);
 	public List<OrderConfigTplDetailBean> getOcTplDetails(Map<String,Object> coditionMap);//tplHeaderId,workshopId
 	//检验流程卡录入
 	public List<TestFlowCardHeaderBean> getTestFlowCardHeaderList(Map<String, Object> conditionMap);

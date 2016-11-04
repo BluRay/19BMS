@@ -96,5 +96,11 @@ public interface ICommDao {
 	 * @return
 	 */
 	public List queryProductionIndexData(Map<String, Object> conditionMap);
+	/**
+	 * 查询user的权限车间（BMS_BASE_KEY表）
+	 * @param map1
+	 * @return
+	 */
+	public List getWorkshopSelectAuth_Key(Map<String, Object> map1);
 	
 }

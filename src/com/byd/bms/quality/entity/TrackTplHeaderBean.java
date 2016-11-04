@@ -8,6 +8,7 @@ public class TrackTplHeaderBean {
 	private String order;
 	private int configId;
 	private String config;
+	private String workshop;
 	private String version;
 	private String memo;
 	private int editorId;
@@ -54,6 +55,12 @@ public class TrackTplHeaderBean {
 	}
 	public void setConfig(String config) {
 		this.config = config;
+	}
+	public String getWorkshop() {
+		return workshop;
+	}
+	public void setWorkshop(String workshop) {
+		this.workshop = workshop;
 	}
 	public String getVersion() {
 		return version;

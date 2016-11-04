@@ -455,8 +455,7 @@
 			</if>
 			
 		</if>
-		ORDER BY c.status asc,c.ecn_document_date desc,c.ecn_document_number
-		desc,b.status asc,b.task_number asc,b.id asc
+		ORDER BY c.ecn_document_date desc,c.ecn_document_number desc,b.status asc,b.task_number asc,b.id asc
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
 		</if>

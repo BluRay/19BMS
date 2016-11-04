@@ -61,25 +61,19 @@
 		ORDER BY s.id DESC LIMIT 1
 	</select>
 
-	<select id="getTrackTplHeaderIdByBusNo" parameterType="String"
+	<select id="getTrackTplHeaderIdByBusNo" parameterType="Map"
 		resultType="Integer">
-		select id from (
-		(select h.id,h.version,tmp.*,1 detail_index
-		from
+		select distinct detail.id from (
+		(select h.id,h.version,tmp.*,1 detail_index from
 		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER h
 		,(select
 		o.bus_type_id,t.internal_name
-		bus_type,b.order_cofig_id,CONCAT(o.order_no,'
-		',o.order_name,t.internal_name,convert(o.order_qty,char))
-		order_name,b.order_id,c.order_config_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
 		config
-		from BMS_PLAN_BUS b
-		left join BMS_ORDER o on b.order_id=o.id
-		left join BMS_BASE_BUS_TYPE t
-		on o.bus_type_id=t.id
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
 		left join
-		BMS_ORDER_CONFIG c on
-		b.order_cofig_id=c.id
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
 		where
 		b.bus_number=#{busNo} ) tmp
 		where
@@ -88,50 +82,40 @@
 		h.order_config_id=tmp.order_cofig_id
 		)
 		union
-		(select
-		h.id,h.version,tmp.*,2 detail_index from
+		(select h.id,h.version,tmp.*,2 detail_index from
 		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER h
-		,(select
-		o.bus_type_id,t.internal_name
-		bus_type,b.order_cofig_id,CONCAT(o.order_no,'
-		',o.order_name,t.internal_name,convert(o.order_qty,char))
-		order_name,b.order_id,c.order_config_name
+		,(select o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
 		config
-		from BMS_PLAN_BUS b
-		left join BMS_ORDER o on b.order_id=o.id
-		left join BMS_BASE_BUS_TYPE t
-		on o.bus_type_id=t.id
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
 		left join
-		BMS_ORDER_CONFIG c on
-		b.order_cofig_id=c.id
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
 		where
 		b.bus_number=#{busNo} ) tmp
 		where
 		h.bus_type_id=tmp.bus_type_id and
 		h.order_id=tmp.order_id
 		)
-		union
+		union 
 		(select h.id,h.version,tmp.*,3 detail_index from
 		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER h
-		,(select
-		o.bus_type_id,t.internal_name
-		bus_type,b.order_cofig_id,CONCAT(o.order_no,'
-		',o.order_name,t.internal_name,convert(o.order_qty,char))
-		order_name,b.order_id,c.order_config_name
+		,(select o.bus_type_id,t.internal_name
+		bus_type,b.order_cofig_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,b.order_id,c.order_config_name
 		config
-		from BMS_PLAN_BUS b
-		left join BMS_ORDER o on b.order_id=o.id
-		left join BMS_BASE_BUS_TYPE t
-		on o.bus_type_id=t.id
+		from BMS_PLAN_BUS b left join BMS_ORDER o on b.order_id=o.id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
 		left join
-		BMS_ORDER_CONFIG c on
-		b.order_cofig_id=c.id
-		where
+		BMS_ORDER_CONFIG c on b.order_cofig_id=c.id
+		where 
 		b.bus_number=#{busNo}) tmp
 		where
 		h.bus_type_id=tmp.bus_type_id
 		) )detail
-		order by detail.detail_index asc,detail.version desc limit 1
+		left join BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS td on detail.id=td.template_tracking_card_id
+		left join BMS_BASE_KEY k on k.id=td.workshop
+		where k.key_name=#{workshop}
+	order by detail.detail_index asc,detail.version desc limit 1
 	</select>
 
 	<select id="queryPartsList" parameterType="Map" resultType="Map">

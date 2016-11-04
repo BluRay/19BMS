@@ -31,12 +31,16 @@
 					<table>
 						<tr>
 							<td>工厂</td>
+							<td>车间</td>
 							<td>订单</td>
 							<td>车号</td>
 							<td></td>
 						</tr>
 						<tr>
 							<td><select name="" id="input_factory"
+								class="input-medium carType">
+							</select></td>
+							<td><select name="" id="input_workshop"
 								class="input-medium carType">
 							</select></td>
 							<td><input type="text" class="input-medium revise"
@@ -51,25 +55,6 @@
 						</tr>
 					</table>
 				</form>
-
-				<table id="tableResult" class="table table-condensed"
-					style="display: none" style="font-size: 12px;">
-					<thead>
-						<tr>
-							<th>工厂</th>
-							<th>订单</th>
-							<th>车号</th>
-							<th>车型</th>
-							<th>订单配置</th>
-							<th>录入人</th>
-							<th>录入时间</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-
-					</tbody>
-				</table>
 				<div id="pagination"
 					class="pagination pagination-small pagination-right"
 					style="display: none">
@@ -85,6 +70,26 @@
 						<li id="last"><a href="#">»</a></li>
 					</ul>
 				</div>
+				<table id="tableResult" class="table table-condensed"
+					style="display: none" style="font-size: 12px;">
+					<thead>
+						<tr>
+							<th>工厂</th>
+							<th>车间</th>
+							<th>订单</th>
+							<th>车号</th>
+							<th>车型</th>
+							<th>订单配置</th>
+							<th>录入人</th>
+							<th>录入时间</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+				
 			</div>
 
 		</div>

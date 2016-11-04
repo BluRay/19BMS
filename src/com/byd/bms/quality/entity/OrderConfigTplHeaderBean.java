@@ -9,6 +9,7 @@ public class OrderConfigTplHeaderBean {
 	private int configId;
 	private String config;
 	private String version;
+	private String workshop;
 	private String memo;
 	private int editorId;
 	private String editor;
@@ -60,6 +61,12 @@ public class OrderConfigTplHeaderBean {
 	}
 	public void setVersion(String version) {
 		this.version = version;
+	}
+	public String getWorkshop() {
+		return workshop;
+	}
+	public void setWorkshop(String workshop) {
+		this.workshop = workshop;
 	}
 	public String getMemo() {
 		return memo;

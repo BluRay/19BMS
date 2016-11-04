@@ -159,6 +159,7 @@ function generateTable(workshop){
 		if(workshop.indexOf("总装")>=0){
 			tableId="#assembly";
 		}
+		//$("#welding_tab").removeClass("active");
 		$(tableId+" tbody").html("");
 		$.each(detaillist,function(index,value){
 			if(value.workshop.indexOf(workshop)>=0){
@@ -184,6 +185,8 @@ function generateTable(workshop){
 			}
 				
 		});
+		$(tableId+"_tab").addClass("active").css("display","");
+		$(tableId).addClass("active");
 	}
 	function getDetail() {
 		$.ajax({
@@ -191,12 +194,13 @@ function generateTable(workshop){
 			dataType : "json",// 返回json格式的数据
 			url : "trackTpl!getTplDetail.action",
 			data : {
-				"tplHeader.id" : $('#tplHeaderId').val()
+				"tplHeader.id" : $('#tplHeaderId').val(),
+				"tplHeader.workshop" : getQueryString("tplHeader.workshop")
 			},
 			success : function(response) {
 				var tplarray = response.dataList;
 				detaillist = tplarray;
-				generateTable("焊装");
+				generateTable(getQueryString("tplHeader.workshop"));
 
 			}
 		});

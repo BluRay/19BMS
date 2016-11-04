@@ -1011,27 +1011,27 @@ public class PlanAction extends BaseAction<Object> {
 		
 		BmsPDException exception = new BmsPDException();
 		exception.setId(Integer.parseInt(request.getParameter("id")));
-		if(!request.getParameter("factory_id").equals("")) exception.setFactory_id(Integer.parseInt(request.getParameter("factory_id")));
-		if(!request.getParameter("workshop_id").equals("")) exception.setWorkshop_id(Integer.parseInt(request.getParameter("workshop_id")));
-		if(!request.getParameter("line_id").equals("")) exception.setLine_id(Integer.parseInt(request.getParameter("line_id")));
-		if(!request.getParameter("bus_number").equals("")) exception.setBus_number(request.getParameter("bus_number"));
-		if(!request.getParameter("process_id").equals("")) exception.setProcess_id(Integer.parseInt(request.getParameter("process_id")));
-		if(!request.getParameter("reason_type_id").equals("")) exception.setReason_type_id(Integer.parseInt(request.getParameter("reason_type_id")));
-		if(!request.getParameter("detailed_reasons").equals("")) exception.setDetailed_reasons(request.getParameter("detailed_reasons"));
-		if(!request.getParameter("severity_level").equals("")) exception.setSeverity_level(Integer.parseInt(request.getParameter("severity_level")));
-		if(!request.getParameter("duty_department_id").equals("")) exception.setDuty_department_id(Integer.parseInt(request.getParameter("duty_department_id")));
-		if(!request.getParameter("measures").equals("")) exception.setMeasures(Integer.parseInt(request.getParameter("measures")));
-		if(!request.getParameter("solution").equals("")) exception.setSolution(request.getParameter("solution"));
+		if(StringUtils.isNotEmpty(request.getParameter("factory_id"))) exception.setFactory_id(Integer.parseInt(request.getParameter("factory_id")));
+		if(StringUtils.isNotEmpty(request.getParameter("workshop_id"))) exception.setWorkshop_id(Integer.parseInt(request.getParameter("workshop_id")));
+		if(StringUtils.isNotEmpty(request.getParameter("line_id"))) exception.setLine_id(Integer.parseInt(request.getParameter("line_id")));
+		if(StringUtils.isNotEmpty(request.getParameter("bus_number"))) exception.setBus_number(request.getParameter("bus_number"));
+		if(StringUtils.isNotEmpty(request.getParameter("process_id"))) exception.setProcess_id(Integer.parseInt(request.getParameter("process_id")));
+		if(StringUtils.isNotEmpty(request.getParameter("reason_type_id"))) exception.setReason_type_id(Integer.parseInt(request.getParameter("reason_type_id")));
+		if(StringUtils.isNotEmpty(request.getParameter("detailed_reasons"))) exception.setDetailed_reasons(request.getParameter("detailed_reasons"));
+		if(StringUtils.isNotEmpty(request.getParameter("severity_level"))) exception.setSeverity_level(Integer.parseInt(request.getParameter("severity_level")));
+		if(StringUtils.isNotEmpty(request.getParameter("duty_department_id"))) exception.setDuty_department_id(Integer.parseInt(request.getParameter("duty_department_id")));
+		if(StringUtils.isNotEmpty(request.getParameter("measures"))) exception.setMeasures(Integer.parseInt(request.getParameter("measures")));
+		if(StringUtils.isNotEmpty(request.getParameter("solution"))) exception.setSolution(request.getParameter("solution"));
 		if(StringUtils.isNotEmpty(request.getParameter("close_date"))) exception.setClose_date(request.getParameter("close_date"));
-		if(!request.getParameter("start_time").equals("")) exception.setStart_time(request.getParameter("start_time"));
-		if(!request.getParameter("finish_time").equals("")) exception.setFinish_time(request.getParameter("finish_time"));
-		if(!request.getParameter("pfinish_time").equals("")) exception.setPfinish_time(request.getParameter("pfinish_time"));
-		if(!request.getParameter("memo").equals("")) exception.setMemo(request.getParameter("memo"));
-		if(!request.getParameter("email_id").equals("")) exception.setEmail_id(Integer.parseInt(request.getParameter("email_id")));
-		if(!request.getParameter("email_send").equals("")) exception.setEmail_send(request.getParameter("email_send"));
-		if(!request.getParameter("bus_type").equals("")) exception.setBus_type_id(Integer.parseInt(request.getParameter("bus_type")));
-		if(!request.getParameter("waste_num").equals("")) exception.setWaste_num(Integer.parseInt(request.getParameter("waste_num")));
-		if(!request.getParameter("pause_time").equals("")) exception.setPause_time(request.getParameter("pause_time"));
+		if(StringUtils.isNotEmpty(request.getParameter("start_time"))) exception.setStart_time(request.getParameter("start_time"));
+		if(StringUtils.isNotEmpty(request.getParameter("finish_time"))) exception.setFinish_time(request.getParameter("finish_time"));
+		if(StringUtils.isNotEmpty(request.getParameter("pfinish_time"))) exception.setPfinish_time(request.getParameter("pfinish_time"));
+		if(StringUtils.isNotEmpty(request.getParameter("memo"))) exception.setMemo(request.getParameter("memo"));
+		if(StringUtils.isNotEmpty(request.getParameter("email_id"))) exception.setEmail_id(Integer.parseInt(request.getParameter("email_id")));
+		if(StringUtils.isNotEmpty(request.getParameter("email_send"))) exception.setEmail_send(request.getParameter("email_send"));
+		if(StringUtils.isNotEmpty(request.getParameter("bus_type"))) exception.setBus_type_id(Integer.parseInt(request.getParameter("bus_type")));
+		if(StringUtils.isNotEmpty(request.getParameter("waste_num"))) exception.setWaste_num(Integer.parseInt(request.getParameter("waste_num")));
+		if(StringUtils.isNotEmpty(request.getParameter("pause_time"))) exception.setPause_time(request.getParameter("pause_time"));
 		
 		if(StringUtils.isNotEmpty(request.getParameter("finish_time"))) exception.setCloser_id(userid);
 		if(StringUtils.isNotEmpty(request.getParameter("finish_time"))) exception.setStatus(1);
@@ -1039,7 +1039,7 @@ public class PlanAction extends BaseAction<Object> {
 		exception.setException_type(request.getParameter("exception_type"));
 		exception.setEditor_id(userid);
 		exception.setEdit_date(curTime);
-		if(request.getParameter("finish_time").equals("")){
+		if(!StringUtils.isNotEmpty(request.getParameter("finish_time"))){
 			planDao.updateExceptionInfo(exception);
 		}else{
 			planDao.manageExceptionInfo(exception);
@@ -1062,24 +1062,24 @@ public class PlanAction extends BaseAction<Object> {
 		HttpServletRequest request= ServletActionContext.getRequest();
 		request.setCharacterEncoding("UTF-8");
 		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		if (request.getParameter("factory_id") != null) conditionMap.put("factory_id", request.getParameter("factory_id"));
-		if (request.getParameter("workshop_id") != null) conditionMap.put("workshop_id", request.getParameter("workshop_id"));
-		if (request.getParameter("line_id") != null) conditionMap.put("line_id", request.getParameter("line_id"));
-		if (request.getParameter("bus_number") != null) conditionMap.put("bus_number", request.getParameter("bus_number"));
-		if (request.getParameter("severity_level") != null) conditionMap.put("severity_level", request.getParameter("severity_level"));
-		if (request.getParameter("measures") != null) conditionMap.put("measures", request.getParameter("measures"));
-		if (request.getParameter("status") != null) conditionMap.put("status", request.getParameter("status"));
-		if (request.getParameter("date_start") != null) conditionMap.put("date_start", request.getParameter("date_start"));
-		if (request.getParameter("date_end") != null) conditionMap.put("date_end", request.getParameter("date_end"));
-		if (request.getParameter("exception_id") != null) conditionMap.put("exception_id", request.getParameter("exception_id"));
-		if (request.getParameter("exception_type") != null) conditionMap.put("exception_type", request.getParameter("exception_type"));
-		if (request.getParameter("reason_type_id") != null) conditionMap.put("reason_type_id", request.getParameter("reason_type_id"));
-		if (request.getParameter("order_no") != null) conditionMap.put("order_no", request.getParameter("order_no"));
-		if (request.getParameter("date_start2") != null) conditionMap.put("date_start2", request.getParameter("date_start2"));
-		if (request.getParameter("date_end2") != null) conditionMap.put("date_end2", request.getParameter("date_end2"));
-		if (request.getParameter("factory_name") != null) conditionMap.put("factory_name", request.getParameter("factory_name"));
+		if (StringUtils.isNotEmpty(request.getParameter("factory_id"))) conditionMap.put("factory_id", request.getParameter("factory_id"));
+		if (StringUtils.isNotEmpty(request.getParameter("workshop_id"))) conditionMap.put("workshop_id", request.getParameter("workshop_id"));
+		if (StringUtils.isNotEmpty(request.getParameter("line_id"))) conditionMap.put("line_id", request.getParameter("line_id"));
+		if (StringUtils.isNotEmpty(request.getParameter("bus_number"))) conditionMap.put("bus_number", request.getParameter("bus_number"));
+		if (StringUtils.isNotEmpty(request.getParameter("severity_level"))) conditionMap.put("severity_level", request.getParameter("severity_level"));
+		if (StringUtils.isNotEmpty(request.getParameter("measures"))) conditionMap.put("measures", request.getParameter("measures"));
+		if (StringUtils.isNotEmpty(request.getParameter("status"))) conditionMap.put("status", request.getParameter("status"));
+		if (StringUtils.isNotEmpty(request.getParameter("date_start"))) conditionMap.put("date_start", request.getParameter("date_start"));
+		if (StringUtils.isNotEmpty(request.getParameter("date_end"))) conditionMap.put("date_end", request.getParameter("date_end"));
+		if (StringUtils.isNotEmpty(request.getParameter("exception_id"))) conditionMap.put("exception_id", request.getParameter("exception_id"));
+		if (StringUtils.isNotEmpty(request.getParameter("exception_type"))) conditionMap.put("exception_type", request.getParameter("exception_type"));
+		if (StringUtils.isNotEmpty(request.getParameter("reason_type_id"))) conditionMap.put("reason_type_id", request.getParameter("reason_type_id"));
+		if (StringUtils.isNotEmpty(request.getParameter("order_no"))) conditionMap.put("order_no", request.getParameter("order_no"));
+		if (StringUtils.isNotEmpty(request.getParameter("date_start2"))) conditionMap.put("date_start2", request.getParameter("date_start2"));
+		if (StringUtils.isNotEmpty(request.getParameter("date_end2"))) conditionMap.put("date_end2", request.getParameter("date_end2"));
+		if (StringUtils.isNotEmpty(request.getParameter("factory_name"))) conditionMap.put("factory_name", request.getParameter("factory_name"));
 			
-		if(request.getParameter("query_type") == null){
+		//if(StringUtils.isNotEmpty(request.getParameter("query_type"))){
 			if (pager != null){
 				conditionMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());
 				conditionMap.put("pageSize", pager.getPageSize());
@@ -1089,7 +1089,7 @@ public class PlanAction extends BaseAction<Object> {
 					conditionMap.put("pageSize", 10);
 				}*/
 			}
-		}
+		//}
 		
 		List datalist=new ArrayList();
 		datalist=planDao.getExceptionList(conditionMap);
@@ -2541,10 +2541,10 @@ public class PlanAction extends BaseAction<Object> {
 		HttpServletRequest request= ServletActionContext.getRequest();
 		request.setCharacterEncoding("UTF-8");
 		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		if (request.getParameter("factory_id") != "") conditionMap.put("factory_id", request.getParameter("factory_id"));
-		if (request.getParameter("order_no") != "") conditionMap.put("order_no", request.getParameter("order_no"));
-		if (request.getParameter("bus_number") != "") conditionMap.put("bus_number", request.getParameter("bus_number"));
-		if (request.getParameter("bus_vin") != "") conditionMap.put("bus_vin", request.getParameter("bus_vin"));	
+		if (StringUtils.isNotEmpty(request.getParameter("factory_id"))) conditionMap.put("factory_id", request.getParameter("factory_id"));
+		if (StringUtils.isNotEmpty(request.getParameter("order_no"))) conditionMap.put("order_no", request.getParameter("order_no"));
+		if (StringUtils.isNotEmpty(request.getParameter("bus_number"))) conditionMap.put("bus_number", request.getParameter("bus_number"));
+		if (StringUtils.isNotEmpty(request.getParameter("bus_vin"))) conditionMap.put("bus_vin", request.getParameter("bus_vin"));	
 		
 		if (pager != null){
 			conditionMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());

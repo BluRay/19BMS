@@ -43,18 +43,18 @@
 				<div role="tabpanel" >
 					<!-- Nav tabs -->
 					<ul class="nav nav-pills" role="tablist" style="height: 30px">
-						<li role="presentation" class="active"><a href="#welding"
+						<li id="welding_tab" role="presentation" style="display:none"><a href="#welding"
 							aria-controls="welding" role="tab" data-toggle="tab" onclick="generateTable('焊装')">焊装</a></li>
-						<li role="presentation"><a href="#painting"
+						<li id="painting_tab" role="presentation" style="display:none"><a href="#painting"
 							aria-controls="painting" role="tab" data-toggle="tab" onclick="generateTable('涂装')">涂装</a></li>
-						<li role="presentation"><a href="#bottom"
+						<li id="bottom_tab" role="presentation" style="display:none"><a href="#bottom"
 							aria-controls="bottom" role="tab" data-toggle="tab" onclick="generateTable('底盘')">底盘</a></li>
-						<li role="presentation"><a href="#assembly"
+						<li id="assembly_tab" role="presentation" style="display:none"><a href="#assembly"
 							aria-controls="assembly" role="tab" data-toggle="tab" onclick="generateTable('总装')">总装</a></li>
 					</ul>
 					<!-- Tab panes -->
 						<div class="tab-content" >
-						<div role="tabpanel" class="tab-pane active" id="welding">
+						<div role="tabpanel" class="tab-pane" id="welding">
 							<table class="table table-bordered" style="min-width: 680px;">
 								<thead>
 									<tr>

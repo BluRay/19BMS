@@ -4,28 +4,41 @@ $(document).ready(function() {
 	});
 	initPage();
 	$(".fa-search").live("click",function(e){
-		var headerId=$(e.target).parent("td").parent("tr").data("id")
+		var tr=$(e.target).parent("td").parent("tr");
+		var headerId=$(tr).data("id");
+		var workshop=$(tr).find("td").eq(3).html();
 		//alert(headerId);
-		window.open("trackTpl!showTplDetailPage.action?tplHeader.id="+headerId,"_self");
+		window.open("trackTpl!showTplDetailPage.action?tplHeader.id="+headerId+"&tplHeader.workshop="+workshop,"_self");
 	})
 	$(".fa-files-o").live("click",function(e){
-		var headerId=$(e.target).parent("td").parent("tr").data("id");
-		window.open("trackTpl!showTplDetailCopyPage.action?tplHeader.id="+headerId,"_self");
+		var tr=$(e.target).parent("td").parent("tr");
+		var headerId=$(tr).data("id");
+		var workshop=$(tr).find("td").eq(3).html();
+
+		window.open("trackTpl!showTplDetailCopyPage.action?tplHeader.id="+headerId+"&tplHeader.workshop="+workshop,"_self");
 	});
 	$(".fa-pencil").live("click",function(e){
-		var headerId=$(e.target).parent("td").parent("tr").data("id");
-		window.open("trackTpl!showTplDetailEditPage.action?tplHeader.id="+headerId,"_self");
+		var tr=$(e.target).parent("td").parent("tr");
+		var headerId=$(tr).data("id");
+		var workshop=$(tr).find("td").eq(3).html();
+		window.open("trackTpl!showTplDetailEditPage.action?tplHeader.id="+headerId+"&tplHeader.workshop="+workshop,"_self");
 	});
 })
 function initPage(){
 	getBusTypeSelect("#input_busType","","");
 /*	getOrderSelect("#input_order","");*/
 	getOrderConfigSelect("#input_config","");
+	getWorkshopSelect_Auth_Key("#input_workshop", "", "","");
 	pageSize=20;
 	$("#qc_tmpl_in").addClass("in");
 }
 // 查询模板列表
 function ajaxQuery(targetPage) {
+	var workshopAll="";
+	$("#input_workshop option").each(function(){
+		workshopAll+=$(this).text()+",";
+	});
+	var workshop=$("#input_workshop :selected").text()=="全部"?workshopAll:$("#input_workshop :selected").text();
 	$
 			.ajax({
 				type : "get",// 使用get方法访问后台
@@ -35,6 +48,7 @@ function ajaxQuery(targetPage) {
 					"tplHeader.busType" : $('#input_busType').val(),
 					"tplHeader.order" : $('#input_order').val(),
 					"tplHeader.config" : $('#input_config').val(),
+					"tplHeader.workshop":workshop,
 					"pager.pageSize" : 20,
 					"pager.curPage" : targetPage || 1
 				},
@@ -52,6 +66,8 @@ function ajaxQuery(targetPage) {
 												tr);
 										$("<td />").html(value.config)
 												.appendTo(tr);
+										$("<td />").html(value.workshop)
+										.appendTo(tr);
 										$("<td />").html(value.version)
 												.appendTo(tr);
 										$("<td />").html(value.memo).appendTo(

@@ -8,27 +8,39 @@ $(document).ready(function() {
 		window.open("ocIn!recordAddPage.action","_self");
 	});
 	$(".fa-pencil").live("click",function(e){
+		var tr=$(e.target).parent("td").parent("tr");
+		var workshop=$(tr).find("td").eq(1).html();
 		var factoryId=$(e.target).parent("td").parent("tr").data("factoryId");
 		var busNo=$(e.target).parent("td").parent("tr").data("busNo");
-		window.open("ocIn!recordUpdatePage.action?ocHeader.factoryId="+factoryId+"&ocHeader.busNo="+busNo,"_self");
+		window.open("ocIn!recordUpdatePage.action?ocHeader.factoryId="+factoryId+"&ocHeader.busNo="+busNo+"&ocHeader.workshop="+workshop,"_self");
 	});
 	$(".fa-search").live("click",function(e){
+		var tr=$(e.target).parent("td").parent("tr");
+		var workshop=$(tr).find("td").eq(1).html();
 		var factoryId=$(e.target).parent("td").parent("tr").data("factoryId");
 		var busNo=$(e.target).parent("td").parent("tr").data("busNo");
-		window.open("ocIn!recordDetailPage.action?ocHeader.factoryId="+factoryId+"&ocHeader.busNo="+busNo,"_self");
+		window.open("ocIn!recordDetailPage.action?ocHeader.factoryId="+factoryId+"&ocHeader.busNo="+busNo+"&ocHeader.workshop="+workshop,"_self");
 	});
 })
 function initPage(){
-	getFactorySelect("#input_factory","","");
+	//getFactorySelect("#input_factory","","");
+	getAuthorityFactorySelect("#input_factory", "", "noall");
+	getWorkshopSelect_Auth("#input_workshop", "", $("#input_factory :selected").text(), "");
+	getOrderNoSelect("#input_order","#orderId");
 	pageSize=20;
 	$("#qc_record_in").addClass("in");
 }
 //查询列表
 function ajaxQuery(targetPage) {
+	var workshopAll="";
+	$("#input_workshop option").each(function(){
+		workshopAll+=$(this).text()+",";
+	});
+	var workshop=$("#input_workshop :selected").text()=="全部"?workshopAll:$("#input_workshop :selected").text();
 	var factoryId=isNaN(parseInt($("#input_factory").val()))?0:parseInt($("#input_factory").val());
 	var conditions="{";
 	conditions+="factoryId:"+factoryId+",orderName:'"+$("#input_order").val()+
-		"',busNo:'"+$("#input_bus_no").val()+"'}";
+		"',workshop:'"+workshop+"',busNo:'"+$("#input_bus_no").val()+"'}";
 	//alert(conditions);	
 	$
 			.ajax({
@@ -50,6 +62,8 @@ function ajaxQuery(targetPage) {
 										var tr = $("<tr />");
 										$("<td />").html(value.factory)
 												.appendTo(tr);
+										$("<td />").html(value.workshop)
+										.appendTo(tr);
 										$("<td />").html(value.order).appendTo(
 												tr);
 										$("<td />").html(value.busNo)

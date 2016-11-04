@@ -182,13 +182,14 @@ public class HrReportAction extends BaseAction<Object> {
 		}
 		
 		//160418 先查询车号，再根据车号查询视图
-		List<String> staff_number_list = hrDao.getPieceTimeReportStaffList(conditionMap);
-		conditionMap.put("list", staff_number_list);
+		List<String> staff_number_list=new ArrayList<String>();
+		//staff_number_list = hrDao.getPieceTimeReportStaffList(conditionMap);
+		//conditionMap.put("list", staff_number_list);
 		//System.out.println("bus_number_list size = " + bus_number_list.size());		
-		
+		conditionMap.put("list", staff_number_list);
 		List<Map<String, String>> list = hrDao.getPieceTimeReportList2(conditionMap);
-		//int count = hrDao.getPieceTimeReportListCount2(conditionMap);
-		int count = hrDao.getPieceTimeReportStaffListCount(conditionMap);
+		int count = hrDao.getPieceTimeReportListCount2(conditionMap);
+		//int count = hrDao.getPieceTimeReportStaffListCount(conditionMap);
 		
 		Map<String, String> page_map = new HashMap<String, String>();  
 		if (pager != null){

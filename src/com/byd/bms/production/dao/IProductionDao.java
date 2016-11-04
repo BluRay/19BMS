@@ -371,7 +371,7 @@ public interface IProductionDao {
 	 * @param busNo
 	 * @return
 	 */
-	public Integer getTrackTplHeaderIdByBusNo(String busNo);
+	public Integer getTrackTplHeaderIdByBusNo(Map<String,Object> queryMap);
 	/**
 	 * @author xjw
 	 * 查询关键零部件列表

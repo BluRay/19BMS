@@ -526,7 +526,7 @@ function getOrderNoSelect(elementId, submitId, fn_backcall, bustype,factory,area
 			return item + "  " + order_name + " " + bus_type + order_qty;
 		},
 		matcher : function(item) {
-			if(areaflg=="area"){
+			if(areaflg!="copy"){//复制粘贴，非选择默认列表第一个项
 				return true;
 			}
 			// alert(this.query);
@@ -536,6 +536,7 @@ function getOrderNoSelect(elementId, submitId, fn_backcall, bustype,factory,area
 					if (typeof (fn_backcall) == "function") {
 						fn_backcall(value);
 					}
+					return;
 				}
 			})
 			// alert(submitId);
@@ -823,6 +824,38 @@ function getWorkshopSelect_Auth2(elementId, selectVal, selectFactory, selectType
 	})
 }
 
+function getWorkshopSelect_Auth_Key(elementId, selectVal, selectType,valName){
+	var href = window.location.href;
+	var url = href.substring(href.lastIndexOf('/'), href.length);
+	var ii = url.indexOf('?');
+	if (ii > 0) {
+		url = url.substring(0, ii);
+	}
+	var is= url.indexOf('#');
+	if (is > 0) {
+		url = url.substring(0, is);
+	}
+	$.ajax({
+		url : "common!getWorkshopSelectAuth_Key.action",
+		dataType : "json",
+		data : {
+			"url":url
+		},
+		async : false,
+		error : function() {
+			alertError();
+		},
+		success : function(response) {
+			if (selectType == 'noall') {
+				getSelects_noall(response, selectVal, elementId,null,valName);
+			} else if (selectType == 'empty') {
+				getSelects_empty(response, selectVal, elementId,null,valName);
+			} else {
+				getSelects(response, selectVal, elementId,null,valName);
+			}
+		}
+	})
+}
 /*
  * 班组下拉列表
  */

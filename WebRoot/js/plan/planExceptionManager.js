@@ -51,11 +51,11 @@ $(document).ready(function () {
 		}
 		
 		//异常处理措施选择为停线时 增加一条停线记录
-		if($("#edit_measures").val()=="2"){
+		/*if($("#edit_measures").val()=="2"){
 			$("#manage_exception_type").val('1');
 			ajaxManage($("#edit_id").val());
 			$("#is_new").val('1');
-			/*$("#manage_id").val($("#edit_id").val());
+			$("#manage_id").val($("#edit_id").val());
 			$("#manage_bus_number").val($("#edit_bus_number").val());
 			$("#manage_solution").val($("#edit_solution").val());
 			$("#editModal").modal("hide");
@@ -64,10 +64,11 @@ $(document).ready(function () {
 			getManagerDepartmentSelect($("#edit_factory").val());
 			$("#manage_department").val($("#edit_department").val());
 			$("#manage_reason_type").val($("#edit_reason_type").val());
-			$("#manageModal").modal("show");*/
+			$("#manageModal").modal("show");
 		}else{
 			ajaxEditConfirm();	
-		}
+		}*/
+		ajaxEditConfirm();
 		return false;
 	});
 	
@@ -324,7 +325,7 @@ function ajaxManageConfirm(){
 function ajaxEditConfirm(){
 	var edit_measures = $('#edit_measures').val();
 	var exception_type = $("#edit_exception_type").val();
-	if(edit_measures == "2")exception_type="1";
+	//if(edit_measures == "2")exception_type="1";
 	$.ajax({
 		url: "plan!editExceptionInfo.action",
 		dataType: "json",
@@ -348,7 +349,7 @@ function ajaxEditConfirm(){
 		error: function () {alertError();},
 		success: function (response) {
 			if(response.success){
-				//alert("修改成功");
+				alert("修改成功");
 				$("#editModal").modal("hide");
 				ajaxQuery();
 			} else {
@@ -427,7 +428,7 @@ function ajaxQuery(targetPage,queryAll){
     			var detailed_reasons = value.detailed_reasons;
     			if(value.detailed_reasons.length>15&&queryAll!='all'){detailed_reasons = value.detailed_reasons.substring(0,12) + '...'};
     			$("<td title='"+value.detailed_reasons+"' style=\"text-align:center;padding:3px\" />").html(detailed_reasons).appendTo(tr);
-    			$("<td style=\"text-align:center;padding:3px\" />").html((value.exception_type=="0")?"异常":"停线").appendTo(tr);
+    			$("<td style=\"text-align:center;padding:3px\" />").html((value.measures=="0")?"忽略":(value.measures=="1"?"异常":"停线")).appendTo(tr);
     			$("<td style=\"text-align:center;padding:3px\" />").html(value.department).appendTo(tr);
     			$("<td style=\"text-align:center;padding:3px\" />").html(value.display_name).appendTo(tr);
     			$("<td style=\"text-align:center;padding:3px\" />").html(value.start_time).appendTo(tr);
@@ -488,7 +489,7 @@ function ajaxManage(exception_id){
 			if(response.success){
 				$.each(response.data,function(index,value){
 					if(index == 0){
-						if($("#manage_exception_type").val() == "0"){
+						/*if($("#manage_exception_type").val() == "0"){
 							$("#newPause_date").hide();
 							$("#manage_waste_num").attr("disabled","disabled")
 							$("#div_memo").hide();
@@ -500,7 +501,12 @@ function ajaxManage(exception_id){
 							$("#div_memo").show();
 							$("#div_mail_id").show();
 							$("#div_email_send").show();
-						}
+						}*/
+						$("#newPause_date").hide();
+						$("#manage_waste_num").attr("disabled","disabled")
+						$("#div_memo").hide();
+						$("#div_mail_id").hide();
+						$("#div_email_send").hide();
 						
 						$("#manage_id").val(value.id);
 						$("#manage_exception_type").val(value.exception_type);

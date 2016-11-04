@@ -114,12 +114,15 @@ public class ProdTrackInAction extends BaseAction<Object>{
 		result=new HashMap<String,Object>();
 		JSONObject jo=JSONObject.fromObject(conditions);
 		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		Map<String,Object> cMap=new HashMap<String,Object>();
 		String busNo=(String) jo.get("busNo");
 		String workshop=(String) jo.get("workshop");
-		List<TrackTplHeaderBean> thblist=qualityDao.getTrackTplHeaderByBusNo(busNo);
+		cMap.put("busNo", busNo);
+		cMap.put("workshop", workshop);
+		List<TrackTplHeaderBean> thblist=qualityDao.getTrackTplHeaderByBusNo(cMap);
 		TrackTplHeaderBean tplHeader=new TrackTplHeaderBean();
 		if(thblist.size()>0){
-			tplHeader=qualityDao.getTrackTplHeaderByBusNo(busNo).get(0);
+			tplHeader=qualityDao.getTrackTplHeaderByBusNo(cMap).get(0);
 		}
 		
 		int tplHeaderId=tplHeader.getId();

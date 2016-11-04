@@ -499,6 +499,20 @@ public class CommonAction extends BaseAction<Object> {
 		
 		return SUCCESS;
 	}
+	
+	public String getWorkshopSelectAuth_Key(){
+		int userid = getUser().getId();
+
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String factory = request.getParameter("factory");
+		String url = request.getParameter("url");
+		Map<String, Object> map1 = new HashMap<String, Object>();
+		map1.put("userId", userid);
+		map1.put("url", url);
+		selectList = commDao.getWorkshopSelectAuth_Key(map1);
+		
+		return SUCCESS;
+	}
 
 	public String getTempoBydate() throws UnsupportedEncodingException {
 		HttpServletRequest request = ServletActionContext.getRequest();

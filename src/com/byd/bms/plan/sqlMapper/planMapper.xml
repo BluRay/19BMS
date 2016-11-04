@@ -235,6 +235,7 @@
 		id FROM BMS_ORDER WHERE order_no=#{order_no})
 		AND factory_id = (SELECT
 		id FROM BMS_BASE_FACTORY WHERE factory_name = #{factory_name})
+		limit 1
 	</select>
 
 	<insert id="insertPlanBusNumber" useGeneratedKeys="true"
@@ -242,7 +243,7 @@
 		<![CDATA[
 		insert into BMS_PLAN_BUS_NUMBER (bus_serial_number,bus_number,creator_id,creat_date,print_sign,printer_id,print_date,print_times)
 		VALUES(
-		(select a.sn from (SELECT IFNULL(max(bus_serial_number) +1,CONCAT(#{year},'0001')) AS sn FROM BMS_PLAN_BUS_NUMBER WHERE left(bus_serial_number,4) = #{year}) a),
+		(select a.sn from (SELECT IFNULL(max(cast(bus_serial_number as unsigned)) +1,CONCAT(#{year},'00001')) AS sn FROM BMS_PLAN_BUS_NUMBER WHERE left(bus_serial_number,4) = #{year}) a),
 		(CONCAT(#{bus_code},'-',#{order_code},'-',#{year},'-',LPAD(#{num},5,'0') )),
 		#{creator_id},#{creat_date},#{print_sign},#{printer_id},#{print_date},#{print_times}
 		)
@@ -282,14 +283,14 @@
 		SELECT * FROM BMS_PLAN_BUS_NUMBER WHERE
 		bus_number =
 		CONCAT(LEFT((SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE
-		bus_serial_number = (SELECT max(bus_serial_number) FROM
+		bus_serial_number = (SELECT max(cast(bus_serial_number as unsigned)) FROM
 		BMS_PLAN_BUS_NUMBER)),
 		INSTR((SELECT bus_number FROM
 		BMS_PLAN_BUS_NUMBER WHERE bus_serial_number = (SELECT
-		max(bus_serial_number) FROM BMS_PLAN_BUS_NUMBER)),
+		max(cast(bus_serial_number as unsigned)) FROM BMS_PLAN_BUS_NUMBER)),
 		(SELECT
 		productive_year FROM BMS_ORDER WHERE order_no = #{order_no})+'-')+4),
-		LPAD((#{num}),4,'0'))
+		LPAD((#{num}),5,'0'))
 	</select>
 
 	<select id="getMaxNumByOrderNo" parameterType="String"
@@ -338,7 +339,7 @@
 		exception_type=#{exception_type},reason_type_id=#{reason_type_id},detailed_reasons=#{detailed_reasons},
 		edit_date=#{edit_date},start_time=#{start_time},pfinish_time=#{pfinish_time},finish_time=#{finish_time},severity_level=#{severity_level},
 		measures=#{measures},duty_department_id=#{duty_department_id},temporary_measures=#{temporary_measures},status=#{status},
-		processor=#{processor},process_date=#{process_date},closer_id=#{closer_id},order_list=#{order},pause_time=#{pause_time},capacity_loss=#{capacityLoss}
+		processor=#{processor},process_date=#{process_date},closer_id=#{closer_id},order_list=#{order},pause_time=#{pause_time},capacity_loss=#{capacityLoss},
 		email_id=#{email_id} WHERE id=#{id}
 		]]>
 	</update>
@@ -458,46 +459,46 @@
 		LEFT OUTER JOIN BMS_ORDER o ON s.order_id = o.id --> 
 		WHERE 1=1
 
-		<if test="bus_number!=''">
+		<if test="bus_number!='' and bus_number!=null">
 			AND b.bus_number LIKE CONCAT('%',#{bus_number},'%')
 		</if>
-		<if test="factory_id!=''">
+		<if test="factory_id!='' and factory_id!=null">
 			AND b.factory_id = #{factory_id}
 		</if>
-		<if test="workshop_id!=''">
+		<if test="workshop_id !='' and workshop_id !=null">
 			AND b.workshop_id = #{workshop_id}
 		</if>
-		<if test="line_id!=''">
+		<if test="line_id!='' and line_id!=null">
 			AND b.line_id = #{line_id}
 		</if>
-		<if test="severity_level!=''">
+		<if test="severity_level!='' and severity_level!=null">
 			AND b.severity_level = #{severity_level}
 		</if>
-		<if test="measures!=''">
+		<if test="measures!='' and measures!=null">
 			AND b.measures= #{measures}
 		</if>
-		<if test="status!=''">
+		<if test="status!='' and status !=null">
 			AND b.status= #{status}
 		</if>
-		<if test="exception_type!=''">
-			and b.exception_type >= #{exception_type}
+		<if test="exception_type!='' and exception_type!=null">
+			and b.exception_type = #{exception_type}
 		</if>
-		<if test="reason_type_id !=''">
+		<if test="reason_type_id !='' and reason_type_id !=null">
 			and b.reason_type_id >= #{reason_type_id}
 		</if>
 		<if test="order_no !='' and order_no!=null">
 			and find_in_set(b.order_list,#{order_no})>0
 		</if>
-		<if test="date_start !=''">
+		<if test="date_start !='' and date_start !=null">
 			and date_add(b.start_time, interval +410 MINUTE) >= CONCAT(#{date_start},' 00:00:00')
 		</if>
-		<if test="date_end !=''">
+		<if test="date_end !='' and date_end !=null">
 			and date_add(b.start_time, interval +410 MINUTE) &lt;= CONCAT(#{date_end},' 23:59:59')
 		</if>
-		<if test="date_start2 !=''">
+		<if test="date_start2 !='' and date_start2 !=null">
 			and b.pfinish_time >= #{date_start2}
 		</if>
-		<if test="date_end2 !=''">
+		<if test="date_end2 !='' and date_end2 !=null">
 			and b.pfinish_time &lt;= #{date_end2}
 		</if>
 		<if test="exception_id!=null">

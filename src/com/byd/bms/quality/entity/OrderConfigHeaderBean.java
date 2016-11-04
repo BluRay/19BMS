@@ -3,6 +3,7 @@ package com.byd.bms.quality.entity;
 public class OrderConfigHeaderBean {
 	private int factoryId;
 	private String factory;
+	private String workshop;
 	private int orderId;
 	private String order;
 	private String busNo;
@@ -22,6 +23,12 @@ public class OrderConfigHeaderBean {
 	}
 	public void setFactory(String factory) {
 		this.factory = factory;
+	}
+	public String getWorkshop() {
+		return workshop;
+	}
+	public void setWorkshop(String workshop) {
+		this.workshop = workshop;
 	}
 	public int getOrderId() {
 		return orderId;

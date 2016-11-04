@@ -579,7 +579,7 @@
 		order by p.factory,p.workshop,p.workgroup,p.team,p.order_id,p.edit_date desc
 		<if test="offset!=null">
 		 LIMIT #{offset} ,#{pageSize} 
-	</if>
+		</if>
 	</select>	
 	
 	<select id="getWorkgroupPriceCount" parameterType="Map" resultType="int">
@@ -607,10 +607,6 @@
 			and effective_date &lt;=#{effctiveDateEnd}
 		</if>
 	</select>	
-
-	
-	
-	
 
 
 	<select id="getPieceTimeReportList2" resultType="Map" parameterType='Map'>	
@@ -644,7 +640,11 @@
 			AND UPPER(bus_number) = #{bus_number}
 		</if>
 		GROUP BY staff_number
-		ORDER BY staff_number;
+		ORDER BY staff_number
+		<if test="offset!=null">
+		 LIMIT #{offset} ,#{pageSize} 
+		</if>
+		;
 	</select>
 	<select id="getPieceTimeReportListCount2" resultType="int" parameterType='Map'>
 	SELECT COUNT(staff_number) as count_num FROM
@@ -676,12 +676,12 @@
 		AND UPPER(bus_number) = #{bus_number}
 	</if>
 	GROUP BY staff_number
-	ORDER BY staff_number
+	ORDER BY staff_number) tmp
 	</select>
 	
 	<select id="getPieceTimeReportStaffList" resultType="String" parameterType='Map' >
-	SELECT DISTINCT s.staff_number  FROM BMS_HR_STAFF_HOURS h 
-	LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id
+	SELECT DISTINCT h.staff_number  FROM BMS_PIECE_PAY_CAL h 
+	<!-- LEFT OUTER JOIN BMS_HR_STAFF s ON h.staff_id = s.id -->
 	WHERE h.factory = #{factory}
 	<if test="workshop !=null and workshop !=''">
 		AND find_in_set(h.workshop,#{workshop})>0
@@ -693,15 +693,15 @@
 		AND team = #{subgroup}
 	</if>
 	<if test="bus_number!=''">
-		AND UPPER(bus_number) = #{bus_number}
+		AND UPPER(h.bus_number) = #{bus_number}
 	</if>
 	<if test="staff_number!=''">
-		AND (s.staff_number = #{staff_number} OR s.name = #{staff_number})
+		AND (h.staff_number = #{staff_number} OR h.staff_name = #{staff_number})
 	</if>
-	AND hour_type = '1'
-	AND h.`status` IN('1', '3') AND h.participation > 0 
+<!-- 	AND hour_type = '1' -->
+	AND h.`status` IN('1', '3') and h.ppay>0
 	AND h.work_date >= #{date_start} AND h.work_date &lt;= #{date_end}
-	ORDER BY s.staff_number
+	ORDER BY h.staff_number
 	<if test="offset!=null">
 		LIMIT #{offset} ,#{pageSize} 
 	</if>
@@ -843,7 +843,7 @@
 	<!-- 计件工时统计优化-谭海文 2016-04-01 -->
 	<select id="getWorkHourReportList" resultType="Map"
 		parameterType='Map'>
-	select
+	<!-- select
 	tmp.staff_id,group_concat(tmp.workHoursType,'=',tmp.participationStr
 	order by tmp.staff_id separator '|') workhours,ss.staff_number,ss.name
 	as staff_name,r.new_value,
@@ -890,7 +890,86 @@
 		LIKE CONCAT('%',#{staff_number},'%'))
 	</if>
 	group by tmp.staff_id
-	ORDER BY ss.staff_number,tmp.workHoursType
+	ORDER BY ss.staff_number,tmp.workHoursType -->
+	
+	select group_concat(tmp.workHoursType,'=',tmp.participationStr order by tmp.staff_number separator '|') workhours,
+	tmp.staff_number,tmp.staff_name,
+	a.D1,a.D2,a.D3,a.D4,a.D5,a.D6,a.D7,a.D8,a.D9,a.D10,a.D11,a.D12,a.D13,a.D14,a.D15,a.D16,a.D17,a.D18,a.D19,a.D20, a.D21,a.D22,a.D23,a.D24,a.D25,a.D26,a.D27,a.D28,a.D29,a.D30,a.D31 
+	from
+	( SELECT a.staff_number,a.staff_name,a.workhour_type workHoursType,
+	group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";') order by work_date separator '') AS participationStr 
+	FROM 
+	(select '计件' workhour_type,pp.staff_number,pp.staff_name,sum(pp.bus_count) sum_participation,pp.work_date 
+	from BMS_PIECE_PAY_CAL pp
+	where pp.work_date like CONCAT(#{work_date},'%') and FIND_IN_SET(pp.status,'1,3') and pp.distribution>0
+	<if test="factory!='全部'">
+		AND pp.factory = #{factory}
+	</if>
+	<if test="workshop!=''">
+		AND FIND_IN_SET(pp.workshop,#{workshop}) >0
+	</if>
+	<if test="group!='全部'">
+		AND pp.workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND pp.team = #{subgroup}
+	</if>
+	GROUP BY pp.staff_number,pp.work_date 
+	union all
+	select '额外' workhour_type,tp.staff_number,tp.staff_name,sum(tp.work_hour) sum_participation,tp.work_date
+	from BMS_TMP_PAY_CAL tp
+	where tp.work_date like CONCAT(#{work_date},'%')  
+	<if test="factory!='全部'">
+		AND tp.factory = #{factory}
+	</if>
+	<if test="workshop!=''">
+		AND FIND_IN_SET(tp.workshop,#{workshop}) >0
+	</if>
+	<if test="group!='全部'">
+		AND tp.workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND tp.team = #{subgroup}
+	</if>
+	GROUP BY tp.staff_number,tp.work_date 
+	union all
+	select '技改' workhour_type,ep.staff_number,ep.staff_name,sum(ep.work_hour) sum_participation,ep.work_date
+	from BMS_ECN_PAY_CAL ep
+	where ep.work_date like CONCAT(#{work_date},'%')  
+	<if test="factory!='全部'">
+		AND ep.factory = #{factory}
+	</if>
+	<if test="workshop!=''">
+		AND FIND_IN_SET(ep.workshop,#{workshop}) >0
+	</if>
+	<if test="group!='全部'">
+		AND ep.workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND ep.team = #{subgroup}
+	</if>
+	GROUP BY ep.staff_number,ep.work_date 
+	union all
+	select '等待' workhour_type,wp.staff_number,wp.staff_name,sum(wp.work_hour) sum_participation,wp.work_date
+	from BMS_WAIT_PAY_CAL wp
+	where wp.work_date like CONCAT(#{work_date},'%')  
+	<if test="factory!='全部'">
+		AND wp.factory = #{factory}
+	</if>
+	<if test="workshop!=''">
+		AND FIND_IN_SET(wp.workshop,#{workshop}) >0
+	</if>
+	<if test="group!='全部'">
+		AND wp.workgroup = #{group}
+	</if>
+	<if test="subgroup!='全部'">
+		AND wp.team = #{subgroup}
+	</if>
+	GROUP BY wp.staff_number,wp.work_date ) a 
+	GROUP BY a.staff_number,a.workhour_type) tmp 
+	LEFT JOIN BMS_HR_STAFF_ATTENDANCE a ON tmp.staff_number = a.staff_number and a.month=#{work_date}
+	group by tmp.staff_number
+	ORDER BY tmp.staff_number,tmp.workHoursType 
 	<if test="offset!=null">
 		LIMIT #{offset} ,#{pageSize}
 	</if>	
@@ -1040,22 +1119,77 @@
 	<!-- 计件工时统计优化-谭海文 2016-04-01 -->
 	<select id="getWorkHourReportListCount" resultType="int"
 		parameterType='Map'>
-		SELECT count(distinct staff_id)
-		FROM BMS_HR_STAFF_HOURS 
-		where status in ('1','3') and (participation>0 or work_hour>0)
+		SELECT count(distinct staff_number)
+		FROM (
+		select '计件' workhour_type,pp.staff_number,pp.staff_name,sum(pp.bus_count) sum_participation,pp.work_date 
+		from BMS_PIECE_PAY_CAL pp
+		where pp.work_date like CONCAT(#{work_date},'%') and FIND_IN_SET(pp.status,'1,3') 
 		<if test="factory!='全部'">
-			AND factory = #{factory}
+			AND pp.factory = #{factory}
 		</if>
 		<if test="workshop!=''">
-			AND FIND_IN_SET(workshop,#{workshop}) >0
+			AND FIND_IN_SET(pp.workshop,#{workshop}) >0
 		</if>
 		<if test="group!='全部'">
-			AND workgroup = #{group}
+			AND pp.workgroup = #{group}
 		</if>
 		<if test="subgroup!='全部'">
-			AND team = #{subgroup}
+			AND pp.team = #{subgroup}
 		</if>
-		and work_date LIKE CONCAT('%',#{work_date},'%');
+		GROUP BY pp.staff_number,pp.work_date 
+		union all
+		select '额外' workhour_type,tp.staff_number,tp.staff_name,sum(tp.work_hour) sum_participation,tp.work_date
+		from BMS_TMP_PAY_CAL tp
+		where tp.work_date like CONCAT(#{work_date},'%')  
+		<if test="factory!='全部'">
+			AND tp.factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(tp.workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND tp.workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND tp.team = #{subgroup}
+		</if>
+		GROUP BY tp.staff_number,tp.work_date 
+		union all
+		select '技改' workhour_type,ep.staff_number,ep.staff_name,sum(ep.work_hour) sum_participation,ep.work_date
+		from BMS_ECN_PAY_CAL ep
+		where ep.work_date like CONCAT(#{work_date},'%')  
+		<if test="factory!='全部'">
+			AND ep.factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(ep.workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND ep.workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND ep.team = #{subgroup}
+		</if>
+		GROUP BY ep.staff_number,ep.work_date 
+		union all
+		select '等待' workhour_type,wp.staff_number,wp.staff_name,sum(wp.work_hour) sum_participation,wp.work_date
+		from BMS_WAIT_PAY_CAL wp
+		where wp.work_date like CONCAT(#{work_date},'%')  
+		<if test="factory!='全部'">
+			AND wp.factory = #{factory}
+		</if>
+		<if test="workshop!=''">
+			AND FIND_IN_SET(wp.workshop,#{workshop}) >0
+		</if>
+		<if test="group!='全部'">
+			AND wp.workgroup = #{group}
+		</if>
+		<if test="subgroup!='全部'">
+			AND wp.team = #{subgroup}
+		</if>
+		GROUP BY wp.staff_number,wp.work_date
+		) tmp
+		
 		<!-- select count(*) from(
 		SELECT
 		u.staff_number,u.staff_name,u.skill_parameter,u.plant_org,u.workshop_org,u.workgroup_org,u.team_org,
@@ -1246,7 +1380,7 @@
 		<if test="subgroup!='全部'">
 			AND w.team = #{subgroup}
 		</if>
-		<if test="staff_number!=null">
+		<if test="staff_number!=null and staff_number !=''">
 			AND (staff_number LIKE CONCAT('%',#{staff_number},'%') OR
 			staff_name LIKE CONCAT('%',#{staff_number},'%'))
 		</if>

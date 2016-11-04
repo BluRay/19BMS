@@ -39,7 +39,7 @@
 						<td>严重等级</td>
 						<td>措施</td>
 						<td>状态</td>
-						<td>故障日期</td><td></td>
+						<td>异常日期</td><td></td>
 					</tr>
 					<tr>
 						<td><select name="" id="search_factory" class="input-small carType"></select></td>

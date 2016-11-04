@@ -427,6 +427,7 @@ $(document).ready(function () {
 	$("#btn_single_bus_num_query_view").click (function () {
 		var order_id = $("#selectBusNumber_orderId_view").val();
 		var factory_id = $("#selectBusNumber_factoryId_view").val();
+		var workshop = $("#selectBusNumber_workshop_view").val();
 		var task_id = $("#selectBusNumber_taskId_view").val();
 		var bus_num_s = $("#bus_num_start_view").val();
 		var bus_num_e = $("#bus_num_end_view").val();
@@ -650,7 +651,7 @@ function ajaxQuery(targetPage){
     			$("<td />").html(value.ready_hour_total).appendTo(tr);
     			/*$("<td />").html(value.noalready).appendTo(tr);*/
     			$("<td  align='center'/>").html("<i name='edit' class=\"fa fa-search\" style=\"cursor: pointer;text-align: center;\" id='imgquery' onclick='ajaxquery("+value.factory_id+","+value.ecn_task_id+")'></i>").appendTo(tr);
-    			$("<td />").html("<i name='edit' class=\"fa fa-search\" style=\"cursor: pointer;text-align: center;\" onclick='getTaskAllSelectedBusNum("+value.order_id+","+value.factory_id+","+value.ecn_task_id+","+value.switch_mode+")'></i>").appendTo(tr);
+    			$("<td />").html("<i name='edit' class=\"fa fa-search\" style=\"cursor: pointer;text-align: center;\" onclick='getTaskAllSelectedBusNum("+value.order_id+","+value.factory_id+","+value.ecn_task_id+","+value.switch_mode+",null,null,\""+value.key_name+"\")'></i>").appendTo(tr);
     			/*if(value.photo=='0'){
     				$("<td />").html("未上传").appendTo(tr);
     			}else if(value.photo=='1'){
@@ -696,17 +697,18 @@ function ajaxQuery(targetPage){
  * @param bus_num_start
  * @param bus_num_end
  */
-function getTaskAllSelectedBusNum(order_id,factoryid,taskid,switch_mode,bus_num_start,bus_num_end){
+function getTaskAllSelectedBusNum(order_id,factoryid,taskid,switch_mode,bus_num_start,bus_num_end,workshop){
 	$("#selectBusNumber_orderId_view").val(order_id);
 	$("#selectBusNumber_factoryId_view").val(factoryid);
+	$("#selectBusNumber_workshop_view").val(workshop);
 	$("#selectBusNumber_taskId_view").val(taskid);
 	$("#selectBusNumber_switch_mode_view").val(switch_mode);
 	var bus_num_start = $("#bus_num_start_view").val()||'';
 	var bus_num_end = $("#bus_num_end_view").val()||'';
 	if(switch_mode=='0'){
-		ajaxShowBusNumber(order_id,taskid,bus_num_start,bus_num_end,factoryid);
+		ajaxShowBusNumber(order_id,taskid,bus_num_start,bus_num_end,factoryid,workshop);
 	}else{
-		querydph(factoryid,taskid,order_id,switch_mode,bus_num_start,bus_num_end);
+		querydph(factoryid,taskid,order_id,switch_mode,bus_num_start,bus_num_end,workshop);
 	}
 }
 
@@ -717,7 +719,7 @@ function getTaskAllSelectedBusNum(order_id,factoryid,taskid,switch_mode,bus_num_
  * @param bus_num_s
  * @param bus_num_e
  */
-function ajaxShowBusNumber(order_id,ecn_task_id,bus_num_s,bus_num_e,factory_id){
+function ajaxShowBusNumber(order_id,ecn_task_id,bus_num_s,bus_num_e,factory_id,workshop){
 	$.ajax({
 		url: "ecnDocumentTask!getEcnTaskBusNumber.action",
 		dataType: "json",
@@ -727,7 +729,8 @@ function ajaxShowBusNumber(order_id,ecn_task_id,bus_num_s,bus_num_e,factory_id){
 				"factory_id":factory_id,
 				"ecn_task_id" : ecn_task_id,
 				"bus_num_start" : bus_num_s||'',
-				"bus_num_end" : bus_num_e||''
+				"bus_num_end" : bus_num_e||'',
+				"workshop":workshop
 		},
 		async: false,
 		error: function () {alert(response.message);},
@@ -760,7 +763,7 @@ function ajaxShowBusNumber(order_id,ecn_task_id,bus_num_s,bus_num_e,factory_id){
  * @param bus_num_start
  * @param bus_num_end
  */
-function querydph(factoryid,taskid,order_id,switch_mode,bus_num_start,bus_num_end){
+function querydph(factoryid,taskid,order_id,switch_mode,bus_num_start,bus_num_end,workshop){
 	$.ajax({
 		url: "ecnDocumentTask!querydphlist.action",
 	    dataType: "json",
@@ -772,6 +775,7 @@ function querydph(factoryid,taskid,order_id,switch_mode,bus_num_start,bus_num_en
 	    	"ecn_switch_mode":switch_mode,
 			"bus_num_start" : bus_num_start,
 			"bus_num_end" : bus_num_end,
+			"workshop":workshop,
 			"status":status
 	    },
 		error : function(response) {
@@ -877,17 +881,18 @@ function singlebusnoQuery(){
  * @param bus_num_start
  * @param bus_num_end
  */
-function getBusNum(order_id,factoryid,taskid,switch_mode){
+function getBusNum(order_id,factoryid,taskid,switch_mode,workshop){
 	$("#selectBusNumber_orderId_view").val(order_id);
 	$("#selectBusNumber_factoryId_view").val(factoryid);
 	$("#selectBusNumber_taskId_view").val(taskid);
+	$("#selectBusNumber_workshop_view").val(workshop);
 	$("#selectBusNumber_switch_mode_view").val(switch_mode);
 	var bus_num_start = $("#bus_num_start_view").val()||'';
 	var bus_num_end = $("#bus_num_end_view").val()||'';
 	if(switch_mode=='0'){
-		ajaxShowBusNumber(order_id,taskid,bus_num_start,bus_num_end,factoryid);
+		ajaxShowBusNumber(order_id,taskid,bus_num_start,bus_num_end,factoryid,workshop);
 	}else{
-		querydph(factoryid,taskid,order_id,switch_mode,bus_num_start,bus_num_end);
+		querydph(factoryid,taskid,order_id,switch_mode,bus_num_start,bus_num_end,workshop);
 	}
 }
 

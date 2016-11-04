@@ -116,11 +116,14 @@ function generateTable(workshop){
 			}
 				
 		});
+		$(tableId+"_tab").addClass("active").css("display","");
+		$(tableId).addClass("active");
 	}
 	function getDetail() {
 		var factoryId=$("#q_factoryId").val();
 		var busNo=$("#q_busNo").val();
-		var conditions="{factoryId:"+factoryId+",busNo:'"+busNo+"'}";
+		var workshop=getQueryString("workshop");
+		var conditions="{factoryId:"+factoryId+",busNo:'"+busNo+"',workshop:'"+workshop+"'}";
 		$.ajax({
 			type : "get",// 使用get方法访问后台
 			dataType : "json",// 返回json格式的数据
@@ -143,10 +146,10 @@ function generateTable(workshop){
 				$("#painting_li").css("display","none");
 				$("#bottom_li").css("display","none");
 				$("#assembly_li").css("display","none");
-				generateTable("焊装");
-				generateTable("涂装");
+				generateTable(workshop);
+				/*generateTable("涂装");
 				generateTable("底盘");
-				generateTable("总装");
+				generateTable("总装");*/
 
 			}
 		});

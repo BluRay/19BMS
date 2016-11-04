@@ -129,7 +129,7 @@ BEGIN
 		from BMS_HR_REWARDS r 
 		left join BMS_HR_STAFF s on s.staff_number=r.staff_number
 		left join BMS_HR_BASE_PRICE p on  p.type=''1'' and r.rewards_date>=p.start_date and r.rewards_date<=p.end_date
-		and p.edit_date=(select max(p1.edit_date) from BMS_HR_BASE_PRICE p1 where  p1.type=p.type ) 
+		and p.edit_date=(select max(p1.edit_date) from BMS_HR_BASE_PRICE p1 where  p1.type=p.type and r.rewards_date>=p1.start_date and r.rewards_date<=p1.end_date) 
 		where 1=1 and substr(r.rewards_date,1,7)=''',q_month,''' and s.staff_number in(''',query_staff_numbers,''')
 		and r.rewards_factory=''',factory,''' and find_in_set(r.rewards_workshop,''',workshop,''')>0
 		group by s.staff_number,substr(r.rewards_date,1,7)');

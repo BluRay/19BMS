@@ -2237,9 +2237,12 @@ public class ProductionAction extends BaseAction<Object>{
 		request.setCharacterEncoding("UTF-8");
 		BmsBus bus = new BmsBus();
 		
-		Map<String,Object> conditionMap=new HashMap<String,Object>();		
+		Map<String,Object> conditionMap=new HashMap<String,Object>();	
+		Map<String,Object> cdMap=new HashMap<String,Object>();
+		cdMap.put("busNo", request.getParameter("bus_number"));
+		cdMap.put("workshop", request.getParameter("workshop_name"));
 		//根据车号查询产品追踪卡模板id
-		Integer tmpid=productionDao.getTrackTplHeaderIdByBusNo(request.getParameter("bus_number"));
+		Integer tmpid=productionDao.getTrackTplHeaderIdByBusNo(cdMap);
 		int tplid=(null==tmpid)?0:tmpid;
 		conditionMap.put("bus_number", request.getParameter("bus_number"));
 		conditionMap.put("tpl_id", tplid);

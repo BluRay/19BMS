@@ -103,12 +103,15 @@ public class OrderConfigInAction extends BaseAction<Object> {
 		result=new HashMap<String,Object>();
 		JSONObject jo=JSONObject.fromObject(conditions);
 		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		Map<String,Object> cMap=new HashMap<String,Object>();
 		String busNo=(String) jo.get("busNo");
 		String workshop=(String) jo.get("workshop");
-		int tplsize=qualityDao.getOcTplHeaderByBusNo(busNo).size();
+		cMap.put("busNo", busNo);
+		cMap.put("workshop", workshop);
+		int tplsize=qualityDao.getOcTplHeaderByBusNo(cMap).size();
 		OrderConfigTplHeaderBean tplHeader=null;
 		if(tplsize>0){
-			tplHeader=qualityDao.getOcTplHeaderByBusNo(busNo).get(0);
+			tplHeader=qualityDao.getOcTplHeaderByBusNo(cMap).get(0);
 			int tplHeaderId=tplHeader.getId();
 			conditionMap.put("tplHeaderId", tplHeaderId);
 			conditionMap.put("workshop", workshop);

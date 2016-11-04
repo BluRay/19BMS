@@ -246,6 +246,7 @@
 	<resultMap type="prodTrackHeader" id="prodTrackHeaderMap">
 		<result property="factoryId" column="factory_id" />
 		<result property="factory" column="factory_name" />
+		<result property="workshop" column="workshop_name" />
 		<result property="orderId" column="order_id" />
 		<result property="order" column="order_name" />
 		<result property="busNo" column="bus_number" />
@@ -278,6 +279,7 @@
 	<resultMap type="ocHeader" id="ocHeaderMap">
 		<result property="factoryId" column="factory_id" />
 		<result property="factory" column="factory_name" />
+		<result property="workshop" column="workshop_name" />
 		<result property="orderId" column="order_id" />
 		<result property="order" column="order_name" />
 		<result property="busNo" column="bus_number" />
@@ -618,11 +620,13 @@
 	</select>
 	<select id="getTrackTplHeaderList" parameterType="Map"
 		resultMap="trackTplHeaderMap">
-		select t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		select distinct t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
 		order_name,c.order_config_name config,t.version,t.memo,u.username
-		editor,t.creat_date edit_date
+		editor,t.creat_date edit_date,k.key_name workshop
 		from
-		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER t
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER t 		
+		left join BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS td  on td.template_tracking_card_id=t.id
+		left join BMS_BASE_KEY k on td.workshop=k.id
 		left join BMS_ORDER o on
 		t.order_id=o.id
 		left join BMS_ORDER_CONFIG c on
@@ -637,40 +641,50 @@
 			and t.bus_type_id=#{busType}
 		</if>
 		<if test="order!=null and  order!=''">
-			and o.order_name=#{order}
+			and (o.order_name like concat('%',#{order},'%') or o.order_no like concat('%',#{order},'%'))
 		</if>
 		<if test="config!=null and  config!=''">
 			and t.order_config_id=#{config}
 		</if>
-		order by t.version desc
+		<if test="workshop !=null and  workshop !=''">
+			and find_in_set(k.key_name,#{workshop})>0
+		</if>
+		order by t.creat_date desc
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
 		</if>
 	</select>
 	<select id="getTrackTplHeaderTotalCount" parameterType="Map"
 		resultType="int">
-		select count(t.id)
+		select count(distinct t.creat_date,k.key_name)
 		from
-		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER t
-		left join BMS_ORDER o on t.order_id=o.id
-		left join BMS_ORDER_CONFIG c
-		on t.order_config_id=c.id
+		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER t 		
+		left join BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS td  on td.template_tracking_card_id=t.id
+		left join BMS_BASE_KEY k on td.workshop=k.id
+		left join BMS_ORDER o on
+		t.order_id=o.id
+		left join BMS_ORDER_CONFIG c on
+		t.order_config_id=c.id
 		left join BMS_BASE_BUS_TYPE b on
 		t.bus_type_id=b.id
-		left join BMS_BASE_USER u on t.creator_id=u.id
+		left join
+		BMS_BASE_USER u on t.creator_id=u.id
 		where
 		1=1
 		<if test="busType!=null and  busType!=''">
 			and t.bus_type_id=#{busType}
 		</if>
 		<if test="order!=null and  order!=''">
-			and o.order_name=#{order}
+			and (o.order_name like concat('%',#{order},'%') or o.order_no like concat('%',#{order},'%'))
 		</if>
 		<if test="config!=null and  config!=''">
 			and t.order_config_id=#{config}
 		</if>
+		<if test="workshop !=null and  workshop !=''">
+			and find_in_set(k.key_name,#{workshop})>0
+		</if>
 	</select>
-	<select id="getTrackTplDetailList" parameterType="int"
+	<select id="getTrackTplDetailList" parameterType="Map"
 		resultMap="trackTplDetailMap">
 		select t.id,t.template_tracking_card_id
 		template_recode_id,t.workshop
@@ -682,9 +696,11 @@
 		BMS_BASE_PARTS p on t.parts_id=p.id
 		left join BMS_BASE_KEY k ON
 		t.workshop=k.id
-		where t.template_tracking_card_id=#{tplHeaderId}
-		order
-		by t.workshop,t.sequence
+		where t.template_tracking_card_id=#{tplHeaderId} 
+		<if test="workshop !=null and  workshop !=''">
+			and k.key_name=#{workshop}
+		</if>
+		order by t.workshop,t.sequence
 	</select>
 	<update id="updateTrackTplDetail" parameterType="java.util.List">
 		<foreach collection="list" item="detail" index="index"
@@ -745,47 +761,15 @@
 	</select>
 	<select id="getOrderConfigTplHeaderList" parameterType="Map"
 		resultMap="ocTplHeaderMap">
-		select t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
+		select distinct t.id,b.internal_name bus_type,CONCAT(o.order_no,' ',o.order_name,b.internal_name,convert(o.order_qty,char))
 		order_name,c.order_config_name config,t.version,t.memo,u.username
-		editor,t.creat_date edit_date
-		from
-		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER t
-		left join BMS_ORDER o
-		on
-		t.order_id=o.id
-		left join BMS_ORDER_CONFIG c on
-		t.order_config_id=c.id
-		left join BMS_BASE_BUS_TYPE b on
-		t.bus_type_id=b.id
-		left join
-		BMS_BASE_USER u on t.creator_id=u.id
-		where
-		1=1
-		<if test="busType!=null and  busType!=''">
-			and t.bus_type_id=#{busType}
-		</if>
-		<if test="order!=null and  order!=''">
-			and o.order_name=#{order}
-		</if>
-		<if test="config!=null and  config!=''">
-			and t.order_config_id=#{config}
-		</if>
-		order by t.version desc
-		<if test="offset!=null">
-			LIMIT #{offset} ,#{pageSize}
-		</if>
-	</select>
-	<select id="getOrderConfigTplHeaderTotalCount" parameterType="Map"
-		resultType="int">
-		select count(t.id)
-		from
-		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER
-		t
+		editor,t.creat_date edit_date,k.key_name workshop
+		from BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER t
+		left join BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_DETAILS td on td.tconfig_id=t.id
+		left join BMS_BASE_KEY k on td.workshop=k.id
 		left join BMS_ORDER o on t.order_id=o.id
-		left join BMS_ORDER_CONFIG c
-		on t.order_config_id=c.id
-		left join BMS_BASE_BUS_TYPE b on
-		t.bus_type_id=b.id
+		left join BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
 		left join BMS_BASE_USER u on t.creator_id=u.id
 		where
 		1=1
@@ -798,24 +782,52 @@
 		<if test="config!=null and  config!=''">
 			and t.order_config_id=#{config}
 		</if>
+		<if test="workshop !=null and  workshop !=''">
+			and find_in_set(k.key_name,#{workshop})>0
+		</if>
+		order by t.creat_date desc
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
 	</select>
-	<select id="getOrderConfigTplDetailList" parameterType="int"
+	<select id="getOrderConfigTplHeaderTotalCount" parameterType="Map"
+		resultType="int">
+		select count(distinct t.creat_date,k.key_name)
+		from BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER t
+		left join BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_DETAILS td on td.tconfig_id=t.id
+		left join BMS_BASE_KEY k on td.workshop=k.id
+		left join BMS_ORDER o on t.order_id=o.id
+		left join BMS_ORDER_CONFIG c on t.order_config_id=c.id
+		left join BMS_BASE_BUS_TYPE b on t.bus_type_id=b.id
+		left join BMS_BASE_USER u on t.creator_id=u.id
+		where
+		1=1
+		<if test="busType!=null and  busType!=''">
+			and t.bus_type_id=#{busType}
+		</if>
+		<if test="order!=null and  order!=''">
+			and o.order_name=#{order}
+		</if>
+		<if test="config!=null and  config!=''">
+			and t.order_config_id=#{config}
+		</if>
+		<if test="workshop !=null and  workshop !=''">
+			and find_in_set(k.key_name,#{workshop})>0
+		</if>
+	</select>
+	<select id="getOrderConfigTplDetailList" parameterType="Map"
 		resultMap="ocTplDetailMap">
-		select t.id,t.tconfig_id
-		template_recode_id,t.workshop
-		workshop_id,
-		k.key_name
-		workshop,t.sequence,t.parts_id,p.parts_name
-		parts,t.parts_number,t.vendor,t.memo
-		from
-		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_DETAILS t left join
-		BMS_BASE_PARTS p on t.parts_id=p.id
-		left join BMS_BASE_KEY k ON
-		t.workshop=k.id
+		select t.id,t.tconfig_id template_recode_id,t.workshop workshop_id,
+		k.key_name workshop,t.sequence,t.parts_id,p.parts_name parts,
+		t.parts_number,t.vendor,t.memo
+		from BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_DETAILS t 
+		left join BMS_BASE_PARTS p on t.parts_id=p.id
+		left join BMS_BASE_KEY k ON t.workshop=k.id
 		where t.tconfig_id=#{tplHeaderId}
-		order
-		by
-		t.workshop,t.sequence
+		<if test="workshop !=null and  workshop !=''">
+			and k.key_name=#{workshop}
+		</if>
+		order by t.workshop,t.sequence
 	</select>
 	<update id="updateOrderConfigTplDetail" parameterType="java.util.List">
 		<foreach collection="list" item="detail" index="index"
@@ -1414,9 +1426,9 @@
 	</update>
 	<!-- 检验记录录入 end -->
 	<!-- 产品追踪卡录入 start -->
-	<select id="getTrackTplHeaderByBusNo" parameterType="String"
+	<select id="getTrackTplHeaderByBusNo" parameterType="Map"
 		resultMap="trackTplHeaderMap">
-		select * from (
+		select distinct detail.id from (
 (select h.id,h.version,tmp.*,1 detail_index from
 		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER h
 		,(select
@@ -1465,6 +1477,9 @@
 		where
 		h.bus_type_id=tmp.bus_type_id
 		) )detail
+		left join BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS td on detail.id=td.template_tracking_card_id
+		left join BMS_BASE_KEY k on k.id=td.workshop
+		where k.key_name=#{workshop}
 	order by detail.detail_index asc,detail.version desc
 	</select>
 	<select id="getTrackTplDetails" parameterType="Map"
@@ -1519,53 +1534,62 @@
 		<if test="workshopId !=null and workshopId !=''">
 			and c.workshop_id=#{workshopId}
 		</if>
+		<if test="workshop !=null and workshop !=''">
+			and w.workshop_name=#{workshop}
+		</if>
 
 	</select>
 	<select id="getProdTrackHeaderList" parameterType="Map"
 		resultMap="prodTrackHeaderMap">
-		select 
-		c.bus_number,c.factory_id,f.factory_name,b.order_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,t.internal_name
-		bus_type,g.order_config_name config,c.editor_id,c.edit_date,u.username
-		from BMS_QM_PRODUCT_TRACKING_CARD c
-		left join BMS_PLAN_BUS b on c.bus_number = b.bus_number
-		left join
-		BMS_BASE_FACTORY f on c.factory_id=f.id
-		left join BMS_ORDER o on
-		b.order_id=o.id
-		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
-		left join BMS_ORDER_CONFIG g on b.order_cofig_id=g.id
-		left join BMS_BASE_USER u on c.editor_id=u.id
-		where 1=1
+		select c.bus_number,c.factory_id,f.factory_name,w.workshop_name,b.order_id,
+		CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,t.internal_name bus_type,
+		g.order_config_name config,c.editor_id,c.edit_date,u.username 
+		from BMS_QM_PRODUCT_TRACKING_CARD c 
+		left join BMS_BASE_WORKSHOP w on w.id=c.workshop_id 
+		left join BMS_PLAN_BUS b on c.bus_number = b.bus_number 
+		left join BMS_BASE_FACTORY f on c.factory_id=f.id 
+		left join BMS_ORDER o on b.order_id=o.id 
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id 
+		left join BMS_ORDER_CONFIG g on b.order_cofig_id=g.id 
+		left join BMS_BASE_USER u on c.editor_id=u.id 
+		where 1=1 
 		<if test="factoryId !=null and factoryId !=0 ">
 			and c.factory_id=#{factoryId}
 		</if>
+		<if test="workshop !=null and workshop !='' ">
+			and find_in_set(w.workshop_name,#{workshop})>0
+		</if>
 		<if test="orderName !=null and orderName !=''">
-			and o.order_name like CONCAT('%',#{orderName},'%')
+			and (o.order_name like CONCAT('%',#{orderName},'%') or o.order_no like CONCAT('%',#{orderName},'%'))
 		</if>
 		<if test="busNo !=null and busNo !=''">
 			and c.bus_number=#{busNo}
 		</if>
-		group by c.bus_number
-		order by c.edit_date desc
+		group by c.bus_number,w.workshop_name
+		order by c.edit_date desc		
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
 		</if>
 	</select>
 	<select id="getProdTrackHeaderCount" parameterType="Map"
 		resultType="int">
-		select count(distinct c.bus_number)
+		select count(distinct c.bus_number,w.workshop_name)
 		from BMS_QM_PRODUCT_TRACKING_CARD c
 		left join BMS_PLAN_BUS b on c.bus_number = b.bus_number
 		left join
 		BMS_BASE_FACTORY f on c.factory_id=f.id
 		left join BMS_ORDER o on
 		b.order_id=o.id
+		left join BMS_BASE_WORKSHOP w on w.id=c.workshop_id 
 		where 1=1
 		<if test="factoryId !=null and factoryId !=0 ">
 			and c.factory_id=#{factoryId}
 		</if>
+		<if test="workshop !=null and workshop !='' ">
+			and find_in_set(w.workshop_name,#{workshop})>0
+		</if>
 		<if test="orderName !=null and orderName !=''">
-			and o.order_name like CONCAT('%',#{orderName},'%')
+			and (o.order_name like CONCAT('%',#{orderName},'%') or o.order_no like CONCAT('%',#{orderName},'%'))
 		</if>
 		<if test="busNo !=null and busNo !=''">
 			and c.bus_number=#{busNo}
@@ -1600,9 +1624,9 @@
 	</select>
 	<!-- 产品追踪卡录入 end -->
 	<!-- 订单配置与一致性录入 start -->
-	<select id="getOcTplHeaderByBusNo" parameterType="String"
+	<select id="getOcTplHeaderByBusNo" parameterType="Map"
 		resultMap="ocTplHeaderMap">
-	select * from (	
+	select distinct detail.id from (	
 (select h.id,h.version,tmp.*,1 detail_index from
 		BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_HEADER h
 		,(select
@@ -1651,7 +1675,11 @@
 		) tmp
 		where h.bus_type_id=tmp.bus_type_id
     )
-)  detail order by detail.detail_index asc, detail.version desc
+)  detail 
+	left join BMS_QM_CONFIG_CONFORMITY_RECORD_TEMPLATE_DETAILS td on detail.id=td.tconfig_id
+	left join BMS_BASE_KEY k on k.id=td.workshop
+	where k.key_name=#{workshop}
+	order by detail.detail_index asc, detail.version desc
     
 	</select>
 	<select id="getOcTplDetails" parameterType="Map" resultMap="ocTplDetailMap">
@@ -1708,15 +1736,19 @@
 		<if test="workshopId !=null and workshopId !=''">
 			and c.workshop_id=#{workshopId}
 		</if>
+		<if test="workshop !=null and workshop !=''">
+			and w.workshop_name=#{workshop}
+		</if>
 	</select>
 
 	<select id="getOrderConfigHeaderList" parameterType="Map"
 		resultMap="ocHeaderMap">
 		select distinct
-		c.bus_number,c.factory_id,f.factory_name,b.order_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,t.internal_name
+		c.bus_number,c.factory_id,f.factory_name,w.workshop_name,b.order_id,CONCAT(o.order_no,' ',o.order_name,t.internal_name,convert(o.order_qty,char)) order_name,t.internal_name
 		bus_type,g.order_config_name config,c.editor_id,c.edit_date,u.username
 		from
 		BMS_QM_CONFIG_CONFORMITY_RECORD c
+		left join BMS_BASE_WORKSHOP w on w.id=c.workshop_id
 		left join BMS_PLAN_BUS b on
 		c.bus_number = b.bus_number
 		left join
@@ -1733,8 +1765,11 @@
 		<if test="factoryId !=null and factoryId !=0 ">
 			and c.factory_id=#{factoryId}
 		</if>
+		<if test="workshop !=null and workshop !='' ">
+			and find_in_set(w.workshop_name,#{workshop})>0
+		</if>
 		<if test="orderName !=null and orderName !=''">
-			and o.order_name like CONCAT('%',#{orderName},'%')
+			and (o.order_name like CONCAT('%',#{orderName},'%') or o.order_no like CONCAT('%',#{orderName},'%'))
 		</if>
 		<if test="busNo !=null and busNo !=''">
 			and c.bus_number=#{busNo}
@@ -1746,9 +1781,10 @@
 	</select>
 	<select id="getOrderConfigHeaderCount" parameterType="Map"
 		resultType="int">
-		select count(distinct c.bus_number)
+		select count(distinct c.bus_number,w.workshop_name)
 		from
 		BMS_QM_CONFIG_CONFORMITY_RECORD c
+		left join BMS_BASE_WORKSHOP w on w.id=c.workshop_id
 		left join BMS_PLAN_BUS b on
 		c.bus_number = b.bus_number
 		left join
@@ -1760,8 +1796,11 @@
 		<if test="factoryId !=null and factoryId !=0 ">
 			and c.factory_id=#{factoryId}
 		</if>
+		<if test="workshop !=null and workshop !='' ">
+			and find_in_set(w.workshop_name,#{workshop})>0
+		</if>
 		<if test="orderName !=null and orderName !=''">
-			and o.order_name like CONCAT('%',#{orderName},'%')
+			and (o.order_name like CONCAT('%',#{orderName},'%') or o.order_no like CONCAT('%',#{orderName},'%'))
 		</if>
 		<if test="busNo !=null and busNo !=''">
 			and c.bus_number=#{busNo}

@@ -668,6 +668,15 @@
 		
 	</select>
 	
+	<select id="getWorkshopSelectAuth_Key" parameterType="Map" resultType="Map">		
+		select distinct k.id,k.key_name name
+		from BMS_BASE_USER u
+		left join BMS_BASE_USER_ROLE r on r.user_id=u.id
+		left join BMS_BASE_ROLE_AUTHORITY a on r.role_id=a.role_id
+		left join BMS_BASE_KEY k on find_in_set(k.key_name,r.workshop)>0
+		where r.workshop !='' and u.id=#{userId} and a.url =#{url}
+	</select>
+	
 	<select id="getWorkshopSelectOrgAuth" parameterType="Map"
 		resultType="Map">
 		select o.*

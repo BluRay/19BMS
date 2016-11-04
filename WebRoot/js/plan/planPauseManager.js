@@ -38,7 +38,7 @@ $(document).ready(function () {
 				type : "get",
 				data : data,
 				success: function (data) { 
-					orderlist = data;
+					order_list = data;
 					var results = new Array();
 					$.each(data, function(index, value) {
 						results.push(value.orderNo);
@@ -52,7 +52,7 @@ $(document).ready(function () {
 			var order_name = "";
 			var bus_type = "";
 			var order_qty = "";
-			$.each(orderlist, function(index, value) {
+			$.each(order_list, function(index, value) {
 				if (value.orderNo == item) {
 					order_name = value.name;
 					bus_type = value.busType;
@@ -65,7 +65,7 @@ $(document).ready(function () {
 			return true;
 		},
 		updater : function(item) {
-			$.each(orderlist, function(index, value) {
+			$.each(order_list, function(index, value) {
 				if (value.orderNo == item) {
 					selectId = value.id;
 					var order_li="<li class=\"search-choice\"><span>"+
@@ -75,7 +75,7 @@ $(document).ready(function () {
 					$("#order_area ul").append(order_li);
 					$("#order_no_list").hide();
 					$("#order_area").show();
-					orderlist.push(value.orderNo);
+					orderlist.push(obj.orderNo);
 					orderDescList.push(value.orderNo+" "+value.name + " " + value.busType +" "+ value.orderQty+"台 ");
 				}
 			})

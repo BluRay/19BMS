@@ -284,6 +284,8 @@ function generateTable(workshop){
 				showAddEmpty=false;
 			}				
 		});
+		$(tableId+"_tab").addClass("active").css("display","");
+		$(tableId).addClass("active");
 		
 		if(showAddEmpty){
 			if(cworkshop=="焊装"){
@@ -329,12 +331,13 @@ function generateTable(workshop){
 			dataType : "json",// 返回json格式的数据
 			url : "trackTpl!getTplDetail.action",
 			data : {
-				"tplHeader.id" : $('#tplHeaderId').val()
+				"tplHeader.id" : $('#tplHeaderId').val(),
+				"tplHeader.workshop" : getQueryString("tplHeader.workshop")
 			},
 			success : function(response) {
 				var tplarray = response.dataList;
 				detaillist = tplarray;
-				generateTable("焊装");
+				generateTable(getQueryString("tplHeader.workshop"));
 
 			}
 		});

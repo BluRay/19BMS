@@ -78,6 +78,7 @@ public class TrackTplAction extends BaseAction<Object> {
 		conditionMap.put("busType", tplHeader.getBusType());
 		conditionMap.put("order", tplHeader.getOrder());
 		conditionMap.put("config", tplHeader.getConfig());
+		conditionMap.put("workshop", tplHeader.getWorkshop());
 		conditionMap.put("offset",(pager.getCurPage() - 1) * pager.getPageSize());
 		conditionMap.put("pageSize", pager.getPageSize());
 		result.put("dataList", qualityDao.getTrackTplHeaderList(conditionMap));
@@ -98,8 +99,11 @@ public class TrackTplAction extends BaseAction<Object> {
 	 */
 	public String getTplDetail() {
 		result = new HashMap<String, Object>();
+		Map<String, Object> conditionMap=new HashMap<String,Object>();
+		conditionMap.put("tplHeaderId", tplHeader.getId());
+		conditionMap.put("workshop", tplHeader.getWorkshop());
 		result.put("dataList",
-				qualityDao.getTrackTplDetailList(tplHeader.getId()));
+				qualityDao.getTrackTplDetailList(conditionMap));
 		return SUCCESS;
 	};
 	/**
