@@ -122,6 +122,12 @@
 		<if test="ecn_type !=null and ecn_type !=''">
 			<![CDATA[	and c.ecn_type =#{ecn_type}]]>
 		</if>
+		<if test="start_date !=null and start_date !=''">
+			and c.ecn_document_date>=#{start_date}
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and c.ecn_document_date&lt;=#{end_date}
+		</if>
 		<![CDATA[ GROUP BY c.ECN_Document_Number,b.ecn_id,b.task_number,b.id,b.task_content,b.ecn_number ]]>
 		ORDER BY c.status asc,c.ecn_document_date desc,c.ecn_document_number
 		desc,b.status asc,b.task_number asc,b.id asc
@@ -172,6 +178,12 @@
 		</if>
 		<if test="ecn_type !=null and ecn_type !=''">
 			<![CDATA[	and c.ecn_type =#{ecn_type}]]>
+		</if>
+		<if test="start_date !=null and start_date !=''">
+			and c.ecn_document_date>=#{start_date}
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and c.ecn_document_date&lt;=#{end_date}
 		</if>
 		<![CDATA[ GROUP BY c.ECN_Document_Number,b.ecn_id,b.task_number,b.id,b.task_content,b.ecn_number
 		 ) t]]>
@@ -350,7 +362,8 @@
 		already,
 		b.ecn_number-(select count(d.bus_number) from
 		BMS_ECN_TASK_DETAIL d where d.ecn_task_id=b.id and d.status='1' and d.workshop=(select k.key_name from BMS_BASE_KEY k WHERE k.id=t.workshop_id)) as
-		noalready,h.total_work_hour,ifnull(h1.ready_hour_total,0) ready_hour_total
+		noalready,h.total_work_hour,ifnull(h1.ready_hour_total,0) ready_hour_total,
+		c.ecn_document_file
 		from BMS_ECN_TIME t
 		left join BMS_ECN_TASK b on b.id=t.ecn_task_id
 		left join BMS_ECN_DOCUMENT c on b.ecn_id = c.id
@@ -455,6 +468,12 @@
 			</if>
 			
 		</if>
+		<if test="start_date !=null and start_date !=''">
+			and c.ecn_document_date>=#{start_date}
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and c.ecn_document_date&lt;=#{end_date}
+		</if>
 		ORDER BY c.ecn_document_date desc,c.ecn_document_number desc,b.status asc,b.task_number asc,b.id asc
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
@@ -506,7 +525,7 @@
 		left join BMS_BASE_FACTORY d on b.ecn_factory_id = d.id
 		left join BMS_ORDER o on b.ecn_order_id = o.id
 		left join BMS_BASE_KEY k on k.key_name = h.workshop
-		where h.hour_type='3' 
+		where h.hour_type='3' and h.status in('0','2')
 		<if test="task_content!=null and task_content!='' ">
 				<![CDATA[ and b.task_content like CONCAT('%',#{task_content},'%')]]>
 		</if>
@@ -570,6 +589,12 @@
 			<if test="hourstatus=='已审批'">
 				and (h.total_work_hour is null or h.total_work_hour=0)
 			</if>
+		</if>
+		<if test="start_date !=null and start_date !=''">
+			and c.ecn_document_date>=#{start_date}
+		</if>
+		<if test="end_date !=null and end_date !=''">
+			and c.ecn_document_date&lt;=#{end_date}
 		</if>
 	</select>
 	<!-- 删除 -->

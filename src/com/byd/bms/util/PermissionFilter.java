@@ -66,7 +66,7 @@ public class PermissionFilter implements Filter {
 			if ((session == null || user == null)&&StringUtils.isEmpty(loginName)) {// *用户登录以后需手动添加session
 				System.out.println("request.getContextPath()="
 						+ request.getContextPath());
-				response.sendRedirect(request.getContextPath() + "/login.jsp");// 如果session为空表示用户没有登录就重定向到login.jsp页面
+				response.sendRedirect("login.jsp");// 如果session为空表示用户没有登录就重定向到login.jsp页面
 				return;
 			} else {
 				if(currentURL.indexOf("account!")>0){

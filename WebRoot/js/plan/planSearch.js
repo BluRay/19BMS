@@ -166,8 +166,32 @@ function getSearch(){
         		treal_rk+=(value.key_name=='入库'?parseInt(value.real_qty):0);
     			
     		});
+    		$("#tr_plan").find("td").eq("1").html(tplan_zzj);
+    		$("#tr_plan").find("td").eq("2").html(tplan_bjoff);
+    		$("#tr_plan").find("td").eq("3").html(tplan_hzon);
+    		$("#tr_plan").find("td").eq("4").html(tplan_tzon);
+    		$("#tr_plan").find("td").eq("5").html(tplan_dpon);
+    		$("#tr_plan").find("td").eq("6").html(tplan_zzoff);
+    		$("#tr_plan").find("td").eq("7").html(tplan_rk);
     		
-    		$("#tr_zzj").find("td").eq("1").html(tplan_zzj);
+    		$("#tr_realDone").find("td").eq("1").html(treal_zzj);
+    		$("#tr_realDone").find("td").eq("2").html(treal_bjoff);
+    		$("#tr_realDone").find("td").eq("3").html(treal_hzon);
+    		$("#tr_realDone").find("td").eq("4").html(treal_tzon);
+    		$("#tr_realDone").find("td").eq("5").html(treal_dpon);
+    		$("#tr_realDone").find("td").eq("6").html(treal_zzon);
+    		$("#tr_realDone").find("td").eq("7").html(treal_rk);
+    		
+    		$("#tr_doneRate").find("td").eq("1").html(tplan_zzj==0?"-":(Math.round(treal_zzj/tplan_zzj * 10000) / 100.00 + "%"));
+    		$("#tr_doneRate").find("td").eq("2").html(tplan_bjoff==0?"-":(Math.round(treal_bjoff/tplan_bjoff * 10000) / 100.00 + "%"));
+    		$("#tr_doneRate").find("td").eq("3").html(tplan_hzon==0?"-":(Math.round(treal_hzon/tplan_hzon * 10000) / 100.00 + "%"));
+    		$("#tr_doneRate").find("td").eq("4").html(tplan_tzon==0?"-":(Math.round(treal_tzon/tplan_tzon * 10000) / 100.00 + "%"));
+    		$("#tr_doneRate").find("td").eq("5").html(tplan_dpon==0?"-":(Math.round(treal_dpon/tplan_dpon * 10000) / 100.00 + "%"));
+    		$("#tr_doneRate").find("td").eq("6").html(tplan_zzoff==0?"-":(Math.round(treal_zzoff/tplan_zzoff * 10000) / 100.00 + "%"));
+    		$("#tr_doneRate").find("td").eq("7").html(tplan_rk==0?"-":(Math.round(treal_rk/tplan_rk * 10000) / 100.00 + "%"));
+    		
+    		
+    		/*$("#tr_zzj").find("td").eq("1").html(tplan_zzj);
     		$("#tr_zzj").find("td").eq("2").html(treal_zzj);
     		$("#tr_zzj").find("td").eq("3").html(tplan_zzj==0?"-":(Math.round(treal_zzj/tplan_zzj * 10000) / 100.00 + "%"));
     		$("#tr_bjon").find("td").eq("1").html(tplan_bjon);
@@ -202,7 +226,7 @@ function getSearch(){
     		$("#tr_zzoff").find("td").eq("3").html(tplan_zzoff==0?"-":(Math.round(treal_zzoff/tplan_zzoff * 10000) / 100.00 + "%"));
     		$("#tr_rk").find("td").eq("1").html(tplan_rk);
     		$("#tr_rk").find("td").eq("2").html(treal_rk);
-    		$("#tr_rk").find("td").eq("3").html(tplan_rk==0?"-":(Math.round(treal_rk/tplan_rk * 10000) / 100.00 + "%"));
+    		$("#tr_rk").find("td").eq("3").html(tplan_rk==0?"-":(Math.round(treal_rk/tplan_rk * 10000) / 100.00 + "%"));*/
 	    }
 	});
 }
@@ -269,7 +293,11 @@ function getDetail(){
     		$.each(response.data,function (index,value) {
     			if ((workshop == "全部" )||((value.workshop).indexOf(workshop)>=0)){
     				var tr = $("<tr id= '"+value.id+"'/>");
-        			$("<td style=\"text-align:center; width:70px;\" />").html(value.order_no).appendTo(tr);
+    				/*if(order_no==value.order_no){
+    					var rowspan=parseInt($("#order_"+order_no).attr("rowspan"));
+    					$("#order_"+order_no).attr("rowspan",rowspan+1);
+    				}else
+    					*/$("<td id='order_"+value.order_no+"' style=\"text-align:center; width:70px;\" />").html(value.order_no).appendTo(tr);
         			order_no = value.order_no;
         			$("<td style=\"text-align:center; width:105px;\" />").html(value.workshop).appendTo(tr);
         			$("<td style=\"text-align:center; width:55px;\" />").html(value.D1).appendTo(tr);
@@ -344,6 +372,8 @@ function getDetail(){
         			//增加达成率
         			if((index+1)%2==0){
         				var tr = $("<tr id= '"+value.id+"'/>");
+        				/*var rowspan=parseInt($("#order_"+order_no).attr("rowspan"));
+    					$("#order_"+order_no).attr("rowspan",rowspan+1);*/
         				$("<td colSpan='1' style=\"text-align:center; text-align:center; width:70px;\" />").html(order_no).appendTo(tr);
             			$("<td colSpan='1' style=\"text-align:center; width:105px;\" />").html("达成率").appendTo(tr);
             			$("<td style=\"text-align:center; width:55px;\" />").html(rate(realQty1,planQty1)).appendTo(tr);

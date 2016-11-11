@@ -75,44 +75,60 @@
 	<thead>
          <tr id='0'>
         	<th style="text-align:center;">生产车间</th>
-            <th style="text-align:center;">计划数量</th>
-            <th style="text-align:center;">实际完成量</th>
-            <th style="text-align:center;">实际达成率</th>
+            <th style="text-align:center;">自制件下线</th>
+            <th style="text-align:center;">部件下线</th>
+            <th style="text-align:center;">焊装上线</th>
+            <th style="text-align:center;">涂装上线</th>
+            <th style="text-align:center;">底盘上线</th>
+            <th style="text-align:center;">总装下线</th>
+            <th style="text-align:center;">入库</th>
         </tr>
     </thead>
 	<tbody>
-		<tr id="tr_zzj">
-			<td>自制件下线</td>
+		<tr id="tr_plan">
+			<td>计划数量</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>
 		</tr>
-		<tr id="tr_bjon">
+	<!-- 	<tr id="tr_bjon">
 			<td>部件上线</td>
 			<td></td>
 			<td></td>
 			<td></td>
-		</tr>
-		<tr id="tr_bjoff">
-			<td>部件下线</td>
+		</tr> -->
+		<tr id="tr_realDone">
+			<td>实际完成量</td>
 			<td></td>
 			<td></td>
 			<td></td>
-		</tr>
-		<tr id="tr_hzon">
-			<td>焊装上线</td>
+			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>
 		</tr>
-		<tr id="tr_hzoff">
+		<tr id="tr_doneRate">
+			<td>实际达成率</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+<!-- 		<tr id="tr_hzoff">
 			<td>焊装下线</td>
 			<td></td>
 			<td></td>
 			<td></td>
-		</tr>
-		<tr id="tr_tzon">
-			<td>涂装上线</td>
+		</tr> -->
+		<!-- <tr id="tr_tzon">
+			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>
@@ -123,12 +139,12 @@
 			<td></td>
 			<td></td>
 		</tr>
-		<tr id="tr_dpon">
-			<td>底盘上线</td>
+ 		<tr id="tr_dpon">
 			<td></td>
 			<td></td>
 			<td></td>
-		</tr>
+			<td></td>
+		</tr> 
 		<tr id="tr_dpoff">
 			<td>底盘下线</td>
 			<td></td>
@@ -142,17 +158,17 @@
 			<td></td>
 		</tr>
 		<tr id="tr_zzoff">
-			<td>总装下线</td>
+			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>
 		</tr>
 		<tr id="tr_rk">
-			<td>入库</td>
 			<td></td>
 			<td></td>
 			<td></td>
-		</tr>
+			<td></td>
+		</tr> -->
 	</tbody>
 </table>
 

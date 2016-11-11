@@ -221,6 +221,8 @@ function ajaxQuery(targetPage){
 	    	"search_factory": $('#search_factory').val(),
 	    	"search_workshop": workshop,
 	    	"taskstatus": $('#taskstatus').val(),
+	    	"start_date":$('#startDate').val(),
+	    	"end_date":$('#endDate').val(),
 	    	"pager.pageSize":pageSize||20,
 			"pager.curPage":targetPage || 1
 	    },
@@ -251,6 +253,8 @@ function ajaxQuery(targetPage){
     		var switch_mode_id = "";
     		var switch_mode_id_index = 0;
     		
+    		var ecn_file_id="";
+    		
     		$.each(response.data,function(index,value){
     			var tr=$("<tr />");
     			
@@ -267,17 +271,24 @@ function ajaxQuery(targetPage){
 					ecn_id = "#ecn_" + ecn_index;
 					ecn_index += 1;
 				}
-				// 下单日期
+				// 下单日期、技改单附件
 				if (value.ecn_id == last_ecn_id) {
 					var noderowspan = parseInt($(ecn_document_date_id).attr(
 							"rowspan"));
 					$(ecn_document_date_id).attr("rowspan", noderowspan + 1);
+					$(ecn_file_id).attr("rowspan", noderowspan + 1)
 				} else {
 					$(
 						"<td id='ecn_document_date_" + ecn_document_date_id_index
 									+ "' rowspan='1' " + "/>").html(
 							value.ecn_document_date).appendTo(tr);
+					var file_url=value.ecn_document_file==undefined?"":"<a href='file/upload/ecn/"+value.ecn_document_file+"'>查看</a>";
+					$(
+							"<td id='ecn_document_file_" + ecn_document_date_id_index
+										+ "' rowspan='1' " + "/>").html(file_url).appendTo(tr);
+					
 					ecn_document_date_id = "#ecn_document_date_" + ecn_document_date_id_index;
+					ecn_file_id="#ecn_document_file_" + ecn_document_date_id_index;
 					ecn_document_date_id_index += 1;
 				}
     			//$("<td />").html(value.ecn_document_date).appendTo(tr);

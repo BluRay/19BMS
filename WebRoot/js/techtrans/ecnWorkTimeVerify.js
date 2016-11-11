@@ -207,6 +207,8 @@ function ajaxQuery(targetPage){
 	    	"search_factory": $('#search_factory').val(),
 	    	"search_workshop": workshop,
 	    	/*"taskstatus": $('#taskstatus').val(),*/
+	    	"start_date":$('#startDate').val(),
+	    	"end_date":$('#endDate').val(),
 	    	"hourstatus": $('#taskstatus').val(),
 	    	"actionType":"verify",
 	    	"pager.pageSize":pageSize||20,

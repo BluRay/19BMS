@@ -124,6 +124,8 @@ function ajaxQuery(targetPage){
 	    	"status": $('#status').val(),
 	    	"ecn_type":$("#search_ecn_type").val(),
 	    	/*"search_workshop": $('#search_workshop :selected').text(),*/
+	    	"start_date":$('#startDate').val(),
+	    	"end_date":$('#endDate').val(),
 	    	"pager.pageSize":pageSize||10,
 			"pager.curPage":targetPage || 1
 	    },

@@ -914,9 +914,12 @@
 	<if test="subgroup!='全部'">
 		AND pp.team = #{subgroup}
 	</if>
+	<if test="staff_number!=''">
+		AND (pp.staff_number = #{staff_number} OR pp.staff_name = #{staff_number})
+	</if>
 	GROUP BY pp.staff_number,pp.work_date 
 	union all
-	select '额外' workhour_type,tp.staff_number,tp.staff_name,sum(tp.work_hour) sum_participation,tp.work_date
+	select '额外' workhour_type,tp.staff_number,tp.staff_name,sum(tp.real_work_hour) sum_participation,tp.work_date
 	from BMS_TMP_PAY_CAL tp
 	where tp.work_date like CONCAT(#{work_date},'%')  
 	<if test="factory!='全部'">
@@ -931,9 +934,12 @@
 	<if test="subgroup!='全部'">
 		AND tp.team = #{subgroup}
 	</if>
+	<if test="staff_number!=''">
+		AND (tp.staff_number = #{staff_number} OR tp.staff_name = #{staff_number})
+	</if>
 	GROUP BY tp.staff_number,tp.work_date 
 	union all
-	select '技改' workhour_type,ep.staff_number,ep.staff_name,sum(ep.work_hour) sum_participation,ep.work_date
+	select '技改' workhour_type,ep.staff_number,ep.staff_name,sum(ep.real_work_hour) sum_participation,ep.work_date
 	from BMS_ECN_PAY_CAL ep
 	where ep.work_date like CONCAT(#{work_date},'%')  
 	<if test="factory!='全部'">
@@ -947,6 +953,9 @@
 	</if>
 	<if test="subgroup!='全部'">
 		AND ep.team = #{subgroup}
+	</if>
+	<if test="staff_number!=''">
+		AND (ep.staff_number = #{staff_number} OR ep.staff_name = #{staff_number})
 	</if>
 	GROUP BY ep.staff_number,ep.work_date 
 	union all
@@ -964,6 +973,9 @@
 	</if>
 	<if test="subgroup!='全部'">
 		AND wp.team = #{subgroup}
+	</if>
+	<if test="staff_number!=''">
+		AND (wp.staff_number = #{staff_number} OR wp.staff_name = #{staff_number})
 	</if>
 	GROUP BY wp.staff_number,wp.work_date ) a 
 	GROUP BY a.staff_number,a.workhour_type) tmp 
@@ -1136,6 +1148,9 @@
 		<if test="subgroup!='全部'">
 			AND pp.team = #{subgroup}
 		</if>
+		<if test="staff_number!=''">
+			AND (pp.staff_number = #{staff_number} OR pp.staff_name = #{staff_number})
+		</if>
 		GROUP BY pp.staff_number,pp.work_date 
 		union all
 		select '额外' workhour_type,tp.staff_number,tp.staff_name,sum(tp.work_hour) sum_participation,tp.work_date
@@ -1152,6 +1167,9 @@
 		</if>
 		<if test="subgroup!='全部'">
 			AND tp.team = #{subgroup}
+		</if>
+		<if test="staff_number!=''">
+			AND (tp.staff_number = #{staff_number} OR tp.staff_name = #{staff_number})
 		</if>
 		GROUP BY tp.staff_number,tp.work_date 
 		union all
@@ -1170,6 +1188,9 @@
 		<if test="subgroup!='全部'">
 			AND ep.team = #{subgroup}
 		</if>
+		<if test="staff_number!=''">
+			AND (ep.staff_number = #{staff_number} OR ep.staff_name = #{staff_number})
+		</if>
 		GROUP BY ep.staff_number,ep.work_date 
 		union all
 		select '等待' workhour_type,wp.staff_number,wp.staff_name,sum(wp.work_hour) sum_participation,wp.work_date
@@ -1186,6 +1207,9 @@
 		</if>
 		<if test="subgroup!='全部'">
 			AND wp.team = #{subgroup}
+		</if>
+		<if test="staff_number!=''">
+			AND (wp.staff_number = #{staff_number} OR wp.staff_name = #{staff_number})
 		</if>
 		GROUP BY wp.staff_number,wp.work_date
 		) tmp

@@ -623,7 +623,7 @@
 		BMS_PLAN_BUS b
 		left join BMS_ORDER o on b.order_id=o.id
 		where
-		b.factory_id=#{factory_id}
+		b.factory_id=#{factory_id} 
 		<if test="onoff=='上线'">
 			and b.welding_online_date is not null
 			<if test="start_date !=null and start_date !=''">
@@ -631,8 +631,7 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.welding_online_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.welding_online_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='下线'">
@@ -642,15 +641,16 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.welding_offline_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.welding_offline_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff==''">
 			and b.welding_online_date is not null and
 			b.welding_offline_date is null
 		</if>
-		<if test="order_no !=null and order_no !=''">and b.order_id=#{order_no}</if>
+		<if test="order_no !=null and order_no !=''">
+			and b.order_id=#{order_no}
+		</if>
 		) a,
 		(SELECT count(b.bus_number) fiberglass_count
 		FROM BMS_PLAN_BUS b
@@ -664,20 +664,20 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.fiberglass_offline_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.fiberglass_offline_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff==''">
 			and b.welding_offline_date is not null and
 			b.fiberglass_offline_date is null
 		</if>
-		<if test="order_no !=null and order_no !=''">and b.order_id=#{order_no}</if>
+		<if test="order_no !=null and order_no !=''"> 
+			and b.order_id=#{order_no}
+		</if>
 		) b,
 		(SELECT count(b.bus_number) painting_count
 		FROM BMS_PLAN_BUS b
-		left
-		join BMS_ORDER o on b.order_id=o.id
+		left join BMS_ORDER o on b.order_id=o.id
 		where b.factory_id=#{factory_id}
 		<if test="onoff=='上线'">
 			and b.painting_online_date is not null
@@ -686,8 +686,7 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.painting_online_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.painting_online_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='下线'">
@@ -697,20 +696,20 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.painting_offline_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.painting_offline_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='' or onoff ==null">
 			and b.painting_online_date is not null and
 			b.painting_offline_date is null
 		</if>
-		<if test="order_no !=null and order_no !=''">and b.order_id=#{order_no}</if>
+		<if test="order_no !=null and order_no !=''">
+			and b.order_id=#{order_no}
+		</if>
 		) c,
 		(SELECT count(b.bus_number) chassis_count
 		FROM BMS_PLAN_BUS b
-		left
-		join BMS_ORDER o on b.order_id=o.id
+		left join BMS_ORDER o on b.order_id=o.id
 		where b.factory_id=#{factory_id}
 		<if test="onoff=='上线'">
 			and b.chassis_online_date is not null
@@ -719,8 +718,7 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.chassis_online_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.chassis_online_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='下线'">
@@ -730,20 +728,20 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.chassis_offline_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.chassis_offline_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='' or onoff ==null">
 			and b.chassis_online_date is not null and
 			b.chassis_offline_date is null
 		</if>
-		<if test="order_no !=null and order_no !=''">and b.order_id=#{order_no}</if>
+		<if test="order_no !=null and order_no !=''">
+			and b.order_id=#{order_no}
+		</if>
 		) d,
 		(SELECT count(b.bus_number) assembly_count
 		FROM BMS_PLAN_BUS b
-		left
-		join BMS_ORDER o on b.order_id=o.id
+		left join BMS_ORDER o on b.order_id=o.id
 		where b.factory_id=#{factory_id}
 		<if test="onoff=='上线'">
 			and b.assembly_online_date is not null
@@ -752,8 +750,7 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.assembly_online_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.assembly_online_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='下线'">
@@ -763,15 +760,16 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.assembly_offline_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.assembly_offline_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='' or onoff ==null">
 			and b.assembly_online_date is not null and
 			b.assembly_offline_date is null
 		</if>
-		<if test="order_no !=null and order_no !=''">and b.order_id=#{order_no}</if>
+		<if test="order_no !=null and order_no !=''">
+			and b.order_id=#{order_no}
+		</if>
 		) e,
 		(SELECT count(b.bus_number) debugarea_count
 		FROM BMS_PLAN_BUS b
@@ -785,8 +783,7 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.debugarea_online_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.debugarea_online_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='下线'">
@@ -796,20 +793,20 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.debugarea_offline_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.debugarea_offline_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='' or onoff ==null">
 			and b.debugarea_online_date is not null and
 			b.debugarea_offline_date is null
 		</if>
-		<if test="order_no !=null and order_no !=''">and b.order_id=#{order_no}</if>
+		<if test="order_no !=null and order_no !=''">
+			and b.order_id=#{order_no}
+		</if>
 		) f,
 		(SELECT count(b.bus_number) testline_count
 		FROM BMS_PLAN_BUS b
-		left
-		join BMS_ORDER o on b.order_id=o.id
+		left join BMS_ORDER o on b.order_id=o.id
 		where b.factory_id=#{factory_id}
 		<if test="onoff=='上线'">
 			and b.testline_online_date is not null
@@ -818,8 +815,7 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.testline_online_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.testline_online_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='下线'">
@@ -829,15 +825,16 @@
 				>CONCAT(date_add(#{start_date},interval '-1' DAY),' 17:10:00')
 			</if>
 			<if test="end_date !=null and end_date !=''">
-				and b.testline_offline_date &lt;=CONCAT(#{end_date},'
-				17:10:00')
+				and b.testline_offline_date &lt;=CONCAT(#{end_date},' 17:10:00')
 			</if>
 		</if>
 		<if test="onoff=='' or onoff ==null">
 			and b.testline_online_date is not null and
 			b.testline_offline_date is null
 		</if>
-		<if test="order_no !=null and order_no !=''">and b.order_id=#{order_no}</if>
+		<if test="order_no !=null and order_no !=''">
+			and b.order_id=#{order_no}
+		</if>
 		) g,
 		(SELECT count(b.bus_number) warehousing_count
 		FROM BMS_PLAN_BUS b
@@ -845,15 +842,16 @@
 		where
 		b.factory_id=#{factory_id} and b.warehousing_date is not null and
 		b.dispatch_date is null
-		<if test="order_no !=null and order_no !=''">and b.order_id=#{order_no}</if>
+		<if test="order_no !=null and order_no !=''">
+			and b.order_id=#{order_no}
+		</if>
 		) h,
 		(SELECT count(b.bus_number) wp_wpi_count
 		FROM BMS_PLAN_BUS b
 		left
 		join BMS_ORDER o on b.order_id=o.id
 		where b.factory_id=#{factory_id}
-		and b.welding_offline_date is not null and b.painting_online_date is
-		null
+		and b.welding_offline_date is not null and b.painting_online_date is null
 		<if test="order_no !=null and order_no !=''">and b.order_id=#{order_no}</if>
 		) a_w,
 		(SELECT count(b.bus_number) pc_wpi_count
@@ -3458,7 +3456,7 @@
 	
 	<!-- 根据工厂、车间查询线别工序列表 -->
 	<select id="queryLineProcessList" parameterType="Map" resultType="Map">
-		SELECT p.line_id,l.line line_name,l.workshop_id,w.workshop_name,w.factory_id,f.factory_name,concat('[',group_concat('{"id":',p.id,',"code":"',p.process_code,'","monitor_flag":"',p.monitory_point_flag,'","name":"',p.process_name,'"}' order by p.id),']') process_list
+		SELECT p.line_id,l.line line_name,l.workshop_id,w.workshop_name,w.factory_id,f.factory_name,concat('[',group_concat('{"id":',p.id,',"code":"',TRIM(p.process_code),'","monitor_flag":"',p.monitory_point_flag,'","name":"',TRIM(p.process_name),'"}' order by p.id),']') process_list
 		FROM BMS_BASE_PROCESS p
 		LEFT JOIN BMS_BASE_LINE l ON p.line_id=l.id
 		LEFT JOIN BMS_BASE_WORKSHOP w on w.id=l.workshop_id

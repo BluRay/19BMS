@@ -16,6 +16,8 @@
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/jquery.form.js"></script>
 <script type="text/javascript" src="js/techtrans/ecnInformationSearch.js"></script>
+<script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
+<link type="text/css" rel="stylesheet" href="js/datePicker/skin/WdatePicker.css">
 <style type="text/css">
 .section-head {
   border-left: 7px solid #000;
@@ -92,24 +94,29 @@
 									<td>工厂</td>
 									<td>车间</td>
 									<td>状态</td>
+									<td>技改单日期</td>
 								</tr>
 								<tr>
 									<td><input type="text" style="height: 30px;" class="input-medium revise" placeholder="请输入技改任务..."  id="task_content" ></td>
 									<td><input type="text" style="height: 30px;" class="input-medium revise" placeholder="请输入技改单编号..."  id="ecnnumber" ></td>
-									<td><input type="text" style="height: 30px;" class="input-medium revise" placeholder="请输入订单号..."  id="order_no" ></td>
+									<td><input type="text" style="height: 30px;width: 90px;" class="input-medium revise" placeholder="请输入订单号..."  id="order_no" ></td>
 									<td>
-										<select name="" id="search_factory" class="input-medium carType"></select>
+										<select name="" id="search_factory" class="input-medium carType" style="width: 100px;"></select>
 									</td>
 									<td>
-										<select name="" id="search_workshop" class="input-medium carType"></select>
+										<select name="" id="search_workshop" class="input-medium carType" style="width: 100px;"></select>
 									</td>
 									<td>
-										<select  class="input-medium carType" id="taskstatus">
+										<select  class="input-medium carType" id="taskstatus" style="width: 80px;">
 											<option value="">全部</option>
 											<option value="1">已完成</option>
 											<option value="0">未完成</option>
 										</select>
-									    <input type="button" class="btn btn-primary" id="btnQuery" value="查询" style="margin-left: 2px;"></input></td>
+									    
+									<td><input name="startDate" id="startDate" class="Wdate" style="height: 30px; background-color: white; width: 120px" onfocus="javascript:WdatePicker()"  type="text"> 至 
+										<input name="endDate" id="endDate" class="Wdate" onfocus="javascript:WdatePicker()" style="height: 30px; background-color: white; width: 120px"  type="text">
+										<input class="btn btn-primary" id="btnQuery" value="查询" style="margin-left: 2px;" type="button">
+									</td>
 								</tr>
 						</thead>
 						<tbody>

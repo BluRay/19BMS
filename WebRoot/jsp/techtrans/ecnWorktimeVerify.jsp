@@ -16,6 +16,7 @@
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/jquery.form.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
+<link type="text/css" rel="stylesheet" href="js/datePicker/skin/WdatePicker.css">
 <script type="text/javascript" src="js/techtrans/ecnWorkTimeVerify.js"></script>
 <style type="text/css">
 .section-head {
@@ -78,20 +79,24 @@
 									<td>订单号</td>
 									<td>工厂</td>
 									<td>车间</td>
+									<td>技改单日期</td>
 									<td>状态</td>
 								</tr>
 								<tr>
 									<td><input type="text" style="height: 30px;" class="input-medium revise" placeholder="请输入技改任务..."  id="task_content" ></td>
 									<td><input type="text" style="height: 30px;" class="input-medium revise" placeholder="请输入技改单编号..."  id="ecnnumber" ></td>
-									<td><input type="text" style="height: 30px;" class="input-medium revise" placeholder="请输入订单号..."  id="order_no" ></td>
+									<td><input type="text" style="height: 30px; width:90px" class="input-medium revise" placeholder="请输入订单号..."  id="order_no" ></td>
 									<td>
-										<select name="" id="search_factory" class="input-medium carType"></select>
+										<select name="" id="search_factory" style="width:100px"  class="input-medium carType"></select>
 									</td>
 									<td>
-										<select name="" id="search_workshop" class="input-medium carType"></select>
+										<select name="" id="search_workshop" style="width:100px"  class="input-medium carType"></select>
+									</td>
+									<td><input name="startDate" id="startDate" class="Wdate" style="height: 30px; background-color: white; width: 120px" onfocus="javascript:WdatePicker()"  type="text"> 至 
+										<input name="endDate" id="endDate" class="Wdate" onfocus="javascript:WdatePicker()" style="height: 30px; background-color: white; width: 120px"  type="text">										
 									</td>
 									<td>
-										<select  class="input-medium carType" id="taskstatus">
+										<select  class="input-medium carType" id="taskstatus" style="width:80px" >
 											<option value="未审批">未审批</option>
 											<option value="已审批">已审批</option>
 										</select>

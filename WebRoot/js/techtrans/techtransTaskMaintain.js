@@ -170,6 +170,8 @@ function ajaxQuery(targetPage){
 	    	"search_factory": $('#search_factory').val(),
 	    	"status": $('#status').val(),
 	    	/*"search_workshop": $('#search_workshop :selected').text(),*/
+	    	"start_date":$('#startDate').val(),
+	    	"end_date":$('#endDate').val(),
 	    	"pager.pageSize":pageSize||10,
 			"pager.curPage":targetPage || 1
 	    },

@@ -119,6 +119,8 @@ function ajaxQuery(targetPage){
 	    	"search_factory": $('#search_factory').val(),
 	    	"search_workshop": workshop,
 	    	"taskstatus": $('#taskstatus').val(),
+	    	"start_date":$('#startDate').val(),
+	    	"end_date":$('#endDate').val(),
 	    	"pager.pageSize":pageSize||20,
 			"pager.curPage":targetPage || 1
 	    },

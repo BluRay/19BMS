@@ -108,6 +108,10 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 		if (request.getParameter("ecn_type") != null)
 			conditionMap.put("ecn_type", new String(request
 					.getParameter("ecn_type").getBytes("UTF-8"), "UTF-8"));
+		if(request.getParameter("start_date")!=null)
+			conditionMap.put("start_date", request.getParameter("start_date"));
+		if(request.getParameter("end_date")!=null)
+			conditionMap.put("end_date", request.getParameter("end_date"));
 		if (pager != null) {
 			conditionMap.put("offset",
 					(pager.getCurPage() - 1) * pager.getPageSize());
@@ -524,6 +528,10 @@ public class EcnDocumentTaskAction extends BaseAction<Object> {
 					"actionType",
 					new String(request.getParameter("actionType").getBytes(
 							"UTF-8"), "UTF-8"));
+		if(request.getParameter("start_date")!=null)
+			conditionMap.put("start_date", request.getParameter("start_date"));
+		if(request.getParameter("end_date")!=null)
+			conditionMap.put("end_date", request.getParameter("end_date"));
 		List datalist = new ArrayList();
 		if (pager != null) {
 			conditionMap.put("offset",

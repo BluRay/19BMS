@@ -75,13 +75,13 @@ $(document).ready(function () {
 					$("#order_area ul").append(order_li);
 					$("#order_no_list").hide();
 					$("#order_area").show();
-					orderlist.push(obj.orderNo);
+					orderlist.push(value.orderNo);
 					orderDescList.push(value.orderNo+" "+value.name + " " + value.busType +" "+ value.orderQty+"台 ");
 				}
 			})
 			// alert(submitId);
-			$(elementId).attr("order_id", selectId);
-			$(submitId).val(selectId);
+			$("#order_no_list").attr("order_id", selectId);
+			
 			return item;
 		}	
 	});
@@ -141,15 +141,20 @@ $(document).ready(function () {
 			return false;
 		}
 		if($("#newPause_date_start").val()==""){
-			alert("请选择开始时间");
+			alert("请选择开始时间！");
 			return false;
 		}
 		if($("#newPause_pfinish_time").val()==""){
-			alert("请选择结束时间");
+			alert("请选择结束时间！");
+			return false;
+		}
+		if($("#new_pause_waste_num").val()==""){
+			alert("请填写浪费人数！");
 			return false;
 		}
 		var pauseTime=getPauseMin($("#newPause_date_start").val(),$("#newPause_pfinish_time").val(),'H');
-		if(pauseTime<$("#new_ppause_time").val()){
+		
+		if(pauseTime<parseFloat($("#new_ppause_time").val())){
 			alert("输入的停线时长不能超出预计停线时长！");
 			return false;
 		}
@@ -185,7 +190,8 @@ $(document).ready(function () {
 			return false;
 		}
 		var pauseTime=getPauseMin($("#manage_date_start").val(),$("#manage_date_end").val(),'H');
-		if(pauseTime<$("#manage_pause_time").val()){
+		//alert(pauseTime);
+		if(pauseTime<parseFloat($("#manage_pause_time").val())){
 			alert("输入的停线时长不能超出实际停线时长！");
 			return false;
 		}
