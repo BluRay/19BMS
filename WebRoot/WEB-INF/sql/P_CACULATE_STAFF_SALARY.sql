@@ -1,8 +1,9 @@
 drop procedure if exists P_CACULATE_SALLARY;
 create procedure P_CACULATE_SALLARY(in factory varchar(100),in workshop varchar(100),in workgroup varchar(100),in team varchar(100),in q_month varchar(10),in staff_number varchar(20),in offset varchar(6),in page_size varchar(3) ) 		
 BEGIN		
-	declare query_condition varchar(200);
+		declare query_condition varchar(200);
 	declare query_condition_2 varchar(200);
+	declare query_condition_3 varchar(200);
 	declare v_sql varchar(10000);
 	declare query_staff_numbers varchar(10000);
 	declare limit_cond varchar(50);
@@ -15,15 +16,18 @@ BEGIN
 
 	set query_condition=concat('and ((s.status=''离职'' and s.leave_date>=''',q_month,''') or s.status=''在职'')');
 	set query_condition_2=concat('and ((s1.status=''离职'' and s1.leave_date>=''',q_month,''') or s1.status=''在职'')');
+	set query_condition_3=concat('and ((s1.status=''离职'' and s1.leave_date>=''',q_month,''') or s1.status=''在职'')');
 	set limit_cond='';
 
 	if factory !='' and factory is not null then
 	set query_condition=concat(query_condition,' and s.plant_org=''',factory,'''');
 	set query_condition_2=concat(query_condition_2,' and h.factory=''',factory,'''');
+	set query_condition_3=concat(query_condition_3,' and h.rewards_factory=''',factory,'''');
 	end if;
 	if workshop !='' and workshop is not null  then
 	set query_condition=concat(query_condition,' and find_in_set(s.workshop_org,''',workshop,''')>0');
 	set query_condition_2=concat(query_condition_2,' and find_in_set(h.workshop,''',workshop,''')>0');
+	set query_condition_3=concat(query_condition_3,' and find_in_set(h.rewards_workshop,''',workshop,''')>0');
 	end if;
 	if workgroup !='' and workgroup is not null then
 	set query_condition=concat(query_condition,' and s.workgroup_org=''',workgroup,'''');
@@ -36,17 +40,35 @@ BEGIN
 	if staff_number !='' and staff_number is not null then
 	set query_condition=concat(query_condition,' and (s.staff_number=''',staff_number,''' or s.name=''',staff_number,''')');
 	set query_condition_2=concat(query_condition_2,' and (s1.staff_number=''',staff_number,''' or s1.name=''',staff_number,''')');
+	set query_condition_3=concat(query_condition_3,' and (s1.staff_number=''',staff_number,''' or s1.name=''',staff_number,''')');
 	end if;
 	if offset !='' and offset is not null then
 	set limit_cond=concat(' limit ',offset,',',page_size);
 	end if;
 
 	set v_sql=concat(' select group_concat(t.staff_number separator ''',''''',''''',''') into @query_staff_numbers from ( select distinct tmp.staff_number from (
-	select s.staff_number,s.workshop_org,s.workgroup_org,s.team_org,s.job from BMS_HR_STAFF s where 1=1 and s.salary_type=''计件''', query_condition,' 
-	union all 
-	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_HR_STAFF_HOURS h 
-	left join BMS_HR_STAFF s1 on h.staff_id =s1.id where h.status in (''1'',''3'') and  h.work_date like concat(''',q_month,''',''%'')',
-	query_condition_2 ,' order by workshop_org,workgroup_org,team_org,job',') tmp ',limit_cond,' )t');
+	select s.staff_number,s.workshop_org,s.workgroup_org,s.team_org,s.job from BMS_HR_STAFF s where 1=1 and s.salary_type=''计件''', query_condition,
+	' union all 
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_PIECE_PAY_CAL h 
+	left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number where h.status in (''1'',''3'') and  h.work_date like concat(''',q_month,''',''%'')',
+	query_condition_2 ,
+	' union all
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_ECN_PAY_CAL h 
+	left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number where  h.work_date like concat(''',q_month,''',''%'')',
+	query_condition_2 ,
+	' union all 
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_TMP_PAY_CAL h 
+	left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number where  h.work_date like concat(''',q_month,''',''%'')',
+	query_condition_2 ,
+	' union all 
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_WAIT_PAY_CAL h 
+	left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number where h.status in (''1'',''3'') and h.work_date like concat(''',q_month,''',''%'')',
+	query_condition_2 ,
+	' union all 
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_HR_REWARDS h 
+	left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number where h.status !=''2'' and h.rewards_date like concat(''',q_month,''',''%'')',
+	query_condition_3 ,' order by workshop_org,workgroup_org,team_org,job',
+	') tmp ',limit_cond,' )t');
 	
 	set @vsql=v_sql;
 	#select @vsql;
@@ -129,7 +151,7 @@ BEGIN
 		from BMS_HR_REWARDS r 
 		left join BMS_HR_STAFF s on s.staff_number=r.staff_number
 		left join BMS_HR_BASE_PRICE p on  p.type=''1'' and r.rewards_date>=p.start_date and r.rewards_date<=p.end_date
-		and p.edit_date=(select max(p1.edit_date) from BMS_HR_BASE_PRICE p1 where  p1.type=p.type and r.rewards_date>=p1.start_date and r.rewards_date<=p1.end_date) 
+		and p.edit_date=(select max(p1.edit_date) from BMS_HR_BASE_PRICE p1 where  p1.type=p.type and r.rewards_date>=p1.start_date and r.rewards_date<=p1.end_date ) 
 		where 1=1 and substr(r.rewards_date,1,7)=''',q_month,''' and s.staff_number in(''',query_staff_numbers,''')
 		and r.rewards_factory=''',factory,''' and find_in_set(r.rewards_workshop,''',workshop,''')>0
 		group by s.staff_number,substr(r.rewards_date,1,7)');

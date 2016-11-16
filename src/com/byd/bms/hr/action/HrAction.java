@@ -723,14 +723,14 @@ public class HrAction extends BaseAction<Object>{
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	public String uploadAttendance() throws UnsupportedEncodingException{
+	public String uploadAttendance() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String curTime = df.format(new Date());
 		int userid=getUser().getId();
 		logger.info("---->HrAction::uploadAttendance " + curTime + " " + userid + ";fileFileName = " + fileFileName);
 		
 		HttpServletRequest request = ServletActionContext.getRequest();
-		request.setCharacterEncoding("UTF-8");
+		//request.setCharacterEncoding("UTF-8");
 		HttpServletResponse response = ServletActionContext.getResponse();
 		response.setContentType("text/html;charset=utf-8");
 		PrintWriter out = null;
@@ -943,37 +943,37 @@ public class HrAction extends BaseAction<Object>{
 						if(data[33] == "")data[33] = list.get(0).get("D31");
 						
 					}else{
-						attendanceInfo.put("D1", data[3] == null?null:data[3].toString().trim());
-						attendanceInfo.put("D2", data[4] == null?null:data[4].toString().trim());
-						attendanceInfo.put("D3", data[5] == null?null:data[5].toString().trim());
-						attendanceInfo.put("D4", data[6] == null?null:data[6].toString().trim());
-						attendanceInfo.put("D5", data[7] == null?null:data[7].toString().trim());
-						attendanceInfo.put("D6", data[8] == null?null:data[8].toString().trim());
-						attendanceInfo.put("D7", data[9] == null?null:data[9].toString().trim());
-						attendanceInfo.put("D8", data[10] == null?null:data[10].toString().trim());
-						attendanceInfo.put("D9", data[11] == null?null:data[11].toString().trim());
-						attendanceInfo.put("D10", data[12] == null?null:data[12].toString().trim());
-						attendanceInfo.put("D11", data[13] == null?null:data[13].toString().trim());
-						attendanceInfo.put("D12", data[14] == null?null:data[14].toString().trim());
-						attendanceInfo.put("D13", data[15] == null?null:data[15].toString().trim());
-						attendanceInfo.put("D14", data[16] == null?null:data[16].toString().trim());
-						attendanceInfo.put("D15", data[17] == null?null:data[17].toString().trim());
-						attendanceInfo.put("D16", data[18] == null?null:data[18].toString().trim());
-						attendanceInfo.put("D17", data[19] == null?null:data[19].toString().trim());
-						attendanceInfo.put("D18", data[20] == null?null:data[20].toString().trim());
-						attendanceInfo.put("D19", data[21] == null?null:data[21].toString().trim());
-						attendanceInfo.put("D20", data[22] == null?null:data[22].toString().trim());
-						attendanceInfo.put("D21", data[23] == null?null:data[23].toString().trim());
-						attendanceInfo.put("D22", data[24] == null?null:data[24].toString().trim());
-						attendanceInfo.put("D23", data[25] == null?null:data[25].toString().trim());
-						attendanceInfo.put("D24", data[26] == null?null:data[26].toString().trim());
-						attendanceInfo.put("D25", data[27] == null?null:data[27].toString().trim());
-						attendanceInfo.put("D26", data[28] == null?null:data[28].toString().trim());
-						attendanceInfo.put("D27", data[29] == null?null:data[29].toString().trim());
-						attendanceInfo.put("D28", data[30] == null?null:data[30].toString().trim());
-						attendanceInfo.put("D29", data[31] == null?null:data[31].toString().trim());
-						attendanceInfo.put("D30", data[32] == null?null:data[32].toString().trim());
-						attendanceInfo.put("D31", data[33] == null?null:data[33].toString().trim());
+						attendanceInfo.put("D1", data[3] == null?"0":data[3].toString().trim());
+						attendanceInfo.put("D2", data[4] == null?"0":data[4].toString().trim());
+						attendanceInfo.put("D3", data[5] == null?"0":data[5].toString().trim());
+						attendanceInfo.put("D4", data[6] == null?"0":data[6].toString().trim());
+						attendanceInfo.put("D5", data[7] == null?"0":data[7].toString().trim());
+						attendanceInfo.put("D6", data[8] == null?"0":data[8].toString().trim());
+						attendanceInfo.put("D7", data[9] == null?"0":data[9].toString().trim());
+						attendanceInfo.put("D8", data[10] == null?"0":data[10].toString().trim());
+						attendanceInfo.put("D9", data[11] == null?"0":data[11].toString().trim());
+						attendanceInfo.put("D10", data[12] == null?"0":data[12].toString().trim());
+						attendanceInfo.put("D11", data[13] == null?"0":data[13].toString().trim());
+						attendanceInfo.put("D12", data[14] == null?"0":data[14].toString().trim());
+						attendanceInfo.put("D13", data[15] == null?"0":data[15].toString().trim());
+						attendanceInfo.put("D14", data[16] == null?"0":data[16].toString().trim());
+						attendanceInfo.put("D15", data[17] == null?"0":data[17].toString().trim());
+						attendanceInfo.put("D16", data[18] == null?"0":data[18].toString().trim());
+						attendanceInfo.put("D17", data[19] == null?"0":data[19].toString().trim());
+						attendanceInfo.put("D18", data[20] == null?"0":data[20].toString().trim());
+						attendanceInfo.put("D19", data[21] == null?"0":data[21].toString().trim());
+						attendanceInfo.put("D20", data[22] == null?"0":data[22].toString().trim());
+						attendanceInfo.put("D21", data[23] == null?"0":data[23].toString().trim());
+						attendanceInfo.put("D22", data[24] == null?"0":data[24].toString().trim());
+						attendanceInfo.put("D23", data[25] == null?"0":data[25].toString().trim());
+						attendanceInfo.put("D24", data[26] == null?"0":data[26].toString().trim());
+						attendanceInfo.put("D25", data[27] == null?"0":data[27].toString().trim());
+						attendanceInfo.put("D26", data[28] == null?"0":data[28].toString().trim());
+						attendanceInfo.put("D27", data[29] == null?"0":data[29].toString().trim());
+						attendanceInfo.put("D28", data[30] == null?"0":data[30].toString().trim());
+						attendanceInfo.put("D29", data[31] == null?"0":data[31].toString().trim());
+						attendanceInfo.put("D30", data[32] == null?"0":data[32].toString().trim());
+						attendanceInfo.put("D31", data[33] == null?"0":data[33].toString().trim());
 					}
 					
 					attendanceInfo.put("staff_number", staff_number);
@@ -985,13 +985,15 @@ public class HrAction extends BaseAction<Object>{
 					int attendance_days = 0;
 					float attendance_hours = 0;
 
-					System.out.println("---->data[3] = " + data[3]);
+					System.out.println(staff_number+"---->data[3] = " + data[3]);
 					for(int i=3;i<=33;i++){
-						if(data[i] != ""){
-							if(!data[i].toString().equals("0")){
+						if(data[i] != "0"&&data[i]!=null&&data[i]!=""){
+							/*if(!"0".equals(data[i])){
 							attendance_days++;
 							attendance_hours+=Float.valueOf(data[i].toString().trim());
-							}
+							}*/
+							attendance_days++;
+							attendance_hours+=Float.valueOf(data[i].toString().trim());
 						}
 					}
 					attendanceInfo.put("attendance_days", attendance_days);

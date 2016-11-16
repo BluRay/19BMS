@@ -118,10 +118,10 @@
 								class="table table-bordered table-striped">
 								<thead>
 									<tr>
-										<th style="text-align: center;" width="40px">序号</th>
+										<!-- <th style="text-align: center;" width="40px">序号</th> -->
 										<th style="text-align: center;" width="70px">工厂</th>
 										<th style="text-align: center;" width="180px">订单</th>
-										<th style="text-align: center;" width="110px">VIN号</th>
+										<th style="text-align: center;" width="120px">VIN号</th>
 										<th style="text-align: center;" width="65px">左电机号</th>
 										<th style="text-align: center;" width="65px">右电机号</th>
 										<th style="text-align: center;" width="100px">车号</th>

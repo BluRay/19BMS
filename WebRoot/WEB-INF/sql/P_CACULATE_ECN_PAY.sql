@@ -106,7 +106,7 @@ BEGIN
 	left join BMS_ECN_TASK t on h.ecn_task_id=t.id
 	left join BMS_ECN_TIME t1 on t.id=t1.ecn_task_id 
 	and t1.workshop_id=(select k.id from BMS_BASE_KEY k 
-		WHERE k.key_name=q_workshop )
+		WHERE k.key_name=q_workshop and k.key_type='车间')
 	left join BMS_ECN_DOCUMENT d on t.ecn_id=d.id
 	left join BMS_HR_BASE_PRICE p on  p.factory=h.factory and p.type='3' and h.work_date>=p.start_date and h.work_date<=p.end_date
 		and p.edit_date=(select max(p1.edit_date) from BMS_HR_BASE_PRICE p1 where p1.factory=p.factory and p1.type=p.type and h.work_date>=p1.start_date and h.work_date<=p1.end_date)

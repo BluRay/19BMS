@@ -3728,5 +3728,56 @@ public class PlanAction extends BaseAction<Object> {
 			return vin.substring(0, 8) + vin_sum%11 + vin.substring(9,17);
 		}
 	}
+	
+	public String updateVinMotor() throws UnsupportedEncodingException{
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String curTime = df.format(new Date());
+		int userid=getUser().getId();
+		HttpServletRequest request= ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");		
+		PrintWriter out = null;
+		
+		String vin=request.getParameter("vin");
+		String update_val=request.getParameter("update_val");
+		String update_flg=request.getParameter("update_flg");
+		Map<String,Object> cdmap=new HashMap<String,Object>();
+		cdmap.put("vin", vin);
+		cdmap.put("update_val", update_val);
+		cdmap.put("update_flg", update_flg);
+	
+		JSONObject json=null;
+		//查询vin号、左右电机号是否已经绑定，已绑定返回错误信息
+		Map<String,String> busMap=planDao.queryBusByVinMotor(cdmap);
+		StringBuffer message=new StringBuffer();
+		if(busMap!=null){
+			if("vin".equals(update_flg)){
+				message.append("vin号："+update_val+"已经绑定，请先解绑该vin号！");
+			}
+			if("left_motor".equals(update_flg)){
+				message.append("左电机号："+update_val+"已经绑定，请先解绑该左电机号！");
+			}
+			if("right_motor".equals(update_flg)){
+				message.append("右电机号："+update_val+"已经绑定，请先解绑该右电机号！");
+			}
+			json=Util.dataListToJson(false, message.toString(), null,null);
+		}
+		//未绑定，更新vin号、左右电机号
+		else{
+			planDao.updateVinMotor(cdmap);
+			planDao.updateBusVinMotor(cdmap);
+			json= Util.dataListToJson(true,"修改成功",null,null);
+		}		
+		
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+			json= Util.dataListToJson(false,"系统异常，修改失败",null,null);
+		}
+		out.print(json);
+		return null;
+	}
 
 }

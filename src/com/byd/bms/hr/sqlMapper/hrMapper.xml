@@ -2328,8 +2328,8 @@
 		</if>
 		union all
 		select distinct s1.staff_number
-		from BMS_HR_STAFF_HOURS h
-		left join BMS_HR_STAFF s1 on h.staff_id =s1.id where h.status in
+		from BMS_PIECE_PAY_CAL h
+		left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number where h.status in
 		('1','3')
 		<if test="factory !=null and factory !=''">
 			and h.factory=#{factory}
@@ -2382,8 +2382,8 @@
 	</select>
 	<select id="querySalaryStaffList" parameterType="Map"
 		resultType="String">
-		select distinct s1.staff_number from BMS_HR_STAFF_HOURS h
-		left join BMS_HR_STAFF s1 on h.staff_id =s1.id where h.status in
+		<!-- select distinct s1.staff_number from BMS_PIECE_PAY_CAL h
+		left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number where h.status in
 		('1','3')
 		<if test="factory !=null and factory !=''">
 			and h.factory=#{factory}
@@ -2409,7 +2409,106 @@
 		</if>
 		<if test="staff !=null and staff !=''">
 			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if> -->
+	select distinct tmp.staff_number from (
+		select s.staff_number,s.workshop_org,s.workgroup_org,s.team_org,s.job from BMS_HR_STAFF s 
+		where 1=1 and s.salary_type='计件'and ((s.status='离职' and s.leave_date>=#{monthStart}) or s.status='在职') 
+		<if test="factory !=null and factory !=''">
+			and s.plant_org=#{factory}
 		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(s.workshop_org,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and s.workgroup_org=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and s.team_org=#{team}
+		</if> 
+		<if test="staff !=null and staff !=''">
+			and (s.staff_number=#{staff} or s.name=#{staff})
+		</if>
+	union all 
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_PIECE_PAY_CAL h 
+	left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number 
+	where h.status in ('1','3') and  h.work_date like concat(#{monthStart},'%') 
+	and ((s1.status='离职' and s1.leave_date>=#{monthStart}) or s1.status='在职') 
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and h.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and h.team=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if>
+	union all
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_ECN_PAY_CAL h 
+	left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number 
+	where  h.work_date like concat(#{monthStart},'%') 
+	and ((s1.status='离职' and s1.leave_date>=#{monthStart}) or s1.status='在职') 
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and h.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and h.team=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if>
+	union all 
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_TMP_PAY_CAL h 
+	left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number 
+	where  h.work_date like concat(#{monthStart},'%') 
+	and ((s1.status='离职' and s1.leave_date>=#{monthStart}) or s1.status='在职') 
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and h.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and h.team=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if> 
+	union all 
+	select distinct s1.staff_number,s1.workshop_org,s1.workgroup_org,s1.team_org,s1.job from BMS_WAIT_PAY_CAL h 
+	left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number 
+	where h.status in ('1','3') and h.work_date like concat(#{monthStart},'%') 
+	and ((s1.status='离职' and s1.leave_date>=#{monthStart}) or s1.status='在职') 
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(h.workshop,#{workshop})>0
+		</if>
+		<if test="workgroup !=null and workgroup !=''">
+			and h.workgroup=#{workgroup}
+		</if>
+		<if test="team !=null and team !=''">
+			and h.team=#{team}
+		</if>
+		<if test="staff !=null and staff !=''">
+			and (s1.staff_number=#{staff} or s1.name=#{staff})
+		</if> 
+	)tmp
 		<!-- select distinct tmp.staff_number
 		from (
 		select s.staff_number from

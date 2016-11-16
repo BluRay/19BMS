@@ -280,7 +280,7 @@
 
 	<select id="checkBusNumber" parameterType="map"
 		resultType="com.byd.bms.plan.entity.PlanBusNumber">
-		SELECT * FROM BMS_PLAN_BUS_NUMBER WHERE
+		<!-- SELECT * FROM BMS_PLAN_BUS_NUMBER WHERE
 		bus_number =
 		CONCAT(LEFT((SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE
 		bus_serial_number = (SELECT max(cast(bus_serial_number as unsigned)) FROM
@@ -290,7 +290,10 @@
 		max(cast(bus_serial_number as unsigned)) FROM BMS_PLAN_BUS_NUMBER)),
 		(SELECT
 		productive_year FROM BMS_ORDER WHERE order_no = #{order_no})+'-')+4),
-		LPAD((#{num}),5,'0'))
+		LPAD((#{num}),5,'0')) -->
+		SELECT * FROM BMS_PLAN_BUS_NUMBER 
+		WHERE cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)= cast(#{num} as unsigned)
+		
 	</select>
 
 	<select id="getMaxNumByOrderNo" parameterType="String"
@@ -1639,4 +1642,38 @@
 		LEFT OUTER JOIN BMS_ORDER o ON p.order_id = o.id
 		WHERE p.factory_id = #{factory_id} AND p.plan_date >= #{start_date} AND p.plan_date &lt;= #{end_date}
 	</select>
+	
+	<select id="queryBusByVinMotor" parameterType="Map" resultType="Map">
+		SELECT vin,left_motor_number,right_motor_number 
+		FROM BMS_PD_VIN
+		WHERE
+		<if test="update_flg=='vin'">
+			vin=#{update_val}
+		</if>
+		<if test="update_flg=='left_motor'">
+			left_motor_number=#{update_val}
+		</if>
+		<if test="update_flg=='right_motor'">
+			right_motor_number=#{update_val}
+		</if>
+	</select>
+	
+	<update id="updateVinMotor" parameterType="Map">
+		update BMS_PD_VIN 
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="update_flg=='vin' ">vin=#{update_val},</if>
+			<if test="update_flg=='left_motor' ">left_motor_number=#{update_val},</if>
+			<if test="update_flg=='right_motor' ">right_motor_number=#{update_val},</if>
+		</trim>
+		where vin=#{vin}
+	</update>
+	<update id="updateBusVinMotor" parameterType="Map">
+		update BMS_PLAN_BUS 
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="update_flg=='vin' ">vin=#{update_val},</if>
+			<if test="update_flg=='left_motor' ">left_motor_number=#{update_val},</if>
+			<if test="update_flg=='right_motor' ">right_motor_number=#{update_val},</if>
+		</trim>
+		where vin=#{vin}
+	</update>
 </mapper>

@@ -90,7 +90,68 @@ $(document).ready(function () {
 	});
 	
 	
+	$(".vin").live("change",function(e){
+		if(confirm("是否确定修改？")){
+			var tr=$(e.target).parent("td").parent("tr");
+			var bus_number=$(tr).find("td").eq(5).html();
+			var update_val=$(this).val();
+			ajaxUpdateVinMotor(bus_number,update_val,"vin",e);
+		}else{
+			$(this).val($(this).attr("old_val"))
+		}
+	})
+	
+	$(".left_motor").live("change",function(e){
+		if(confirm("是否确定修改？")){
+			var tr=$(e.target).parent("td").parent("tr");
+			var bus_number=$(tr).find("td").eq(5).html();
+			var update_val=$(this).val();
+			ajaxUpdateVinMotor(bus_number,update_val,"left_motor",e);
+		}else{
+			$(this).val($(this).attr("old_val"))
+		}
+	})
+	
+	$(".right_motor").live("change",function(e){
+		if(confirm("是否确定修改？")){
+			var tr=$(e.target).parent("td").parent("tr");
+			var bus_number=$(tr).find("td").eq(5).html();
+			var update_val=$(this).val();
+			ajaxUpdateVinMotor(bus_number,update_val,"right_motor",e);
+		}else{
+			$(this).val($(this).attr("old_val"))
+		}
+	})
+	
 });
+
+function ajaxUpdateVinMotor(bus_number,update_val,update_flg,e){
+	$.ajax({
+		url : "plan!updateVinMotor.action",
+		dataType : "json",
+		data : {
+			"vin":$(e.target).closest("tr").find(".vin").attr("old_val"),
+			"update_val":update_val,
+			"update_flg":update_flg
+		},
+		async : false,
+		error : function(response) {
+			//alert(response.responseText)
+			if(response.responseText.indexOf("用户没有权限")>=0){
+				alert("抱歉，您没有修改权限！");
+			}
+		},
+		success : function(response) {
+			if(response.success){
+				ajaxQuery()
+			}else{
+				alert(response.message);
+				$(e.target).val($(e.target).attr("old_val"));
+			}
+			
+		}
+	});
+}
 
 function ajaxQuery(targetPage,queryAll){
 	$(".divLoading").addClass("fade in").show();
@@ -127,12 +188,12 @@ function ajaxQuery(targetPage,queryAll){
     		if(queryAll!='all'){
     			$.each(response.data,function (index,value) {
         			var tr = $("<tr />");
-        			$("<td style=\"text-align:center;\" />").html(index+1).appendTo(tr);
+        			/*$("<td style=\"text-align:center;\" />").html(index+1).appendTo(tr);*/
         			$("<td style=\"text-align:center;\" />").html(value.factory_name).appendTo(tr);
         			$("<td style=\"text-align:center;\" />").html(value.order_no+" "+value.order_name+value.bus_type_code+" "+value.order_qty+"台").appendTo(tr);
-        			$("<td style=\"text-align:center;\" />").html(value.vin).appendTo(tr);
-        			$("<td style=\"text-align:center;\" />").html(value.left_motor_number).appendTo(tr);
-        			$("<td style=\"text-align:center;\" />").html(value.right_motor_number).appendTo(tr);
+        			$("<td style=\"text-align:center;\" />").html("<input class='vin' style='font-size: 12px;color: #333333;border:0;width:100%' value='"+value.vin+"' old_val='"+value.vin+"'>").appendTo(tr);
+        			$("<td style=\"text-align:center;\" />").html("<input class='left_motor' style='font-size: 12px;color: #333333;border:0;width:100%' value='"+value.left_motor_number+"' old_val='"+value.left_motor_number+"'>").appendTo(tr);
+        			$("<td style=\"text-align:center;\" />").html("<input class='right_motor' style='font-size: 12px;color: #333333;border:0;width:100%' value='"+value.right_motor_number+"' old_val='"+value.right_motor_number+"'>").appendTo(tr);
         			$("<td style=\"text-align:center;\" />").html(value.bus_number).appendTo(tr);
         			/*$("<td style=\"text-align:center;\" />").html(value.productive_date).appendTo(tr);*/
         			$("<td style=\"text-align:center;\" />").html(value.creator_name).appendTo(tr);
