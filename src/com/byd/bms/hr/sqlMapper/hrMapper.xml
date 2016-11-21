@@ -2694,12 +2694,12 @@
 			and month<=#{monthEnd}
 		]]>
 		</if>
-		<if test="factory !=null and factory !=''">
+		<!-- <if test="factory !=null and factory !=''">
 			and submit_factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
 			and find_in_set(submit_workshop,#{workshop})>0
-		</if>
+		</if> -->
 		
 	</update>
 	<update id="updateWorkHourStatus" parameterType="map">

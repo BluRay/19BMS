@@ -2,6 +2,7 @@ package com.byd.bms.util.action;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
@@ -28,6 +29,8 @@ public class LoginAction extends BaseAction<BmsBaseUser>{
 		try {
 			//encryptedPwd = MD5Util.getEncryptedPwd(password);
 			HttpServletRequest  request=ServletActionContext.getRequest();
+			HttpServletResponse response = ServletActionContext.getResponse();  
+			String last_url=request.getParameter("last_url");
 			HttpSession session= request.getSession();
 			if (list.size() > 0) {
 				user=(BmsBaseUser) list.get(0);
@@ -37,6 +40,11 @@ public class LoginAction extends BaseAction<BmsBaseUser>{
 					session.setAttribute("user_id", user.getId());
 					session.setAttribute("factory", user.getFactory());
 					session.setAttribute("bmsuser", user);
+					if(last_url!=""&&last_url!=null){
+						response.sendRedirect(last_url);
+						//request.getRequestDispatcher(last_url).forward(request,response);
+						return null;
+					}else
 					return SUCCESS;
 				}else{
 					return ERROR;

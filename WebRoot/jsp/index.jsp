@@ -55,8 +55,8 @@
 				dataType:"json",
 				success:function(response){
 					//dpu 
-					var productionInfo=(response.productionInfo)[0];
-					var dpu_welding,dpu_painting,dpu_bottom,dpu_assembly;
+				    var productionInfo=(response.productionInfo)[0];
+					/* var dpu_welding,dpu_painting,dpu_bottom,dpu_assembly;
 					$.each(response.dupList,function(index,value){
 						if(value.workshop_name=='焊装'){
 							dpu_welding=value.dup;
@@ -70,10 +70,10 @@
 						if(value.workshop_name=='总装'){
 							dpu_assembly=value.dup;
 						}
-					});
+					});  */
 					
-					//一次校检合格率
-					var pass_rate_welding,pass_rate_painting,pass_rate_bottom,pass_rate_assembly;
+				 	//一次校检合格率
+				/*	var pass_rate_welding,pass_rate_painting,pass_rate_bottom,pass_rate_assembly;
 					$.each(response.passRateList,function(index,value){
 						if(value.workshop_name=='焊装'){
 							pass_rate_welding=value.pass_rate+"%";
@@ -87,7 +87,7 @@
 						if(value.workshop_name=='总装'){
 							pass_rate_assembly=value.pass_rate+"%";
 						}
-					});
+					}); */
 					//计划模块显示信息
 					$("#planOrderTable tbody").html("");
 					$.each(response.orderList,function(index,order){
@@ -109,14 +109,16 @@
 					$("#exceptionTable tbody").html("");
 					$.each(response.pauseList,function(index,pause){
 						var tr=$("<tr />");
-						$("<td width='50%' style='color:red'/>").html(pause.workshop_name+pause.line).appendTo(tr);
-						$("<td width='50%' style='color:red'/>").html(pause.reason).appendTo(tr);
+						$("<td width='50%' style='color:red' onclick=\"window.open('plan!pausemanager.action?factory="+factoryId+"&workshop="+pause.workshop_name+"&line="+pause.line+"')\"/>")
+						.html(pause.workshop_name+pause.line+"停线").appendTo(tr);
+						$("<td width='50%' style='color:red' onclick=\"window.open('plan!pausemanager.action?factory="+factoryId+"&workshop="+pause.workshop_name+"&line="+pause.line+"')\"/>")
+						.html(pause.reason).appendTo(tr);
 						$("#exceptionTable tbody").append(tr);
 					});
 					$.each(response.exceptionList,function(index,exception){
 						var tr=$("<tr />");
-						$("<td />").html(exception.bus_number).appendTo(tr);
-						$("<td />").html(exception.reason).appendTo(tr);
+						$("<td onclick=\"window.open('plan!exceptionmanager.action?factory="+factoryId+"&bus_number="+exception.bus_number+"')\"/>").html(exception.bus_number+"异常").appendTo(tr);
+						$("<td onclick=\"window.open('plan!exceptionmanager.action?factory="+factoryId+"&bus_number="+exception.bus_number+"')\"/>").html(exception.reason).appendTo(tr);
 						$("#exceptionTable tbody").append(tr);
 					});
 					
@@ -129,14 +131,14 @@
 						$("<td style='width:45%' onclick=\"window.open('production!productionsearch.action?factory="+factoryId+"&workshop=焊装&onoff="+onoff+"','_self')\" />").html(data.done_num+"/"+data.plan_total).appendTo(tr);
 						$("#weldingTable tbody").append(tr);
 					});
-					var tr_w_dpu=$("<tr />");
+					/* var tr_w_dpu=$("<tr />");
 					$("<td style='width:55%' onclick=\"window.open('qualityReport!dpuReport.action?department=焊装','_self')\" />").html("DPU").appendTo(tr_w_dpu);
 					$("<td style='width:45%' onclick=\"window.open('qualityReport!dpuReport.action?department=焊装','_self')\" />").html(dpu_welding).appendTo(tr_w_dpu);
 					var tr_w_pass_rate=$("<tr />");
 					$("<td style='width:55%' onclick=\"window.open('qualityReport!passRateReport.action?department=焊装','_self')\" />").html("一次交检合格率").appendTo(tr_w_pass_rate);
 					$("<td style='width:45%' onclick=\"window.open('qualityReport!passRateReport.action?department=焊装','_self')\" />").html(pass_rate_welding).appendTo(tr_w_pass_rate);
 					if(dpu_welding!=null) $("#weldingTable tbody").append(tr_w_dpu);
-					if(pass_rate_welding!=null) $("#weldingTable tbody").append(tr_w_pass_rate);
+					if(pass_rate_welding!=null) $("#weldingTable tbody").append(tr_w_pass_rate); */
 					
 					/*
 					焊装在制库存
@@ -155,14 +157,14 @@
 						$("<td style='width:45%' onclick=\"window.open('production!productionsearch.action?factory="+factoryId+"&workshop=涂装&onoff="+onoff+"','_self')\" />").html(data.done_num+"/"+data.plan_total).appendTo(tr);
 						$("#paintingTable tbody").append(tr);
 					});
-					var tr_p_dpu=$("<tr />");
+					/* var tr_p_dpu=$("<tr />");
 					$("<td style='width:55%' onclick=\"window.open('qualityReport!dpuReport.action?department=涂装','_self')\" />").html("DPU").appendTo(tr_p_dpu);
 					$("<td style='width:45%' onclick=\"window.open('qualityReport!dpuReport.action?department=涂装','_self')\" />").html(dpu_painting).appendTo(tr_p_dpu);
 					var tr_p_pass_rate=$("<tr />");
 					$("<td style='width:55%' onclick=\"window.open('qualityReport!passRateReport.action?department=涂装','_self')\" />").html("一次交检合格率").appendTo(tr_p_pass_rate);
 					$("<td style='width:45%' onclick=\"window.open('qualityReport!passRateReport.action?department=涂装','_self')\" />").html(pass_rate_painting).appendTo(tr_p_pass_rate);
 					if(dpu_painting!=null) $("#paintingTable tbody").append(tr_p_dpu);
-					if(pass_rate_painting!=null) $("#paintingTable tbody").append(tr_p_pass_rate);
+					if(pass_rate_painting!=null) $("#paintingTable tbody").append(tr_p_pass_rate); */
 					/*
 					 涂装在制库存
 					*/
@@ -180,14 +182,14 @@
 						$("<td style='width:45%' onclick=\"window.open('production!productionsearch.action?factory="+factoryId+"&workshop=底盘&onoff="+onoff+"','_self')\" />").html(data.done_num+"/"+data.plan_total).appendTo(tr);
 						$("#bottomTable tbody").append(tr);
 					});
-					var tr_b_dpu=$("<tr />");
+					/* var tr_b_dpu=$("<tr />");
 					$("<td style='width:55%' onclick=\"window.open('qualityReport!dpuReport.action?department=底盘','_self')\" />").html("DPU").appendTo(tr_b_dpu);
 					$("<td style='width:45%' onclick=\"window.open('qualityReport!dpuReport.action?department=底盘','_self')\" />").html(dpu_bottom).appendTo(tr_b_dpu);
 					var tr_b_pass_rate=$("<tr />");
 					$("<td style='width:55%' onclick=\"window.open('qualityReport!passRateReport.action?department=底盘','_self')\" />").html("一次交检合格率").appendTo(tr_b_pass_rate);
 					$("<td style='width:45%' onclick=\"window.open('qualityReport!passRateReport.action?department=底盘','_self')\" />").html(pass_rate_bottom).appendTo(tr_b_pass_rate);
 					if(dpu_bottom!=null) $("#bottomTable tbody").append(tr_b_dpu);
-					if(pass_rate_bottom!=null) $("#bottomTable tbody").append(tr_b_pass_rate);
+					if(pass_rate_bottom!=null) $("#bottomTable tbody").append(tr_b_pass_rate); */
 					/*
 					 底盘在制库存
 					*/
@@ -205,14 +207,14 @@
 						$("<td style='width:45%' onclick=\"window.open('production!productionsearch.action?factory="+factoryId+"&workshop=总装&onoff="+onoff+"','_self')\" />").html(data.done_num+"/"+data.plan_total).appendTo(tr);
 						$("#assemblyTable tbody").append(tr);
 					});
-					var tr_a_dpu=$("<tr />");
+					/* var tr_a_dpu=$("<tr />");
 					$("<td style='width:55%' onclick=\"window.open('qualityReport!dpuReport.action?department=总装','_self')\" />").html("DPU").appendTo(tr_a_dpu);
 					$("<td style='width:45%' onclick=\"window.open('qualityReport!dpuReport.action?department=总装','_self')\" />").html(dpu_assembly).appendTo(tr_a_dpu);
 					var tr_a_pass_rate=$("<tr />");
 					$("<td style='width:55%' onclick=\"window.open('qualityReport!passRateReport.action?department=总装','_self')\" />").html("一次交检合格率").appendTo(tr_a_pass_rate);
 					$("<td style='width:45%' onclick=\"window.open('qualityReport!passRateReport.action?department=总装','_self')\" />").html(pass_rate_assembly).appendTo(tr_a_pass_rate);
 					if(dpu_assembly!=null) $("#assemblyTable tbody").append(tr_a_dpu);
-					if(pass_rate_assembly!=null) $("#assemblyTable tbody").append(tr_a_pass_rate);
+					if(pass_rate_assembly!=null) $("#assemblyTable tbody").append(tr_a_pass_rate); */
 					/*
 					总装在制库存
 					*/
@@ -337,7 +339,8 @@ a:hover {
 						</div>
 					</li>
 					<li class="span3">
-						<div id="exceptionMaintain" class="thumbnail" onclick="window.open('productionReport!exceptionReport.action')"
+					<!-- onclick="window.open('productionReport!exceptionReport.action')" -->
+						<div id="exceptionMaintain" class="thumbnail" 
 							style="border-radius:9px;border:0px;height: 163px; background: url('<%=basePath%>/images/home-2.png') no-repeat; background-size: 100% auto;filter:alpha(opacity=10)">
 							<div>
 								<h4 align="left" style="color: white">异常</h4>

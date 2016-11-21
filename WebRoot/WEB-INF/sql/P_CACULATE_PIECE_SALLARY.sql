@@ -1,8 +1,8 @@
 drop procedure if exists P_CACULATE_PIECE_SALLARY;
 create procedure P_CACULATE_PIECE_SALLARY(in q_factory varchar(100),in q_workshop varchar(100),in q_workgroup varchar(100),in q_team varchar(100),in q_month varchar(10)) 		
 BEGIN		
-	declare query_condition varchar(200);
-	declare query_condition_2 varchar(200);
+	declare query_condition varchar(500);
+	declare query_condition_2 varchar(500);
 	declare v_sql varchar(200000);
 	declare query_staff_numbers varchar(50000);
 	declare limit_cond varchar(50);
@@ -13,8 +13,8 @@ BEGIN
 	SET SESSION  group_concat_max_len = 200000; 
 	SET SESSION max_heap_table_size=128*1024*1024;
 
-	set query_condition=concat('and ((s.status=''离职'' and s.leave_date>=''',q_month,''') or s.status=''在职'')');
-	set query_condition_2=concat('and ((s1.status=''离职'' and s1.leave_date>=''',q_month,''') or s1.status=''在职'')');
+	set query_condition=concat('and ((s.status=''离职'' and date(s.leave_date)>=date(''',q_month,''')) or s.status=''在职'')');
+	set query_condition_2=concat('and ((s1.status=''离职'' and s1.leave_date>=date(''',q_month,''')) or s1.status=''在职'')');
 	set limit_cond='';
 
 	if q_factory !='' and q_factory is not null then

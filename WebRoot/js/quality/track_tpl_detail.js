@@ -26,8 +26,8 @@ function generateTable(workshop){
 				.html(value.sequence).appendTo(tr);
 				$("<td />").attr("recordId",index)
 				.html(value.processName==null?"":value.processName).appendTo(tr);
-				$("<td />").attr("recordId",index)
-				.html(value.processNo==null?"":value.processNo).appendTo(tr);
+				/*$("<td />").attr("recordId",index)
+				.html(value.processNo==null?"":value.processNo).appendTo(tr);*/
 				$("<td />").attr("recordId",index)
 				.html(value.parts==null?"":value.parts).appendTo(tr);
 				tr.appendTo(tableId+" tbody");

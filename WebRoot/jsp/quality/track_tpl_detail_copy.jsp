@@ -71,7 +71,7 @@
 									<tr>
 										<th width="80px">序号</th>
 										<th width="150px">工序名称</th>
-										<th width="100px">工序编号</th>
+										<!-- <th width="100px">工序编号</th> -->
 										<th width="220px">零部件名称</th>
 										<th></th>
 									</tr>
@@ -86,7 +86,7 @@
 									<tr>
 										<th width="80px">序号</th>
 										<th width="150px">工序名称</th>
-										<th width="100px">工序编号</th>
+									<!-- 	<th width="100px">工序编号</th> -->
 										<th width="220px">零部件名称</th>
 										<th></th>
 									</tr>
@@ -101,7 +101,7 @@
 									<tr>
 										<th width="80px">序号</th>
 										<th width="150px">工序名称</th>
-										<th width="100px">工序编号</th>
+									<!-- 	<th width="100px">工序编号</th> -->
 										<th width="220px">零部件名称</th>
 										<th></th>
 									</tr>
@@ -116,7 +116,7 @@
 									<tr>
 										<th width="80px">序号</th>
 										<th width="150px">工序名称</th>
-										<th width="100px">工序编号</th>
+										<!-- <th width="100px">工序编号</th> -->
 										<th width="220px">零部件名称</th>
 										<th></th>
 									</tr>

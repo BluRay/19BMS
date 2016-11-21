@@ -61,7 +61,7 @@ $(document).ready(function(){
 	})	
 })
 function initPage(){
-	pageSize=1000;
+	pageSize=10000;
 	getAuthorityFactorySelect("#factory", "", "noall");
 	var selectFactory = $("#factory :selected").text();
 	var defaultWorkshop=$("#d_workshop").val();
@@ -152,7 +152,7 @@ function ajaxQuery(targetPage,queryAll){
 	}else{
 		data={
 			  "conditions" : conditions,
-			  "pager.pageSize" : 1000,
+			  "pager.pageSize" : pageSize,
 			  "pager.curPage" : targetPage || 1	
 		}
 		table=$("#tableResult tbody");

@@ -5,9 +5,12 @@ $(document).ready(function () {
 	function initPage(){
 		getFactorySelect();
 		getOrderNoSelect("#search_order_no","#orderId");
+		var now = new Date(); //当前日期
+		var startDate=new Date(now.getTime()-6*24*3600*1000);
+		
 		$("#search_factory").val(16);
-		$("#start_date").val(getMonthStartDate());
-		$("#end_date").val(getMonthEndDate());
+		$("#start_date").val(formatDate(startDate));
+		$("#end_date").val(formatDate(now));
 		$("#planSearchResultdiv").show();
 		$("#planSearchDetaildiv").hide();
 		$("#btnQuery").removeAttr("disabled");
@@ -291,7 +294,10 @@ function getDetail(){
     		$("#tablePlanDetail tbody").html("");
     		var order_no = ""
     		$.each(response.data,function (index,value) {
-    			if ((workshop == "全部" )||((value.workshop).indexOf(workshop)>=0)){
+    			
+    			if ((value.workshop).indexOf("部件上线")==-1&&(value.workshop).indexOf("焊装下线")==-1
+    					&&(value.workshop).indexOf("涂装下线")==-1&&(value.workshop).indexOf("底盘下线")==-1
+    					&&(value.workshop).indexOf("总装上线")==-1){
     				var tr = $("<tr id= '"+value.id+"'/>");
     				/*if(order_no==value.order_no){
     					var rowspan=parseInt($("#order_"+order_no).attr("rowspan"));
@@ -370,7 +376,9 @@ function getDetail(){
         			((index+1)%2==1)?planQty34 = value.total_order:realQty34 = value.total_order;
         			$("#tablePlanDetail tbody").append(tr);	
         			//增加达成率
-        			if((index+1)%2==0){
+        			if((index+1)%2==0&&((value.workshop).indexOf("部件上线")==-1&&(value.workshop).indexOf("焊装下线")==-1
+        					&&(value.workshop).indexOf("涂装下线")==-1&&(value.workshop).indexOf("底盘下线")==-1
+        					&&(value.workshop).indexOf("总装上线")==-1)){
         				var tr = $("<tr id= '"+value.id+"'/>");
         				/*var rowspan=parseInt($("#order_"+order_no).attr("rowspan"));
     					$("#order_"+order_no).attr("rowspan",rowspan+1);*/
@@ -540,25 +548,10 @@ function ChangeDateToString(DateIn)
 
 }
 
-//格局化日期：yyyy-MM-dd 
-function formatDate(date) { 
-	var myyear = date.getFullYear(); 
-	var mymonth = date.getMonth()+1; 
-	var myweekday = date.getDate();
-
-	if(mymonth < 10){ 
-		mymonth = "0" + mymonth; 
-	} 
-	if(myweekday < 10){ 
-		myweekday = "0" + myweekday; 
-	} 
-	return (myyear+"-"+mymonth + "-" + myweekday); 
-}
 //获得本月的开端日期 
 function getMonthStartDate(){
 	var now = new Date(); //当前日期 
 	var nowMonth = now.getMonth(); //当前月 
-	var nowYear = now.getYear(); //当前年 
 	var nowYear = now.getYear(); //当前年 
 	nowYear += (nowYear < 2000) ? 1900 : 0; //
 	var monthStartDate = new Date(nowYear, nowMonth, 1); 

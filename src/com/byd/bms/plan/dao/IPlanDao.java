@@ -139,6 +139,7 @@ public interface IPlanDao {
 	public List<Map<String,Object>> getBusDispatchDetailList(Map<String, Object> conditionMap);//查询发车记录明细
 	public int getBusDispatchDetailCount(Map<String, Object> conditionMap);//查询发车记录明细记录数
 	public Map<String, String> queryBusByVinMotor(Map<String, Object> cdmap);//根据车号、vin、左右电机号查询车辆信息
+	public Map<String,String> queryBusByVin(Map<String, Object> cdmap);//根据vin查询车辆信息
 	public void updateVinMotor(Map<String, Object> cdmap);//更新vin号对应的vin、左右电机号
 	public void updateBusVinMotor(Map<String, Object> cdmap);//更新vin号对应的vin、左右电机号
 }

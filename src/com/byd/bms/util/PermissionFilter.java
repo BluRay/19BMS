@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.byd.bms.util.dao.IRoleAuthorityDao;
@@ -28,6 +29,7 @@ import com.byd.bms.util.entity.BmsBaseUser;
  * @author YangKe 150604
  */
 public class PermissionFilter implements Filter {
+	static Logger logger = Logger.getLogger(PermissionFilter.class.getName());
 	private ServletContext servletContext;
 
 	public void destroy() {
@@ -46,8 +48,9 @@ public class PermissionFilter implements Filter {
 				.getBean("loginDao");
 
 		String currentURL = request.getRequestURI();// 取得根目录所对应的绝对路径:
-		//String currentURL = request.getRequestURL().toString();// 取得根目录所对应的绝对路径:
-
+		String accessURL = currentURL.substring(currentURL.indexOf("/", 1)+1,
+				currentURL.length()); 
+		logger.info("current access URL:"+accessURL);
 		String targetURL = currentURL.substring(currentURL.indexOf("/", 1),
 				currentURL.length()); // 截取到当前文件名用于比较
 		//System.out.println(targetURL);
@@ -56,17 +59,17 @@ public class PermissionFilter implements Filter {
 		}
 		
 		BmsBaseUser user=(BmsBaseUser) session.getAttribute("bmsuser");
-		System.out.println(user+"/"+targetURL);
+		logger.info(user+"/"+targetURL);
 		String loginName = request.getHeader("BMS_USER_ID");
 		String remoteAddr = request.getRemoteAddr();
-		System.out.println("SSO IP:"+remoteAddr);
+		logger.info("SSO IP:"+remoteAddr);
 		// TODO 判断后台是否登陆，如果没登陆跳转到login.jsp
 		if (!"/login.jsp".equals(targetURL)
 				&& !"/login.action".equals(targetURL)&&!targetURL.contains("/common")) {// 判断当前页是否是重定向以后的登录页面页面，如果是就不做session的判断，防止出现死循环
 			if ((session == null || user == null)&&StringUtils.isEmpty(loginName)) {// *用户登录以后需手动添加session
-				System.out.println("request.getContextPath()="
+				logger.info("request.getContextPath()="
 						+ request.getContextPath());
-				response.sendRedirect("login.jsp");// 如果session为空表示用户没有登录就重定向到login.jsp页面
+				response.sendRedirect("login.jsp?last_url="+accessURL);// 如果session为空表示用户没有登录就重定向到login.jsp页面
 				return;
 			} else {
 				if(currentURL.indexOf("account!")>0){
@@ -90,13 +93,12 @@ public class PermissionFilter implements Filter {
 					}*/
 					actionName = targetURL;
 					if (!authlist.contains(actionName)) {
-						System.out.println("用户没有权限，跳转到authError.jsp");
-						response.sendRedirect(request.getContextPath()
-								+ "/authError.jsp");
+						logger.info("用户没有权限，跳转到authError.jsp");
+						response.sendRedirect("authError.jsp");
 						return;
 					}
 					if(user.getPwd_modified()==null || "".equals(user.getPwd_modified())){
-						System.out.println("请修改密码！");
+						logger.info("请修改密码！");
 						response.sendRedirect(request.getContextPath()
 								+ "/account!accountCenter.action?changepwd=1");
 						return;
@@ -111,7 +113,7 @@ public class PermissionFilter implements Filter {
 						/*
 						 * 和OAM SSO集成，从OAM获取登录验证标识
 						 */
-						System.out.println("SSO login name:"+loginName);
+						logger.info("SSO login name:"+loginName);
 						// 如果获取不到HEADER直接进入本地登录入口
 						if (StringUtils.isEmpty(loginName)) {
 							// 跳转到原始登录页面
@@ -135,7 +137,7 @@ public class PermissionFilter implements Filter {
 							List list=loginDao.getUser(loginName);
 							if(list.size()>0){
 								user=(BmsBaseUser) list.get(0);
-								System.out.println("user name:"+user.getDisplay_name());
+								logger.info("user name:"+user.getDisplay_name());
 							}else{
 								response.sendRedirect(request.getContextPath());
 								return;
@@ -150,7 +152,7 @@ public class PermissionFilter implements Filter {
 								ipOK = true;
 							
 							if(ipOK){
-								System.out.println("ipOK:"+ipOK);
+								logger.info("ipOK:"+ipOK);
 								session.setAttribute("user_name", user.getUsername());
 								session.setAttribute("display_name", user.getDisplay_name());
 								session.setAttribute("user_id", user.getId());

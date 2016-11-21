@@ -985,9 +985,9 @@ public class HrAction extends BaseAction<Object>{
 					int attendance_days = 0;
 					float attendance_hours = 0;
 
-					System.out.println(staff_number+"---->data[3] = " + data[3]);
+					System.out.println(staff_number+"---->data[3] = " + data[3].toString());
 					for(int i=3;i<=33;i++){
-						if(data[i] != "0"&&data[i]!=null&&data[i]!=""){
+						if(!"0".equals(data[i])&&data[i]!=null&&StringUtils.isNotEmpty(data[i].toString().trim())){
 							/*if(!"0".equals(data[i])){
 							attendance_days++;
 							attendance_hours+=Float.valueOf(data[i].toString().trim());

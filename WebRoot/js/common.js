@@ -1631,6 +1631,21 @@ function compareTime(beginTime,endTime){
     	return -1;  
       }   
 } 
+
+/**格局化日期：yyyy-MM-dd */
+function formatDate(date) { 
+	var myyear = date.getFullYear(); 
+	var mymonth = date.getMonth()+1; 
+	var myweekday = date.getDate();
+
+	if(mymonth < 10){ 
+		mymonth = "0" + mymonth; 
+	} 
+	if(myweekday < 10){ 
+		myweekday = "0" + myweekday; 
+	} 
+	return (myyear+"-"+mymonth + "-" + myweekday); 
+}
 /**
  * 判断staff是否已经在staff列表中存在 for ：工时维护时判断使用
  */

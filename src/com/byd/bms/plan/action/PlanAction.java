@@ -3740,16 +3740,25 @@ public class PlanAction extends BaseAction<Object> {
 		PrintWriter out = null;
 		
 		String vin=request.getParameter("vin");
+		String bus_number=request.getParameter("bus_number");
 		String update_val=request.getParameter("update_val");
 		String update_flg=request.getParameter("update_flg");
 		Map<String,Object> cdmap=new HashMap<String,Object>();
 		cdmap.put("vin", vin);
+		cdmap.put("bus_number", bus_number);
 		cdmap.put("update_val", update_val);
 		cdmap.put("update_flg", update_flg);
 	
 		JSONObject json=null;
 		//查询vin号、左右电机号是否已经绑定，已绑定返回错误信息
-		Map<String,String> busMap=planDao.queryBusByVinMotor(cdmap);
+		Map<String,String> busMap=null;
+		if(StringUtils.isNotEmpty(update_val)){
+			if("vin".equals(update_flg)){
+				busMap=planDao.queryBusByVin(cdmap);//根据vin查询BMS_PLAN_BUS表中是否已经绑定了该vin码
+			}
+			else busMap=planDao.queryBusByVinMotor(cdmap);	//查询左右电机号是否在BMS_PD_VIN表中已经和vin码绑定
+		}		
+		
 		StringBuffer message=new StringBuffer();
 		if(busMap!=null){
 			if("vin".equals(update_flg)){
@@ -3765,8 +3774,11 @@ public class PlanAction extends BaseAction<Object> {
 		}
 		//未绑定，更新vin号、左右电机号
 		else{
-			planDao.updateVinMotor(cdmap);
-			planDao.updateBusVinMotor(cdmap);
+			if(!"vin".equals(update_flg)){
+				planDao.updateVinMotor(cdmap);
+				planDao.updateBusVinMotor(cdmap);
+			}else	
+				planDao.updateBusVinMotor(cdmap);
 			json= Util.dataListToJson(true,"修改成功",null,null);
 		}		
 		

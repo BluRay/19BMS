@@ -18,15 +18,15 @@ $(document).ready(function(){
 		var index=parseInt((trId.split("_"))[1]);
 		var c_sequence=parseInt($(tds[0]).html());
 		var c_parts=$("#parts_"+index).val();
-		var c_partsId=parseInt($(tds[1]).attr("partsId"));
+		var c_partsId=parseInt($(tds[2]).attr("partsId"));
 		var c_recordId=parseInt($(tds[1]).attr("recordId"));
-		var c_processNo=$(tds[2]).html();
+		var c_processNo=""/*$(tds[2]).html()*/;
 		var c_processName=$("#processName_"+index).val();
 		//alert(c_recordId);
 		if(c_sequence>1){
 			detaillist[c_recordId].partsId=detaillist[c_recordId-1].partsId;
 			detaillist[c_recordId].parts=detaillist[c_recordId-1].parts;
-			detaillist[c_recordId].processNo=detaillist[c_recordId-1].processNo;
+			detaillist[c_recordId].processNo=""/*detaillist[c_recordId-1].processNo*/;
 			detaillist[c_recordId].processName=detaillist[c_recordId-1].processName;
 			//detaillist[c_recordId].sequence=detaillist[c_recordId-1].sequence;
 			detaillist[c_recordId-1].partsId=c_partsId;
@@ -38,14 +38,14 @@ $(document).ready(function(){
 			var index_last=index-1;
 			var trId_last="tr_"+(index-1);
 			var parts_last=$("#parts_"+index_last).val();
-			var processNo_last=$("#td2_"+index_last).html();
+			var processNo_last=""/*$("#td2_"+index_last).html()*/;
 			var processName_last=$("#processName_"+index_last).val();
 			//alert(processNo_last);
 			$("#parts_"+index).val(parts_last);
 			$("#processName_"+index).val(processName_last);
-			$("#td2_"+index).html(processNo_last);
+			/*$("#td2_"+index).html(processNo_last);*/
 			$("#parts_"+index_last).val(c_parts);
-			$("#td2_"+index_last).html(c_processNo);
+			/*$("#td2_"+index_last).html(c_processNo);*/
 			$("#processName_"+index_last).val(c_processName);
 			
 		}		
@@ -58,14 +58,14 @@ $(document).ready(function(){
 		var c_parts=$("#parts_"+index).val();
 		var c_partsId=parseInt($(tds[1]).attr("partsId"));
 		var c_recordId=parseInt($(tds[1]).attr("recordId"));
-		var c_processNo=$(tds[2]).html();
+		var c_processNo=""/*$(tds[2]).html()*/;
 		var c_processName=$("#processName_"+index).val();
 		var next_sequence=detaillist[c_recordId+1].sequence;
 		//alert(next_sequence);
 		if(next_sequence!=1){
 			detaillist[c_recordId].partsId=detaillist[c_recordId+1].partsId;
 			detaillist[c_recordId].parts=detaillist[c_recordId+1].parts;
-			detaillist[c_recordId].processNo=detaillist[c_recordId+1].processNo;
+			detaillist[c_recordId].processNo=""/*detaillist[c_recordId+1].processNo*/;
 			detaillist[c_recordId].processName=detaillist[c_recordId+1].processName;
 			//detaillist[c_recordId].sequence=detaillist[c_recordId-1].sequence;
 			detaillist[c_recordId+1].partsId=c_partsId;
@@ -78,14 +78,14 @@ $(document).ready(function(){
 			//alert(index_next);
 			var trId_next="tr_"+(index+1);
 			var parts_next=$("#parts_"+index_next).val();
-			var processNo_next=$("#td2_"+index_next).html();
+			var processNo_next=""/*$("#td2_"+index_next).html()*/;
 			var processName_next=$("#processName_"+index_next).val();
 			//alert(processNo_next);
 			$("#parts_"+index).val(parts_next);
 			$("#processName_"+index).val(processName_next);
-			$("#td2_"+index).html(processNo_next);
+			/*$("#td2_"+index).html(processNo_next);*/
 			$("#parts_"+index_next).val(c_parts);
-			$("#td2_"+index_next).html(c_processNo);
+			/*$("#td2_"+index_next).html(c_processNo);*/
 			$("#processName_"+index_next).val(c_processName);
 		}		
 	});
@@ -190,7 +190,7 @@ $(document).ready(function(){
 			var c_recordId=parseInt($(tds[1]).attr("recordId"));
 			//alert($(tds[0]).html());
 			$(tds[1]).html(obj.process_code);
-			detaillist[c_recordId].processNo=obj.process_code;
+			detaillist[c_recordId].processNo=""/*obj.process_code*/;
 			detaillist[c_recordId].processName=obj.process_name;	
 		});
 	});
@@ -198,14 +198,14 @@ $(document).ready(function(){
 	$("#btnSaveTplDetail").live("click",function(){
 		var flag=true;
 		$.each(detaillist,function(index,detail){
-			if(detail.partsId==''||detail.partsId=='0'){
+			if(detail.partsId==''||detail.partsId=='0'||detail.partsId==null){
 				$("#parts_"+index).val("").attr("placeholder","请输入有效零部件！").css("color","red");
 				flag=false;
 			}
-			if(detail.processNo==''){
+			/*if(detail.processNo==''){
 				$("#processName_"+index).val("").attr("placeholder","请输入有效工序！").css("color","red");
 				flag=false;
-			}
+			}*/
 		});
 		var busTypeId=isNaN(parseInt($("#input_busType").val()))?0:parseInt($("#input_busType").val());
 		var orderId=isNaN(parseInt($("#input_order").val()))?0:parseInt($("#input_order").val());
@@ -266,14 +266,14 @@ function generateTable(workshop){
 				var processName=value.processName==null?'':value.processName;
 				$("<td />").attr("recordId",index)
 				.attr("processName",processName)
-				.html("<input style='border:0;width:100%' class='process' value='"+processName+"' id='processName_"+index+"'>").appendTo(tr);
-				$("<td id='td2_"+index+"'/>").attr("recordId",index)
+				.html("<input style='border:0;width:100%;text-align:center' class='process' value='"+processName+"' id='processName_"+index+"'>").appendTo(tr);
+				/*$("<td id='td2_"+index+"'/>").attr("recordId",index)
 				.attr("processNo",value.processNo)
-				.html(value.processNo).appendTo(tr);
+				.html(value.processNo).appendTo(tr);*/
 				
 				$("<td />").attr("recordId",index)
 				.attr("partsId",value.partsId)
-				.html("<input style='border:0;width:100%'class='parts' value='"+value.parts+"' id='parts_"+index+"'>").appendTo(tr);
+				.html("<input style='border:0;width:100%;text-align:center'class='parts' value='"+value.parts+"' id='parts_"+index+"'>").appendTo(tr);
 				
 				$("<td />").html("<i name='edit' class=\"fa fa-arrow-up\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;"+
 						"<i name='edit' class=\"fa fa-arrow-down\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;"+
@@ -308,9 +308,9 @@ function generateTable(workshop){
 			$("<td />").attr("recordId",detailListSize)
 			.attr("processName","")
 			.html("<input style='border:0;width:100%'class='process' value='"+"' id='processName_"+detailListSize+"'>").appendTo(tr);
-			$("<td id='td2_"+detailListSize+"'/>").attr("recordId",detailListSize)
+			/*$("<td id='td2_"+detailListSize+"'/>").attr("recordId",detailListSize)
 			.attr("processNo","")
-			.html("").appendTo(tr);
+			.html("").appendTo(tr);*/
 			
 			$("<td />").attr("recordId",detailListSize)
 			.attr("partsId",0)

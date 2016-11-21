@@ -1658,6 +1658,16 @@
 		</if>
 	</select>
 	
+	<select id="queryBusByVin" parameterType="Map" resultType="Map">
+		SELECT bus_number,vin
+		FROM BMS_PLAN_BUS
+		WHERE
+		<if test="update_flg=='vin'">
+			vin=#{update_val}
+		</if>
+		
+	</select>
+	
 	<update id="updateVinMotor" parameterType="Map">
 		update BMS_PD_VIN 
 		<trim prefix="SET" suffixOverrides=",">
@@ -1674,6 +1684,6 @@
 			<if test="update_flg=='left_motor' ">left_motor_number=#{update_val},</if>
 			<if test="update_flg=='right_motor' ">right_motor_number=#{update_val},</if>
 		</trim>
-		where vin=#{vin}
+		where bus_number=#{bus_number}
 	</update>
 </mapper>

@@ -196,6 +196,8 @@ public class ExcelOperator {
 								errorMsg.append("名称为"+sheet.getSheetName()+"的sheet页的第"+rowIndex+"行，第"+(i+1)+"列的数据格式有误，应为"+mustType+"类型，实际为"+cellType+"类型。");
 								throw new Exception(errorMsg.toString());
 							}
+						}else{
+							rowData[i] = "";
 						}
 					}else{
 						Cell cell = row.getCell(i);

@@ -8,6 +8,9 @@ $(document).ready(function () {
 		getBusType();
 		getUserFactory();
 		getWorkshopSelect();
+		$("#search_factory").val(getQueryString("factory"));
+		$("#search_busnumber").val(getQueryString("bus_number"));
+		ajaxQuery();
 	}
 	
 	$("#btnQuery").click (function () {

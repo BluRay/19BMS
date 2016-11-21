@@ -4,7 +4,10 @@ $(document).ready(function () {
 	initPage();
 	
 	function initPage(){
-		getFactorySelect();
+		getFactorySelect(getQueryString("factory"),getQueryString("workshop"));
+		if($("#search_workshop").val() !=''){
+			getAllLineSelect();
+		}
 		getReasonTypeSelect();
 		getBusType();
 		getOrderNoSelect("#search_order_no","#orderId");
@@ -20,6 +23,11 @@ $(document).ready(function () {
 			orderlist.push(obj.orderNo);
 			orderDescList.push(obj.orderNo+" "+obj.name + " " + obj.busType +" "+ obj.orderQty+"台 ");
 		},$("#newPause_bus_type :selected").text(),newPause_factory,"area");*/
+		
+		/*$("#search_factory").val(getQueryString("factory"));
+		$("#search_workshop").val(getQueryString("workshop"));*/
+		$("#search_line").val(getQueryString("line"));
+		ajaxQuery();
 		
 	}
 	$("#order_no_list").typeahead({
@@ -582,7 +590,7 @@ function Div(exp1, exp2)
     return rslt;
 }
 
-function getFactorySelect() {
+function getFactorySelect(factory,workshop) {
 	$.ajax({
 		url : "common!getFactorySelect.action",
 		dataType : "json",
@@ -592,13 +600,13 @@ function getFactorySelect() {
 			alert(response.message)
 		},
 		success : function(response) {
-			getSelects(response, "", "#search_factory");
+			getSelects(response, factory, "#search_factory");
 			getSelects_empty(response, "", "#newPause_factory");
-			getWorkshopSelect();
+			getWorkshopSelect(workshop);
 		}
 	});
 }
-function getWorkshopSelect() {
+function getWorkshopSelect(workshop) {
 	$.ajax({
 		url : "common!getWorkshopSelect.action",
 		dataType : "json",
@@ -608,11 +616,12 @@ function getWorkshopSelect() {
 			alert(response.message)
 		},
 		success : function(response) {
-			getSelects(response, "", "#search_workshop");	
+			getSelects(response, workshop, "#search_workshop");	
 		}
 	});
 }
-function getAllLineSelect() {
+function getAllLineSelect(line) {
+	line=line||"";
 	$("#search_line").empty();
 	$.ajax({
 		url : "common!getLineSelect.action",
@@ -625,7 +634,7 @@ function getAllLineSelect() {
 			alert(response.message)
 		},
 		success : function(response) {
-			getSelects_empty(response, "", "#search_line"); 
+			getSelects_empty(response, line, "#search_line"); 
 		}
 	});
 }
