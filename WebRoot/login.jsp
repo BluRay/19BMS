@@ -22,6 +22,13 @@
 
 <script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	var last_url=getQueryString("last_url");
+	$("#last_url").val(last_url);
+});
+</script>
 <style id="style-1-cropbar-clipper">
 .en-markup-crop-options {
 	top: 18px !important;
@@ -90,6 +97,8 @@
 										</div>
 									</div>
 									 <p>* 请使用 <a href="firefox.exe">火狐浏览器(点击下载)</a> 使用本系统</p> 
+									 
+									 <input type="hidden" id="last_url" name="last_url" ></input>
 								</s:form>
 							</div>
 							

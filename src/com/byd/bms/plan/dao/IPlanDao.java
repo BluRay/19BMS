@@ -62,7 +62,7 @@ public interface IPlanDao {
 	public BmsOrder getOrderInfoByOrderID(String order_id);
 	public String getOrderIdByConfigId(String config_id);
 	
-	public List<Map<String,String>> getFactoryOrderDetail(Map<String,Object> queryMap);
+	public List<Map<String, Object>> getFactoryOrderDetail(Map<String,Object> queryMap);
 	
 	public List<Map<String,String>> getBusNumber(Map<String,Object> queryMap);
 	public int getBusNumberCount(Map<String,Object> queryMap);

@@ -17,6 +17,7 @@
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/json2.js"></script>
 <script type="text/javascript" src="js/order/orderMaintain2.js"></script>
 <script type="text/javascript" src="js/jsrender.min.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
@@ -180,7 +181,7 @@
                     <table style="margin-left:-25px" class="exp-table table">
 			          <thead>
 			            <tr>
-			              <th ><button style="height:24px" class="btn btn-success btn-xs" id="addFactoryOrder"><span class="glyphicon glyphicon-plus">+</span></button></th>
+			              <th ><i id="addFactoryOrder" class="fa fa-plus" style="cursor: pointer; padding-top: 25px; color: blue;"></th>
 			              <th class="col-sm-5">生产工厂</th>
 			              <th class="col-sm-7">数量</th>
 			              <th class="col-sm-7">起始号</th>
@@ -292,10 +293,11 @@
                 <label class="control-label" for="">产地分配</label>
                 <div class="controls">
                 <!-- <input type="text" class="input-medium" placeholder="选择订单交期..." id="bmsFactoryOrder" /> -->
-                    <table style="margin-left:-25px" class="exp-table table">
+                    <table style="margin-left:-20px" class="exp-table table">
 			          <thead>
 			            <tr>
-			              <th ><button style="height:24px" class="btn btn-success btn-xs" id="editFactoryOrder"><span class="glyphicon glyphicon-plus">+</span></button></th>
+			              <th ><i id="editFactoryOrder" class="fa fa-plus" style="cursor: pointer; padding-top: 25px; color: blue;"></i>
+			              <%-- <button style="height:24px" class="btn btn-success btn-xs" id="editFactoryOrder"><span class="glyphicon glyphicon-plus">+</span></button> --%></th>
 			              <th class="col-sm-5">生产工厂</th>
 			              <th class="col-sm-7">数量</th>
 			              <th class="col-sm-7">开始</th>

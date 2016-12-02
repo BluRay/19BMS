@@ -60,7 +60,7 @@ $(document).ready(function() {
 					alert("未查询到匹配模板！");
 					$("#td_info").css("display", "none");
 					return false;
-				}else if(!response.busInfo.vin&&workshopName=='底盘'){
+				}/*else if(!response.busInfo.vin&&workshopName=='底盘'){
 					alert("未绑定VIN编码！");
 					$("#btnSave").attr("disabled",true);
 					return false;
@@ -72,7 +72,7 @@ $(document).ready(function() {
 					alert("未绑定右电机号！");
 					$("#btnSave").attr("disabled",true);
 					return false;
-				}else{
+				}*/else{
 					$("#td_info").css("display","");
 					$("#btnQuery").attr("disabled",true);
 				}	

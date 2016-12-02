@@ -3,6 +3,7 @@ var wDate="";//上一月份
 var llDate="";//上上个月份
 var month_start= null;
 var month_end = null;
+var email_list=new Array();
 $(document).ready(function(){
 	month_start=document.getElementById("month_start");
 	month_end = document.getElementById("month_end");
@@ -52,9 +53,35 @@ $(document).ready(function(){
 	
 	//驳回工资
 	$("#btnReject").click(function(){	
-		ajaxUpdateSalaryHistory("驳回");	
+		$("#reasonModal").modal("show");
+		//ajaxUpdateSalaryHistory("驳回");	
 	})	
+//输入驳回原因确认后驳回
+	$("#btnMtaSave").click(function() {
+		var rejectReason=$("#reject_reason").val();
+		if(!rejectReason){
+			alert("请输入驳回原因！");
+			return false;		
+		}else{
+			ajaxUpdateSalaryHistory("驳回");
+			$("#reasonModal").modal("hide");
+			$.each(email_list,function(i,email_addr){
 
+				var tblobj=new Array();
+				var obj={};
+				obj['月份']=$("#month_start").val();
+				obj['驳回原因']=rejectReason;
+				obj['驳回人']=$("#login_user").html();
+				tblobj.push(obj)
+				
+				if(email_addr!=undefined &&email_addr!=""){
+					sendEmail(email_addr,'','计件工资驳回','月份,驳回原因,驳回人',JSON.stringify(tblobj),'')	
+				}
+				
+			})
+		}
+	})
+	
 	//结算工资
 	$("#btnSave").click(function(){	
 		ajaxUpdateSalaryHistory("结算");	
@@ -131,6 +158,7 @@ function changeMonth(){
 }
 
 function ajaxQuery(targetPage,queryAll){
+	email_list=new Array();
 	$(".divLoading").addClass("fade in").show();
 	var workshopAll="";
 	$("#workshop option").each(function(){
@@ -166,7 +194,12 @@ function ajaxQuery(targetPage,queryAll){
 		success : function(response) {
 			
 			$(table).html("");
+			var last_saver="";
 			$.each(response.salaryList,function(index,salary){
+				if(last_saver!=salary.saver){
+					email_list.push(salary.saver_email);
+				}		
+				last_saver=salary.saver;
 				var tr=$("<tr />");
 				$("<td />").html(salary.month).appendTo(tr);
 				$("<td />").html(salary.staff_number).appendTo(tr);
@@ -259,7 +292,7 @@ function ajaxUpdateSalaryHistory(actionType){
 		data : {
 			"conditions":conditions
 		},
-		success : function(response) {
+		success : function(response) {					
 			$(".divLoading").hide();
 			alert(response.message);		
 		}

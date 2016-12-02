@@ -68,7 +68,7 @@ function getAccessIp(){
 				</ul>
         		<ul class="nav pull-right">
           			<li>
-            			<a href="account!accountCenter.action" rel="tooltip" data-toggle="tooltip" data-placement="bottom" title="账户管理"><i class="fa fa-user"></i>&nbsp;<%=session.getAttribute("display_name") %></a>
+            			<a href="account!accountCenter.action" rel="tooltip" data-toggle="tooltip" data-placement="bottom" title="账户管理"><i class="fa fa-user"></i>&nbsp;<span id='login_user'><%=session.getAttribute("display_name") %></span></a>
          			 </li>
          			 <li>
             			<a id="a_logout" href="<%=basePath%>logout" rel="tooltip" data-toggle="tooltip" data-placement="bottom" title="注销"><i class="fa fa-sign-out"></i></a>

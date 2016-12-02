@@ -73,16 +73,24 @@
 		]]>
 	</insert>
 	
-	<insert id="insertFactoryOrder" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.order.entity.BmsFactoryOrder">
-		<![CDATA[
+	<insert id="insertFactoryOrder" useGeneratedKeys="true" parameterType="com.byd.bms.order.entity.BmsFactoryOrder">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
 			insert into BMS_FACTORY_ORDER(order_id,factory_id,production_qty,busnum_start,busnum_end,bus_number_start,bus_number_count,editor_id,edit_date) 
 			values(#{order_id},#{factory_id},#{production_qty},#{busnum_start},#{busnum_end},#{bus_number_start},#{bus_number_count},#{editor_id},#{edit_date})
-		]]>
 	</insert>
 	<insert id="updateFactoryOrder" useGeneratedKeys="true" keyProperty="id" parameterType="com.byd.bms.order.entity.BmsFactoryOrder">
 		<![CDATA[
-			UPDATE BMS_FACTORY_ORDER SET production_qty = production_qty + ${production_qty} 
-			WHERE order_id = #{order_id} AND factory_id = #{factory_id}
+			UPDATE BMS_FACTORY_ORDER SET production_qty = production_qty + ${production_qty},factory_id = #{factory_id} 
+			WHERE id = #{id}  
+		]]>
+	</insert>
+	<insert id="delFactoryOrderQty" useGeneratedKeys="true" keyProperty="id" parameterType="Map">
+		<![CDATA[
+			UPDATE BMS_FACTORY_ORDER SET production_qty = production_qty - ${production_qty} 
+			WHERE id = #{factory_order_id} 
 		]]>
 	</insert>
 	
@@ -92,8 +100,8 @@
 		values(#{factory_order_id},#{busnum_start},#{busnum_end},#{bus_number_start},
 		(SELECT count(bus_number) FROM  BMS_PLAN_BUS WHERE order_id = (SELECT order_id FROM BMS_FACTORY_ORDER WHERE id = #{factory_order_id}) 
 		AND welding_online_date IS NOT NULL 
-		AND RIGHT(bus_number,4) + 0 >= ${bus_number_start} 
-		AND RIGHT(bus_number,4) + 0 <= (${busnum_end} - ${busnum_start} + ${bus_number_start} + 0)
+		AND RIGHT(bus_number,5) + 0 >= ${bus_number_start} 
+		AND RIGHT(bus_number,5) + 0 <= (${busnum_end} - ${busnum_start} + ${bus_number_start} + 0)
 		)
 		,#{editor_id},#{edit_date})
 		]]>
@@ -180,6 +188,12 @@
 			AND RIGHT(b.bus_number,4) >= d.bus_number_start AND RIGHT(b.bus_number,4) <= (d.bus_number_start + d.busnum_end - d.busnum_start + 1)) 
 		WHERE d.factory_order_id IN (SELECT o.id FROM BMS_FACTORY_ORDER o WHERE o.order_id = #{order_id} AND o.factory_id = #{factory_id})
 		]]>
+	</update>
+	
+	<update id="updateFactorOrderDetail" parameterType="com.byd.bms.order.entity.BmsFactoryOrderDetail">
+		UPDATE BMS_FACTORY_ORDER_DETAIL d set busnum_start=#{busnum_start},
+		busnum_end=#{busnum_end},bus_number_start=#{busnum_start}
+		where id=#{id}
 	</update>
 	
 	<update id="deleteFactoryOrderDetail" parameterType="String">
@@ -396,8 +410,8 @@
 			LIMIT #{offset} ,#{pageSize} 
 		</if>			
 	</select>
-	<select id="getOrderDetailList" parameterType="Map" resultMap="orderMap">
-		SELECT (d.busnum_end - d.busnum_start +1) AS production_qty,d.busnum_start,d.busnum_end,d.bus_number_count,a.area,a.id AS 'factory_id',a.factory_name,
+	<select id="getOrderDetailList" parameterType="Map" resultType="com.byd.bms.order.entity.BmsFactoryOrderDetail">
+		<!-- SELECT (d.busnum_end - d.busnum_start +1) AS production_qty,d.busnum_start,d.busnum_end,d.bus_number_count,a.area,a.id AS 'factory_id',a.factory_name,
 		(SELECT COUNT(id) FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = f.order_id) AS issed_qty,
 		(SELECT IFNULL(MIN(RIGHT(bus_number,4) + 0),0) as minbusnum FROM BMS_PLAN_BUS WHERE order_id = #{order_id} AND welding_online_date IS NOT NULL AND RIGHT(bus_number,4) + 0 >= d.bus_number_start AND RIGHT(bus_number,4) + 0 &lt;= (d.busnum_end-d.busnum_start + d.busnum_start)) AS minbusnum,
 		(SELECT IFNULL(MAX(RIGHT(bus_number,4) + 0),0) as maxbusnum FROM BMS_PLAN_BUS WHERE order_id = #{order_id} AND welding_online_date IS NOT NULL AND RIGHT(bus_number,4) + 0 >= d.bus_number_start AND RIGHT(bus_number,4) + 0 &lt;= (d.busnum_end-d.busnum_start + d.busnum_start)) AS maxbusnum,
@@ -405,7 +419,18 @@
 			LEFT OUTER JOIN BMS_FACTORY_ORDER_DETAIL d ON f.id = d.factory_order_id
 			LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 
 			LEFT JOIN BMS_ORDER o ON f.order_id = o.id
-			LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1
+			LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1 -->
+		select d.id id,d.busnum_start busnum_start,d.busnum_end busnum_end,fo.id factory_order_id,(d.busnum_end-d.busnum_start+1) production_qty,fo.factory_id factory_id,o.order_no order_no,o.order_name order_name,
+		o.order_code order_code,o.order_type order_type,o.order_qty order_qty,o.productive_year productive_year,o.color color,o.seats seats,t.bus_type_code bus_type_code,
+		(SELECT ifnull(max(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=fo.order_id and factory_id=fo.factory_id) maxbusnum,
+		(SELECT ifnull(min(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=fo.order_id and factory_id=fo.factory_id) minbusnum,
+		fo.order_id order_id,o.delivery_date delivery_date,f.factory_name factory_name,d.editor_id editor_id,d.edit_date edit_date,d.bus_number_count bus_number_count,d.bus_number_start bus_number_start
+		from BMS_FACTORY_ORDER_DETAIL d
+		left join BMS_FACTORY_ORDER fo on fo.id=d.factory_order_id
+		left join BMS_BASE_FACTORY f on f.id=fo.factory_id
+		left join BMS_ORDER o on o.id=fo.order_id
+		left join BMS_BASE_BUS_TYPE t on o.bus_type_id = t.id
+		where 1=1
 		<if test="search_order_no!=null">
 			and o.order_no like CONCAT('%',#{search_order_no},'%')   
 		</if>
@@ -416,12 +441,12 @@
 			and o.productive_year = #{search_productive_year} 
 		</if>
 		<if test="search_factory!=null">
-			and f.factory_id = #{search_factory} 
+			and fo.factory_id = #{search_factory} 
 		</if>
 		<if test="order_id!=null">
-			and f.order_id = #{order_id} 
+			and fo.order_id = #{order_id} 
 		</if>
-		ORDER BY d.id
+		ORDER BY d.busnum_start
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize} 
 		</if>			
@@ -457,9 +482,7 @@
 		(SELECT COUNT(s.id) AS online_count FROM BMS_PLAN_BUS s WHERE s.order_cofig_id = c.id AND s.factory_id = a.factory_id AND s.bus_number IN (SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE print_sign = 1)) AS online_count
 		FROM BMS_ORDER o 
 		LEFT JOIN BMS_ORDER_CONFIG c ON o.id = c.order_id 
-		LEFT OUTER JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.id = a.order_id AND c.id = a.order_config_id 
-		AND a.factory_id = #{factory_id}
-		
+		LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.id = a.order_id AND c.id = a.order_config_id 				
 		LEFT JOIN BMS_BASE_BUS_TYPE b ON o.bus_type_id = b.id where 1=1
  		]]>
 		<if test="search_order_no!=null">
@@ -473,6 +496,9 @@
 		</if>
 		<if test="order_id!=null">
 			and o.id = #{order_id} 
+		</if>
+		<if test="factory_id !=null">
+			and a.factory_id = #{factory_id}
 		</if>
 		ORDER BY o.id DESC
 		<if test="offset!=null">
@@ -528,7 +554,7 @@
 		(SELECT id FROM BMS_ORDER WHERE productive_year = #{productive_year} AND order_type != 'KD件') 
 		AND order_id &lt;= #{order_id} 
 		ORDER BY order_id ,id -->
-		select bus_number_start+busnum_end-busnum_start
+		select ifnull(max(bus_number_start+busnum_end-busnum_start),0)
 		from BMS_FACTORY_ORDER_DETAIL 
 		where bus_number_start=(
 		select max(od.bus_number_start)
@@ -548,6 +574,7 @@
 		<if test="factory_id != null">
 		 and b.factory_id = #{factory_id} 
 		</if>
+		order by cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)
 	</select>
 	
 	<select id="getOrderBusDetail" parameterType="Map" resultType="Map">
@@ -573,5 +600,13 @@
 		AND order_cofig_id = #{order_cofig_id} AND welding_online_date IS NOT NULL
 		]]>
 	</select>
+	
+	<update id="deleteFactoryOrderDetailByDetailId" parameterType="int">
+		delete from BMS_FACTORY_ORDER_DETAIL where id=#{order_detail_id}
+	</update>
+	
+	<update id="deleteFactoryOrderNoProduction" parameterType="int">
+		delete from BMS_FACTORY_ORDER where order_id =#{order_id} and production_qty&lt;=0	
+	</update>
 	
 </mapper>

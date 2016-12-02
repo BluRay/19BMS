@@ -56,6 +56,11 @@ $(document).ready(function () {
 	})
 	
 	$("#btnAddConfirm").click (function () {
+		if(!validateUrlAuth("/plan!getGenerateVin.action")){
+			alert("抱歉，您没有“生成VIN号”的权限！");
+			return false;
+		}
+		
 		$("#divBulkAdd").hide();
 		if($("#vin_factory").val()==""){
 			alert('请选择VIN号生成工厂！');
@@ -90,10 +95,10 @@ $(document).ready(function () {
 	});
 	
 	
-	$(".vin").live("change",function(e){
+	$(".bus_number").live("change",function(e){
 		if(confirm("是否确定修改？")){
 			var tr=$(e.target).parent("td").parent("tr");
-			var bus_number=$(tr).find("td").eq(5).html();
+			var bus_number=$(tr).find("td").eq(5).find("input").attr("old_val");
 			var update_val=$(this).val();
 			ajaxUpdateVinMotor(bus_number,update_val,"vin",e);
 		}else{
@@ -104,7 +109,7 @@ $(document).ready(function () {
 	$(".left_motor").live("change",function(e){
 		if(confirm("是否确定修改？")){
 			var tr=$(e.target).parent("td").parent("tr");
-			var bus_number=$(tr).find("td").eq(5).html();
+			var bus_number=$(tr).find("td").eq(5).find("input").attr("old_value");
 			var update_val=$(this).val();
 			ajaxUpdateVinMotor(bus_number,update_val,"left_motor",e);
 		}else{
@@ -115,7 +120,7 @@ $(document).ready(function () {
 	$(".right_motor").live("change",function(e){
 		if(confirm("是否确定修改？")){
 			var tr=$(e.target).parent("td").parent("tr");
-			var bus_number=$(tr).find("td").eq(5).html();
+			var bus_number=$(tr).find("td").eq(5).find("input").attr("old_value");
 			var update_val=$(this).val();
 			ajaxUpdateVinMotor(bus_number,update_val,"right_motor",e);
 		}else{
@@ -131,7 +136,7 @@ function ajaxUpdateVinMotor(bus_number,update_val,update_flg,e){
 		url : "plan!updateVinMotor.action",
 		dataType : "json",
 		data : {
-			"vin":$(e.target).closest("tr").find(".vin").attr("old_val"),
+			"vin":$(e.target).closest("tr").find("td").eq(2).html(),
 			"bus_number":bus_number,
 			"update_val":update_val,
 			"update_flg":update_flg
@@ -195,10 +200,10 @@ function ajaxQuery(targetPage,queryAll){
         			/*$("<td style=\"text-align:center;\" />").html(index+1).appendTo(tr);*/
         			$("<td style=\"text-align:center;\" />").html(value.factory_name).appendTo(tr);
         			$("<td style=\"text-align:center;\" />").html(value.order_no+" "+value.order_name+value.bus_type_code+" "+value.order_qty+"台").appendTo(tr);
-        			$("<td style=\"text-align:center;\" />").html("<input id='vin_"+index+"' class='vin' style='font-size: 12px;color: #333333;border:0;width:100%' value='"+value.vin+"' old_val='"+value.vin+"'>").appendTo(tr);
+        			$("<td style=\"text-align:center;\" />").html(value.vin).appendTo(tr);
         			$("<td style=\"text-align:center;\" />").html("<input id='left_motor_"+index+"' class='left_motor' style='font-size: 12px;color: #333333;border:0;width:100%' value='"+value.left_motor_number+"' old_val='"+value.left_motor_number+"'>").appendTo(tr);
         			$("<td style=\"text-align:center;\" />").html("<input id='right_motor_"+index+"' class='right_motor' style='font-size: 12px;color: #333333;border:0;width:100%' value='"+value.right_motor_number+"' old_val='"+value.right_motor_number+"'>").appendTo(tr);
-        			$("<td style=\"text-align:center;\" />").html(value.bus_number).appendTo(tr);
+        			$("<td style=\"text-align:center;\" />").html("<input id='bus_"+index+"' class='bus_number' style='font-size: 12px;color: #333333;border:0;width:100%' value='"+value.bus_number+"' old_val='"+value.bus_number+"'>").appendTo(tr);
         			/*$("<td style=\"text-align:center;\" />").html(value.productive_date).appendTo(tr);*/
         			$("<td style=\"text-align:center;\" />").html(value.creator_name).appendTo(tr);
         			$("<td style=\"text-align:center;\" />").html(value.creat_date).appendTo(tr);

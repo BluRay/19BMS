@@ -281,7 +281,7 @@
 	</select>
 
 	<select id="getIndexOrderList" parameterType="Map" resultType="Map">
-		select o.production_qty, count(b.id)
+		<!-- select o.production_qty, count(b.id)
 		alreadyNum,o.order_id,r.order_no,r.order_name,t.bus_type_code,r.order_qty
 		FROM BMS_FACTORY_ORDER o left join BMS_PLAN_BUS b on
 		b.order_id=o.order_id and b.warehousing_date is not null and
@@ -295,7 +295,27 @@
 		</if>
 		group by o.order_id
 		order by o.edit_date desc
-		limit 0,5
+		limit 0,5 -->
+		select tmp.production_qty,count(distinct b.bus_number) alreadyNum,tmp.order_id,r.order_no,r.order_name,t.bus_type_code,r.order_qty
+		from(
+		select sum(o.production_qty) production_qty,o.order_id,o.factory_id
+		FROM BMS_FACTORY_ORDER o
+		where 1=1 
+		<if test="factoryId !=null">
+			and o.factory_id=#{factoryId}
+		</if> 
+		group by o.order_id) tmp
+		left join BMS_PLAN_BUS b on b.order_id=tmp.order_id and b.warehousing_date is not null 
+		and tmp.factory_id=b.factory_id
+		left join BMS_ORDER r on tmp.order_id=r.id
+		left join BMS_BASE_BUS_TYPE t on r.bus_type_id=t.id
+		where 1=1 
+		<if test="factoryId !=null">
+			and tmp.factory_id=#{factoryId}
+		</if>	 
+		group by tmp.order_id
+		order by r.order_no desc
+		limit 0,5;
 	</select>
 	<select id="getIndexExceptionList" parameterType="Map"
 		resultType="Map">

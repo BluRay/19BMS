@@ -13,8 +13,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.xwork.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 
@@ -226,7 +228,7 @@ public class OrderAction extends BaseAction<BmsOrder>{
 		return null;
 	}
 	
-	public String editOrder2()throws UnsupportedEncodingException{
+	/*public String editOrder2()throws UnsupportedEncodingException{
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String curTime = df.format(new Date());
 		int userid=getUser().getId();
@@ -342,6 +344,145 @@ public class OrderAction extends BaseAction<BmsOrder>{
 			
 		}	
 		}
+		JSONObject json = Util.dataListToJson(true,"查询成功",null);
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(json);	
+		return null;
+		
+	}*/
+	/**
+	 * added by xjw 161130
+	 * 订单维护
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public String editOrder2()throws UnsupportedEncodingException{
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String curTime = df.format(new Date());
+		int userid=getUser().getId();
+		logger.info("---->OrderAction::editOrder2 " + curTime + " " + userid);
+		
+		HttpServletRequest request= ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+		
+		String factoryOrderDetail = request.getParameter("factoryOrderDetail");
+		JSONArray jsa=JSONArray.fromObject(factoryOrderDetail);
+		List<Map<String,Object>> factoryOrderList=new ArrayList<Map<String,Object>>();//根据factoryOrderDetail合并后的工厂订单列表
+		
+		JSONArray deljsa=JSONArray.fromObject(request.getParameter("del_order_list"));
+		/**
+		 * 如果del_order_list不为空，先删除factory_order_detail ,然后factory_order的production_qty相应减少，
+		 * 当production_qty减少为0时删除该factory_order
+		 */
+		
+		for(Object o:deljsa){
+			JSONObject jso=JSONObject.fromObject(o);
+			int order_detail_id=jso.getInt("order_detail_id");
+			int factory_order_id=jso.getInt("factory_order_id");
+			int production_qty=jso.getInt("production_qty");
+			
+			orderDao.deleteFactoryOrderDetailByDetailId(order_detail_id);
+			
+			Map<String,Object> factoryorder_ard=new HashMap<String,Object>();
+			factoryorder_ard.put("factory_order_id", factory_order_id);
+			factoryorder_ard.put("production_qty", production_qty);
+			orderDao.delFactoryOrderQty(factoryorder_ard);
+		}		
+		
+		int order_id=Integer.parseInt(request.getParameter("data_order_id"));
+		
+		//当production_qty减少为0时删除该factory_order//当production_qty减少为0时删除该factory_order
+		orderDao.deleteFactoryOrderNoProduction(order_id);
+		
+		/**
+		 * 修改BMS_ORDER表的订单数据
+		 */
+		BmsOrder order = new BmsOrder();
+		order.setId(order_id);
+		order.setColor(request.getParameter("color"));
+		order.setSeats(request.getParameter("seats"));
+		order.setDelivery_date(request.getParameter("delivery_date"));
+		order.setMemo(request.getParameter("memo"));
+		orderDao.updateOrder(order);		
+		
+		/**
+		 * 遍历factoryOrderDetail，无detail_id的往BMS_FACTORY_ORDER_DETAIL表中
+		 * 新增一行数据;有detail_id的修改BMS_FACTORY_ORDER_DETAIL表对应数据
+		 */
+		for(Object o:jsa){
+			JSONObject jso=JSONObject.fromObject(o);
+			int factory_id=jso.getInt("factory_id");
+			int factory_order_id=jso.getInt("factory_order_id");
+			int order_detail_id=jso.getInt("order_detail_id");
+			int production_qty=jso.getInt("production_qty");
+			int old_production_qty=jso.getInt("old_production_qty");
+			int busnum_start=jso.getInt("busnum_start");
+			int busnum_end=jso.getInt("busnum_end");			
+			BmsFactoryOrderDetail fod=new BmsFactoryOrderDetail();
+			fod.setId(order_detail_id);
+			fod.setFactory_order_id(factory_order_id);
+			fod.setEditor_id(userid);
+			fod.setEdit_date(curTime);
+			fod.setBusnum_start(busnum_start);
+			fod.setBusnum_end(busnum_end);
+			fod.setBus_number_start(busnum_start);
+			
+			/**
+			 * 先将有factory_order_id的BMS_FACTORY_ORDER表中对应记录的production_qty减去old_production_qty
+			 */
+			if(factory_order_id!=0){
+				Map<String,Object> factoryorder_ard=new HashMap<String,Object>();
+				factoryorder_ard.put("factory_order_id", factory_order_id);
+				factoryorder_ard.put("production_qty", old_production_qty);
+				orderDao.delFactoryOrderQty(factoryorder_ard);
+			}
+			
+			
+			/**
+			 * 根据order_id和factory_id查询BMS_FACTORY_ORDER表数据，
+			 * 有记录就更新，未查询到数据则往BMS_FACTORY_ORDER表新增一行数据
+			 */
+			Map<String,Object> queryMap=new HashMap<String,Object>();
+			queryMap.put("order_id", order_id);
+			queryMap.put("factory_id", factory_id);
+			//无factory_order_id的查询factory_order_id，未找到的新增一行工厂订单数据
+			if(factory_order_id==0){
+				factory_order_id=orderDao.getFactoryOrderID(queryMap);
+			}
+			
+			BmsFactoryOrder factoryorder=new BmsFactoryOrder();
+			factoryorder.setProduction_qty(production_qty);
+			factoryorder.setId(factory_order_id);
+			factoryorder.setOrder_id(order_id);
+			factoryorder.setFactory_id(factory_id);
+			factoryorder.setEditor_id(userid);
+			factoryorder.setEdit_date(curTime);
+			//查询factory_order_id，未找到的新增一行工厂订单数据
+			if(factory_order_id==0){			
+				orderDao.insertFactoryOrder(factoryorder);
+				factory_order_id=factoryorder.getId();
+			}else{
+				orderDao.updateFactoryOrder(factoryorder);//更新工厂订单production_qty 加上新的产地分配数量
+			}
+			
+			//已存在的detail记录更新,不存在的新增
+			if(order_detail_id!=0){
+				orderDao.updateFactorOrderDetail(fod);
+			}else{
+				fod.setFactory_order_id(factory_order_id);
+				orderDao.insertFactoryOrderDetail(fod);
+			}
+			
+		}
+		
+		
 		JSONObject json = Util.dataListToJson(true,"查询成功",null);
 		try {
 			out = response.getWriter();
@@ -474,7 +615,7 @@ public class OrderAction extends BaseAction<BmsOrder>{
 		return null;
 	}
 	
-	public String addOrder2() throws UnsupportedEncodingException{
+/*	public String addOrder2() throws UnsupportedEncodingException{
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String curTime = df.format(new Date());
 		int userid=getUser().getId();
@@ -556,6 +697,117 @@ public class OrderAction extends BaseAction<BmsOrder>{
 			factoryOrderDetail.setFactory_order_id(factory_order_id);
 			if(request.getParameter("data_order_type").equals("KD件")){
 				factoryOrderDetail.setBus_number_start(0);
+			}else{
+				factoryOrderDetail.setBus_number_start(busNumberStart);
+			}
+			busNumberStart+=production_qty;
+			factoryOrderDetail.setBusnum_start(busnum_start);
+			factoryOrderDetail.setBusnum_end(busnum_end);
+			factoryOrderDetail.setEditor_id(userid);
+			factoryOrderDetail.setEdit_date(curTime);
+			
+			orderDao.insertFactoryOrderDetail(factoryOrderDetail);
+			
+			busnum_start = busnum_end + 1;
+			
+		}		
+		JSONObject json = Util.dataListToJson(true,"查询成功",null);
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(json);	
+		return null;
+	}*/
+	
+	public String addOrder2() throws UnsupportedEncodingException{
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String curTime = df.format(new Date());
+		int userid=getUser().getId();
+		logger.info("---->OrderAction::addOrder2 " + curTime + " " + userid);
+		
+		HttpServletRequest request= ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+		
+		BmsOrder order = new BmsOrder();
+		order.setOrder_no(getOrderSerialByYear(request.getParameter("data_productive_year")));
+		order.setOrder_name(request.getParameter("data_order_name"));
+		order.setOrder_code(request.getParameter("data_order_code"));
+		//added by xjw for adding order type on 2016-05-03
+		order.setOrder_type(request.getParameter("data_order_type"));
+		
+		order.setBus_type_id(Integer.parseInt(request.getParameter("data_bus_type_id")));
+		order.setOrder_qty(Integer.parseInt(request.getParameter("data_order_qty")));
+		order.setProductive_year(request.getParameter("data_productive_year"));
+		order.setColor(request.getParameter("color"));
+		order.setSeats(request.getParameter("seats"));
+		order.setDelivery_date(request.getParameter("delivery_date"));
+		order.setStatus(request.getParameter("status"));
+		order.setMemo(request.getParameter("memo"));
+		order.setEditor_id(userid);
+		order.setEdit_date(curTime);
+		
+		/**往BMS_ORDER 表中插入一条记录*/
+		orderDao.insertOrder(order);
+		
+		int newOrderId = order.getId();		
+		//logger.info("插入后主键为："+ order.getId());
+		String factoryOrderNum = request.getParameter("factoryOrderNum");
+		String[] strarray=factoryOrderNum.split(",");
+		
+		//计算当前订单 车号起始值
+		String productive_year = request.getParameter("data_productive_year");
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		conditionMap.put("productive_year", productive_year);
+		conditionMap.put("order_id", newOrderId);
+		int busNumberStart = orderDao.getBusNumberStart(conditionMap) + 1;
+		int busnum_start = busNumberStart;		//开始流水号
+		if(request.getParameter("data_order_type").equals("KD件")){
+			busnum_start=0;
+		}
+		int busnum_end = 0;			//开始流水号
+		
+		logger.info("---->busNumberStart = " + busNumberStart);
+		for(int i = 0; i < strarray.length; i++) {			
+			int factory_id = Integer.parseInt(strarray[i].substring(0, strarray[i].indexOf(":")));
+			int production_qty = Integer.parseInt(strarray[i].substring(strarray[i].indexOf(":") + 1, strarray[i].length()));			
+			busnum_end = busnum_start + production_qty - 1;			
+			//开始写入订单工厂表BMS_FACTORY_ORDER
+			BmsFactoryOrder factoryOrder = new BmsFactoryOrder();
+			factoryOrder.setOrder_id(newOrderId);
+			factoryOrder.setFactory_id(factory_id);
+			factoryOrder.setProduction_qty(production_qty);
+			//factoryOrder.setBus_number_start(busNumberStart);
+			//busNumberStart+=production_qty;
+			//factoryOrder.setBusnum_start(busnum_start);
+			//factoryOrder.setBusnum_end(busnum_end);
+			factoryOrder.setEditor_id(userid);
+			factoryOrder.setEdit_date(curTime);
+			
+			int factory_order_id = 0;
+			Map<String,Object> conditionMap2=new HashMap<String,Object>();
+			conditionMap2.put("order_id", newOrderId);
+			conditionMap2.put("factory_id", factory_id);
+			//factory_order_id = orderDao.getFactoryOrderID(conditionMap2);
+			
+			if(factory_order_id == 0){
+				orderDao.insertFactoryOrder(factoryOrder);
+				factory_order_id = factoryOrder.getId();
+								
+			}else{
+				factoryOrder.setId(factory_order_id);
+				orderDao.updateFactoryOrder(factoryOrder);
+						
+			}
+			
+			BmsFactoryOrderDetail factoryOrderDetail = new BmsFactoryOrderDetail();
+			factoryOrderDetail.setFactory_order_id(factory_order_id);
+			if(request.getParameter("data_order_type").equals("KD件")){
+				factoryOrderDetail.setBus_number_start(busnum_start);
 			}else{
 				factoryOrderDetail.setBus_number_start(busNumberStart);
 			}
@@ -1023,5 +1275,31 @@ public class OrderAction extends BaseAction<BmsOrder>{
 		return new_order_no;		
 	}
 	
-	
+	/**
+	 * added by xjw 16/11/22
+	 * 根据年份查询车辆最大流水起始号
+	 */
+	public String getLatestBusSeries(){
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = null;
+		JSONObject resultJson = null;
+		String productive_year=request.getParameter("productive_year");
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			Map<String,Object> conditionMap=new HashMap<String,Object>();
+			conditionMap.put("productive_year", productive_year);	
+			int bus_num_start=orderDao.getBusNumberStart(conditionMap)+1;
+			
+			resultMap.put("latest_num_start", bus_num_start);
+			
+			resultJson=JSONObject.fromObject(resultMap);			
+			out=response.getWriter();			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(resultJson);
+		return null;
+	}
 }

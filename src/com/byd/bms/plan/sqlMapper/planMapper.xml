@@ -271,7 +271,9 @@
 	</select>
 	
 	<select id="getFactoryOrderDetail" parameterType="Map" resultType="Map">
-		SELECT o.id,d.id AS detail_id,o.factory_id,o.order_id,o.production_qty,d.busnum_start,d.busnum_end,d.bus_number_start,(d.busnum_end - d.busnum_start + 1) AS qty, d.bus_number_count 
+		SELECT o.id,d.id AS detail_id,o.factory_id,o.order_id,o.production_qty,d.busnum_start,d.busnum_end,d.bus_number_start,(d.busnum_end - d.busnum_start + 1) AS qty, d.bus_number_count,
+		(SELECT ifnull(max(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=o.order_id and factory_id=o.factory_id) maxbusnum,
+		(SELECT ifnull(min(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=o.order_id and factory_id=o.factory_id) minbusnum
 		FROM BMS_FACTORY_ORDER o 
 		LEFT JOIN BMS_FACTORY_ORDER_DETAIL d ON d.factory_order_id = o.id
 		WHERE o.order_id = (SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
@@ -1647,9 +1649,7 @@
 		SELECT vin,left_motor_number,right_motor_number 
 		FROM BMS_PD_VIN
 		WHERE
-		<if test="update_flg=='vin'">
-			vin=#{update_val}
-		</if>
+
 		<if test="update_flg=='left_motor'">
 			left_motor_number=#{update_val}
 		</if>
@@ -1663,7 +1663,8 @@
 		FROM BMS_PLAN_BUS
 		WHERE
 		<if test="update_flg=='vin'">
-			vin=#{update_val}
+			bus_number=#{update_val}
+			and vin=#{vin}
 		</if>
 		
 	</select>
@@ -1671,19 +1672,30 @@
 	<update id="updateVinMotor" parameterType="Map">
 		update BMS_PD_VIN 
 		<trim prefix="SET" suffixOverrides=",">
-			<if test="update_flg=='vin' ">vin=#{update_val},</if>
 			<if test="update_flg=='left_motor' ">left_motor_number=#{update_val},</if>
 			<if test="update_flg=='right_motor' ">right_motor_number=#{update_val},</if>
 		</trim>
 		where vin=#{vin}
 	</update>
 	<update id="updateBusVinMotor" parameterType="Map">
-		update BMS_PLAN_BUS 
-		<trim prefix="SET" suffixOverrides=",">
-			<if test="update_flg=='vin' ">vin=#{update_val},</if>
-			<if test="update_flg=='left_motor' ">left_motor_number=#{update_val},</if>
-			<if test="update_flg=='right_motor' ">right_motor_number=#{update_val},</if>
-		</trim>
-		where bus_number=#{bus_number}
+		<if test="update_flg=='vin'">
+			<if test="update_val=='' or update_val==null ">
+				update BMS_PLAN_BUS set left_motor_number='',right_motor_number='',vin=''
+				where bus_number=#{bus_number}				
+			</if>
+			<if test="update_val!='' and update_val!=null ">
+				update BMS_PLAN_BUS set vin=#{vin}
+				where bus_number=#{update_val}				
+			</if>
+		</if>
+		<if test="update_flg=='left_motor'">
+			update BMS_PLAN_BUS set left_motor_number=#{update_val}
+			where bus_number=#{bus_number}
+		</if>
+		<if test="update_flg=='right_motor' ">
+			update BMS_PLAN_BUS set right_motor_number=#{update_val}
+			where bus_number=#{bus_number}
+		</if>
+
 	</update>
 </mapper>

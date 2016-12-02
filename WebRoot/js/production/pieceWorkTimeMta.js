@@ -277,6 +277,7 @@ $(document)
 					$("#btnSave")
 							.click(
 									function() {
+										
 										var inputlist = $("#table_workhour input[class='input-small card_num']");
 										var org ="";
 										var factory="";
@@ -368,8 +369,9 @@ $(document)
 												total_distribution=numAdd(total_distribution,distribution);
 												//total_distribution+=Number(distribution)
 												//alert(total_distribution)
-												if (staffId != undefined
-														&& staffId
+												//alert(staffId)
+												if (staffId != "undefined"&&staffId!=undefined
+														&& staffNumber
 																.trim().length > 0/*&&participation !=0*/) {
 													var staff = {};
 													staff.factory=factory;
@@ -405,6 +407,10 @@ $(document)
 														return false;
 														
 													}			
+												}else{
+													saveFlag=false;
+													alert("第"+(index+1)+"行数据未填写有效员工工号！");
+													return false;
 												}
 												if (workshop=='自制件'&&(participation == ''
 														|| participation
@@ -449,10 +455,13 @@ $(document)
 											}
 											
 											if (saveFlag ) {
+												$("#btnSave").hide();
 												if(stafflist.length > 0){
 													ajaxSave(JSON.stringify(stafflist));
+													$("#btnSave").show();
 												}else{
 													alert("无数据保存！");
+													$("#btnSave").show();
 												}
 												
 											}
@@ -542,7 +551,7 @@ function addWorkHourItem(staffId, cardNo, staffName, staffPost, workHour,
 
 function ajaxSave(conditions) {
 	$(".divLoading").addClass("fade in").show();
-	$('#btnSave').attr("disabled",true);
+	/*$('#btnSave').attr("disabled",true);*/
 	$.ajax({
 		url : "pieceWorkTime!saveWorkHourInfo.action",
 		dataType : "json",
@@ -554,7 +563,7 @@ function ajaxSave(conditions) {
 		success : function(response) {
 			$(".divLoading").hide();
 			alert(response.message);
-			$('#btnSave').attr("disabled",false);
+			//$('#btnSave').attr("disabled",false);
 		}
 	});
 }

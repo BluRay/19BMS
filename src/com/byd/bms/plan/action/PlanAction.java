@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1211,6 +1212,7 @@ public class PlanAction extends BaseAction<Object> {
 			String year = order_info.getProductive_year();
 			String order_type = order_info.getOrder_type();		//订单类型，KD件不产生车号	
 			
+			
 			for(int j=1;j<issuanceArray.length;j++){
 				if (Integer.valueOf(issuanceArray[j])>0){
 					PlanProductionPlan productionPlan = new PlanProductionPlan();
@@ -1237,63 +1239,83 @@ public class PlanAction extends BaseAction<Object> {
 								Map<String,Object> orderDetailMap=new HashMap<String,Object>();
 								orderDetailMap.put("factory_id", factory_id);
 								orderDetailMap.put("order_no", order_no);
-								List datalist=new ArrayList();
+								List<Map<String,Object>> datalist=new ArrayList<Map<String,Object>>();
 								datalist = planDao.getFactoryOrderDetail(orderDetailMap);
+								
+								/**
+							 	* 查询该工厂订单下的车号流水最小值，判断最小值是否超出流水范围，未超出则用最小值减一生成车号，超出则查找该工厂订单下车号流水的最大值，判断最大值
+							 	* 是否超出流水范围，未超出用最大值加一生成车号，超出则不生成车号；
+							 	*/						
+								//int min=planDao.getMinSeriesByFactoryOrder(orderDetailMap);
+								Integer cur_bus_number=null;//当前产生车号准备使用的流水号
+								int detail_id = 0;
+								
+								/**
+								 * 当最小车号流水为0代表该工厂订单还未生成车号，则使用起始流水号开始生成车号；
+								 * 当最小车号流水不为0，且最小车号流水大于起始流水号，则使用最小车号流水-1生成车号
+								 * 当最小车号流水等于起始流水车号，判断最大车号流水是否小于结束流水号，是：用最大车号流水+1生成车号；
+								 * 当最小车号流水等于起始流水车号，且最大车号流水等于结束流水号，则需要判断该工厂订单是否存在其他流水段，存在再重复该循环，
+								 * 直到找到合适流水号，未找到则表明所有车号均已产生
+								 */
+	
 								for(int k=0;k<datalist.size();k++){
-									Map<String,String> result = new HashMap<String,String>();
-									result = (Map<String, String>) datalist.get(k);
-									//System.out.println(String.valueOf(result.get("id")) + "|" + String.valueOf(result.get("busnum_start")) + "|" + String.valueOf(result.get("busnum_end")) + "|" + String.valueOf(result.get("qty")));
-									if(Integer.valueOf(String.valueOf(result.get("bus_number_count")))<Integer.valueOf(String.valueOf(result.get("qty")))){
-										//车号生成数 < 总数
-										int cur_bus_number = Integer.valueOf(String.valueOf(result.get("bus_number_start"))) + Integer.valueOf(String.valueOf(result.get("bus_number_count")));
-										int detail_id = Integer.valueOf(String.valueOf(result.get("detail_id")));
-										logger.info("---->当前车号为:" + cur_bus_number);
-										//判断生成的车号是否已经生成
-										Map<String,Object> queryMap2=new HashMap<String,Object>();
-										queryMap2.put("order_no", order_no);
-										queryMap2.put("num", cur_bus_number);
-										PlanBusNumber TempbusNumber = new PlanBusNumber();
-										TempbusNumber = planDao.checkBusNumber(queryMap2);
-										int countNumber = 0;
-										if(TempbusNumber!=null){
-											//车号已经存在，计算新车号
-											logger.info("---->当前车号已经存在:" + cur_bus_number);										
-										}else{
-											PlanBusNumber busNumber = new PlanBusNumber();
-											busNumber.setCreator_id(userId);
-											busNumber.setPrint_sign("0");
-											busNumber.setCreat_date(curTime);
-											busNumber.setNum(cur_bus_number);
-											busNumber.setBus_code(bus_type);
-											busNumber.setOrder_code(order_code);
-											busNumber.setYear(year);
-											int busNumberId = planDao.insertPlanBusNumber(busNumber);
-											logger.info("---->busNumberId = " + busNumberId + "=" + busNumber.getId());
-											
-											PlanBus bus = new PlanBus();
-											bus.setBus_number_id(busNumber.getId());
-											bus.setFactory_id(factory_id);
-											bus.setStatus("0");
-											bus.setOrder_no(order_no);
-											bus.setOrder_cofig_id(Integer.valueOf(issuanceArray[0].substring(0, issuanceArray[0].length()-1)));
-											bus.setSequence(i+1);
-											bus.setProduction_plan_id(production_plan_id);
-											planDao.insertPlanBus(bus);
-											
-										}	
-										//更新工厂已发布数:已发布数+1
-										planDao.updateFactoryOrderDetail(detail_id);
-										bus_count++;								
+									Map<String, Object> result = new HashMap<String,Object>();
+									result = (Map<String, Object>) datalist.get(k);
+									Long max=(Long)result.get("maxbusnum") ;
+									Long min=(Long)result.get("minbusnum");
+									int maxbusnum=max.intValue();
+									int minbusnum=min.intValue();
+									int busnum_start=Integer.parseInt(result.get("busnum_start").toString());
+									int busnum_end=Integer.parseInt(result.get("busnum_end").toString());
+									detail_id=Integer.parseInt(result.get("detail_id").toString());
+									if(minbusnum==0){
+										cur_bus_number=busnum_start;
+										break;
+									}else if(minbusnum>busnum_start){
+										cur_bus_number=minbusnum-1;
+										break;
+									}else if(minbusnum==busnum_start && maxbusnum<busnum_end){
+										cur_bus_number=maxbusnum+1;
+										minbusnum=0;
 										break;
 									}
 								}
+							logger.info("---->当前车号为:" + cur_bus_number);	
+							if(cur_bus_number!=null){//当找到了合适的流水号时，产生车号，否则代表已全部生成完
+								PlanBusNumber busNumber = new PlanBusNumber();
+								busNumber.setCreator_id(userId);
+								busNumber.setPrint_sign("0");
+								busNumber.setCreat_date(curTime);
+								busNumber.setNum(cur_bus_number);
+								busNumber.setBus_code(bus_type);
+								busNumber.setOrder_code(order_code);
+								busNumber.setYear(year);
+								int busNumberId = planDao.insertPlanBusNumber(busNumber);
+								logger.info("---->busNumberId = " + busNumberId + "=" + busNumber.getId());
 								
+								PlanBus bus = new PlanBus();
+								bus.setBus_number_id(busNumber.getId());
+								bus.setFactory_id(factory_id);
+								bus.setStatus("0");
+								bus.setOrder_no(order_no);
+								bus.setOrder_cofig_id(Integer.valueOf(issuanceArray[0].substring(0, issuanceArray[0].length()-1)));
+								bus.setSequence(i+1);
+								bus.setProduction_plan_id(production_plan_id);
+								planDao.insertPlanBus(bus);
+								
+								//更新工厂已发布数:已发布数+1
+								planDao.updateFactoryOrderDetail(detail_id);
+								bus_count++;
+							}
+
 							}//END循环生成车号
+							
 						}
 						
 					}
 				}			
 			}
+					
 		}		
 
 		JSONObject json = Util.dataListToJson(true,String.valueOf(bus_count),null,null);

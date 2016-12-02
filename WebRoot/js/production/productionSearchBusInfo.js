@@ -517,7 +517,7 @@ function ajaxQueryTab04(){
 			$("#tb04_result").html("");
 			$("#tb04_tester").html("");
 			$("#tb04_qe").html("");
-			$("#table04Result tbody").html("");
+			$("#table04Result").find("tbody").html("");
 			$.each(response.dataList, function(index, value) {
 				strs += "<option value=" + value.id + ">" + value.workshop
 							+ "</option>";
@@ -567,6 +567,7 @@ function queryTestCardInfo(headerId){
 		});
 }
 function generateTestCardTable(dataList) {
+	$("#table04Result tbody").html("");
 	var last_processNo = null;
 	var last_itemNo = null;
 	var last_node = null;
@@ -735,6 +736,7 @@ function ajaxQueryTab05(){
 }
 function generateProdTrackTable(workshop){
 	var tableId="#table05Result";
+	$(tableId+" tbody").html("");
 	var i=1;
 	$.each(prod_track_infos,function(index,value){
 		if(value.workshop.indexOf(workshop)>=0){

@@ -67,4 +67,18 @@ public interface IOrderDao {
 	public int getOrderBusNumberCount(Map<String,Object> queryMap);
 	public int getAllOrderBusNumberCount(Map<String,Object> queryMap);
 
+	public int updateFactorOrderDetail(BmsFactoryOrderDetail factoryorderdetail);
+	public int delFactoryOrderQty(Map<String,Object> queryMap);
+	/**
+	 * added by xjw 161130
+	 * 根据工厂订单明细id删除工厂订单明细记录
+	 * @param order_detail_id
+	 */
+	public void deleteFactoryOrderDetailByDetailId(int order_detail_id);
+	/**
+	 * added by xjw 161130
+	 * 根据订单id删除工厂订单中production为0的记录
+	 * @param order_id
+	 */
+	public void deleteFactoryOrderNoProduction(int order_id); 
 }

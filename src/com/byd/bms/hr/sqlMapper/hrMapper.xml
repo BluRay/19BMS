@@ -2304,7 +2304,9 @@
 		select h.id,h.month,h.staff_number,h.staff_name,s.status staff_status,h.skill_parameter,h.job,h.plant_org,h.workshop_org,h.workgroup_org,h.team_org,h.attendance_days,h.attendance_hours,sum(h.piece_total) piece_total,
 		sum(h.bonus_total) bonus_total,sum(h.piece_pay_total) piece_pay_total,sum(h.ecnwh_total) ecnwh_total,sum(h.ecn_pay_total) ecn_pay_total,sum(h.wwh_total) wwh_total,
 		sum(h.wait_pay_total) wait_pay_total,sum(h.tmpwh_total) tmpwh_total,sum(h.tmp_pay_total) tmp_pay_total,sum(h.dscore_total) dscore_total,sum(h.deduct_pay_total) deduct_pay_total,
-		case when find_in_set('已提交',group_concat(h.status,','))>0 then '已提交' else '已结算' end status 
+		case when find_in_set('已提交',group_concat(h.status,','))>0 then '已提交' else '已结算' end status,(select u.email from BMS_BASE_USER u 
+		left join BMS_HR_STAFF s1 on s1.staff_number=u.card_number 
+		where s1.name=h.saver and s1.workshop_org=h.submit_workshop and s1.plant_org=h.submit_factory ) saver_email,h.saver
 		from BMS_HR_PIECE_SALARY_HISTORY h 
 		left join BMS_HR_STAFF s on h.staff_number=s.staff_number
 		where h.staff_number in (

@@ -41,7 +41,8 @@ $(document).ready(function () {
 	});
 	
 	$("#new_staff_Factory").change(function(){
-		getDepartSelect("#new_staff_Workshop","",$(this).val(),"empty");
+		//getDepartSelect("#new_staff_Workshop","",$(this).val(),"empty");
+		getWorkshopSelect("#new_staff_Workshop", "", $(this).val(), "empty","")
 	});
 	
 	$("#btnAdd").click( function (argument) {
