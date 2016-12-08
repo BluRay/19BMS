@@ -453,9 +453,9 @@ public class OrderAction extends BaseAction<BmsOrder>{
 			queryMap.put("order_id", order_id);
 			queryMap.put("factory_id", factory_id);
 			//无factory_order_id的查询factory_order_id，未找到的新增一行工厂订单数据
-			if(factory_order_id==0){
+			/*if(factory_order_id==0){
 				factory_order_id=orderDao.getFactoryOrderID(queryMap);
-			}
+			}*/
 			
 			BmsFactoryOrder factoryorder=new BmsFactoryOrder();
 			factoryorder.setProduction_qty(production_qty);

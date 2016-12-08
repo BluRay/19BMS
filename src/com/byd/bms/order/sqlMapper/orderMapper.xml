@@ -381,14 +381,14 @@
 	
 	<select id="getOrderList" parameterType="Map" resultMap="orderMap">
 		<!-- select o.*,t.bus_type_code from BMS_ORDER o LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1 -->
-		SELECT (d.busnum_end-d.busnum_start+1) production_qty,f.busnum_start,f.busnum_end,a.area,a.id AS 'factory_id',a.factory_name,f.edit_date,u.username as 'user_name',
+		SELECT (d.busnum_end-d.busnum_start+1) production_qty,f.busnum_start,f.busnum_end,a.factory_name area,a.id AS 'factory_id',a.factory_name,d.edit_date,u.username as 'user_name',
 		(SELECT COUNT(id) FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = f.order_id) AS issed_qty,t.bus_type_code,o.*,CONCAT(o.order_name,t.bus_type_code,o.order_qty,'台') AS 'order_name_str',d.bus_number_start,(d.bus_number_start+d.busnum_end-d.busnum_start) bus_number_end
 			FROM BMS_FACTORY_ORDER f 
 			LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 
 			LEFT JOIN BMS_ORDER o ON f.order_id = o.id
 			LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id 
-			left join BMS_BASE_USER u on f.editor_id = u.id
-			LEFT JOIN BMS_FACTORY_ORDER_DETAIL d ON f.id = d.factory_order_id 
+			LEFT JOIN BMS_FACTORY_ORDER_DETAIL d ON f.id = d.factory_order_id
+			left join BMS_BASE_USER u on d.editor_id = u.id 
 			where 1=1 
 		<if test="search_order_no!=null">
 			and o.order_no like CONCAT('%',#{search_order_no},'%')   
@@ -422,8 +422,8 @@
 			LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1 -->
 		select d.id id,d.busnum_start busnum_start,d.busnum_end busnum_end,fo.id factory_order_id,(d.busnum_end-d.busnum_start+1) production_qty,fo.factory_id factory_id,o.order_no order_no,o.order_name order_name,
 		o.order_code order_code,o.order_type order_type,o.order_qty order_qty,o.productive_year productive_year,o.color color,o.seats seats,t.bus_type_code bus_type_code,
-		(SELECT ifnull(max(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=fo.order_id and factory_id=fo.factory_id) maxbusnum,
-		(SELECT ifnull(min(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=fo.order_id and factory_id=fo.factory_id) minbusnum,
+		(SELECT ifnull(max(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=fo.order_id and factory_id=fo.factory_id and factory_order_detail_id=d.id) maxbusnum,
+		(SELECT ifnull(min(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=fo.order_id and factory_id=fo.factory_id and factory_order_detail_id=d.id) minbusnum,
 		fo.order_id order_id,o.delivery_date delivery_date,f.factory_name factory_name,d.editor_id editor_id,d.edit_date edit_date,d.bus_number_count bus_number_count,d.bus_number_start bus_number_start
 		from BMS_FACTORY_ORDER_DETAIL d
 		left join BMS_FACTORY_ORDER fo on fo.id=d.factory_order_id

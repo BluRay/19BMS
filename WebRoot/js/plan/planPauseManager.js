@@ -144,6 +144,9 @@ $(document).ready(function () {
 	});
 	
 	$("#btnNewPauseConfirm").click (function () {
+		var mailTo=$("#new_pause_email_send").val();
+		var cc=$("#new_pause_email_cc").val();
+		
 		if($("#line_str").val()==""){
 			alert("请选择线别！");
 			return false;
@@ -171,6 +174,18 @@ $(document).ready(function () {
 			$("#new_pause_waste_num").focus();
 			return false;
 		}
+
+		var error_mail=validateEmail(mailTo.split(";"));
+		if(error_mail.trim().length>0){
+			alert("收件人中"+error_mail+"不是有效邮箱地址！")
+			return false;
+		}
+		var error_mail=validateEmail(cc.split(";"));
+		if(error_mail.trim().length>0){
+			alert("CC中"+error_mail+"不是有效邮箱地址！")
+			return false;
+		}
+		
 		ajaxNewPauseConfirm();
 		return false;
 	});
@@ -181,10 +196,12 @@ $(document).ready(function () {
 	});
 	
 	$("#btnManageConfirm").click (function () {
-		if($("#manage_date_end").val()==""){
+		/*if($("#manage_date_end").val()==""){
 			alert("请选择停线实际结束时间");
 			return false;
-		}
+		}*/
+		var mailTo=$("#manage_email_send").val();
+		var cc=$("#manage_email_cc").val();
 		if($("#manage_date_start").val()==""){
 			alert("请选择停线开始时间");
 			return false;
@@ -197,25 +214,39 @@ $(document).ready(function () {
 			alert("损失产能必须为数字！");
 			return false;
 		}
-		var pauseTime=getPauseMin($("#manage_date_start").val(),$("#manage_date_end").val(),'H');
-		//alert(pauseTime);
-		if(pauseTime<parseFloat($("#manage_pause_time").val())){
-			alert("输入的停线时长不能超出实际停线时长！");
-			return false;
+		if($("#manage_date_end").val()!=""){
+			var pauseTime=getPauseMin($("#manage_date_start").val(),$("#manage_date_end").val(),'H');
+			//alert(pauseTime);
+			if(pauseTime<parseFloat($("#manage_pause_time").val())){
+				alert("输入的停线时长不能超出实际停线时长！");
+				return false;
+			}
+			
+			if($("#manage_date_end").val()<=$("#manage_date_start").val()){
+				alert("停线实际结束时间不能小于开始时间！");
+				return false;
+			}
+			if($("#manage_close_date").val()<=$("#manage_date_start").val()){
+				alert("处理时间不能小于开始时间！");
+				return false;
+			}
+			if($("#manage_close_date").val()>=$("#manage_date_end").val()){
+				alert("处理时间不能大于结束时间！");
+				return false;
+			}			
+			var error_mail=validateEmail(mailTo.split(";"));
+			if(error_mail.trim().length>0){
+				alert("收件人中"+error_mail+"不是有效邮箱地址！")
+				return false;
+			}
+			var error_mail=validateEmail(cc.split(";"));
+			if(error_mail.trim().length>0){
+				alert("CC中"+error_mail+"不是有效邮箱地址！")
+				return false;
+			}
+
 		}
-		
-		if($("#manage_date_end").val()<=$("#manage_date_start").val()){
-			alert("停线实际结束时间不能小于开始时间！");
-			return false;
-		}
-		if($("#manage_close_date").val()<=$("#manage_date_start").val()){
-			alert("处理时间不能小于开始时间！");
-			return false;
-		}
-		if($("#manage_close_date").val()>=$("#manage_date_end").val()){
-			alert("处理时间不能大于结束时间！");
-			return false;
-		}
+
 		
 		ajaxManageConfirm();
 		return false;
@@ -297,13 +328,29 @@ function ajaxNewPauseConfirm(){
 				tbdatalist+="'损失工时（H）':'"+"',";
 				tbdatalist+="'产能损失':'"+"',";
 				tbdatalist+="'备注':'"+$("#new_pause_memo").val()+"'}]";
-				sendEmail(mailTo,cc,title,thead,tbdatalist);
+				
+				sendEmail(mailTo,cc,title,thead,tbdatalist);		
 				
 			} else {
 				alert(response.message);
 			}
 		}
 	})
+}
+/**
+ * 邮箱地址校验
+ * @param maillist
+ * @returns mailaddr
+ */
+function validateEmail(maillist){
+	var mailaddr="";
+	$.each(maillist,function(i,mail){
+		if(!const_email_validate.test(mail)){
+			mailaddr=mail;
+			return false;
+		}
+	});
+	return mailaddr;
 }
 
 function ajaxQuery(targetPage){
@@ -504,6 +551,7 @@ function ajaxManageConfirm(){
 				tbdatalist+="'损失工时（H）':'"+(pauseTime*parseFloat($("#manage_waste_num").val()))+"',";
 				tbdatalist+="'产能损失':'"+$("#capacityLoss").val()+"',";
 				tbdatalist+="'备注':'"+$("#manage_memo").val()+"'}]";
+				
 				sendEmail(mailTo,cc,title,thead,tbdatalist);
 			} else {
 				alert(response.message);

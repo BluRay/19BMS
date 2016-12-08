@@ -26,6 +26,7 @@ public class PlanBus {
 	private String dispatch_date;		//发车日期
 	private int bus_number_id;
 	private String order_no;
+	private int factory_order_detail_id;
 	
 	public int getId() {
 		return id;
@@ -146,6 +147,12 @@ public class PlanBus {
 	}
 	public void setFactory_name(String factory_name) {
 		this.factory_name = factory_name;
+	}
+	public int getFactory_order_detail_id() {
+		return factory_order_detail_id;
+	}
+	public void setFactory_order_detail_id(int factory_order_detail_id) {
+		this.factory_order_detail_id = factory_order_detail_id;
 	}
 
 

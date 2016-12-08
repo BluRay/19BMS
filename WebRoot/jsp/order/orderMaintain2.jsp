@@ -18,7 +18,7 @@
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/json2.js"></script>
-<script type="text/javascript" src="js/order/orderMaintain2.js"></script>
+<script type="text/javascript" src="js/order/orderMaintain2.js?timestamp="+new Date().getTime()></script>
 <script type="text/javascript" src="js/jsrender.min.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 

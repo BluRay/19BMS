@@ -1241,7 +1241,7 @@ public class PlanAction extends BaseAction<Object> {
 								orderDetailMap.put("order_no", order_no);
 								List<Map<String,Object>> datalist=new ArrayList<Map<String,Object>>();
 								datalist = planDao.getFactoryOrderDetail(orderDetailMap);
-								
+								List<Map<String,Object>> busNo_generatelist=new ArrayList<Map<String,Object>>();
 								/**
 							 	* 查询该工厂订单下的车号流水最小值，判断最小值是否超出流水范围，未超出则用最小值减一生成车号，超出则查找该工厂订单下车号流水的最大值，判断最大值
 							 	* 是否超出流水范围，未超出用最大值加一生成车号，超出则不生成车号；
@@ -1268,17 +1268,31 @@ public class PlanAction extends BaseAction<Object> {
 									int busnum_start=Integer.parseInt(result.get("busnum_start").toString());
 									int busnum_end=Integer.parseInt(result.get("busnum_end").toString());
 									detail_id=Integer.parseInt(result.get("detail_id").toString());
-									if(minbusnum==0){
-										cur_bus_number=busnum_start;
+									/*if(minbusnum>=busnum_start && maxbusnum<busnum_end){//该段流水已生成车号，但是未生成完，后端流水有空余流水号，接着生成
+										cur_bus_number=maxbusnum+1;									
 										break;
-									}else if(minbusnum>busnum_start){
+									}else if(minbusnum>busnum_start&&maxbusnum==busnum_end){//该段流水未生成完，前段流水有空余流水号
 										cur_bus_number=minbusnum-1;
 										break;
-									}else if(minbusnum==busnum_start && maxbusnum<busnum_end){
+									}else if(maxbusnum>=busnum_start && maxbusnum<busnum_end){//该段流水已生成车号，但是未生成完，后端流水有空余流水号，接着生成
 										cur_bus_number=maxbusnum+1;
-										minbusnum=0;
+										break;
+									}else if(minbusnum>busnum_end||maxbusnum<busnum_start){//该段流水未产生车号
+										cur_bus_number=busnum_start;
+										break;
+									}*/
+									if(minbusnum>busnum_start){//该段流水前段有剩余流水号，minbusnum-1接着生成
+										cur_bus_number=minbusnum-1;
+										 break;
+									}else if(maxbusnum<busnum_end&&minbusnum!=0&&maxbusnum!=0){//该段流水后段有剩余流水号，maxbusnum+1接着生成
+										cur_bus_number=maxbusnum+1;
+										break;
+									}else if(minbusnum==0&&maxbusnum==0){//该段流水未产生车号
+										cur_bus_number=busnum_start;
 										break;
 									}
+									
+									
 								}
 							logger.info("---->当前车号为:" + cur_bus_number);	
 							if(cur_bus_number!=null){//当找到了合适的流水号时，产生车号，否则代表已全部生成完
@@ -1301,6 +1315,7 @@ public class PlanAction extends BaseAction<Object> {
 								bus.setOrder_cofig_id(Integer.valueOf(issuanceArray[0].substring(0, issuanceArray[0].length()-1)));
 								bus.setSequence(i+1);
 								bus.setProduction_plan_id(production_plan_id);
+								bus.setFactory_order_detail_id(detail_id);;
 								planDao.insertPlanBus(bus);
 								
 								//更新工厂已发布数:已发布数+1

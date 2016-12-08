@@ -255,9 +255,11 @@
 		<![CDATA[
 		insert into BMS_PLAN_BUS (
 		factory_id,production_plan_id,bus_number,status,order_id,order_cofig_id,sequence,vin,customer_number,left_motor_number,right_motor_number,
-		bus_color,bus_seats)
-		VALUES(#{factory_id},#{production_plan_id},(SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE id=#{bus_number_id}),#{status},(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}),#{order_cofig_id},#{sequence},#{vin},#{customer_number},
-		#{left_motor_number},#{right_motor_number},#{bus_color},#{bus_seats})
+		bus_color,bus_seats,factory_order_detail_id)
+		VALUES(#{factory_id},#{production_plan_id},
+		(SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE id=#{bus_number_id}),
+		#{status},(SELECT id FROM BMS_ORDER WHERE order_no=#{order_no}),#{order_cofig_id},#{sequence},#{vin},#{customer_number},
+		#{left_motor_number},#{right_motor_number},#{bus_color},#{bus_seats},#{factory_order_detail_id})
 		]]>
 	</insert>
 
@@ -272,8 +274,8 @@
 	
 	<select id="getFactoryOrderDetail" parameterType="Map" resultType="Map">
 		SELECT o.id,d.id AS detail_id,o.factory_id,o.order_id,o.production_qty,d.busnum_start,d.busnum_end,d.bus_number_start,(d.busnum_end - d.busnum_start + 1) AS qty, d.bus_number_count,
-		(SELECT ifnull(max(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=o.order_id and factory_id=o.factory_id) maxbusnum,
-		(SELECT ifnull(min(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=o.order_id and factory_id=o.factory_id) minbusnum
+		(SELECT ifnull(max(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=o.order_id and factory_id=o.factory_id and factory_order_detail_id=d.id) as maxbusnum,
+		(SELECT ifnull(min(cast(reverse(substr(reverse(bus_number),1,instr(reverse(bus_number),'-')-1)) as signed)),0) FROM BMS_PLAN_BUS where order_id=o.order_id and factory_id=o.factory_id and factory_order_detail_id=d.id) as minbusnum
 		FROM BMS_FACTORY_ORDER o 
 		LEFT JOIN BMS_FACTORY_ORDER_DETAIL d ON d.factory_order_id = o.id
 		WHERE o.order_id = (SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
@@ -338,15 +340,84 @@
 	</select>
 
 	<update id="updateExceptionInfo" parameterType="com.byd.bms.plan.entity.BmsPDException">
-		<![CDATA[
-		UPDATE BMS_PD_PRODUCTION_EXCEPTION SET 
-		factory_id=#{factory_id},workshop_id=#{workshop_id},line_id=#{line_id},process_id=#{process_id},bus_number=#{bus_number},
-		exception_type=#{exception_type},reason_type_id=#{reason_type_id},detailed_reasons=#{detailed_reasons},
-		edit_date=#{edit_date},start_time=#{start_time},pfinish_time=#{pfinish_time},finish_time=#{finish_time},severity_level=#{severity_level},
-		measures=#{measures},duty_department_id=#{duty_department_id},temporary_measures=#{temporary_measures},status=#{status},
-		processor=#{processor},process_date=#{process_date},closer_id=#{closer_id},order_list=#{order},pause_time=#{pause_time},capacity_loss=#{capacityLoss},
-		email_id=#{email_id} WHERE id=#{id}
-		]]>
+		UPDATE BMS_PD_PRODUCTION_EXCEPTION 
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="factory_id!=null and factory_id!=''">
+				factory_id=#{factory_id},
+			</if>
+			<if test="workshop_id !=null and workshop_id !=''">
+				workshop_id=#{workshop_id},
+			</if>
+			<if test="line_id !=null and line_id !=''">
+				line_id=#{line_id},
+			</if>
+			<if test="process_id !=null and process_id !=''">
+				process_id=#{process_id},
+			</if>
+			<if test="bus_number !=null and bus_number !=''">
+				bus_number=#{bus_number},
+			</if>
+			<if test="exception_type !=null and exception_type !=''">
+				exception_type=#{exception_type},
+			</if>
+			<if test="reason_type_id !=null and reason_type_id !=''">
+				reason_type_id=#{reason_type_id},
+			</if>
+			<if test="detailed_reasons !=null and detailed_reasons !=''">
+				detailed_reasons=#{detailed_reasons},
+			</if>
+			<if test="edit_date !=null and edit_date !=''">
+				edit_date=#{edit_date},
+			</if>
+			<if test="start_time !=null and start_time !=''">
+				start_time=#{start_time},
+			</if>
+			<if test="pfinish_time !=null and pfinish_time !=''">
+				pfinish_time=#{pfinish_time},
+			</if>
+			<if test="finish_time !=null and finish_time !=''">
+				finish_time=#{finish_time},
+			</if>
+			<if test="severity_level !=null and severity_level !=''">
+				severity_level=#{severity_level},
+			</if>
+			<if test="measures !=null and measures !=''">
+				measures=#{measures},
+			</if>
+			<if test="duty_department_id !=null and duty_department_id !=''">
+				duty_department_id=#{duty_department_id},
+			</if>
+			<if test="temporary_measures !=null and temporary_measures !=''">
+				temporary_measures=#{temporary_measures},
+			</if>
+			<if test="status !=null and status !=''">
+				status=#{status},
+			</if>
+			<if test="processor !=null and processor !=''">
+				processor=#{processor},
+			</if>
+			<if test="process_date !=null and process_date !=''">
+				process_date=#{process_date},
+			</if>
+			<if test="closer_id !=null and closer_id !=''">
+				closer_id=#{closer_id},
+			</if>		
+			<if test="order !=null and order !=''">
+				order_list=#{order},
+			</if>
+			<if test="pause_time !=null and pause_time !=''">
+				pause_time=#{pause_time},
+			</if>
+			<if test="capacityLoss !=null and capacityLoss !=''">
+				capacity_loss=#{capacityLoss},
+			</if>
+			<if test="email_id !=null and email_id !=''">
+				email_id=#{email_id}
+			</if>
+
+		</trim> 
+	
+		 WHERE id=#{id}
 	</update>
 	<update id="manageExceptionInfo" parameterType="com.byd.bms.plan.entity.BmsPDException">
 		<![CDATA[
