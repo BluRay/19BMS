@@ -26,8 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
+//import com.sun.image.codec.jpeg.JPEGCodec;
+//import com.sun.image.codec.jpeg.JPEGImageEncoder;
  
 /**
  * Author:Qingqing.cao
@@ -311,9 +311,9 @@ public class IoUtils {
 				bufferedimage1.getGraphics().drawImage(bufferedimage, 0, 0, newWidth, newHeight,
 						null);
 				fileoutputstream = new FileOutputStream(outPath+outf);
-				JPEGImageEncoder jpegimageencoder = JPEGCodec
-						.createJPEGEncoder(fileoutputstream);
-				jpegimageencoder.encode(bufferedimage1);
+				//JPEGImageEncoder jpegimageencoder = JPEGCodec
+				//		.createJPEGEncoder(fileoutputstream);
+				//jpegimageencoder.encode(bufferedimage1);
 			}
 		} catch (Exception exception) {
 			System.out.println(exception);
