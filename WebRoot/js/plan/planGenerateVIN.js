@@ -109,7 +109,7 @@ $(document).ready(function () {
 	$(".left_motor").live("change",function(e){
 		if(confirm("是否确定修改？")){
 			var tr=$(e.target).parent("td").parent("tr");
-			var bus_number=$(tr).find("td").eq(5).find("input").attr("old_value");
+			var bus_number=$(tr).find("td").eq(5).find("input").attr("old_val");
 			var update_val=$(this).val();
 			ajaxUpdateVinMotor(bus_number,update_val,"left_motor",e);
 		}else{
@@ -120,7 +120,7 @@ $(document).ready(function () {
 	$(".right_motor").live("change",function(e){
 		if(confirm("是否确定修改？")){
 			var tr=$(e.target).parent("td").parent("tr");
-			var bus_number=$(tr).find("td").eq(5).find("input").attr("old_value");
+			var bus_number=$(tr).find("td").eq(5).find("input").attr("old_val");
 			var update_val=$(this).val();
 			ajaxUpdateVinMotor(bus_number,update_val,"right_motor",e);
 		}else{

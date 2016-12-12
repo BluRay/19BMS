@@ -235,7 +235,7 @@ function ajaxQuery(targetPage){
 			{name:'order_name',idMerge:true},
 			{name:'delivery_date',idMerge:true},
 			{name:'factory_name',idMerge:true},
-			{name:'production_qty',idMerge:true},
+			{name:'production_qty',idMerge:false},
 			{name:'order_config_name'},
 			{name:'product_qty',hidGrid:true},
 			{name:'sequence'},

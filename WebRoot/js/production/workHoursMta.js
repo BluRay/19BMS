@@ -49,13 +49,10 @@ $(document)
 										var readyQty = $(tr).data("readyQty");
 										var workshop=$(tr).data("workshop");
 										edit_list = [];
-										ready_hour = 0;
+										ready_hour = $(tds[9]).html();;
 										var conditions = "{tempOrderId:'"
 												+ $(tr).data("id") + "'}";
-										var response = ajaxGetStaffWorkHours(conditions)
-										var swhlist = response.dataList;
-										var scheduleList = response.tempScheduleList;
-										generateWorkhourTb(swhlist, true);
+										
 										$(".read_hours").html(
 												"已分配工时：" + ready_hour);
 										if (type == "工时维护") {
@@ -81,6 +78,10 @@ $(document)
 											$("#mtaModal").modal("show");
 										}
 										if (type == "工时修改") {
+											var response = ajaxGetStaffWorkHours(conditions)
+											var swhlist = response.dataList;
+											//var scheduleList = response.tempScheduleList;
+											generateWorkhourTb(swhlist, true);
 											$("#edit_orderNo").html(orderNo);
 											$("#edit_reason").html(reason);
 											$("#editModal").data("orderId",
@@ -140,6 +141,7 @@ $(document)
 					$("#btnMtaSave")
 							.click(
 									function() {
+										$("#btnMtaSave").hide();
 										var inputlist = $("#table_workhour input[class='input-small card_num']");
 										// alert(inputlist.length);
 										var saveFlag = true;
@@ -170,10 +172,19 @@ $(document)
 										var workDate = $("#mta_wdate").val();
 										if (workshopId == '0') {
 											alert("请选择车间");
+											$("#btnMtaSave").show();
 										} else if (workDate == null
 												|| workDate.trim().length == 0) {
 											alert("请输入操作日期");
+											$("#btnMtaSave").show();
 										} else {
+											
+											if(checkSalarySubmit(factory,workshop,workDate.substring(0,7))=='true'){
+												alert("车间工资已提交/结算，不允许再维护工时信息！");
+												return false;
+												$("#btnMtaSave").show();
+											}
+											
 											$
 													.each(
 															inputlist,
@@ -234,6 +245,7 @@ $(document)
 																	} else {
 																		saveFlag = false;
 																		alert("不能重复维护工时！");
+																		$("#btnMtaSave").show();
 																		return false;
 																	}
 																}
@@ -242,6 +254,7 @@ $(document)
 																				.trim().length == 0) {
 																	saveFlag = false;
 																	alert("额外工时不能为空！");
+																	$("#btnMtaSave").show();
 																	return false;
 																}
 																var staffNum = $(
@@ -250,6 +263,7 @@ $(document)
 																if (staffNum
 																		.trim().length == 0) {
 																	alert("工号不能为空！");
+																	$("#btnMtaSave").show();
 																	saveFlag = false;
 																	return false;
 																}
@@ -270,6 +284,7 @@ $(document)
 																	// $(tr).remove();
 																	saveFlag = false;
 																	alert("不能重复维护工时！");
+																	$("#btnMtaSave").show();
 																	return false;
 																}
 
@@ -278,6 +293,7 @@ $(document)
 													&& stafflist.length > 0) {
 												ajaxSave(JSON
 														.stringify(stafflist));
+												$("#btnMtaSave").show();
 												// $("#mtaModal").modal("hide");
 												/*var selectFactory = $(
 														"#factory :selected")

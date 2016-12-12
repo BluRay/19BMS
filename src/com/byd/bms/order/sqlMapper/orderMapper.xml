@@ -476,15 +476,32 @@
 	</select>
 	
 	<select id="getOrderConfigList" parameterType="Map" resultType="com.byd.bms.order.entity.BmsOrderConfig">
-		<![CDATA[
-		SELECT c.*,o.id AS o_id,o.order_no,o.order_name,o.order_qty,b.bus_type_code as bus_type,a.product_qty as allot_qty,
+		 <!-- SELECT c.*,o.id AS o_id,o.order_no,o.order_name,o.order_qty,b.bus_type_code as bus_type,a.product_qty as allot_qty,
 		(SELECT COUNT(id) FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = o.id) AS issed_qty,
-		(SELECT COUNT(s.id) AS online_count FROM BMS_PLAN_BUS s WHERE s.order_cofig_id = c.id AND s.factory_id = a.factory_id AND s.bus_number IN (SELECT bus_number FROM BMS_PLAN_BUS_NUMBER WHERE print_sign = 1)) AS online_count
+		(SELECT COUNT(distinct s.id) AS online_count FROM BMS_PLAN_BUS s 
+		left join  BMS_PLAN_BUS_NUMBER bn on bn.bus_number=s.bus_number
+		WHERE s.order_cofig_id = c.id AND s.factory_id = a.factory_id 
+		AND bn.print_sign =1 ) online_count
 		FROM BMS_ORDER o 
 		LEFT JOIN BMS_ORDER_CONFIG c ON o.id = c.order_id 
 		LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.id = a.order_id AND c.id = a.order_config_id 				
-		LEFT JOIN BMS_BASE_BUS_TYPE b ON o.bus_type_id = b.id where 1=1
- 		]]>
+		LEFT JOIN BMS_BASE_BUS_TYPE b ON o.bus_type_id = b.id where 1=1  -->
+		SELECT c.*,o.id AS o_id,o.order_no,o.order_name,o.order_qty,b.bus_type_code as bus_type,
+		(SELECT COUNT(id) FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = o.id) AS issed_qty
+		<if test="factory_id !=null and factory_id!=''">
+			,(SELECT COUNT(distinct s.id) AS online_count FROM BMS_PLAN_BUS s 
+		left join  BMS_PLAN_BUS_NUMBER bn on bn.bus_number=s.bus_number
+		WHERE s.order_cofig_id = c.id AND s.factory_id = a.factory_id 
+		AND bn.print_sign =1 ) online_count,a.product_qty as allot_qty,a.factory_id
+		</if>
+		FROM BMS_ORDER o 
+		LEFT JOIN BMS_ORDER_CONFIG c ON o.id = c.order_id 			
+		LEFT JOIN BMS_BASE_BUS_TYPE b ON o.bus_type_id = b.id
+		<if test="factory_id !=null and factory_id!=''">
+		LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.id = a.order_id AND c.id = a.order_config_id
+			and a.factory_id = #{factory_id}
+		</if>
+		where 1=1
 		<if test="search_order_no!=null">
 			and o.order_no like CONCAT('%',#{search_order_no},'%')   
 		</if>
@@ -497,9 +514,7 @@
 		<if test="order_id!=null">
 			and o.id = #{order_id} 
 		</if>
-		<if test="factory_id !=null">
-			and a.factory_id = #{factory_id}
-		</if>
+		
 		ORDER BY o.id DESC
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize} 

@@ -998,4 +998,10 @@
 				AND assembly_online_date IS NOT NULL AND assembly_offline_date IS NULL	
 		]]>			
 	</select>
+	
+	<select id="querySubmitSalary" parameterType="Map" resultType="Map">
+		SELECT staff_number,staff_name 
+		FROM BMS_HR_PIECE_SALARY_HISTORY
+		WHERE month=#{month} AND submit_factory=#{factory} AND submit_workshop=#{workshop} AND status in('已提交','已结算')
+	</select>
 </mapper>

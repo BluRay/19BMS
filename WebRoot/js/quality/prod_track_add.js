@@ -86,8 +86,8 @@ $(document).ready(function() {
 									var tr = $("<tr />");
 									$("<td />").html(value.sequence)
 											.appendTo(tr);
-									$("<td />").html(value.processNo).appendTo(
-											tr);
+									/*$("<td />").html(value.processNo).appendTo(
+											tr);*/
 									$("<td />").html(value.processName).appendTo(
 											tr);
 									$("<td />").html(value.parts).appendTo(

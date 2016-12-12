@@ -647,14 +647,12 @@
 		;
 	</select>
 	<select id="getPieceTimeReportListCount2" resultType="int" parameterType='Map'>
-	SELECT COUNT(staff_number) as count_num FROM
-	(SELECT
-	staff_number,staff_name,job,workshop_org,workgroup_org,team_org,skill_parameter,GROUP_CONCAT(bus_number,',',work_date,',',participation,',',CONCAT(ppay,'|')
-	separator '') AS 'piece_str'
+	SELECT
+	count(distinct staff_number)
 	FROM BMS_PIECE_PAY_CAL
 	WHERE work_date >= #{date_start} AND work_date &lt;= #{date_end} and status in('1','3')
 	AND factory = #{factory}
-	<if test="list.size !=0">
+	<if test="list !=null">
 			AND staff_number IN
 			<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
 				#{item}
@@ -675,8 +673,7 @@
 	<if test="bus_number!=''">
 		AND UPPER(bus_number) = #{bus_number}
 	</if>
-	GROUP BY staff_number
-	ORDER BY staff_number) tmp
+	
 	</select>
 	
 	<select id="getPieceTimeReportStaffList" resultType="String" parameterType='Map' >

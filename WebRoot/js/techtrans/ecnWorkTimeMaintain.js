@@ -119,6 +119,10 @@ $(document).ready(function () {
 						}else if(workDate==null||workDate.trim().length==0){
 							alert("请输入操作日期！");
 						}else{
+							if(checkSalarySubmit(factory,workshop,workDate.substring(0,7))=='true'){
+								alert("车间工资已提交/结算，不允许再维护工时信息！");
+								return false;
+							}
 							var staffNumlist="";
 							$.each(inputlist,
 									function(index, input) {
@@ -265,10 +269,7 @@ $(document).ready(function () {
 							alert("技改工时只能保留一位小数！");
 							$(this).val("");
 						}*/
-						
-						
-						
-						
+			
 						/*else if((parseFloat(total_hour)+parseFloat(ready_hour)) - limit_total_hour > 0) {
 							
 							alert("总工时不能超过" + limit_total_hour

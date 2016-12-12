@@ -36,7 +36,7 @@ function generateTable(workshop){
 				hasTap=true;
 				var tr = $("<tr />");
 				$("<td />").html(i).appendTo(tr);
-				$("<td />").html(value.processNo).appendTo(tr);
+				/*$("<td />").html(value.processNo).appendTo(tr);*/
 				$("<td />").html(value.processName).appendTo(tr);
 				$("<td />").html(value.parts).appendTo(tr);
 				$("<td />").html(value.partsNo).appendTo(tr);

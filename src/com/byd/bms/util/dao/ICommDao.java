@@ -102,5 +102,12 @@ public interface ICommDao {
 	 * @return
 	 */
 	public List getWorkshopSelectAuth_Key(Map<String, Object> map1);
+	/**
+	 *	added by xjw 161207
+	 *	根据factory,workshop,month查询已经提交或者结算的工资明细
+	 * @param conditionMap
+	 * @return
+	 */
+	public List querySubmitSalary(Map<String, Object> conditionMap);
 	
 }

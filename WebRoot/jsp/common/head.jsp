@@ -22,7 +22,7 @@ function getAccessIp(){
 }
 </script>
 
-<div id="divHead">
+<div id="divHead" style="line-height:1px">
 <div class="navbar navbar-fixed-top" id="bmsHead">
 	<div class="navbar-inner">
 		<div style="width:1200px" class="container">

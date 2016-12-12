@@ -290,6 +290,7 @@ function generateTb(swhlist){
 	var mergecount1=0;
 	var mergecount2=0;
 	
+	var warp = document.createDocumentFragment();//创建文档碎片节点,最后渲染该碎片节点，减少浏览器渲染消耗的资源
 	$.each(swhlist,function(index,swh){
 		var tr=$("<tr />");
 		var workorg=swh.workgroup+"-"+swh.team;
@@ -368,12 +369,15 @@ function generateTb(swhlist){
 			$("<td />").html(swh.approve_date).appendTo(tr);
 		
 		$("#tb_workhour").append(tr);
+		//$(warp).append(tr);
+		
 		$(tr).data("swhid",swh.id);
 		$(tr).data("swhlist_index",index);
 		last_bus_number=swh.bus_number;
 		last_workdate=swh.work_date;
 		last_workorg=workorg;
 	});
+	//$("#tb_workhour").append($(warp));
 }
 //批准、驳回
 function ajaxUpdate(swhlist,conditions,whflag,rejectReason) {

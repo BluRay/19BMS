@@ -644,10 +644,10 @@
 		left join BMS_BASE_FACTORY f on f.id=v.factory_id
 		LEFT OUTER JOIN BMS_BASE_USER u ON v.creator_id = u.id
 		left join BMS_BASE_USER u1 on v.printer_id=u1.id
-		LEFT OUTER JOIN BMS_PLAN_BUS b ON v.vin = b.vin
+		LEFT OUTER JOIN BMS_PLAN_BUS b ON v.vin = b.vin and b.vin is not null and b.vin !='' 
 		left join BMS_ORDER o on v.order_id=o.id
 		left join BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
-		where 1=1
+		where 1=1 
 		<if test="factory_id!=null and factory_id !=''">
 			and v.factory_id = #{factory_id}
 		</if>
@@ -668,7 +668,7 @@
 	<select id="getPlanVinCount" parameterType="Map" resultType="int">
 		SELECT count(v.vin) FROM BMS_PD_VIN v
 		LEFT OUTER JOIN BMS_PLAN_BUS b ON
-		v.vin = b.vin where 1=1
+		v.vin = b.vin and b.vin !=null where 1=1 
 		<if test="factory_id!=null and factory_id !=''">
 			and v.factory_id = #{factory_id}
 		</if>
@@ -1755,8 +1755,10 @@
 				where bus_number=#{bus_number}				
 			</if>
 			<if test="update_val!='' and update_val!=null ">
-				update BMS_PLAN_BUS set vin=#{vin}
-				where bus_number=#{update_val}				
+				update BMS_PLAN_BUS b,(select * from BMS_PD_VIN v where v.vin=#{vin})  v 
+				set b.vin=v.vin,b.left_motor_number=v.left_motor_number,b.right_motor_number=v.right_motor_number
+				where b.bus_number=#{update_val}
+				
 			</if>
 		</if>
 		<if test="update_flg=='left_motor'">

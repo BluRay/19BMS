@@ -835,7 +835,8 @@ function ajaxEdit(order_id,issed_qty){
 						$("#editOrderName").val(value.order_name);
 						$("#editOrderCode").val(value.order_code);
 						$("#editOrderType").val(value.order_type);
-						$("#editBusType").val(value.bus_type_id);
+						//$("#editBusType").val(value.bus_type_code);
+						select_selectOption("#editBusType",value.bus_type_code)
 						$("#edit_order_qty").val(value.order_qty);
 						$("#edit_order_descriptive").val(value.order_name + value.bus_type_code + " " + value.order_qty + "台");
 						$("#edit_productive_year").val(value.productive_year);

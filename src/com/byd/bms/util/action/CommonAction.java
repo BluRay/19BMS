@@ -1208,4 +1208,14 @@ public class CommonAction extends BaseAction<Object> {
 		out.print(resultJson);
 		return null;
 	}
+	
+	public String getSubmitSalary(){
+		HttpServletRequest request = ServletActionContext.getRequest();
+		conditionMap = new HashMap<String, Object>();
+		conditionMap.put("month", request.getParameter("month"));
+		conditionMap.put("factory", request.getParameter("factory"));	
+		conditionMap.put("workshop", request.getParameter("workshop"));
+		selectList=commDao.querySubmitSalary(conditionMap);
+		return SUCCESS;
+	}
 }

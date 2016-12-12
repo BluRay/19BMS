@@ -1749,3 +1749,39 @@ function sendEmail(mailTo,cc,title,thead,tbdatalist,content){
 			}
 		})
 	}
+
+
+function checkSalarySubmit(factory,workshop,month){
+	var submit_flg="";
+	$.ajax({
+		url : "common!getSubmitSalary.action",
+		dataType : "json",
+		data : {
+			"factory":factory,
+			"workshop":workshop,
+			"month":month
+		},
+		type:"post",
+		async:false,
+		error : function(response) {
+			//alert(response.message)
+		},
+		success : function(response) {
+			if(response.length>0){
+				submit_flg= "true";
+			}else{
+				submit_flg= "false";
+			}
+		}
+	})
+	return submit_flg;
+}
+
+function select_selectOption(elementId,value){
+	var options=$(elementId).find("option");
+	$.each(options,function(i,option){
+		if($(option).text()==value||$(option).attr("value")==value){
+			$(elementId).find("option").eq(i).attr("selected", "selected");
+		}
+	})
+}

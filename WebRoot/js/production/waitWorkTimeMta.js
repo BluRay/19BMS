@@ -182,6 +182,12 @@ $(document).ready(function(){
 		}else{
 			start_time=start_time.substring(0,10);
 		}
+		
+		if(checkSalarySubmit(factory,workshop,workDate.substring(0,7))=='true'){
+			alert("车间工资已提交/结算，不允许再维护工时信息！");
+			return false;
+		}
+		
 		if(org==""){
 			alert("请选择小班组！");
 		}else if($("#waitReason").val().trim().length==0){

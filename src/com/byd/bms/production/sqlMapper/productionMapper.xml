@@ -2674,7 +2674,7 @@
 	<select id="queryStaffWorkHours" parameterType="Map" resultType="Map">
 		<choose>
 			<when test="hourType==1 and workshop!='自制件' ">
-				select h.*,u.username approver,u.email
+				select h.id,h.bus_number,h.staff_number,h.staff_name,h.job,h.plant_org,h.workshop_org,h.workgroup_org,h.team_org,h.bonus,h.distribution,h.ppay,h.work_date,h.status,h.approve_date,u.username approver,u.email
 				from BMS_PIECE_PAY_CAL h
 				left join BMS_BASE_USER u on h.approver_id=u.id
 				where 1=1
@@ -2766,58 +2766,58 @@
 				</if>
 			</when>
 			<otherwise>
-				select h.*,o.name work_org,s.staff_number,s.name staff_name,s.plant_org,s.workshop_org,
-				s.workgroup_org,s.team_org,s.job,u.username editor,u1.username approver,u.email,p.ppay
-				from
-				BMS_HR_STAFF_HOURS h
-				left join BMS_BASE_ORG o on h.org_id=o.id
-				left join BMS_HR_STAFF s on
-				h.staff_id=s.id
-				left join BMS_BASE_USER u on u.id=h.editor_id
-				left join
-				BMS_BASE_USER u1 on u1.id=h.approver_id
-				left join BMS_PIECE_PAY_CAL p on s.staff_number=p.staff_number 
-				and h.work_date=p.work_date and p.factory=h.factory and p.workshop=h.workshop
-				and p.team= h.team and p.bus_number=h.bus_number
-				where 1=1
+					select h.*,o.name work_org,s.staff_number,s.name staff_name,s.plant_org,s.workshop_org,
+					s.workgroup_org,s.team_org,s.job,u.username editor,u1.username approver,u.email,p.ppay
+					from
+					BMS_HR_STAFF_HOURS h
+					left join BMS_BASE_ORG o on h.org_id=o.id
+					left join BMS_HR_STAFF s on
+					h.staff_id=s.id
+					left join BMS_BASE_USER u on u.id=h.editor_id
+					left join
+					BMS_BASE_USER u1 on u1.id=h.approver_id
+					left join BMS_PIECE_PAY_CAL p on s.staff_number=p.staff_number 
+					and h.work_date=p.work_date and p.factory=h.factory and p.workshop=h.workshop
+					and p.team= h.team and p.bus_number=h.bus_number
+					where 1=1
 				<if test="hourType !=null and hourType !=''">
-					and h.hour_type=#{hourType}
+					and h.hour_type=#{hourType} 
 				</if>
 				<if test="status !=null and status !=''">
-					and h.status=#{status}
+					and h.status=#{status} and p.status=#{status}
 				</if>
 				<if test="factory !=null and factory !='' and factory !='请选择'">
-					and h.factory=#{factory}
+					and h.factory=#{factory} and p.factory=#{factory}
 				</if>
 				<if test="workshop !=null and workshop !='' and workshop !='请选择'">
-					and find_in_set(h.workshop,#{workshop})>0
+					and find_in_set(h.workshop,#{workshop})>0 and find_in_set(p.workshop,#{workshop})>0
 				</if>
 				<if test="workgroup !=null and workgroup !='' and workgroup !='请选择'">
-					and h.workgroup=#{workgroup}
+					and h.workgroup=#{workgroup} and p.workgroup=#{workgroup}
 				</if>
 				<if test="team !=null and team !='' and team !='请选择'">
-					and h.team=#{team}
+					and h.team=#{team} and p.team=#{team}
 				</if>
 				<if test="orgId !=null and orgId !=''">
 					and h.org_id=#{orgId}
 				</if>
 				<if test="staffNum !=null and staffNum !=''">
-					and find_in_set(s.staff_number,#{staffNum})>0
+					and find_in_set(s.staff_number,#{staffNum})>0 and find_in_set(p.staff_number,#{staffNum})>0
 				</if>
 				<if test="workDate !=null and workDate !=''">
-					and h.work_date=#{workDate}
+					and h.work_date=#{workDate} and p.work_date=#{workDate} 
 				</if>
 				<if test="workMonth !=null and workMonth !=''">
-					and h.work_date like concat(#{workMonth},'%')
+					and h.work_date like concat(#{workMonth},'%') and p.work_date like concat(#{workMonth},'%')
 				</if>
 				<if test="wdateStart !=null and wdateStart !=''">
 				<![CDATA[ 
-					and h.work_date>=#{wdateStart}
+					and h.work_date>=#{wdateStart} and p.work_date>=#{wdateStart}
 				]]>
 					</if>
 					<if test="wdateEnd !=null and wdateEnd !=''">
 				<![CDATA[ 
-					and h.work_date<=#{wdateEnd}
+					and h.work_date<=#{wdateEnd} and p.work_date<=#{wdateEnd}
 				]]>
 				</if>
 				<if test="waitReason !=null and waitReason !=''">

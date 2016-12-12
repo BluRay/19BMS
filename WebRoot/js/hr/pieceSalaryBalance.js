@@ -1,110 +1,191 @@
-var cDate="";//当前月份
-var wDate="";//上一月份
-var llDate="";//上上个月份
-var month_start= null;
-var month_end = null;
-var email_list=new Array();
 $(document).ready(function(){
-	month_start=document.getElementById("month_start");
-	month_end = document.getElementById("month_end");
-	initPage();
-	// 工厂切换事件
-	$("#factory").change(
-			function() {
-				var selectFactory = $("#factory :selected").text();
-				getWorkshopSelect_Auth("#workshop", null,
-						selectFactory, "");
-				getChildOrgSelect("#group", workshop, "",
-				"");
-				$("#subgroup").html(
-						"<option value=''>全部</option>");
-			});
-	// 车间切换事件
-	$("#workshop").change(
-			function() {
-				var workshop = $("#workshop").val();
-				getChildOrgSelect("#group", workshop, "",
-						"");
-				$("#subgroup").html(
-						"<option value=''>全部</option>");
-			});
-	// 班组切换事件
-	$("#group").change(function() {
-		var group = $("#group").val();
-		getChildOrgSelect("#subgroup", group, "", "noall");
-	});
-	
-	$("#btnQuery").click(function(){
-		ajaxQuery(1);
-	});
-	
-	$("#export").click(function(){
-		//ajaxQuery(0,"all")
-		htmlToExcel("tableResult", "", "","计件工资明细","计件工资明细");
-		return false;
-	});
-	
-	/**
-	 * 月份开始input change事件：当起始月份不等于上月或当月时，隐藏驳回和结算按钮
-	 */
-	$("#month_start").live("onchange",function(){
-		
-	})
-	
-	//驳回工资
-	$("#btnReject").click(function(){	
-		$("#reasonModal").modal("show");
-		//ajaxUpdateSalaryHistory("驳回");	
-	})	
-//输入驳回原因确认后驳回
-	$("#btnMtaSave").click(function() {
-		var rejectReason=$("#reject_reason").val();
-		if(!rejectReason){
-			alert("请输入驳回原因！");
-			return false;		
-		}else{
-			ajaxUpdateSalaryHistory("驳回");
-			$("#reasonModal").modal("hide");
-			$.each(email_list,function(i,email_addr){
+    	$(".container").width(getWidth());
+        var scripts = [
+                location.search.substring(1) || 'js/bootstrap-table.js',
+                'js/bootstrap-table-export.js','js/tableExport.js',
+                'js/bootstrap-table-editable.js','js/bootstrap-editable.js'
+            ],
+            eachSeries = function (arr, iterator, callback) {
+                callback = callback || function () {};
+                if (!arr.length) {return callback();}
+                var completed = 0;
+                var iterate = function () {
+                    iterator(arr[completed], function (err) {
+                        if (err) {callback(err);callback = function () {};}
+                        else {completed += 1;if (completed >= arr.length) {callback(null);}else {iterate();}}
+                    });
+                };
+                iterate();
+            };
+        eachSeries(scripts, getScript, initTable);
+        
+        initPage();
+    });
+function getScript(url, callback) {
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.src = url;
+    var done = false;
+    script.onload = script.onreadystatechange = function() {
+        if (!done && (!this.readyState ||this.readyState == 'loaded' || this.readyState == 'complete')) {
+            done = true;
+            if (callback)
+            	callback();
+            	script.onload = script.onreadystatechange = null;
+        }
+    };
+    head.appendChild(script);
+    return undefined;
+}
+function initTable() {
+    $table.bootstrapTable({
+        height: getHeight(),
+        columns: [
+        [
+            {
+            	field: 'id',title: '月份',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '工号',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '姓名',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '车间',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '班组',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '小班组',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '岗位',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '在职',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '出勤<br/>天数',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '出勤<br/>小时数',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '计件<br/>产量',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '补贴车',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '纯计件<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '技改<br/>工时',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '技改<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '额外<br/>工时',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '额外<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '等待<br/>工时',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '等待<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '计件<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '考核<br/>扣款',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '实发计<br/>件工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '平均<br/>日薪',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '状态',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '操作人',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: false,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '操作时间',width:'60px',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: false,footerFormatter: totalTextFormatter
+            }
+        ]
+    ]
+    });
+    // sometimes footer render error.
+    setTimeout(function () {$table.bootstrapTable('resetView');}, 200);
+    $table.on('check.bs.table uncheck.bs.table ' + 'check-all.bs.table uncheck-all.bs.table', function () {
+        $remove.prop('disabled', !$table.bootstrapTable('getSelections').length);
+        selections = getIdSelections();
+    });
+    $table.on('expand-row.bs.table', function (e, index, row, $detail) {
+        if (index % 2 == 1) {
+            $detail.html('正在查询...');
+            $.get('LICENSE', function (res) {$detail.html(res.replace(/\n/g, '<br>'));});
+        }
+    });
+    $table.on('all.bs.table', function (e, name, args) {console.log(name, args);});
+    $remove.click(function () {
+        var ids = getIdSelections();
+        $table.bootstrapTable('remove', {field: 'id',values: ids});
+        $remove.prop('disabled', true);
+    });
+    $(window).resize(function () {
+        $table.bootstrapTable('resetView', {height: getHeight()});
+    });
+}
+function getIdSelections() {
+    return $.map($table.bootstrapTable('getSelections'), function (row) {return row.id});
+}
+function responseHandler(res) {
+    $.each(res.rows, function (i, row) {row.state = $.inArray(row.id, selections) !== -1;});return res;
+}
+function detailFormatter(index, row) {
+    var html = [];
+    $.each(row, function (key, value) {html.push('<p><b>' + key + ':</b> ' + value + '</p>');});
+    return html.join('');
+}
+function operateFormatter(value, row, index) {
+    return ['<a class="remove" href="javascript:void(0)" title="Remove">','<i class="glyphicon glyphicon-remove"></i>','</a>'].join('');
+}
+window.operateEvents = {
+    'click .like': function (e, value, row, index) {alert('You click like action, row: ' + JSON.stringify(row));},
+    'click .remove': function (e, value, row, index) {ajaxDel(row.id);}
+};
+function totalTextFormatter(data) {return 'Total';}
+function totalNameFormatter(data) {return data.length;}
+function totalPriceFormatter(data) {
+    var total = 0;
+    $.each(data, function (i, row) {total += +(row.price.substring(1));});
+    return '$' + total;
+}
+function getHeight() {return $(window).height() - 220;}
+function getWidth() {return $(window).width()-220;}
+//----------END bootstrap Table ----------
 
-				var tblobj=new Array();
-				var obj={};
-				obj['月份']=$("#month_start").val();
-				obj['驳回原因']=rejectReason;
-				obj['驳回人']=$("#login_user").html();
-				tblobj.push(obj)
-				
-				if(email_addr!=undefined &&email_addr!=""){
-					sendEmail(email_addr,'','计件工资驳回','月份,驳回原因,驳回人',JSON.stringify(tblobj),'')	
-				}
-				
-			})
-		}
-	})
-	
-	//结算工资
-	$("#btnSave").click(function(){	
-		ajaxUpdateSalaryHistory("结算");	
-	})	
-})
 function initPage(){
-	pageSize=10000;
 	getAuthorityFactorySelect("#factory", "", "noall");
 	var selectFactory = $("#factory :selected").text();
 	var defaultWorkshop=$("#d_workshop").val();
 	var defaultWorkgourp=$("#d_workgroup").val();
 	var defaultTeam=$("#d_team").val();
 	getWorkshopSelect_Auth("#workshop", defaultWorkshop, selectFactory, "");
-/*	 $('#workshop').multiselect({
-         buttonWidth: '150px',
-         buttonContainer: '<div class="btn-group input-medium btn-select " />'
-     });*/
-	//$("#workshop").attr("disabled",true);
 	var workshop = $("#workshop").val();
 	getChildOrgSelect("#group", workshop, defaultWorkgourp, "");
 	var group = $("#group").val();
 	getChildOrgSelect("#subgroup", group, defaultTeam, "");
-	
 	var d = new Date();
 	var eYear = d.getFullYear();
 	var eMon = d.getMonth();
@@ -131,8 +212,6 @@ function initPage(){
 	if($(span).hasClass("fa-angle-down")){
 		$(span).removeClass("fa-angle-down").addClass("fa-angle-up");
 	}
-
-	 //ajaxQuery(1);
 }
 
 function changeMonth(){
@@ -142,160 +221,14 @@ function changeMonth(){
 		$("#month_end").val(cDate).attr("disabled",true);
 	}else{
 		WdatePicker({'dateFmt':'yyyy-MM','maxDate':llDate,'el':'month_end'});
-		//$("#month_end").click();
 		$("#month_end").val(llDate);
 		$("#month_end").attr("disabled",false);
-	}
-	
+	}	
 	if($("#month_start").val()!=wDate&&$("#month_start").val()!=cDate){
 		$("#btnReject").css("display","none");
 		$("#btnSave").css("display","none");
 	}else{
 		$("#btnReject").css("display","");
 		$("#btnSave").css("display","");
-	}
-	
+	}	
 }
-
-function ajaxQuery(targetPage,queryAll){
-	email_list=new Array();
-	$(".divLoading").addClass("fade in").show();
-	var workshopAll="";
-	$("#workshop option").each(function(){
-		workshopAll+=$(this).text()+",";
-	});
-	//alert(workshopAll);
-	var workshop=$("#workshop :selected").text()=="全部"?workshopAll:$("#workshop :selected").text();
-	var workgroup=$("#group :selected").text()=="全部"?"":$("#group :selected").text();
-	var team=$("#subgroup :selected").text()=="全部"?"":$("#subgroup :selected").text();
-	var conditions="{factory:'"+$("#factory :selected").text()+"',workshop:'"+workshop
-		+"',workgroup:'"+workgroup+"',staff:'"+$("#staff").val()+
-		"',team:'"+team+ "',monthStart:'"+$("#month_start").val()+"',monthEnd:'"+$("#month_end").val()+"'}";
-	if(queryAll=="all"){
-	    data={
-			 "conditions" : conditions,
-			 "pager":null
-	    }	
-	    table=$("#tableResultAll tbody");
-	}else{
-		data={
-			  "conditions" : conditions,
-			  "pager.pageSize" : pageSize,
-			  "pager.curPage" : targetPage || 1	
-		}
-		table=$("#tableResult tbody");
-	}
-	$.ajax({
-		url:"hrReport!getSubmitSalaryList.action",
-		dataType : "json",
-		async:false,
-		type : "get",
-		data : data,
-		success : function(response) {
-			
-			$(table).html("");
-			var last_saver="";
-			$.each(response.salaryList,function(index,salary){
-				if(last_saver!=salary.saver){
-					email_list.push(salary.saver_email);
-				}		
-				last_saver=salary.saver;
-				var tr=$("<tr />");
-				$("<td />").html(salary.month).appendTo(tr);
-				$("<td />").html(salary.staff_number).appendTo(tr);
-				$("<td />").html(salary.staff_name).appendTo(tr);
-				$("<td />").html(salary.workshop_org).appendTo(tr);
-				$("<td />").html(salary.workgroup_org).appendTo(tr);
-				$("<td />").html(salary.team_org).appendTo(tr);
-				$("<td />").html(salary.job).appendTo(tr);
-				$("<td />").html(salary.staff_status).appendTo(tr);
-			/*	$("<td />").html(salary.skill_parameter).appendTo(tr);*/
-				$("<td />").html(salary.attendance_days).appendTo(tr);
-				$("<td />").html(salary.attendance_hours).appendTo(tr);
-				var piece_total=salary.piece_total==undefined?0:parseFloat(salary.piece_total);
-				var piece_pay_total=salary.piece_pay_total==undefined?0:parseFloat(salary.piece_pay_total);
-				var ecnwh_total=salary.ecnwh_total==undefined?0:parseFloat(salary.ecnwh_total);
-				var ecn_pay_total=salary.ecn_pay_total==undefined?0:parseFloat(salary.ecn_pay_total);
-				var tmpwh_total=salary.tmpwh_total==undefined?0:parseFloat(salary.tmpwh_total);
-				var tmp_pay_total=salary.tmp_pay_total==undefined?0:parseFloat(salary.tmp_pay_total);
-				var wwh_total=salary.wwh_total==undefined?0:parseFloat(salary.wwh_total);
-				var wait_pay_total=salary.wait_pay_total==undefined?0:parseFloat(salary.wait_pay_total);
-				var deduct_pay_total=salary.deduct_pay_total==undefined?0:parseFloat(salary.deduct_pay_total);
-				$("<td />").html(piece_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(parseInt(salary.bonus_total).toFixed(2)).appendTo(tr);
-				$("<td />").html(piece_pay_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(ecnwh_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(ecn_pay_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(tmpwh_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(tmp_pay_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(wwh_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(wait_pay_total.toFixed(2)).appendTo(tr);
-				var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
-				$("<td />").html(piece_salary.toFixed(2)).appendTo(tr);
-				$("<td />").html(deduct_pay_total.toFixed(2)).appendTo(tr);
-				$("<td />").html((parseFloat(piece_salary)+parseFloat(deduct_pay_total)).toFixed(2)).appendTo(tr);
-				var avg_salary=isNaN((piece_salary+deduct_pay_total)/salary.attendance_days)?"":((piece_salary+deduct_pay_total)/salary.attendance_days).toFixed(2);
-				$("<td />").html(avg_salary).appendTo(tr);
-				$("<td />").html(salary.status).appendTo(tr);
-				if(queryAll =='all'){
-					$("<td />").html(salary.calculator).appendTo(tr);
-					$("<td />").html(salary.calculate_date).appendTo(tr);
-				}
-				$(table).append(tr);
-			});
-			if(queryAll!="all"){
-				$("#total").html(response.pager.totalCount);
-				$("#total").attr("total", response.pager.totalCount);
-				$("#cur").attr("page", response.pager.curPage);
-				$("#cur").html(
-						"<a href=\"#\">" + response.pager.curPage + "</a>");
-				$("#pagination").show();
-			}
-			$(".divLoading").hide();
-		}
-		
-	})
-}
-
-function ajaxUpdateSalaryHistory(actionType){
-	$(".divLoading").addClass("fade in").show();
-	var workshopAll="";
-	$("#workshop option").each(function(){
-		workshopAll+=$(this).text()+",";
-	});
-	var workshop=$("#workshop :selected").text()=="全部"?workshopAll:$("#workshop :selected").text();
-	var workgroup=$("#group :selected").text()=="全部"?"":$("#group :selected").text();
-	var team=$("#subgroup :selected").text()=="全部"?"":$("#subgroup :selected").text();
-	var staff=$("#staff").val();
-	var staffId='';
-	if(staff.trim().length>0){
-		var trs=$("#tableResult tbody").find("tr");
-		staffId=$(trs[0]).data("staff_id");
-	}		
-	var conditions="{factory:'"+$("#factory :selected").text()+"',workshop:'"+
-	workshop+"',workgroup:'"+workgroup+ "',team:'"+team+"',staff:'"+staff+"',staffId:'"+staffId+
-	"',monthStart:'"+$("#month_start").val()+"',monthEnd:'"+$("#month_end").val()+"'}";
-	
-	var url="";
-	if(actionType=='驳回'){
-		url="hrReport!rejectPieceSalary.action"
-	}
-	if(actionType=='结算'){
-		url="hrReport!balacePieceSalary.action";
-	}
-	
-	$.ajax({
-		url:url,
-		dataType : "json",
-		async:false,
-		type : "get",
-		data : {
-			"conditions":conditions
-		},
-		success : function(response) {					
-			$(".divLoading").hide();
-			alert(response.message);		
-		}
-	});
-}
-

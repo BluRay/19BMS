@@ -90,7 +90,7 @@ ul.main-menu > li > a,
   width: 200px;
   float: left;
   font-size: 14px;
-  height: 500px;
+  height: 50px;
   margin-top: -1.52px;
 }
 /* line 126, ../../sass/partials/_navigation.scss */
@@ -98,7 +98,7 @@ ul.main-menu > li > a,
   width: 40px;
   margin-right: -40px;
   z-index: 9;
-  height: 500px;
+  height: 50px;
   border: 1px solid #d0e0ec;
 }
 /* line 131, ../../sass/partials/_navigation.scss */

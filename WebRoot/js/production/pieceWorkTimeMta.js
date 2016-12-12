@@ -1,4 +1,6 @@
+var factory="";
 var workshop="";
+var team="";
 var workgroup_price=0;
 $(document)
 		.ready(
@@ -55,17 +57,37 @@ $(document)
 								if (value.bus_number == item) {
 									selectId = value.order_id;
 									$("#bus_number").attr("order_id", selectId);
-									var list=ajaxGetStaffList();
+								if(team.trim().length==0){
+									alert("请选择小班组！");
+									return false;
+								}	
+									
+								var conditions = "{"
+									+ "busNumber:'"+ value.bus_number
+									+"',workshop:'"+workshop+"',team:'"
+									+ team+"'}";	
+								var sfwlist = ajaxGetStaffWorkHours(conditions);
+								//alert(sfwlist[0].id);
+								if (sfwlist.length > 0) {
+									alert("该车号已维护工时！");
+									$("#bus_number").val("");
+									$("#bus_number").attr("order_id","");
 									$("#tb_workhour").html("");
-									workgroup_price=ajaxGetWorkgroupPrice();
-									$.each(list, function(index, staff) {
+									return false;
+									
+								}
+										
+								var list=ajaxGetStaffList();
+								$("#tb_workhour").html("");
+								workgroup_price=ajaxGetWorkgroupPrice();
+								$.each(list, function(index, staff) {
 										//workgroup_price+=parseFloat(staff.distribution);
 										// alert(staff.id);
-									addWorkHourItem(staff.id, staff.staff_number, staff.name,
+								addWorkHourItem(staff.id, staff.staff_number, staff.name,
 												staff.job, "", staff.team_org, staff.workgroup_org,
 												staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index)
-									});
-								}
+								});
+							}
 							})
 
 							return item;
@@ -277,7 +299,7 @@ $(document)
 					$("#btnSave")
 							.click(
 									function() {
-										
+										var workDate = $("#mta_wdate").val();
 										var inputlist = $("#table_workhour input[class='input-small card_num']");
 										var org ="";
 										var factory="";
@@ -302,6 +324,12 @@ $(document)
 										var busCount=1;
 										var bus_start;
 										var bus_end;
+										
+										if(checkSalarySubmit(factory,workshop,workDate.substring(0,7))=='true'){
+											alert("车间工资已提交/结算，不允许再维护工时信息！");
+											return false;
+										}									
+										
 										if(isCustomer=='1'){
 											busNumber=$("#c_bus_number").val();
 										}
@@ -336,7 +364,7 @@ $(document)
 										//alert(busCount);
 									/*	workshop = $("#workshop").find(
 												"option:selected").text();*/
-										var workDate = $("#mta_wdate").val();
+										
 										var stafflist = [];
 										var saveFlag = true;
 										if (org == "") {
@@ -635,12 +663,12 @@ function ajaxGetStaffList() {
 		orderId=$("#bus_number").attr("order_id");
 		if(!orderId||orderId.trim().length==0){
 			flag=false;
-			alert("请输入有效车号！");
+			//alert("请输入有效车号！");
 			return false;
 		}
 		if(workDate.trim().length==0){
 			flag=false;
-			alert("请输入日期！");
+			//alert("请输入日期！");
 			return false;
 		}
 	}
@@ -676,6 +704,21 @@ function ajaxGetStaffList() {
 
 //改变操作日期更新分配比例
 function ajaxGetDist(){
+	if($("#bus_number").val().trim().length>0){
+		var conditions = "{"
+			+ "busNumber:'"+ $("#bus_number").val()
+			+"',workshop:'"+workshop+"',team:'"
+			+ team+"'}";	
+		var sfwlist = ajaxGetStaffWorkHours(conditions);
+		//alert(sfwlist[0].id);
+		if (sfwlist.length > 0) {
+			alert("该车号已维护工时！");
+			$("#tb_workhour").html("");
+			return false;
+			
+		}
+	}
+	
 	var stafflist=ajaxGetStaffList();
 	workgroup_price=ajaxGetWorkgroupPrice();
 	/*$.each(stafflist, function(index, staff) {
@@ -706,8 +749,11 @@ function zTreeOnClick(event, treeId, treeNode) {
 		workshop=treeNode.getParentNode().displayName;
 	}
 	if(treeNode.org_type == '6'){
+		factory=treeNode.getParentNode().getParentNode().getParentNode().getParentNode().displayName;
 		workshop=treeNode.getParentNode().getParentNode().displayName;
+		team=treeNode.displayName;
 	}
+	
 	//alert(workshop);
 	//alert(treeNode.is_customer);
 	if(workshop=="自制件"){
@@ -760,7 +806,24 @@ function zTreeOnClick(event, treeId, treeNode) {
 		alert("请选择小班组！");
 		return false;
 	}else{
+		if($("#bus_number").val().trim().length>0){
+			var conditions = "{"
+				+ "busNumber:'"+ $("#bus_number").val()
+				+"',workshop:'"+workshop+"',team:'"
+				+ team+"'}";	
+			var sfwlist = ajaxGetStaffWorkHours(conditions);
+			//alert(sfwlist[0].id);
+			if (sfwlist.length > 0) {
+				alert("该车号已维护工时！");
+				$("#bus_number").val("");
+				$("#tb_workhour").html("");
+				return false;
+				
+			}
+		}
+		
 		var list=ajaxGetStaffList();
+	
 		$("#tb_workhour").html("");
 		workgroup_price=ajaxGetWorkgroupPrice();
 		$.each(list, function(index, staff) {
