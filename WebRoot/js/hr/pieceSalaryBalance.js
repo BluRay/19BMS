@@ -76,7 +76,7 @@ function initTable() {
         height: getHeight(),
         url:data_url,
         striped:true,
-        paginationVAlign:'top',
+        paginationVAlign:'bottom',
         searchOnEnterKey:true,
         queryParams:function(params) {
         	var workshopAll="";
@@ -181,7 +181,6 @@ function initTable() {
         ]
     ]
     });
-    // sometimes footer render error.
     setTimeout(function () {$table.bootstrapTable('resetView');}, 200);
     $table.on('check.bs.table uncheck.bs.table ' + 'check-all.bs.table uncheck-all.bs.table', function () {
         $remove.prop('disabled', !$table.bootstrapTable('getSelections').length);

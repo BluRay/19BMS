@@ -380,8 +380,8 @@ public class HrReportAction extends BaseAction<Object> {
 		
 		HttpServletRequest request = ServletActionContext.getRequest();
 		request.setCharacterEncoding("UTF-8");
-		conditionMap.put("offset", Integer.valueOf(request.getParameter("offset")));
-		conditionMap.put("pageSize", Integer.valueOf(request.getParameter("limit")));
+		if(request.getParameter("offset")!=null)conditionMap.put("offset", Integer.valueOf(request.getParameter("offset")));
+		if(request.getParameter("limit")!=null)conditionMap.put("pageSize", Integer.valueOf(request.getParameter("limit")));
 		/**
 		if(pager!=null){
 			conditionMap.put("offset",(pager.getCurPage() - 1) * pager.getPageSize());

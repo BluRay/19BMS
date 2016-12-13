@@ -482,22 +482,22 @@
             return sprintf('Showing %s rows', totalRows);
         },
         formatSearch: function () {
-            return 'Search';
+            return '搜索';
         },
         formatNoMatches: function () {
             return '暂时没有查询结果，请刷新或点击查询获取数据';
         },
         formatPaginationSwitch: function () {
-            return 'Hide/Show pagination';
+            return '全部显示';
         },
         formatRefresh: function () {
-            return 'Refresh';
+            return '刷新数据';
         },
         formatToggle: function () {
             return 'Toggle';
         },
         formatColumns: function () {
-            return 'Columns';
+            return '显示隐藏列';
         },
         formatAllRows: function () {
             return 'All';
