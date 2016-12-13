@@ -95,6 +95,7 @@ public class PieceWorkTimeAction extends BaseAction<Object> {
 		String workshop=(String) swh_list.get(0).get("workshop");
 		String workgroup=(String) swh_list.get(0).get("workgroup");
 		String team=(String) swh_list.get(0).get("team");
+		String orderId=(String) swh_list.get(0).get("order_id");
 		map.put("busNumber", busNumber);
 		map.put("startDate", workDate);
 		map.put("endDate", workDate);
@@ -103,6 +104,7 @@ public class PieceWorkTimeAction extends BaseAction<Object> {
 		map.put("workshop", workshop);
 		map.put("workgroup", workgroup);
 		map.put("team", team);	
+		map.put("orderId", orderId);
 		
 		if((/*!"自制件".equals(workshop)&& !"部件".equals(workshop)||*/isCustomer.equals("0"))){
 			if(productionDao.validateBusNumber(map)>0){
@@ -221,9 +223,10 @@ public class PieceWorkTimeAction extends BaseAction<Object> {
 		for(int i=0;i<jsonArray.size();i++){
 			 JSONObject object = (JSONObject)jsonArray.get(i);
 			 String status=(String)object.get("status");
-			 if("1".equals(status)&&StringUtils.isEmpty(whflag)){
+			 if("2".equals(status)&&StringUtils.isEmpty(whflag)){
 				 sb.append(object.getString("bus_number"));
 				 sb.append(",");
+				 object.put("status", "1");
 			 }
 			 object.put("editor_id", user.getId());
 			 object.put("edit_date", createTime);

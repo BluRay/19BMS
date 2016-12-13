@@ -2674,7 +2674,7 @@
 	<select id="queryStaffWorkHours" parameterType="Map" resultType="Map">
 		<choose>
 			<when test="hourType==1 and workshop!='自制件' ">
-				select h.id,h.bus_number,h.staff_number,h.staff_name,h.job,h.plant_org,h.workshop_org,h.workgroup_org,h.team_org,h.bonus,h.distribution,h.ppay,h.work_date,h.status,h.approve_date,u.username approver,u.email
+				select h.id,h.factory,h.workshop,h.workgroup,h.team,h.bus_number,h.order_id,h.staff_number,h.staff_name,h.job,h.plant_org,h.workshop_org,h.workgroup_org,h.team_org,h.bonus,h.distribution,h.standard_price,h.ppay,h.work_date,h.status,h.approve_date,u.username approver,u.email
 				from BMS_PIECE_PAY_CAL h
 				left join BMS_BASE_USER u on h.approver_id=u.id
 				where 1=1
@@ -2715,8 +2715,10 @@
 				<if test="busNumber !=null and busNumber !=''">
 					and h.bus_number=#{busNumber}
 				</if>
-				order by
-				bus_number,h.factory,h.workshop,h.workgroup,h.team,h.work_date desc
+				<if test="order_id !=null and order_id !=''">
+					and h.order_id=#{order_id}
+				</if>
+				order by order_id,bus_number,h.factory,h.workshop,h.workgroup,h.team,h.work_date desc
 				<if test="offset!=null">
 					LIMIT #{offset} ,#{pageSize}
 				</if>
@@ -2766,58 +2768,183 @@
 				</if>
 			</when>
 			<otherwise>
-					select h.*,o.name work_org,s.staff_number,s.name staff_name,s.plant_org,s.workshop_org,
-					s.workgroup_org,s.team_org,s.job,u.username editor,u1.username approver,u.email,p.ppay
-					from
-					BMS_HR_STAFF_HOURS h
+					select h.*,p.id p_id,o.name work_org,s.staff_number,s.name staff_name,s.plant_org,s.workshop_org,
+					s.workgroup_org,s.team_org,s.job,u.username editor,u1.username approver,u.email,
+					<if test="hourType==1">
+					p.ppay
+					</if>
+					<if test="hourType==2">
+					p.price*p.work_hour ppay
+					</if>
+					<if test="hourType==3">
+					p.wpay ppay
+					</if>					
+					from BMS_HR_STAFF_HOURS h
 					left join BMS_BASE_ORG o on h.org_id=o.id
-					left join BMS_HR_STAFF s on
-					h.staff_id=s.id
+					left join BMS_HR_STAFF s on h.staff_id=s.id
 					left join BMS_BASE_USER u on u.id=h.editor_id
-					left join
-					BMS_BASE_USER u1 on u1.id=h.approver_id
+					left join BMS_BASE_USER u1 on u1.id=h.approver_id					
+					<if test="hourType==1">
 					left join BMS_PIECE_PAY_CAL p on s.staff_number=p.staff_number 
 					and h.work_date=p.work_date and p.factory=h.factory and p.workshop=h.workshop
 					and p.team= h.team and p.bus_number=h.bus_number
+						<if test="status !=null and status !=''">
+						and p.status=#{status}
+						</if>
+						<if test="factory !=null and factory !='' and factory !='请选择'">
+						and p.factory=#{factory}
+						</if>
+						<if test="workshop !=null and workshop !='' and workshop !='请选择'">
+						and find_in_set(p.workshop,#{workshop})>0
+						</if>
+						<if test="workgroup !=null and workgroup !='' and workgroup !='请选择'">
+							and p.workgroup=#{workgroup}
+						</if>
+						<if test="team !=null and team !='' and team !='请选择'">
+							and p.team=#{team}
+						</if>
+						<if test="staffNum !=null and staffNum !=''">
+							and find_in_set(p.staff_number,#{staffNum})>0
+						</if>
+						<if test="workDate !=null and workDate !=''">
+							and p.work_date=#{workDate} 
+						</if>
+						<if test="workMonth !=null and workMonth !=''">
+							and p.work_date like concat(#{workMonth},'%')
+						</if>
+						<if test="wdateStart !=null and wdateStart !=''">
+						<![CDATA[ 
+							and p.work_date>=#{wdateStart}
+						]]>
+						</if>
+							<if test="wdateEnd !=null and wdateEnd !=''">
+						<![CDATA[ 
+							and p.work_date<=#{wdateEnd}
+						]]>
+						</if>
+						<if test="order_id !=null and order_id !=''">
+							and p.order_id=#{order_id}
+						</if>
+					
+					</if>
+					<if test="hourType==2">
+					left join BMS_TMP_PAY_CAL p on s.staff_number=p.staff_number 
+					and h.work_date=p.work_date and p.factory=h.factory and p.workshop=h.workshop
+					and p.team= h.team and p.order_id=h.temp_order_id
+					<if test="status !=null and status !=''">
+						and p.status=#{status}
+						</if>
+						<if test="factory !=null and factory !='' and factory !='请选择'">
+						and p.factory=#{factory}
+						</if>
+						<if test="workshop !=null and workshop !='' and workshop !='请选择'">
+						and find_in_set(p.workshop,#{workshop})>0
+						</if>
+						<if test="workgroup !=null and workgroup !='' and workgroup !='请选择'">
+							and p.workgroup=#{workgroup}
+						</if>
+						<if test="team !=null and team !='' and team !='请选择'">
+							and p.team=#{team}
+						</if>
+						<if test="staffNum !=null and staffNum !=''">
+							and find_in_set(p.staff_number,#{staffNum})>0
+						</if>
+						<if test="workDate !=null and workDate !=''">
+							and p.work_date=#{workDate} 
+						</if>
+						<if test="workMonth !=null and workMonth !=''">
+							and p.work_date like concat(#{workMonth},'%')
+						</if>
+						<if test="wdateStart !=null and wdateStart !=''">
+						<![CDATA[ 
+							and p.work_date>=#{wdateStart}
+						]]>
+						</if>
+							<if test="wdateEnd !=null and wdateEnd !=''">
+						<![CDATA[ 
+							and p.work_date<=#{wdateEnd}
+						]]>
+						</if>
+					</if>
+					<if test="hourType==3">
+					left join BMS_WAIT_PAY_CAL p on s.staff_number=p.staff_number 
+					and h.work_date=p.work_date and p.factory=h.factory and p.workshop=h.workshop
+					and p.team= h.team 
+					<if test="status !=null and status !=''">
+						and p.status=#{status}
+						</if>
+						<if test="factory !=null and factory !='' and factory !='请选择'">
+						and p.factory=#{factory}
+						</if>
+						<if test="workshop !=null and workshop !='' and workshop !='请选择'">
+						and find_in_set(p.workshop,#{workshop})>0
+						</if>
+						<if test="workgroup !=null and workgroup !='' and workgroup !='请选择'">
+							and p.workgroup=#{workgroup}
+						</if>
+						<if test="team !=null and team !='' and team !='请选择'">
+							and p.team=#{team}
+						</if>
+						<if test="staffNum !=null and staffNum !=''">
+							and find_in_set(p.staff_number,#{staffNum})>0
+						</if>
+						<if test="workDate !=null and workDate !=''">
+							and p.work_date=#{workDate} 
+						</if>
+						<if test="workMonth !=null and workMonth !=''">
+							and p.work_date like concat(#{workMonth},'%')
+						</if>
+						<if test="wdateStart !=null and wdateStart !=''">
+						<![CDATA[ 
+							and p.work_date>=#{wdateStart}
+						]]>
+						</if>
+							<if test="wdateEnd !=null and wdateEnd !=''">
+						<![CDATA[ 
+							and p.work_date<=#{wdateEnd}
+						]]>
+						</if>
+					</if>
+					
 					where 1=1
 				<if test="hourType !=null and hourType !=''">
 					and h.hour_type=#{hourType} 
 				</if>
 				<if test="status !=null and status !=''">
-					and h.status=#{status} and p.status=#{status}
+					and h.status=#{status}
 				</if>
 				<if test="factory !=null and factory !='' and factory !='请选择'">
-					and h.factory=#{factory} and p.factory=#{factory}
+					and h.factory=#{factory} 
 				</if>
 				<if test="workshop !=null and workshop !='' and workshop !='请选择'">
-					and find_in_set(h.workshop,#{workshop})>0 and find_in_set(p.workshop,#{workshop})>0
+					and find_in_set(h.workshop,#{workshop})>0 
 				</if>
 				<if test="workgroup !=null and workgroup !='' and workgroup !='请选择'">
-					and h.workgroup=#{workgroup} and p.workgroup=#{workgroup}
+					and h.workgroup=#{workgroup} 
 				</if>
 				<if test="team !=null and team !='' and team !='请选择'">
-					and h.team=#{team} and p.team=#{team}
+					and h.team=#{team} 
 				</if>
 				<if test="orgId !=null and orgId !=''">
 					and h.org_id=#{orgId}
 				</if>
 				<if test="staffNum !=null and staffNum !=''">
-					and find_in_set(s.staff_number,#{staffNum})>0 and find_in_set(p.staff_number,#{staffNum})>0
+					and find_in_set(s.staff_number,#{staffNum})>0 
 				</if>
 				<if test="workDate !=null and workDate !=''">
-					and h.work_date=#{workDate} and p.work_date=#{workDate} 
+					and h.work_date=#{workDate} 
 				</if>
 				<if test="workMonth !=null and workMonth !=''">
-					and h.work_date like concat(#{workMonth},'%') and p.work_date like concat(#{workMonth},'%')
+					and h.work_date like concat(#{workMonth},'%') 
 				</if>
 				<if test="wdateStart !=null and wdateStart !=''">
 				<![CDATA[ 
-					and h.work_date>=#{wdateStart} and p.work_date>=#{wdateStart}
+					and h.work_date>=#{wdateStart} 
 				]]>
-					</if>
-					<if test="wdateEnd !=null and wdateEnd !=''">
+				</if>
+				<if test="wdateEnd !=null and wdateEnd !=''">
 				<![CDATA[ 
-					and h.work_date<=#{wdateEnd} and p.work_date<=#{wdateEnd}
+					and h.work_date<=#{wdateEnd} 
 				]]>
 				</if>
 				<if test="waitReason !=null and waitReason !=''">
@@ -2829,11 +2956,14 @@
 				<if test="busNumber !=null and busNumber !=''">
 					and h.bus_number=#{busNumber}
 				</if>
+				<if test="order_id !=null and order_id !=''">
+					and h.order_id=#{order_id}
+				</if>
 				<if test="hourType==2">
 					order by h.work_date desc
 				</if>
 				<if test="hourType==1">
-					order by bus_number,h.factory,h.workshop,h.workgroup,h.team,h.work_date
+					order by h.order_id,h.bus_number,h.factory,h.workshop,h.workgroup,h.team,h.work_date
 					desc
 				</if>
 				<if test="offset!=null">
@@ -3073,10 +3203,10 @@
 		<foreach collection="list" item="detail" index="index"
 			separator=";">
 			insert into BMS_HR_STAFF_HOURS
-			(org_id,hour_type,bus_number,bus_count,bonus,work_date,staff_id,participation,distribution,editor_id,edit_date,skill_parameter,factory,dept,workshop,workgroup,team,standard_price,status)
+			(org_id,hour_type,bus_number,bus_count,bonus,work_date,staff_id,participation,distribution,editor_id,edit_date,skill_parameter,factory,dept,workshop,workgroup,team,standard_price,status,order_id)
 			values
 			(#{detail.org_id},'1',#{detail.bus_number},#{detail.bus_count},#{detail.bonus},#{detail.work_date},#{detail.staff_id},#{detail.participation},#{detail.distribution},#{detail.editor_id},
-			#{detail.edit_date},#{detail.skill_parameter},#{detail.factory},#{detail.dept},#{detail.workshop},#{detail.workgroup},#{detail.team},#{detail.standard_price},#{detail.status})
+			#{detail.edit_date},#{detail.skill_parameter},#{detail.factory},#{detail.dept},#{detail.workshop},#{detail.workgroup},#{detail.team},#{detail.standard_price},#{detail.status},#{detail.order_id})
 		</foreach>
 	</insert>
 
@@ -3088,11 +3218,11 @@
 		<foreach collection="list" item="detail" index="index"
 			separator=";">
 			insert into BMS_PIECE_PAY_CAL
-			(staff_number,staff_name,job,plant_org,workshop_org,workgroup_org,team_org,standard_price,distribution,work_date,ppay,bus_number,factory,dept,workshop,workgroup,team,bus_count,bonus,status,approver_id,approve_date)
+			(staff_number,staff_name,job,plant_org,workshop_org,workgroup_org,team_org,standard_price,distribution,work_date,ppay,bus_number,factory,dept,workshop,workgroup,team,bus_count,bonus,status,approver_id,approve_date,order_id)
 			values
 			(#{detail.staff_number},#{detail.staff_name},#{detail.job},#{detail.plant_org},#{detail.workshop_org},#{detail.workgroup_org},#{detail.team_org},#{detail.standard_price},#{detail.distribution},#{detail.work_date},
 			(#{detail.distribution}*(#{detail.bus_count}+#{detail.bonus})),#{detail.bus_number},#{detail.factory},#{detail.dept},#{detail.workshop},#{detail.workgroup},#{detail.team},#{detail.bus_count},
-			#{detail.bonus},#{detail.status},#{detail.editor_id},#{detail.edit_date})
+			#{detail.bonus},#{detail.status},#{detail.editor_id},#{detail.edit_date},#{detail.order_id})
 		</foreach>
 	</insert>
 
@@ -3168,31 +3298,15 @@
 	</update>
 	
 	<update id="batchDeletePiecePay" parameterType="List">
-		<foreach collection="list" item="detail" index="index"
-			separator=";">
-			delete from BMS_PIECE_PAY_CAL		
-			<trim prefix="where" suffixOverrides="and">
-				<if test="detail.factory !=null and detail.factory !=''">
-				 	factory =#{detail.factory} and
-				</if>
-				<if test="detail.workshop !=null and detail.workshop !=''">
-				 	workshop =#{detail.workshop} and
-				</if>
-				<if test="detail.workgroup !=null and detail.workgroup !=''">
-				 	workgroup =#{detail.workgroup} and
-				</if>
-				<if test="detail.team !=null and detail.team !=''">
-				 	team =#{detail.team} and
-				</if>
-				<if test="detail.bus_number !=null and detail.bus_number !=''">
-				 	bus_number =#{detail.bus_number} and
-				</if>
-				<if test="detail.work_date !=null and detail.work_date !=''">
-				 	work_date =#{detail.work_date} and
-				</if>
-			</trim>
-
+		delete from BMS_PIECE_PAY_CAL 
+		where id in
+		<trim prefix="(" suffix=")">
+			<foreach collection="list" item="detail" index="index"
+			separator=",">
+				#{detail.p_id}			
 		</foreach>
+		</trim>
+		
 	</update>
 
 	<update id="deletePiecePay" parameterType="Map">
@@ -3278,7 +3392,7 @@
 
 	<select id="caculateSalary" statementType="CALLABLE"
 		parameterType="Map" resultType="String">
-		call P_CACULATE_PIECE_SALLARY_V2(#{factory},#{workshop},#{workgroup},#{team},#{busNumber},#{startDate},#{endDate});
+		call P_CACULATE_PIECE_SALLARY_V2(#{factory},#{workshop},#{workgroup},#{team},#{busNumber},#{orderId},#{startDate},#{endDate});
 	</select>
 
 	<!-- 计件工时 end -->

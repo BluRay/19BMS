@@ -12,15 +12,11 @@
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 <script type="text/javascript" src="js/hr/pieceSalaryBalance.js"></script>
-<link rel="stylesheet" href="css/common.css">
 <link rel="stylesheet" href="css/bootstrap.css">
 <link rel="stylesheet" href="css/bootstrap.min.css">
 <link rel="stylesheet" href="css/bootstrap-table.css">
 <link rel="stylesheet" href="css/bootstrap-editable.css">
 <title>BMS - 计件工资结算</title>
-
-<script type="text/javascript">
-</script>
 </head>
 <body style="font-family: 'Microsoft YaHei';">
 <%@ include file="../common/head.jsp"%>
@@ -33,41 +29,31 @@
 				<table>
 					<tr>
 						<td width="60px" style="text-align: right">工厂：</td>
-						<td width="160px"><select id="factory" class="input-medium">
-						</select></td>
+						<td width="160px"><select id="factory" class="input-medium"></select></td>
 						<td width="80px" style="text-align: right">车间：</td>
-						<td width="160px"><select id="workshop" class="input-medium">
-						</select></td>
+						<td width="160px"><select id="workshop" class="input-medium"></select></td>
 						<td width="100px" style="text-align: right">班组：</td>
-						<td width="160px"><select id="group" class="input-medium">
-								<!-- <option value=''>请选择</option> -->
-						</select></td>
+						<td width="160px"><select id="group" class="input-medium"></select></td>
 						<td width="80px"></td>
 						<td></td>
 					</tr>
 					<tr>
 						<td width="60px" style="text-align: right">小班组：</td>
 						<td width="160px"><select id="subgroup" class="input-medium">
-								<!-- 	<option value=''>请选择</option> -->
 						</select></td>
 						<td width="80px" style="text-align: right">工号/姓名：</td>
-						<td width="160px" style="padding-top:10px;"><input type="text" id="staff"
-							class="input-medium" placeholder="请输入工号/姓名" /></td>
+						<td width="160px" style="padding-top:10px;"><input type="text" id="staff" class="input-medium" placeholder="请输入工号/姓名" /></td>
 						<td width="100px" style="text-align: right">月份：</td>
 						<td colspan=2  style="padding-top:10px;">
 							<!-- <input type="text" id="mta_wdate" class="input-medium" onclick="WdatePicker({dateFmt:'yyyy-MM'})"/> -->
 							<input type="text" id="month_start" class="input-small" onclick="WdatePicker({dateFmt:'yyyy-MM',onpicked:function(){changeMonth();},maxDate:cDate})" />
-							<span>-</span><input type="text" id="month_end"
-							class="input-small"
-							onclick="WdatePicker({dateFmt:'yyyy-MM',maxDate:llDate})" />
+							<span>-</span><input type="text" id="month_end" class="input-small" onclick="WdatePicker({dateFmt:'yyyy-MM',maxDate:llDate})" />
 						</td>
-						<td><input type="button" class="btn btn-primary"
-							id="btnQuery" value="查询"
-							style="margin-left: 2px; margin-top: -10px;"></input> <input
-							type="button" class="btn btn-danger" id="btnReject" value="驳回"
-							style="margin-left: 2px; margin-top: -10px;"></input> <input
-							type="button" class="btn btn-success" id="btnSave" value="结算"
-							style="margin-left: 2px; margin-top: -10px;"></input></td>
+						<td>
+						<input type="button" class="btn btn-primary" id="btnQuery" value="查询" style="margin-left: 2px; margin-top: -10px;"></input> 
+						<input type="button" class="btn btn-danger" id="btnReject" value="驳回" style="margin-left: 2px; margin-top: -10px;"></input> 
+						<input type="button" class="btn btn-success" id="btnSave" value="结算" style="margin-left: 2px; margin-top: -10px;"></input>
+						</td>
 					</tr>
 				</table>
 			</div>
@@ -76,23 +62,16 @@
 		<div class="container" style="height:200px;padding-left:0px;padding-right:0px;padding-top:0px">
 		<div id="toolbar"></div>
 		<table id="table" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
-	           data-show-toggle="true" data-show-columns="true" data-show-export="true" data-detail-view="false"
+	           data-show-toggle="false" data-show-columns="true" data-show-export="true" data-detail-view="false"
 	           data-detail-formatter="detailFormatter" data-minimum-count-columns="2" data-show-pagination-switch="true"
 	           data-pagination="true" data-id-field="id" data-page-list="[50, 100, 200, 500, ALL]"
-	           data-show-footer="false" data-side-pagination="server"
-	           data-url="/myssm/car/getCompanyList" data-response-handler="responseHandler">
+	           data-show-footer="false" data-side-pagination="server" data-response-handler="responseHandler">
 	    </table>
 		</div>
 	</div>
 </div>
 <script>
 var $table = $('#table'),$remove = $('#remove'),selections = [];
-var cDate="";//当前月份
-var wDate="";//上一月份
-var llDate="";//上上个月份
-var month_start= null;
-var month_end = null;
-var email_list=new Array();
 </script>
 </body>
 </html>

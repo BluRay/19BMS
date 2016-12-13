@@ -317,7 +317,7 @@
         sidePagination: 'client', // client or server
         totalRows: 0, // server side need to set
         pageNumber: 1,
-        pageSize: 100,
+        pageSize: 25,
         pageList: [10, 25, 50, 100],
         paginationHAlign: 'right', //right, left
         paginationVAlign: 'bottom', //bottom, top, both
@@ -470,7 +470,7 @@
 
     BootstrapTable.LOCALES['en-US'] = BootstrapTable.LOCALES.en = {
         formatLoadingMessage: function () {
-            return 'Loading, please wait...';
+            return '正在查询，请稍候...';
         },
         formatRecordsPerPage: function (pageNumber) {
             return sprintf('%s 条数据每页', pageNumber);

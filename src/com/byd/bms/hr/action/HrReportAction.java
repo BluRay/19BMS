@@ -362,8 +362,9 @@ public class HrReportAction extends BaseAction<Object> {
 	/**
 	 * 查询已提交的上月工资列表
 	 * @return
+	 * @throws UnsupportedEncodingException 
 	 */
-	public String getSubmitSalaryList(){
+	public String getSubmitSalaryList() throws UnsupportedEncodingException{
 		result=new HashMap<String,Object>();
 		JSONObject jo=JSONObject.fromObject(conditions);
 		Map<String,Object> conditionMap=new HashMap<String,Object>();
@@ -376,6 +377,12 @@ public class HrReportAction extends BaseAction<Object> {
 		
 		String month_start=(String) conditionMap.get("monthStart");
 		String month_end=(String) conditionMap.get("monthEnd");
+		
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		conditionMap.put("offset", Integer.valueOf(request.getParameter("offset")));
+		conditionMap.put("pageSize", Integer.valueOf(request.getParameter("limit")));
+		/**
 		if(pager!=null){
 			conditionMap.put("offset",(pager.getCurPage() - 1) * pager.getPageSize());
 			conditionMap.put("pageSize", pager.getPageSize());	
@@ -383,9 +390,12 @@ public class HrReportAction extends BaseAction<Object> {
 			totalCount = hrDao.queryPieceSalaryHistoryCount(conditionMapAll);
 			pager.setTotalCount(totalCount);
 			result.put("pager", pager);
-		}
-		
-		result.put("salaryList", hrDao.queryPieceSalaryHistory(conditionMap));
+			
+		}**/
+		int totalCount=0;
+		totalCount = hrDao.queryPieceSalaryHistoryCount(conditionMapAll);
+		result.put("total", totalCount);
+		result.put("rows", hrDao.queryPieceSalaryHistory(conditionMap));
 		return SUCCESS;
 	}
 	/**

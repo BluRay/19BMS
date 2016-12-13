@@ -2244,60 +2244,8 @@
 		]]>
 		</if>
 		 ) tmp  )t;	
-		<!-- select count(distinct t1.staff_id )
-		from(
-		select s.id staff_id
-		from
-		BMS_HR_STAFF s
-		where 1=1 and s.salary_type='计件' and s.status='在职'
-		<if test="factory !=null and factory !=''">
-			and s.plant_org=#{factory}
-		</if>
-		<if test="workshop !=null and workshop !=''">
-			and find_in_set(s.workshop_org,#{workshop})>0
-		</if>
-		<if test="workgroup !=null and workgroup !=''">
-			and s.workgroup_org=#{workgroup}
-		</if>
-		<if test="team !=null and team !=''">
-			and s.team_org=#{team}
-		</if>
-		<if test="staff !=null and staff !=''">
-			and (s.staff_number=#{staff} or s.name=#{staff})
-		</if>
-		union all
-		select distinct st.staff_id
-		from V_ORG_STAFF_INFO st
-		where 1=1
-		<if test="factory !=null and factory !=''">
-			and st.factory=#{factory}
-		</if>
-		<if test="workshop !=null and workshop !=''">
-			and find_in_set(st.workshop,#{workshop})>0
-		</if>
-		<if test="workgroup !=null and workgroup !=''">
-			and st.workgroup=#{workgroup}
-		</if>
-		<if test="team !=null and team !=''">
-			and st.team=#{team}
-		</if>
-		<if test="staff !=null and staff !=''">
-			and (st.staff_number=#{staff} or st.staff_name=#{staff})
-		</if>
-		<if test="monthStart !=null and monthStart !=''">
-		<![CDATA[
-			and substr(st.work_date,1,7)>=#{monthStart}
-		]]>
-		</if>
-		<if test="monthEnd !=null and monthEnd !=''">
-		<![CDATA[
-			and substr(st.work_date,1,7)<=#{monthEnd}
-		]]>
-		</if>
-		) t1 -->
 	</select>
-	<select id="queryPieceSalaryHistory" parameterType="map"
-		resultType="map">
+	<select id="queryPieceSalaryHistory" parameterType="map" resultType="map">
 		select h.id,h.month,h.staff_number,h.staff_name,s.status staff_status,h.skill_parameter,h.job,h.plant_org,h.workshop_org,h.workgroup_org,h.team_org,h.attendance_days,h.attendance_hours,sum(h.piece_total) piece_total,
 		sum(h.bonus_total) bonus_total,sum(h.piece_pay_total) piece_pay_total,sum(h.ecnwh_total) ecnwh_total,sum(h.ecn_pay_total) ecn_pay_total,sum(h.wwh_total) wwh_total,
 		sum(h.wait_pay_total) wait_pay_total,sum(h.tmpwh_total) tmpwh_total,sum(h.tmp_pay_total) tmp_pay_total,sum(h.dscore_total) dscore_total,sum(h.deduct_pay_total) deduct_pay_total,
@@ -2327,29 +2275,24 @@
 		</if>
 		union all
 		select distinct s1.staff_number
-		from BMS_PIECE_PAY_CAL h
+		from BMS_HR_PIECE_SALARY_HISTORY h
 		left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number where h.status in
-		('1','3')
+		('已提交','已结算') 
 		<if test="factory !=null and factory !=''">
-			and h.factory=#{factory}
+			and h.submit_factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
-			and find_in_set(h.workshop,#{workshop})>0
+			and find_in_set(h.submit_workshop,#{workshop})>0
 		</if>
-		<if test="workgroup !=null and workgroup !=''">
-			and h.workgroup=#{workgroup}
-		</if>
-		<if test="team !=null and team !=''">
-			and h.team=#{team}
-		</if>
+	
 		<if test="monthStart !=null and monthStart !=''">
 		<![CDATA[
-			and substr(h.work_date,1,7)>=#{monthStart}
+			and h.month>=#{monthStart}
 		]]>
 		</if>
 		<if test="monthEnd !=null and monthEnd !=''">
 		<![CDATA[
-			and substr(h.work_date,1,7)<=#{monthEnd}
+			and h.month<=#{monthEnd}
 		]]>
 		</if>
 		<if test="staff !=null and staff !=''">
@@ -2562,13 +2505,20 @@
 		</if>
  -->
 	</select>
-	<select id="queryPieceSalaryHistoryCount" parameterType="map"
-		resultType="int">
-		select count(distinct h.staff_number) from BMS_HR_PIECE_SALARY_HISTORY h where
-		h.staff_number in (
+	<select id="queryPieceSalaryHistoryCount" parameterType="map" resultType="int">
+		select count(t.staff_number) from (
+		select h.id,h.month,h.staff_number,h.staff_name,s.status staff_status,h.skill_parameter,h.job,h.plant_org,h.workshop_org,h.workgroup_org,h.team_org,h.attendance_days,h.attendance_hours,sum(h.piece_total) piece_total,
+		sum(h.bonus_total) bonus_total,sum(h.piece_pay_total) piece_pay_total,sum(h.ecnwh_total) ecnwh_total,sum(h.ecn_pay_total) ecn_pay_total,sum(h.wwh_total) wwh_total,
+		sum(h.wait_pay_total) wait_pay_total,sum(h.tmpwh_total) tmpwh_total,sum(h.tmp_pay_total) tmp_pay_total,sum(h.dscore_total) dscore_total,sum(h.deduct_pay_total) deduct_pay_total,
+		case when find_in_set('已提交',group_concat(h.status,','))>0 then '已提交' else '已结算' end status,(select u.email from BMS_BASE_USER u 
+		left join BMS_HR_STAFF s1 on s1.staff_number=u.card_number 
+		where s1.name=h.saver and s1.workshop_org=h.submit_workshop and s1.plant_org=h.submit_factory ) saver_email,h.saver
+		from BMS_HR_PIECE_SALARY_HISTORY h 
+		left join BMS_HR_STAFF s on h.staff_number=s.staff_number
+		where h.staff_number in (
 		select distinct tmp.staff_number from (
-		select
-		s.staff_number from BMS_HR_STAFF s where 1=1 and s.salary_type='计件'
+		select s.staff_number
+		from BMS_HR_STAFF s where 1=1 and s.salary_type='计件'
 		<if test="factory !=null and factory !=''">
 			and s.plant_org=#{factory}
 		</if>
@@ -2585,34 +2535,30 @@
 			and (s.staff_number=#{staff} or s.name=#{staff})
 		</if>
 		union all
-		select distinct s1.staff_number from BMS_HR_STAFF_HOURS h
-		left join BMS_HR_STAFF s1 on h.staff_id =s1.id where h.status in
-		('1','3')
+		select distinct s1.staff_number
+		from BMS_HR_PIECE_SALARY_HISTORY h
+		left join BMS_HR_STAFF s1 on h.staff_number =s1.staff_number where h.status in
+		('已提交','已结算') 
 		<if test="factory !=null and factory !=''">
-			and h.factory=#{factory}
+			and h.submit_factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
-			and find_in_set(h.workshop,#{workshop})>0
+			and find_in_set(h.submit_workshop,#{workshop})>0
 		</if>
-		<if test="workgroup !=null and workgroup !=''">
-			and h.workgroup=#{workgroup}
-		</if>
-		<if test="team !=null and team !=''">
-			and h.team=#{team}
-		</if>
+	
 		<if test="monthStart !=null and monthStart !=''">
 		<![CDATA[
-			and substr(h.work_date,1,7)>=#{monthStart}
+			and h.month>=#{monthStart}
 		]]>
 		</if>
 		<if test="monthEnd !=null and monthEnd !=''">
 		<![CDATA[
-			and substr(h.work_date,1,7)<=#{monthEnd}
+			and h.month<=#{monthEnd}
 		]]>
 		</if>
 		<if test="staff !=null and staff !=''">
 			and (s1.staff_number=#{staff} or s1.name=#{staff})
-		</if>
+		</if>		
 		) tmp)
 		<if test="monthStart !=null and monthStart !=''">
 		<![CDATA[
@@ -2631,6 +2577,8 @@
 		<if test="workshop !=null and workshop !=''">
 			and find_in_set(h.submit_workshop,#{workshop})>0
 		</if>
+		group by h.staff_number
+		) t
 	</select>
 	
 	<select id="queryBalanceSalaryCount" parameterType="map" resultType="int">

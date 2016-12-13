@@ -410,11 +410,29 @@ public class StaffAction extends BaseAction<Object>{
 					if(null == data[13] || StringUtils.isBlank(data[13].toString().trim())){
 						//工厂/部为必填值
 						success = false;
-						result = result+"第"+i+"行工厂/职能部门信息为必填项！\n";
+						result = result+"第"+i+"行工厂/部门、科室、车间、班组、小班组信息为必填项！\n";
 					}
 					//组织结构信息校验
 					Map queryOrgMap = new HashMap<String, Object>();
 					queryOrgMap.put("plant_org", data[13].toString());
+					
+					if(StringUtils.isEmpty(data[14].toString().trim())&&"计件".equals(data[12].toString().trim())){
+						success = false;
+						result = result+"第"+i+"行工厂/部门、科室、车间、班组、小班组信息为必填项！\n";
+					}
+					if(StringUtils.isEmpty(data[15].toString().trim())&&"计件".equals(data[12].toString().trim())){
+						success = false;
+						result = result+"第"+i+"行工厂/部门、科室、车间、班组、小班组信息为必填项！\n";
+					}
+					if(StringUtils.isEmpty(data[16].toString().trim())&&"计件".equals(data[12].toString().trim())){
+						success = false;
+						result = result+"第"+i+"行工厂/部门、科室、车间、班组、小班组信息为必填项！\n";
+					}
+					if(StringUtils.isEmpty(data[17].toString().trim())&&"计件".equals(data[12].toString().trim())){
+						success = false;
+						result = result+"第"+i+"行工厂/部门、科室、车间、班组、小班组信息为必填项！\n";
+					}
+					
 					if(null!=data[14] && !"".equals(data[14].toString().trim())){
 						queryOrgMap.put("dept_org", data[14]==null?null:data[14].toString());
 					}

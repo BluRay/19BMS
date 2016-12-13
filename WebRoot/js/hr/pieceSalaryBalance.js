@@ -1,26 +1,59 @@
+var cDate="";//当前月份
+var wDate="";//上一月份
+var llDate="";//上上个月份
+var month_start= null;
+var month_end = null;
+var email_list=new Array();
+var data_url = "hrReport!getSubmitSalaryList.action?";
+
 $(document).ready(function(){
-    	$(".container").width(getWidth());
-        var scripts = [
-                location.search.substring(1) || 'js/bootstrap-table.js',
-                'js/bootstrap-table-export.js','js/tableExport.js',
-                'js/bootstrap-table-editable.js','js/bootstrap-editable.js'
-            ],
-            eachSeries = function (arr, iterator, callback) {
-                callback = callback || function () {};
-                if (!arr.length) {return callback();}
-                var completed = 0;
-                var iterate = function () {
-                    iterator(arr[completed], function (err) {
-                        if (err) {callback(err);callback = function () {};}
-                        else {completed += 1;if (completed >= arr.length) {callback(null);}else {iterate();}}
-                    });
-                };
-                iterate();
+	
+	$(".container").width(getWidth());
+    var scripts = [
+            location.search.substring(1) || 'js/bootstrap-table.js',
+            'js/bootstrap-table-export.js','js/tableExport.js',
+            'js/bootstrap-table-editable.js','js/bootstrap-editable.js'
+        ],
+        eachSeries = function (arr, iterator, callback) {
+            callback = callback || function () {};
+            if (!arr.length) {return callback();}
+            var completed = 0;
+            var iterate = function () {
+                iterator(arr[completed], function (err) {
+                    if (err) {callback(err);callback = function () {};}
+                    else {completed += 1;if (completed >= arr.length) {callback(null);}else {iterate();}}
+                });
             };
-        eachSeries(scripts, getScript, initTable);
-        
-        initPage();
+            iterate();
+        };
+    eachSeries(scripts, getScript, initTable);
+    
+    initPage();
+    // 工厂切换事件
+	$("#factory").change(
+		function() {
+			var selectFactory = $("#factory :selected").text();
+			getWorkshopSelect_Auth("#workshop", null,selectFactory, "");
+			getChildOrgSelect("#group", workshop, "","");
+			$("#subgroup").html("<option value=''>全部</option>");
+		});
+	// 车间切换事件
+	$("#workshop").change(
+		function() {
+			var workshop = $("#workshop").val();
+			getChildOrgSelect("#group", workshop, "","");
+			$("#subgroup").html("<option value=''>全部</option>");
+		});
+	// 班组切换事件
+	$("#group").change(function() {
+		var group = $("#group").val();
+		getChildOrgSelect("#subgroup", group, "", "noall");
+	});
+	
+	$("#btnQuery").click(function () {
+		ajaxQuery();
     });
+});
 function getScript(url, callback) {
     var head = document.getElementsByTagName('head')[0];
     var script = document.createElement('script');
@@ -38,87 +71,111 @@ function getScript(url, callback) {
     return undefined;
 }
 function initTable() {
+	console.log("---->data_url = " + data_url);
     $table.bootstrapTable({
         height: getHeight(),
+        url:data_url,
+        striped:true,
+        paginationVAlign:'top',
+        searchOnEnterKey:true,
+        queryParams:function(params) {
+        	var workshopAll="";
+        	$("#workshop option").each(function(){
+        		workshopAll+=$(this).text()+",";
+        	});
+        	var workshop=$("#workshop :selected").text()=="全部"?workshopAll:$("#workshop :selected").text();
+        	var workgroup=$("#group :selected").text()=="全部"?"":$("#group :selected").text();
+        	var team=$("#subgroup :selected").text()=="全部"?"":$("#subgroup :selected").text();
+        	var conditions="{factory:'"+$("#factory :selected").text()+"',workshop:'"+workshop
+        		+"',workgroup:'"+workgroup+"',staff:'"+$("#staff").val()+
+        		"',team:'"+team+ "',monthStart:'"+$("#month_start").val()+"',monthEnd:'"+$("#month_end").val()+"'}";
+        	params["conditions"] = conditions; 
+        	return params;
+        },
         columns: [
         [
             {
-            	field: 'id',title: '月份',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'MONTH',title: '月份',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '工号',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'STAFF_NUMBER',title: '工号',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '姓名',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'STAFF_NAME',title: '&nbsp;&nbsp;姓名&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '车间',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'WORKSHOP_ORG',title: '车间',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '班组',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'WORKGROUP_ORG',title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;班组&nbsp;',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '小班组',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'TEAM_ORG',title: '&nbsp;&nbsp;&nbsp;小班组&nbsp;',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '岗位',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'JOB',title: '岗位',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '在职',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'STAFF_STATUS',title: '在职',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '出勤<br/>天数',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'ATTENDANCE_DAYS',title: '出勤<br/>天数',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'ATTENDANCE_HOURS',title: '出勤<br/>小时数',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'PIECE_TOTAL',title: '计件<br/>产量',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'BONUS_TOTAL',title: '补贴车',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'PIECE_PAY_TOTAL',title: '纯计件<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'ECNWH_TOTAL',title: '技改<br/>工时',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'ECN_PAY_TOTAL',title: '技改<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'TMPWH_TOTAL',title: '额外<br/>工时',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'TMP_PAY_TOTAL',title: '额外<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'WWH_TOTAL',title: '等待<br/>工时',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'WAIT_PAY_TOTAL',title: '等待<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'PIECE_SALARY',title: '计件<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'DEDUCT_PAY_TOTAL',title: '考核<br/>扣款',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'id',title: '实发计<br/>件工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                formatter:function(value, row, index){
+                	var data = $table.bootstrapTable('getData');
+                	console.log("---->data : id = " + row.id);
+                	return value;
+                }
+            },{
+            	field: 'id',title: '平均<br/>日薪',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '出勤<br/>小时数',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '计件<br/>产量',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '补贴车',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '纯计件<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '技改<br/>工时',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '技改<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '额外<br/>工时',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '额外<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '等待<br/>工时',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '等待<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '计件<br/>工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '考核<br/>扣款',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '实发计<br/>件工资',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'id',title: '状态',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '平均<br/>日薪',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '状态',width:'60px',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
-            },{
-            	field: 'id',title: '操作人',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'id',title: '操作人',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: false,footerFormatter: totalTextFormatter
             },{
-            	field: 'id',title: '操作时间',width:'60px',align: 'center',valign: 'middle',align: 'center',
+            	field: 'id',title: '操作时间',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: false,footerFormatter: totalTextFormatter
             }
         ]
@@ -231,4 +288,12 @@ function changeMonth(){
 		$("#btnReject").css("display","");
 		$("#btnSave").css("display","");
 	}	
+}
+
+function ajaxQuery(){
+	var workshopAll="";
+	$("#workshop option").each(function(){
+		workshopAll+=$(this).text()+",";
+	});
+	$table.bootstrapTable('refresh', {url: data_url});
 }
