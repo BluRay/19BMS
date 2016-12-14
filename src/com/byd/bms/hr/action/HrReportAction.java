@@ -375,13 +375,15 @@ public class HrReportAction extends BaseAction<Object> {
 		}
 		conditionMapAll.putAll(conditionMap);
 		
-		String month_start=(String) conditionMap.get("monthStart");
-		String month_end=(String) conditionMap.get("monthEnd");
+		//String month_start=(String) conditionMap.get("monthStart");
+		//String month_end=(String) conditionMap.get("monthEnd");
 		
 		HttpServletRequest request = ServletActionContext.getRequest();
 		request.setCharacterEncoding("UTF-8");
 		if(request.getParameter("offset")!=null)conditionMap.put("offset", Integer.valueOf(request.getParameter("offset")));
 		if(request.getParameter("limit")!=null)conditionMap.put("pageSize", Integer.valueOf(request.getParameter("limit")));
+		conditionMap.put("sort", request.getParameter("sort"));
+		conditionMap.put("order", request.getParameter("order"));
 		/**
 		if(pager!=null){
 			conditionMap.put("offset",(pager.getCurPage() - 1) * pager.getPageSize());

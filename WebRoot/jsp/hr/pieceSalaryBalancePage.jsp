@@ -12,9 +12,10 @@
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 <script type="text/javascript" src="js/hr/pieceSalaryBalance.js"></script>
+<link rel="stylesheet" href="css/bootstrap.3.2.css">
 <link rel="stylesheet" href="css/bootstrap.css">
-<link rel="stylesheet" href="css/bootstrap.min.css">
 <link rel="stylesheet" href="css/bootstrap-table.css">
+<link rel="stylesheet" href="css/bootstrap-table-fixed-columns.css">
 <link rel="stylesheet" href="css/bootstrap-editable.css">
 <title>BMS - 计件工资结算</title>
 </head>
@@ -58,7 +59,9 @@
 				</table>
 			</div>
 		</div>
-
+		<div style="display: none;position:fixed;z-index:999;margin-top:150px;margin-left:500px" class="divLoading" >
+            <span><i class="fa fa-spinner fa-spin fa-4x" style="height:1em;"></i></span>
+        </div>
 		<div class="container" style="height:200px;padding-left:0px;padding-right:0px;padding-top:0px">
 		<div id="toolbar"></div>
 		<table id="table" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
@@ -68,7 +71,26 @@
 	           data-show-footer="false" data-side-pagination="server" data-response-handler="responseHandler">
 	    </table>
 		</div>
-	</div>
+
+		<div class="modal fade" id="reasonModal" tabindex="-1" role="dialog" unselectable="on" onselectstart="return false;" 
+		aria-hidden="true" style="display: none; -moz-user-select: -moz-none; width: 600px; height: 250px; left: 45%">
+			<div class="modal-header"><h3>驳回原因</h3></div>
+			<div class="modal-body" style="margin-bottom: -20px;height: 140px;">
+				<div class="control-group">
+					<table>
+						<tr>
+							<td width="100px" style="text-align: right">驳回原因：</td>
+							<td width="350px"><textarea rows="2" id="reject_reason" style="width: 350px"></textarea></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" id="btnMtaSave">确认</button>
+				<button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>
+			</div>
+		</div>
+		</div>
 </div>
 <script>
 var $table = $('#table'),$remove = $('#remove'),selections = [];

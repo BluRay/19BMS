@@ -1111,7 +1111,7 @@
                 if (column.switchable) {
                     html.push(sprintf('<li>' +
                         '<label><input type="checkbox" data-field="%s" value="%s"%s> %s</label>' +
-                        '</li>', column.field, i, checked, column.title.replace('<br/>','')));
+                        '</li>', column.field, i, checked, column.title.replace('<br/>','').replace(' ','')));
                     switchableCount++;
                 }
             });

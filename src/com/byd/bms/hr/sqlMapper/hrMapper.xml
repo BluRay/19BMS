@@ -2317,7 +2317,12 @@
 			and find_in_set(h.submit_workshop,#{workshop})>0
 		</if>
 		group by h.staff_number
+		<if test="sort==null">
 		order by plant_org,workshop_org,workgroup_org,team_org,job
+		</if>
+		<if test="sort!=null">
+		order by ${sort} ${order}
+		</if>
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
 		</if>
