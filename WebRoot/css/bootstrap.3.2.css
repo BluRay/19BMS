@@ -3574,6 +3574,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .input-group-btn:last-child > .btn-group {
   margin-left: -1px;
 }
+/**
 .nav {
   padding-left: 0;
   margin-bottom: 0;
@@ -4288,7 +4289,7 @@ fieldset[disabled] .navbar-inverse .btn-link:hover,
 .navbar-inverse .btn-link[disabled]:focus,
 fieldset[disabled] .navbar-inverse .btn-link:focus {
   color: #444;
-}
+}**/
 .breadcrumb {
   padding: 8px 15px;
   margin-bottom: 20px;

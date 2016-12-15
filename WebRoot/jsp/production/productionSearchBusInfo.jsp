@@ -2,6 +2,7 @@
 <%@ taglib prefix="s" uri="/struts-tags"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<%long _systime= new java.util.Date().getTime();%>
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
@@ -13,12 +14,13 @@
 	<script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/head.js"></script>
-	<script type="text/javascript" src="js/common.js"></script>
-	<script type="text/javascript" src="js/production/productionSearchBusInfo.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>		
+	<script type="text/javascript" src="js/production/productionSearchBusInfo.js?timestamp=<%=_systime%>"></script>
 </head>
 <body>
 	<%@ include file="../common/head.jsp"%>
-	<%@ include file="../common/general_production_left.jsp"%>
+	
+	<%@ include file="../common/general_production_left.jsp"%>	
 	<!-- main -->
 	<div class="content-wrapper ">
 		<div id="bodymain" class="offhead">
@@ -383,4 +385,5 @@
 		</div>
 	</div>
 </body>
+
 </html>

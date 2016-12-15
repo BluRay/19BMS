@@ -120,8 +120,8 @@ function initTable() {
         striped:true,
         paginationVAlign:'bottom',
         searchOnEnterKey:true,
-        fixedColumns: true,
-        fixedNumber: 2,
+        fixedColumns: false,			//冻结列
+        fixedNumber: 0,					//冻结列数
         queryParams:function(params) {
         	var workshopAll="";
         	$("#workshop option").each(function(){
@@ -145,7 +145,7 @@ function initTable() {
 	        	return {css: {"padding-left": "3px", "padding-right": "2px"}};
 	        	}
             },{
-            	field: 'STAFF_NUMBER',title: '&nbsp;&nbsp;员工&nbsp;&nbsp;<br/>&nbsp;&nbsp;工号&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+            	field: 'STAFF_NUMBER',title: '&nbsp;&nbsp;工号&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter
             },{
             	field: 'STAFF_NAME',title: '&nbsp;&nbsp;姓名&nbsp;&nbsp;<br/>',align: 'center',valign: 'middle',align: 'center',

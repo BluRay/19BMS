@@ -2030,8 +2030,10 @@ table th[class*="span"],
   line-height: 14px;
   vertical-align: text-top;
   _vertical-align: middle;
+  /**
   background-image: url("../img/glyphicons-halflings.png");
   _background-image: url("../img/glyphicons-halflings-8.png");
+  **/
   background-position: 14px 14px;
   background-repeat: no-repeat;
   _zoom: 1;

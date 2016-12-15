@@ -24,7 +24,7 @@
 <%@ include file="../common/general_hr_left.jsp"%> 
 <div class="content-wrapper container">
     <div id="bodyright" class="offset2" style="margin-left:10px">
-    <legend style="margin: 0 auto;font-size:17px;line-height:2.3">计件工资结算</legend>
+    <legend style="margin: -5px auto;font-size:17px;line-height:2.3">计件工资结算</legend>
 		<div style="margin-top: -5px;margin-bottom:-25px">
 			<div class="control-group well" style="padding-top:10px;padding-bottom:2px">
 				<table>
