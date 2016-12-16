@@ -105,6 +105,7 @@ public class HrReportAction extends BaseAction<Object> {
 		conditionMap.put("bus_number", request.getParameter("bus_number"));
 		conditionMap.put("date_start", request.getParameter("date_start"));
 		conditionMap.put("date_end", request.getParameter("date_end"));
+		conditionMap.put("order_id", request.getParameter("order_id"));
 		if (pager != null){
 			conditionMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());
 			conditionMap.put("pageSize", pager.getPageSize());
@@ -174,6 +175,7 @@ public class HrReportAction extends BaseAction<Object> {
 		conditionMap.put("subgroup", request.getParameter("subgroup"));
 		conditionMap.put("staff_number", request.getParameter("staff_number"));
 		conditionMap.put("bus_number", request.getParameter("bus_number"));
+		conditionMap.put("order_id", request.getParameter("order_id"));
 		conditionMap.put("date_start", request.getParameter("date_start"));
 		conditionMap.put("date_end", request.getParameter("date_end"));
 		if (pager != null){

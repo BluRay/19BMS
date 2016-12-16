@@ -531,28 +531,31 @@ function ajaxManageConfirm(){
 				$("#manageModal").modal("hide");
 				ajaxQuery();
 				
-				var mailTo=$("#manage_email_send").val();
-				var cc=$("#manage_email_cc").val();
-				var title="第十九事业部"+$("#manageModal").data("factory")+$("#manageModal").data("workshop")+"车间停线恢复通报";
-				var user= $("#userName").val();
-				var thead="订单,停线时间,恢复时间,累计停线时间（H）,停线原因,发出人,停线车间,停线类型,责任部门,损失人数,损失工时（H）,产能损失,备注";
-				//alert(user);
-				var pauseTime=$("#manage_pause_time").val();
-				var tbdatalist="[{'订单':'"+($("#manage_order").data("order_desc")==undefined?"":$("#manage_order").data("order_desc"))+"',";
-				tbdatalist+="'停线时间':'"+$('#manage_date_start').val()+"',";
-				tbdatalist+="'恢复时间':'"+$('#manage_date_end').val()+"',";
-				tbdatalist+="'累计停线时间（H）':'"+pauseTime+"',";
-				tbdatalist+="'停线原因':'"+$('#manage_detailed_reasons').val()+"',";
-				tbdatalist+="'发出人':'"+user+"',";
-				tbdatalist+="'停线车间':'"+$("#manageModal").data("workshop")+"',";
-				tbdatalist+="'停线类型':'"+$('#manage_reason_type :selected').text()+"',";
-				tbdatalist+="'责任部门':'"+$('#manage_department :selected').text()+"',";
-				tbdatalist+="'损失人数':'"+$("#manage_waste_num").val()+"',";
-				tbdatalist+="'损失工时（H）':'"+(pauseTime*parseFloat($("#manage_waste_num").val()))+"',";
-				tbdatalist+="'产能损失':'"+$("#capacityLoss").val()+"',";
-				tbdatalist+="'备注':'"+$("#manage_memo").val()+"'}]";
+				if($('#manage_date_end').val().trim().length>0){
+					var mailTo=$("#manage_email_send").val();
+					var cc=$("#manage_email_cc").val();
+					var title="第十九事业部"+$("#manageModal").data("factory")+$("#manageModal").data("workshop")+"车间停线恢复通报";
+					var user= $("#userName").val();
+					var thead="订单,停线时间,恢复时间,累计停线时间（H）,停线原因,发出人,停线车间,停线类型,责任部门,损失人数,损失工时（H）,产能损失,备注";
+					//alert(user);
+					var pauseTime=$("#manage_pause_time").val();
+					var tbdatalist="[{'订单':'"+($("#manage_order").data("order_desc")==undefined?"":$("#manage_order").data("order_desc"))+"',";
+					tbdatalist+="'停线时间':'"+$('#manage_date_start').val()+"',";
+					tbdatalist+="'恢复时间':'"+$('#manage_date_end').val()+"',";
+					tbdatalist+="'累计停线时间（H）':'"+pauseTime+"',";
+					tbdatalist+="'停线原因':'"+$('#manage_detailed_reasons').val()+"',";
+					tbdatalist+="'发出人':'"+user+"',";
+					tbdatalist+="'停线车间':'"+$("#manageModal").data("workshop")+"',";
+					tbdatalist+="'停线类型':'"+$('#manage_reason_type :selected').text()+"',";
+					tbdatalist+="'责任部门':'"+$('#manage_department :selected').text()+"',";
+					tbdatalist+="'损失人数':'"+$("#manage_waste_num").val()+"',";
+					tbdatalist+="'损失工时（H）':'"+(pauseTime*parseFloat($("#manage_waste_num").val()))+"',";
+					tbdatalist+="'产能损失':'"+$("#capacityLoss").val()+"',";
+					tbdatalist+="'备注':'"+$("#manage_memo").val()+"'}]";
+					
+					sendEmail(mailTo,cc,title,thead,tbdatalist);
+				}
 				
-				sendEmail(mailTo,cc,title,thead,tbdatalist);
 			} else {
 				alert(response.message);
 			}

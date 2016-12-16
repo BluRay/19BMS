@@ -46,6 +46,7 @@ $(document).ready(function () {
 		var ecn = "0";		//技改
 		var onlineflag = "0";
 		var offlineflag = "0";
+		var enterflag=true;
 		if($('#exec_type').val() == "返修"){
 			repair = "1";
 			if($('#exec_onoff').val() == "上线")onlineflag ="1";
@@ -61,49 +62,65 @@ $(document).ready(function () {
 		//alert("onlineflag = " + onlineflag + "\n offlineflag = " + offlineflag + 
 		//		"\n repair = " + repair + "\n ecn = " + ecn);
 		
-        $.ajax({
-            type: "post",
-            dataType: "json",
-            url : "production!enterExecution.action",
-            data: {
-            	"factory_id" : $('#exec_factory').val(),
-            	"workshop_id":$('#exec_workshop').val(),
-                "bus_number":$('#vinText').val(),
-                "process_id":$('#exec_process').val(),
-                "factory_name":$('#exec_factory').find("option:selected").text(),
-                "workshop_name":$('#exec_workshop').find("option:selected").text(),
-                "line_name":$('#exec_line').find("option:selected").text(),
-                "line_id":$('#exec_line').val(),
-                "process_name":$('#exec_process').find("option:selected").text(),
-                "scanner_id":$('#exec_user').val(),
-                "repair":repair,
-                "ecn":ecn,
-                "onlineflag":onlineflag,
-                "offlineflag":offlineflag,
-                "cur_key_name":cur_key_name,
-                "bus_production_status":bus_production_status,
-                "orderType":orderType,
-                "exec_process_name":$("#exec_processname").val(),
-                "parts_list":cur_key_name.indexOf("上线")>0?JSON.stringify(parts_list):JSON.stringify(parts_update_list)
-            },
-            success: function(response){
-                resetPage();
-                if(response.success){ 
-                    fadeMessageAlert(response.message,"alert-success");
-                    resetPage();
-                }
-                else{
-                    fadeMessageAlert(response.message,"alert-error");
-                }
+		if(cur_key_name.indexOf("下线")>=0){
+			//alert(cur_key_name);
+			$.each(parts_list,function(i,parts){
+				if(parts.parts_num==undefined||parts.parts_num.trim().length==0){
+					enterflag=false;
+					return false;
+				}
+			});
+		}
+		
+		if(enterflag){
+			 $.ajax({
+		            type: "post",
+		            dataType: "json",
+		            url : "production!enterExecution.action",
+		            data: {
+		            	"factory_id" : $('#exec_factory').val(),
+		            	"workshop_id":$('#exec_workshop').val(),
+		                "bus_number":$('#vinText').val(),
+		                "process_id":$('#exec_process').val(),
+		                "factory_name":$('#exec_factory').find("option:selected").text(),
+		                "workshop_name":$('#exec_workshop').find("option:selected").text(),
+		                "line_name":$('#exec_line').find("option:selected").text(),
+		                "line_id":$('#exec_line').val(),
+		                "process_name":$('#exec_process').find("option:selected").text(),
+		                "scanner_id":$('#exec_user').val(),
+		                "repair":repair,
+		                "ecn":ecn,
+		                "onlineflag":onlineflag,
+		                "offlineflag":offlineflag,
+		                "cur_key_name":cur_key_name,
+		                "bus_production_status":bus_production_status,
+		                "orderType":orderType,
+		                "exec_process_name":$("#exec_processname").val(),
+		                "parts_list":cur_key_name.indexOf("上线")>0?JSON.stringify(parts_list):JSON.stringify(parts_update_list)
+		            },
+		            success: function(response){
+		                resetPage();
+		                if(response.success){ 
+		                    fadeMessageAlert(response.message,"alert-success");
+		                    resetPage();
+		                }
+		                else{
+		                    fadeMessageAlert(response.message,"alert-error");
+		                }
 
-                setTimeout(function() {
-                    $("#vinHint").hide().html("未输入车号");
-                    toggleVinHint(true);
-                },60000);
-                $("#partsListDiv").hide();
-            },
-            error:function(){alertError();$("#partsListDiv").hide();}
-        });
+		                setTimeout(function() {
+		                    $("#vinHint").hide().html("未输入车号");
+		                    toggleVinHint(true);
+		                },60000);
+		                $("#partsListDiv").hide();
+		            },
+		            error:function(){alertError();$("#partsListDiv").hide();}
+		        });
+		}else{
+			alert(cur_key_name+"扫描前，请将零部件信息录入完整！");
+			$("#btnSubmit").attr("disabled",false);
+		}
+       
     }
 	
 	function ajaxValidate (){

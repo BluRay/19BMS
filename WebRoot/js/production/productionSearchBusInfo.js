@@ -194,8 +194,41 @@ $(document).ready(function () {
 	
 });
 
+
+function clear_baseinfo(){
+	$("#tab01_order_no").html("");
+	$("#tab01_bus_number").html("");
+	$("#tab01_vin").html("");
+	$("#tab01_factory_name").html("");
+	$("#tab01_order_config_name").html("");
+	$("#tab01_customer").html("");
+	$("#tab01_productive_date").html("");
+	$("#tab01_left_motor_number").html("");
+	$("#tab01_right_motor_number").html("");
+	$("#tab01_bus_color").html("");
+	$("#tab01_bus_seats").html("");
+	$("#tab01_production_status").html("");
+	$("#tab01_dispatch_date").html("");
+	$("#tab01_customer_number").html("");
+	$("#tab01_welding_online_date").html("");
+	$("#tab01_welding_offline_date").html("");
+	$("#tab01_fiberglass_offline_date").html("");
+	$("#tab01_painting_online_date").html("");
+	$("#tab01_painting_offline_date").html("");
+	$("#tab01_chassis_online_date").html("");
+	$("#tab01_chassis_offline_date").html("");
+	$("#tab01_assembly_online_date").html("");
+	$("#tab01_assembly_offline_date").html("");
+	$("#tab01_debugarea_online_date").html("");
+	$("#tab01_debugarea_offline_date").html("");
+	$("#tab01_testline_online_date").html("");
+	$("#tab01_testline_offline_date").html("");
+	$("#tab01_warehousing_date").html("");	    			
+	$("#tab01_config_file").html("");
+}
 //基本信息查询
 function ajaxQuery(targetPage){
+	clear_baseinfo();
 	$.ajax({
 	    url: "production!getProductionSearchBusInfo.action",
 	    dataType: "json",

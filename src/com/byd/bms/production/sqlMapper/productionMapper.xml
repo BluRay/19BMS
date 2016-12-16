@@ -2787,7 +2787,7 @@
 					<if test="hourType==1">
 					left join BMS_PIECE_PAY_CAL p on s.staff_number=p.staff_number 
 					and h.work_date=p.work_date and p.factory=h.factory and p.workshop=h.workshop
-					and p.team= h.team and p.bus_number=h.bus_number
+					and p.team= h.team and p.bus_number=h.bus_number and h.order_id=p.order_id
 						<if test="status !=null and status !=''">
 						and p.status=#{status}
 						</if>

@@ -610,11 +610,14 @@
 
 
 	<select id="getPieceTimeReportList2" resultType="Map" parameterType='Map'>	
-		SELECT
-		staff_number,staff_name,job,plant_org,workshop_org,workgroup_org,team_org,GROUP_CONCAT(bus_number,',',work_date,',',distribution,',',ifnull(participation,''),',',ppay,',',standard_price,',',bonus,',',CONCAT(bus_count,'|')
-		separator '') AS 'piece_str'
-		FROM BMS_PIECE_PAY_CAL
-		WHERE work_date >= #{date_start} AND work_date &lt;= #{date_end} and status in('1','3')
+		<![CDATA[		
+		SELECT staff_number,staff_name,job,plant_org,workshop_org,workgroup_org,team_org,
+		GROUP_CONCAT(ifnull(concat(o.order_no,' ',o.order_name,'<br/>',t.bus_type_code,' ',o.order_qty,'台'),''),',',bus_number,',',work_date,',',distribution,',',ifnull(participation,''),',',ppay,',',standard_price,',',bonus,',',CONCAT(bus_count,'|') separator '') AS 'piece_str'
+		FROM BMS_PIECE_PAY_CAL p
+		LEFT JOIN BMS_ORDER o on p.order_id=o.id
+		LEFT JOIN BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id
+		WHERE work_date >= #{date_start} AND work_date <= #{date_end} and p.status in('1','3')
+		]]>
 		<if test="list.size !=0">
 			AND staff_number IN
 			<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
@@ -638,6 +641,9 @@
 		</if>
 		<if test="bus_number!=''">
 			AND UPPER(bus_number) = #{bus_number}
+		</if>
+		<if test="order_id !='' and order_id !=null">
+			AND p.order_id = #{order_id}
 		</if>
 		GROUP BY staff_number
 		ORDER BY staff_number
@@ -672,6 +678,9 @@
 	</if>
 	<if test="bus_number!=''">
 		AND UPPER(bus_number) = #{bus_number}
+	</if>
+	<if test="order_id !='' and order_id !=null">
+		AND order_id = #{order_id}
 	</if>
 	
 	</select>
@@ -744,6 +753,9 @@
 	<if test="bus_number!=''">
 		AND UPPER(bus_number) = #{bus_number}
 	</if>
+	<if test="order_id !='' and order_id !=null">
+		AND h.order_id = #{order_id}
+	</if>
 	<if test="staff_number!=''">
 		AND (h.staff_number = #{staff_number} OR h.staff_name = #{staff_number})
 	</if>
@@ -770,6 +782,9 @@
 	<if test="bus_number!=''">
 		AND UPPER(bus_number) = #{bus_number}
 	</if>
+	<if test="order_id !='' and order_id !=null">
+		AND h.order_id = #{order_id}
+	</if>
 	<if test="staff_number!=''">
 		AND (h.staff_number = #{staff_number} OR h.staff_name = #{staff_number})
 	</if>
@@ -778,11 +793,15 @@
 	</select>
 	
 	<select id="getPieceTimeReportList" resultType="Map" parameterType='Map' >
-	SELECT bus_number,standard_price,work_date,factory as plant_org,workshop as workshop_org,workgroup as workgroup_org,team as team_org,standard_price,bonus,
+	<![CDATA[
+	SELECT ifnull(concat(o.order_no,' ',o.order_name,'<br/>',t.bus_type_code,' ',o.order_qty,'台'),'') as order_desc,bus_number,standard_price,work_date,factory as plant_org,workshop as workshop_org,workgroup as workgroup_org,team as team_org,standard_price,bonus,
 	GROUP_CONCAT(staff_number,',',staff_name,',',IFNULL(job,'-'),',',ifnull(participation,''),',',ifnull(distribution,''),',',CONCAT(ROUND(ppay,2),'|') separator '') AS 'piece_str'
-	FROM BMS_PIECE_PAY_CAL 
-	WHERE work_date >= #{date_start} AND  work_date &lt;= #{date_end} and status in('1','3')
+	FROM BMS_PIECE_PAY_CAL p
+	LEFT JOIN BMS_ORDER o on p.order_id=o.id
+	LEFT JOIN BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id 
+	WHERE work_date >= #{date_start} AND  work_date <= #{date_end} and p.status in('1','3')
 	AND factory = #{factory}
+	]]>
 	<if test="list.size !=0">
 		AND bus_number IN
 		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
@@ -804,9 +823,12 @@
 	<if test="staff_number!=''">
 		AND (staff_number = #{staff_number} OR staff_name = #{staff_number})
 	</if>
-	GROUP BY work_date,bus_number,factory,workshop,workgroup,team
-	ORDER BY work_date,bus_number,factory,workshop,workgroup,team
-		
+	<if test="order_id !='' and order_id !=null">
+		AND p.order_id = #{order_id}
+	</if>
+	GROUP BY work_date,bus_number,order_id,factory,workshop,workgroup,team
+	ORDER BY work_date,bus_number,order_id,factory,workshop,workgroup,team
+	
 	</select>
 	<select id="getPieceTimeReportListCount" resultType="int" parameterType='Map' >
 	SELECT COUNT(bus_number) as count_num FROM
@@ -832,63 +854,17 @@
 	<if test="bus_number!=''">
 		AND UPPER(bus_number) = #{bus_number}
 	</if>
-	GROUP BY work_date,bus_number,factory,workshop,workgroup,team
-	ORDER BY work_date,bus_number,factory,workshop,workgroup,team) a
+	<if test="order_id !='' and order_id !=null">
+		AND order_id = #{order_id}
+	</if>	
+	GROUP BY work_date,bus_number,order_id,factory,workshop,workgroup,team
+	ORDER BY work_date,bus_number,order_id,factory,workshop,workgroup,team) a
 	
 	</select>
 	
-	<!-- 计件工时统计优化-谭海文 2016-04-01 -->
+	<!-- 计件工时统计优化- 2016-12-13 -->
 	<select id="getWorkHourReportList" resultType="Map"
-		parameterType='Map'>
-	<!-- select
-	tmp.staff_id,group_concat(tmp.workHoursType,'=',tmp.participationStr
-	order by tmp.staff_id separator '|') workhours,ss.staff_number,ss.name
-	as staff_name,r.new_value,
-	a.D1,a.D2,a.D3,a.D4,a.D5,a.D6,a.D7,a.D8,a.D9,a.D10,a.D11,a.D12,a.D13,a.D14,a.D15,a.D16,a.D17,a.D18,a.D19,a.D20,
-	a.D21,a.D22,a.D23,a.D24,a.D25,a.D26,a.D27,a.D28,a.D29,a.D30,a.D31
-	from(
-	SELECT a.staff_id,case hour_type when '1' then '计件' when '2' then '额外' when
-	'3' then '技改' when '4' then '等待' end as
-	workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,
-	group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
-	order by work_date separator '') AS participationStr FROM
-	(SELECT staff_id,hour_type,
-	case hour_type when '1' then SUM(bus_count) else SUM(work_hour) end
-	AS sum_participation,work_date,factory plant_org,workshop
-	workshop_org,workgroup workgroup_org,team team_org
-	FROM BMS_HR_STAFF_HOURS
-	WHERE work_date LIKE CONCAT(#{work_date},'%')
-	and FIND_IN_SET(STATUS,'1,3')
-	and (participation > 0 or work_hour>0) 
-	<if test="factory!='全部'">
-		AND factory = #{factory}
-	</if>
-	<if test="workshop!=''">
-		AND FIND_IN_SET(workshop,#{workshop}) >0
-	</if>
-	<if test="group!='全部'">
-		AND workgroup = #{group}
-	</if>
-	<if test="subgroup!='全部'">
-		AND team = #{subgroup}
-	</if>
-	GROUP BY staff_id,hour_type,work_date ORDER BY staff_id,hour_type) a
-	GROUP BY a.staff_id,hour_type) tmp
-	LEFT JOIN BMS_HR_STAFF ss ON ss.id = tmp.staff_id
-	left join BMS_HR_STAFF_UPDATE_RECORD r on tmp.staff_id=r.staff_id and
-	substring(r.edit_date,1,7)&lt;=#{work_date} and r.type='skill_parameter'
-	and r.edit_date=(select max(r1.edit_date) from BMS_HR_STAFF_UPDATE_RECORD
-	r1 where tmp.staff_id=r1.staff_id and
-	substring(r1.edit_date,1,7)&lt;=#{work_date} and r1.type='skill_parameter')
-	LEFT JOIN BMS_HR_STAFF_ATTENDANCE a ON ss.staff_number = a.staff_number
-	where a.month=#{work_date} 
-	<if test="staff_number!=null">
-		AND (ss.staff_number LIKE CONCAT('%',#{staff_number},'%') OR ss.name
-		LIKE CONCAT('%',#{staff_number},'%'))
-	</if>
-	group by tmp.staff_id
-	ORDER BY ss.staff_number,tmp.workHoursType -->
-	
+		parameterType='Map'>	
 	select group_concat(tmp.workHoursType,'=',tmp.participationStr order by tmp.staff_number separator '|') workhours,
 	tmp.staff_number,tmp.staff_name,
 	a.D1,a.D2,a.D3,a.D4,a.D5,a.D6,a.D7,a.D8,a.D9,a.D10,a.D11,a.D12,a.D13,a.D14,a.D15,a.D16,a.D17,a.D18,a.D19,a.D20, a.D21,a.D22,a.D23,a.D24,a.D25,a.D26,a.D27,a.D28,a.D29,a.D30,a.D31 
@@ -983,148 +959,7 @@
 		LIMIT #{offset} ,#{pageSize}
 	</if>	
 	</select>	
-<!-- 	<select id="getWorkHourReportList" resultType="Map"
-		parameterType='Map'>
-		SELECT
-		u.staff_number,u.staff_name,u.skill_parameter,u.plant_org,u.workshop_org,u.workgroup_org,u.team_org,
-		group_concat(u.workHoursType,'=',u.participationStr order by
-		u.staff_number separator '|') AS 'workhours',
-		a.D1,a.D2,a.D3,a.D4,a.D5,a.D6,a.D7,a.D8,a.D9,a.D10,a.D11,a.D12,a.D13,a.D14,a.D15,a.D16,a.D17,a.D18,a.D19,a.D20,
-		a.D21,a.D22,a.D23,a.D24,a.D25,a.D26,a.D27,a.D28,a.D29,a.D30,a.D31
-		FROM
-		(
-		SELECT n.*,ss.staff_number,ss.name as staff_name,r.new_value as
-		skill_parameter
-		FROM (
-		(SELECT a.staff_id,'计件' AS
-		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
-		group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
-		order by work_date separator '') AS participationStr FROM
-		(SELECT staff_id,SUM(bus_count) AS
-		sum_participation,work_date,factory plant_org,workshop
-		workshop_org,workgroup workgroup_org,team team_org
-		FROM BMS_HR_STAFF_HOURS
-		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
-		and hour_type = '1' and FIND_IN_SET(STATUS,'1,3')
-		and participation > 0
-		<if test="factory!='全部'">
-			AND factory = #{factory}
-		</if>
-		<if test="workshop!=''">
-			AND FIND_IN_SET(workshop,#{workshop}) >0
-		</if>
-		<if test="group!='全部'">
-			AND workgroup = #{group}
-		</if>
-		<if test="subgroup!='全部'">
-			AND team = #{subgroup}
-		</if>
-		GROUP BY staff_id,work_date ORDER BY work_date) a
-		GROUP BY a.staff_id
-		ORDER BY a.work_date,staff_id)
-		UNION
-		(SELECT a.staff_id,'额外' AS
-		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
-		group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
-		order by work_date separator '') AS participationStr FROM
-		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
-		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
-		FROM BMS_HR_STAFF_HOURS
-		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
-		and hour_type = '2' and FIND_IN_SET(STATUS,'1,3')
-		and work_hour > 0
-		<if test="factory!='全部'">
-			AND factory = #{factory}
-		</if>
-		<if test="workshop!=''">
-			AND FIND_IN_SET(workshop,#{workshop}) >0
-		</if>
-		<if test="group!='全部'">
-			AND workgroup = #{group}
-		</if>
-		<if test="subgroup!='全部'">
-			AND team = #{subgroup}
-		</if>
-		GROUP BY staff_id,work_date ORDER BY work_date) a
-		GROUP BY a.staff_id
-		ORDER BY a.work_date,staff_id)
-		UNION
-		(SELECT a.staff_id,'技改' AS
-		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
-		group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
-		order by work_date separator '') AS participationStr FROM
-		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
-		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
-		FROM BMS_HR_STAFF_HOURS h1
-		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
-		and hour_type = '3' and FIND_IN_SET(STATUS,'1,3')
-		and work_hour > 0
-		<if test="factory!='全部'">
-			AND factory = #{factory}
-		</if>
-		<if test="workshop!=''">
-			AND FIND_IN_SET(workshop,#{workshop}) >0
-		</if>
-		<if test="group!='全部'">
-			AND workgroup = #{group}
-		</if>
-		<if test="subgroup!='全部'">
-			AND team = #{subgroup}
-		</if>
-		GROUP BY staff_id,work_date ORDER BY work_date) a
-		GROUP BY a.staff_id
-		ORDER BY a.work_date,staff_id)
-		UNION
-		(SELECT a.staff_id,'等待' AS
-		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
-		group_concat('\"',substr(a.work_date,9,10),'\":\"',CONCAT(a.sum_participation,'\";')
-		order by work_date separator '') AS participationStr FROM
-		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
-		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
-		FROM BMS_HR_STAFF_HOURS
-		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
-		and hour_type = '4' and FIND_IN_SET(STATUS,'1,3')
-		and work_hour > 0
-		<if test="factory!='全部'">
-			AND factory = #{factory}
-		</if>
-		<if test="workshop!=''">
-			AND FIND_IN_SET(workshop,#{workshop}) >0
-		</if>
-		<if test="group!='全部'">
-			AND workgroup = #{group}
-		</if>
-		<if test="subgroup!='全部'">
-			AND team = #{subgroup}
-		</if>
-		GROUP BY staff_id,work_date ORDER BY work_date) a
-		GROUP BY a.staff_id
-		ORDER BY a.work_date,staff_id)
 
-		) n LEFT JOIN BMS_HR_STAFF ss ON ss.id = n.staff_id
-		left join BMS_HR_STAFF_UPDATE_RECORD r on n.staff_id=r.staff_id and
-		substring(r.edit_date,1,7)=substring(n.work_date,1,7) and
-		r.type='skill_parameter'
-		and r.edit_date=(select max(r1.edit_date) from BMS_HR_STAFF_UPDATE_RECORD
-		r1 where n.staff_id=r1.staff_id and
-		substring(r1.edit_date,1,7)=substring(n.work_date,1,7) and
-		r1.type='skill_parameter')
-		) u
-		LEFT JOIN BMS_HR_STAFF_ATTENDANCE a ON u.staff_number = a.staff_number AND
-		a.month = #{work_date}
-		LEFT JOIN BMS_HR_BASE_PRICE p ON p.type = '0' AND p.start_date &lt;= 
-			CONCAT(#{work_date},'-01') AND p.end_date >= CONCAT(#{work_date},'-01')
-		where 1=1
-		<if test="staff_number!=null">
-			AND (u.staff_number LIKE CONCAT('%',#{staff_number},'%') OR u.staff_name
-			LIKE CONCAT('%',#{staff_number},'%'))
-		</if>
-		GROUP BY u.staff_number
-		ORDER BY u.staff_number,workHoursType
-		<if test="offset!=null">
-			LIMIT #{offset} ,#{pageSize}
-		</if>
-	</select> -->
 	<!-- 计件工时统计优化-谭海文 2016-04-01 -->
 	<select id="getWorkHourReportListCount" resultType="int"
 		parameterType='Map'>
@@ -1211,180 +1046,7 @@
 		GROUP BY wp.staff_number,wp.work_date
 		) tmp
 		
-		<!-- select count(*) from(
-		SELECT
-		u.staff_number,u.staff_name,u.skill_parameter,u.plant_org,u.workshop_org,u.workgroup_org,u.team_org,
-		group_concat(u.workHoursType,'=',u.participationStr order by
-		u.staff_number separator '|') AS 'workhours'
-		FROM
-		(
-		SELECT n.*,ss.staff_number,ss.name as staff_name,r.new_value as
-		skill_parameter
-		FROM (
-		(SELECT a.staff_id,'计件' AS
-		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
-		group_concat(substr(a.work_date,9,10),':',CONCAT(a.sum_participation,';')
-		order by work_date separator '') AS participationStr FROM
-		(SELECT staff_id,COUNT(DISTINCT bus_number) AS
-		sum_participation,work_date,factory plant_org,workshop
-		workshop_org,workgroup workgroup_org,team team_org
-		FROM BMS_HR_STAFF_HOURS
-		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
-		and hour_type = '1' and FIND_IN_SET(STATUS,'1,3')
-		and participation > 0
-		<if test="factory!='全部'">
-			AND factory = #{factory}
-		</if>
-		<if test="workshop!=''">
-			AND FIND_IN_SET(workshop,#{workshop}) >0
-		</if>
-		<if test="group!='全部'">
-			AND workgroup = #{group}
-		</if>
-		<if test="subgroup!='全部'">
-			AND team = #{subgroup}
-		</if>
-		GROUP BY staff_id,work_date ORDER BY work_date) a
-		GROUP BY a.staff_id
-		ORDER BY a.work_date,staff_id)
-		UNION
-		(SELECT a.staff_id,'额外' AS
-		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
-		group_concat(substr(a.work_date,9,10),':',CONCAT(a.sum_participation,';')
-		order by work_date separator '') AS participationStr FROM
-		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
-		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
-		FROM BMS_HR_STAFF_HOURS
-		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
-		and hour_type = '2' and FIND_IN_SET(STATUS,'1,3')
-		and work_hour > 0
-		<if test="factory!='全部'">
-			AND factory = #{factory}
-		</if>
-		<if test="workshop!=''">
-			AND FIND_IN_SET(workshop,#{workshop}) >0
-		</if>
-		<if test="group!='全部'">
-			AND workgroup = #{group}
-		</if>
-		<if test="subgroup!='全部'">
-			AND team = #{subgroup}
-		</if>
-		GROUP BY staff_id,work_date ORDER BY work_date) a
-		GROUP BY a.staff_id
-		ORDER BY a.work_date,staff_id)
-		UNION
-		(SELECT a.staff_id,'技改' AS
-		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
-		group_concat(substr(a.work_date,9,10),':',CONCAT(a.sum_participation,';')
-		order by work_date separator '') AS participationStr FROM
-		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
-		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
-		FROM BMS_HR_STAFF_HOURS h1
-		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
-		and hour_type = '3' and FIND_IN_SET(STATUS,'1,3')
-		and work_hour > 0
-		<if test="factory!='全部'">
-			AND factory = #{factory}
-		</if>
-		<if test="workshop!=''">
-			AND FIND_IN_SET(workshop,#{workshop}) >0
-		</if>
-		<if test="group!='全部'">
-			AND workgroup = #{group}
-		</if>
-		<if test="subgroup!='全部'">
-			AND team = #{subgroup}
-		</if>
-		GROUP BY staff_id,work_date ORDER BY work_date) a
-		GROUP BY a.staff_id
-		ORDER BY a.work_date,staff_id)
-		UNION
-		(SELECT a.staff_id,'等待' AS
-		workHoursType,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org,a.work_date,
-		group_concat(substr(a.work_date,9,10),':',CONCAT(a.sum_participation,';')
-		order by work_date separator '') AS participationStr FROM
-		(SELECT staff_id,SUM(work_hour) AS sum_participation,work_date,factory
-		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org
-		FROM BMS_HR_STAFF_HOURS
-		WHERE work_date LIKE CONCAT('%',#{work_date},'%')
-		and hour_type = '4' and FIND_IN_SET(STATUS,'1,3')
-		and work_hour > 0
-		<if test="factory!='全部'">
-			AND factory = #{factory}
-		</if>
-		<if test="workshop!=''">
-			AND FIND_IN_SET(workshop,#{workshop}) >0
-		</if>
-		<if test="group!='全部'">
-			AND workgroup = #{group}
-		</if>
-		<if test="subgroup!='全部'">
-			AND team = #{subgroup}
-		</if>
-		GROUP BY staff_id,work_date ORDER BY work_date) a
-		GROUP BY a.staff_id
-		ORDER BY a.work_date,staff_id)
-
-		) n LEFT JOIN BMS_HR_STAFF ss ON ss.id = n.staff_id
-		left join BMS_HR_STAFF_UPDATE_RECORD r on n.staff_id=r.staff_id and
-		substring(r.edit_date,1,7)=substring(n.work_date,1,7) and
-		r.type='skill_parameter'
-		and r.edit_date=(select max(r1.edit_date) from BMS_HR_STAFF_UPDATE_RECORD
-		r1 where n.staff_id=r1.staff_id and
-		substring(r1.edit_date,1,7)=substring(n.work_date,1,7) and
-		r1.type='skill_parameter')
-		) u
-		LEFT JOIN BMS_HR_STAFF_ATTENDANCE a ON u.staff_number = a.staff_number AND
-		a.month = #{work_date}
-		LEFT JOIN BMS_HR_BASE_PRICE p ON p.type = '0' AND p.start_date &lt;= 
-			CONCAT(#{work_date},'-01') AND p.end_date >= CONCAT(#{work_date},'-01')
-		where 1=1
-		<if test="staff_number!=null">
-			AND (u.staff_number LIKE CONCAT('%',#{staff_number},'%') OR u.staff_name
-			LIKE CONCAT('%',#{staff_number},'%'))
-		</if>
-		GROUP BY u.staff_number
-		ORDER BY u.staff_number,workHoursType
-		) p -->
 	</select>
-	<!-- <select id="getWorkHourReportListCount" resultType="int" parameterType='Map' 
-		> SELECT COUNT(*) FROM (SELECT u.staff_number,u.staff_name,u.skill_parameter,u.plant_org,u.workshop_org,u.workgroup_org,u.team_org, 
-		group_concat(u.workHoursType,'=',u.participationStr order by u.staff_number 
-		separator '|') FROM ( (SELECT a.staff_number,a.staff_name,'计件' AS workHoursType,a.skill_parameter,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org, 
-		group_concat(substr(a.work_date,9,10),':',(a.sum_participation) order by 
-		work_date separator ',') AS participationStr FROM (SELECT staff_number,staff_name,skill_parameter,SUM(participation) 
-		AS sum_participation,work_date,factory plant_org,workshop workshop_org,workgroup 
-		workgroup_org,team team_org FROM V_PIECE_PAY WHERE work_date LIKE CONCAT('%',#{work_date},'%') 
-		GROUP BY staff_number,work_date ORDER BY work_date) a GROUP BY a.staff_number 
-		ORDER BY a.work_date,staff_number) UNION (SELECT a.staff_number,a.staff_name,'额外' 
-		AS workHoursType,a.skill_parameter,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org, 
-		group_concat(substr(a.work_date,9,10),':',(a.sum_participation) order by 
-		work_date separator ',') AS participationStr FROM (SELECT staff_number,staff_name,skill_parameter,SUM(real_work_hour) 
-		AS sum_participation,work_date,factory plant_org,workshop workshop_org,workgroup 
-		workgroup_org,team team_org FROM V_TMP_PAY WHERE work_date LIKE CONCAT('%',#{work_date},'%') 
-		GROUP BY staff_number,work_date ORDER BY work_date) a GROUP BY a.staff_number 
-		ORDER BY a.work_date,staff_number) UNION (SELECT a.staff_number,a.staff_name,'技改' 
-		AS workHoursType,a.skill_parameter,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org, 
-		group_concat(substr(a.work_date,9,10),':',(a.sum_participation) order by 
-		work_date separator ',') AS participationStr FROM (SELECT staff_number,staff_name,skill_parameter,SUM(real_work_hour) 
-		AS sum_participation,work_date,factory plant_org,workshop workshop_org,workgroup 
-		workgroup_org,team team_org FROM V_ECN_PAY WHERE work_date LIKE CONCAT('%',#{work_date},'%') 
-		GROUP BY staff_number,work_date ORDER BY work_date) a GROUP BY a.staff_number 
-		ORDER BY a.work_date,staff_number) UNION (SELECT a.staff_number,a.staff_name,'等待' 
-		AS workHoursType,a.skill_parameter,a.plant_org,a.workshop_org,a.workgroup_org,a.team_org, 
-		group_concat(substr(a.work_date,9,10),':',(a.sum_participation) order by 
-		work_date separator ',') AS participationStr FROM (SELECT staff_number,staff_name,'' 
-		AS skill_parameter,SUM(work_hour) AS sum_participation,work_date,factory 
-		plant_org,workshop workshop_org,workgroup workgroup_org,team team_org FROM 
-		V_WAIT_PAY WHERE work_date LIKE CONCAT('%',#{work_date},'%') GROUP BY staff_number,work_date 
-		ORDER BY work_date) a GROUP BY a.staff_number ORDER BY a.work_date,staff_number) 
-		) u where 1=1 <if test="factory!='全部'"> AND u.plant_org = #{factory} </if> 
-		<if test="workshop!='全部'"> AND FIND_IN_SET(u.workshop_org,#{workshop}) >0 
-		</if> <if test="group!='全部'"> AND u.workgroup_org = #{group} </if> <if test="subgroup!='全部'"> 
-		AND u.team_org = #{subgroup} </if> <if test="staff_number!=null"> AND (u.staff_number 
-		LIKE CONCAT('%',#{staff_number},'%') OR u.staff_name LIKE CONCAT('%',#{staff_number},'%')) 
-		</if> GROUP BY u.staff_number ORDER BY u.staff_number,workHoursType ) p </select> -->
 
 	<select id="getWaitManHourList" resultType="Map" parameterType='Map'>
 		SELECT * FROM BMS_WAIT_PAY_CAL w WHERE w.work_date LIKE
@@ -2246,7 +1908,7 @@
 		 ) tmp  )t;	
 	</select>
 	<select id="queryPieceSalaryHistory" parameterType="map" resultType="map">
-		select h.id,h.month,h.staff_number,h.staff_name,s.status staff_status,h.skill_parameter,h.job,h.plant_org,h.workshop_org,h.workgroup_org,h.team_org,h.attendance_days,h.attendance_hours,sum(h.piece_total) piece_total,
+		select h.id,h.month,h.staff_number,h.staff_name,s.status staff_status,h.skill_parameter,h.job,h.plant_org,h.workshop_org,h.workgroup_org,h.team_org,h.attendance_days,h.attendance_hours,sum(h.piece_total) piece_total,ifnull(h.production_qty,0) production_qty,
 		sum(h.bonus_total) bonus_total,sum(h.piece_pay_total) piece_pay_total,sum(h.ecnwh_total) ecnwh_total,sum(h.ecn_pay_total) ecn_pay_total,sum(h.wwh_total) wwh_total,
 		sum(h.wait_pay_total) wait_pay_total,sum(h.tmpwh_total) tmpwh_total,sum(h.tmp_pay_total) tmp_pay_total,sum(h.dscore_total) dscore_total,sum(h.deduct_pay_total) deduct_pay_total,
 		case when find_in_set('已提交',group_concat(h.status,','))>0 then '已提交' else '已结算' end status,(select u.email from BMS_BASE_USER u 
@@ -2608,13 +2270,13 @@
 			insert into BMS_HR_PIECE_SALARY_HISTORY
 			(month,staff_number,staff_name,plant_org,workshop_org,workgroup_org,team_org,job,skill_parameter,attendance_days,
 			attendance_hours,piece_total,bonus_total,piece_pay_total,ecnwh_total,ecn_pay_total,wwh_total,wait_pay_total,tmpwh_total,tmp_pay_total,
-			dscore_total,deduct_pay_total,saver,save_date,submit_factory,submit_workshop)
+			dscore_total,deduct_pay_total,saver,save_date,submit_factory,submit_workshop,production_qty)
 			values
 			(#{detail.month},#{detail.staff_number},#{detail.staff_name},#{detail.plant_org},#{detail.workshop_org},
 			#{detail.workgroup_org},#{detail.team_org},#{detail.job},#{detail.skill_parameter},#{detail.attendance_days},
 			#{detail.attendance_hours},#{detail.piece_total},#{detail.bonus_total},#{detail.piece_pay_total},#{detail.ecnwh_total},#{detail.ecn_pay_total},
 			#{detail.wwh_total},#{detail.wait_pay_total},#{detail.tmpwh_total},#{detail.tmp_pay_total},#{detail.dscore_total},#{detail.deduct_pay_total},
-			#{detail.saver},#{detail.save_date},#{detail.submit_factory},#{detail.submit_workshop})
+			#{detail.saver},#{detail.save_date},#{detail.submit_factory},#{detail.submit_workshop},#{detail.production_qty})
 		</foreach>
 	</update>
 
@@ -2646,12 +2308,12 @@
 			and month<=#{monthEnd}
 		]]>
 		</if>
-		<!-- <if test="factory !=null and factory !=''">
+		<if test="factory !=null and factory !=''">
 			and submit_factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
 			and find_in_set(submit_workshop,#{workshop})>0
-		</if> -->
+		</if> 
 		
 	</update>
 	<update id="updateWorkHourStatus" parameterType="map">

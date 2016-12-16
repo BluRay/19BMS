@@ -403,22 +403,22 @@ function ajaxUpdate(swhlist,conditions,whflag,rejectReason) {
 						var obj={};
 						obj['车号']=swh.bus_number;
 						obj['操作班组']=swh.workgroup+"-"+swh.team;
-						obj['承包单价']=swh.standard_price;
+						obj['承包单价']=swh.standard_price||'';
 						obj['操作日期']=swh.work_date;
 						obj['补贴车']=swh.bonus;
 						obj['工号']=swh.staff_number;
 						obj['姓名']=swh.staff_name;
 						obj['岗位']=swh.job;
-						obj['分配金额']=swh.distribution;
-						obj['工时']=swh.participation;
-						obj['计件工资']=swh.ppay;
+						obj['分配金额']=swh.distribution||'0';
+						obj['工时']=swh.participation||'0';
+						obj['计件工资']=swh.ppay||'0';
 						obj['班组']=swh.workgroup_org+"-"+swh.team_org;
 						
 						emaillist.push(obj);
 					})
-					var tbhead='车号,操作班组,承包单价,操作日期,补贴车,工号,姓名,岗位,分配金额,计件工资,班组';
+					var tbhead='车号,操作班组,承包单价,操作日期,补贴车,工号,姓名,岗位,分配金额,班组';
 					if(conditionobj.workshop=='自制件'){
-						tbhead='车号,操作班组,承包单价,操作日期,补贴车,工号,姓名,岗位,工时,分配金额,计件工资,班组';
+						tbhead='车号,操作班组,承包单价,操作日期,补贴车,工号,姓名,岗位,工时,分配金额,班组';
 					}
 					//alert(JSON.stringify(emaillist))
 					sendEmail(datalist[0].email,'',conditionobj.factory+conditionobj.workshop+"车间"+'计件工时信息驳回',tbhead,JSON.stringify(emaillist),rejectReason)

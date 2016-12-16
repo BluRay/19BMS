@@ -94,6 +94,10 @@ $(document)
 						}
 					});
 					
+					
+					$("#order_number").live("input",function(){
+						$("#order_number").attr("order_id","");
+					});
 					/**
 					 * 订单编号模糊查询
 					 */
@@ -154,6 +158,7 @@ $(document)
 									selectId = value.id;
 								}
 							})
+							//alert(selectId);
 							$("#order_number").attr("order_id", selectId);
 							var list=ajaxGetStaffList();
 							$("#tb_workhour").html("");
@@ -321,6 +326,7 @@ $(document)
 										var bonus_num=isNaN(parseFloat($("#bonus_num").val()))?0:parseFloat($("#bonus_num").val());
 										//alert(workshop);
 										var busNumber = $("#bus_number").val();
+										var order_id=$("#bus_number").attr("order_id");
 										var busCount=1;
 										var bus_start;
 										var bus_end;
@@ -332,6 +338,7 @@ $(document)
 										
 										if(isCustomer=='1'){
 											busNumber=$("#c_bus_number").val();
+											order_id=$("#order_number").attr("order_id");
 										}
 										if(workshop=='自制件'/*||workshop=='部件'||workshop=='车架'||workshop=='五大片'*/){											
 											var area=busNumber.split("_");
@@ -411,6 +418,7 @@ $(document)
 													staff.workshop_org=workshop_org;
 													staff.workgroup_org=workgroup_org;
 													staff.team_org=team_org;
+													staff.order_id=order_id;
 													staff.bus_number = busNumber.trim();
 													staff.work_date = workDate;
 													staff.staff_id = staffId;
@@ -457,8 +465,8 @@ $(document)
 										if(!saveFlag){
 											return false;
 										}
-							var conditions = "{staffNum:'"+ staffNumlist
-												+ "',busNumber:'"+ busNumber
+							var conditions = "{staffNum:'"+ staffNumlist+"',order_id:"+order_id
+												+ ",busNumber:'"+ busNumber
 												+"',workshop:'"+workshop+"',team:'"
 												+ team+"'}";	
 											var sfwlist = ajaxGetStaffWorkHours(conditions);

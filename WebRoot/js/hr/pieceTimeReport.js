@@ -36,6 +36,69 @@ $(document).ready(function(){
 			ajaxQuery();
 		}
 	});
+	/**
+	 * 订单编号模糊查询
+	 */
+	$("#order_number").live("input",function(){
+		$(this).attr("order_id","");
+	});
+	var orderList=new Array();
+	$("#order_number").typeahead({
+		source : function(input,process){
+			//alert($(this).val());
+			var factory=$("#factory :selected").text();
+			
+			var data={
+					"conditionMap.busType":"",
+					"conditionMap.orderNo":input,
+					"conditionMap.factory":factory
+			};		
+			return $.ajax({
+				url:"common!getOrderFuzzySelect.action",
+				dataType : "json",
+				type : "get",
+				data : data,
+				success: function (data) { 
+					orderList = data;
+					var results = new Array();
+					$.each(data, function(index, value) {
+						results.push(value.orderNo);
+					})
+					return process(results);
+				}
+			});
+		},
+		items : 30,
+		highlighter : function(item) {
+			var order_name = "";
+			var bus_type = "";
+			var order_qty = "";
+			$.each( orderList, function(index, value) {
+				//alert(value.orderNo);
+				if (value.orderNo == item) {
+					order_name = value.name;
+					bus_type = value.busType;
+					order_qty = value.orderQty + "台";
+				}
+			})
+			return item + "  " + order_name + " " + bus_type + order_qty;
+		},
+		matcher : function(item) {
+			return true;
+		},
+		updater : function(item) {
+			$.each(orderList, function(index, value) {
+				if (value.orderNo == item) {
+					selectId = value.id;
+					if (typeof (fn_backcall) == "function") {
+						fn_backcall(value);
+					}
+				}
+			})
+			$("#order_number").attr("order_id", selectId);
+			return item;
+		}
+	});
 	
 	// 工厂切换事件
 	$("#factory").change(function() {
@@ -128,7 +191,8 @@ function ajaxQuery(targetPage,queryAll){
 			    	"staff_number":$("#staff_number").val(),
 			    	"bus_number":$("#bus_number").val(),
 			    	"date_start":$("#date_start").val(),
-			    	"date_end":$("#date_end").val()
+			    	"date_end":$("#date_end").val(),
+			    	"order_id":$("#order_number").attr("order_id")
 			    };
 		}else{
 			data={
@@ -138,6 +202,7 @@ function ajaxQuery(targetPage,queryAll){
 		    	"subgroup":$("#subgroup").find("option:selected").text(),
 		    	"staff_number":$("#staff_number").val(),
 		    	"bus_number":$("#bus_number").val(),
+		    	"order_id":$("#order_number").attr("order_id"),
 		    	"date_start":$("#date_start").val(),
 		    	"date_end":$("#date_end").val(),
 		       	"pager.pageSize":5,
@@ -169,7 +234,7 @@ function ajaxQuery(targetPage,queryAll){
 	    	    		for (var i=0;i<piece_Arr.length-1;i++){
 	    	    			var tr = $("<tr />");
 		    				if(i==0){
-		    					$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(count).appendTo(tr);
+		    					$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.order_desc).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.bus_number).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.standard_price).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.bonus).appendTo(tr);
@@ -214,6 +279,7 @@ function ajaxQuery(targetPage,queryAll){
 			    	"subgroup":$("#subgroup").find("option:selected").text(),
 			    	"staff_number":$("#staff_number").val(),
 			    	"bus_number":$("#bus_number").val(),
+			    	"order_id":$("#order_number").attr("order_id"),
 			    	"date_start":$("#date_start").val(),
 			    	"date_end":$("#date_end").val()
 			    }
@@ -225,6 +291,7 @@ function ajaxQuery(targetPage,queryAll){
 			    	"subgroup":$("#subgroup").find("option:selected").text(),
 			    	"staff_number":$("#staff_number").val(),
 			    	"bus_number":$("#bus_number").val(),
+			    	"order_id":$("#order_number").attr("order_id"),
 			    	"date_start":$("#date_start").val(),
 			    	"date_end":$("#date_end").val(),
 			       	"pager.pageSize":5,
@@ -270,14 +337,14 @@ function ajaxQuery(targetPage,queryAll){
 		    				var piece_info_arr = piece_info.split(",");
 		    				//$("<td style=\"padding-left:0px;padding-right:0px\" />").html(piece_info).appendTo(tr);
 		    				for(var j=0;j<piece_info_arr.length;j++){
-		    					if(j==4){
+		    					if(j==5){
 		    						$("<td style=\"padding-left:0px;padding-right:0px\" />").html(changeTwoDecimal(piece_info_arr[j])).appendTo(tr);
 		    						sum_ppay+=parseFloat(piece_info_arr[j]);
-		    					}else if(j==6){
+		    					}else if(j==7){
 		    						bonus_count += parseFloat(piece_info_arr[j]);
 		    						$("<td style=\"padding-left:0px;padding-right:0px\" />").html(piece_info_arr[j]).appendTo(tr);
 		    					}
-		    					else if(j==7){
+		    					else if(j==8){
 		    						bus_count += parseFloat(piece_info_arr[j]);
 		    					}else{
 		    						$("<td style=\"padding-left:0px;padding-right:0px\" />").html(piece_info_arr[j]).appendTo(tr);
@@ -298,7 +365,8 @@ function ajaxQuery(targetPage,queryAll){
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
-		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);	    					
+		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);	
+		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);	
 		    					$("<td style=\"padding-left:0px;padding-right:0px;font-weight:bold\" />").html(bus_count).appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);
 		    					$("<td style=\"padding-left:0px;padding-right:0px\" />").html("").appendTo(tr);

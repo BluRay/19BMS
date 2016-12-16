@@ -1,6 +1,7 @@
 var swhlist = [];
 var updateCond={};
 var select_workshop="";
+var select_factory="";
 var status_arr={'1':'已审批','2':'已驳回','3':'已锁定'}
 $(document)
 		.ready(
@@ -204,7 +205,7 @@ $(document)
 						var flag=validateDistribution();
 						if(!flag){
 							alert("分配金额之和必须等于班组承包单价！");
-						}else{
+						}else{							
 							ajaxSave(JSON.stringify(swhlist),"",JSON.stringify(updateCond));
 							ajaxQuery(1);
 						}
@@ -321,7 +322,6 @@ function ajaxQuery(targetPage) {
 		updateCond.startDate=$("#wdate_start").val();
 		updateCond.endDate=$("#wdate_end").val();
 		
-		
 		$(".divLoading").addClass("fade in").show();
 		var conditions = "{orgId:'" + subgroup + /*
 													 * "',workDate:'" +
@@ -365,6 +365,7 @@ function generateTb(swhlist,workshop) {
 	}
 	$("#tb_workhour").html("");
 	var last_bus_number = "";
+	var last_order_id="";
 	var last_workorg = "";
 	var last_workdate = "";
 	var busNumberId = "";
@@ -388,20 +389,20 @@ function generateTb(swhlist,workshop) {
 						var workorg = swh.workgroup + "-" + swh.team;
 
 						// 车号合并单元格
-						if (swh.bus_number == last_bus_number) {
+						if (swh.bus_number == last_bus_number&&swh.order_id==last_order_id) {
 							var rowspan = parseInt($(busNumberId).attr(
 									"rowspan"));
-							var checkboxId = "#chk_" + swh.bus_number;
+							var checkboxId = "#chk_" + swh.bus_number+"_"+swh.order_id;
 							$(busNumberId).attr("rowspan", rowspan + 1);
 						} else {
-							busNumberId = "#bus_" + swh.bus_number;
-							$("<td id='bus_" + swh.bus_number + "' rowspan=1/>")
+							busNumberId = "#bus_" + swh.bus_number+"_"+swh.order_id;;
+							$("<td id='bus_" + swh.bus_number +"_"+swh.order_id+ "' rowspan=1/>")
 									.html(swh.bus_number).appendTo(tr);
 
 						}
 
 						// 操作班组合并单元格
-						if (swh.bus_number == last_bus_number
+						if (swh.bus_number == last_bus_number&&swh.order_id==last_order_id
 								&& workorg == last_workorg) {
 							var rowspan = parseInt($(workorgId).attr("rowspan"));
 							$(workorgId).attr("rowspan", rowspan + 1);
@@ -421,7 +422,7 @@ function generateTb(swhlist,workshop) {
 
 						}
 						// 操作日期合并单元格
-						if (swh.bus_number == last_bus_number
+						if (swh.bus_number == last_bus_number&&swh.order_id==last_order_id
 								&& workorg == last_workorg
 								&& swh.work_date == last_workdate) {
 
@@ -529,6 +530,7 @@ function generateTb(swhlist,workshop) {
 						$(tr).data("workgroup", swh.workgroup);
 						$(tr).data("team", swh.team);
 						last_bus_number = swh.bus_number;
+						last_order_id=swh.order_id;
 						last_workdate = swh.work_date;
 						last_workorg = workorg;
 					});
@@ -568,6 +570,32 @@ function ajaxSave(conditions,whflag,updateCond) {
 		success : function(response) {
 			if (response.success) {
 				alert(response.message);
+				
+				var emaillist=[];
+				var datalist=JSON.parse(conditions);						
+				$.each(datalist,function(i,swh){
+					var obj={};
+					obj['车号']=swh.bus_number;
+					obj['操作班组']=swh.workgroup+"-"+swh.team;
+					obj['承包单价']=swh.standard_price||'0';
+					obj['操作日期']=swh.work_date;
+					obj['补贴车']=swh.bonus||'0';
+					obj['工号']=swh.staff_number;
+					obj['姓名']=swh.staff_name;
+					obj['岗位']=swh.job;
+					obj['分配金额']=swh.distribution||'0';
+					obj['工时']=swh.participation||'0';
+					obj['计件工资']=swh.ppay||'0';
+					obj['班组']=swh.workgroup_org+"-"+swh.team_org;
+					
+					emaillist.push(obj);
+				})
+				var tbhead='车号,操作班组,承包单价,操作日期,补贴车,工号,姓名,岗位,分配金额,班组';
+				if(select_workshop=='自制件'){
+					tbhead='车号,操作班组,承包单价,操作日期,补贴车,工号,姓名,岗位,工时,分配金额,班组';
+				}
+				sendEmail(datalist[0].email,'',select_factory+select_workshop+"车间"+'计件工时信息已修改',tbhead,JSON.stringify(emaillist),'')				
+				
 			} else {
 				alert(response.message);
 			}
@@ -586,6 +614,7 @@ function zTreeOnClick(event, treeId, treeNode) {
 		select_workshop=treeNode.getParentNode().displayName;
 	}
 	if(treeNode.org_type == '6'){
+		select_factory=treeNode.getParentNode().getParentNode().getParentNode().getParentNode().displayName;
 		select_workshop=treeNode.getParentNode().getParentNode().displayName;
 	}
 	if (treeNode.name != '无数据权限' || treeNode.id != '0') {
@@ -602,12 +631,13 @@ function validateDistribution(){
 	var standar_price_arr={};
 	var total_distribution_arr={};
 	var last_bus_number="";
+	var last_order_id="";
 	var last_work_date="";
 	var arr_count=0;
  
 	for(var i in swhlist){
 		
-		if(swhlist[i].bus_number!=last_bus_number||swhlist[i].work_date!=last_work_date){
+		if(swhlist[i].bus_number!=last_bus_number||swhlist[i].work_date!=last_work_date||swhlist[i].order_id!=last_order_id){
 			standar_price_arr[arr_count]=parseFloat(swhlist[i].standard_price);
 			total_distribution_arr[arr_count]=parseFloat(swhlist[i].distribution);
 			arr_count++;
@@ -615,6 +645,7 @@ function validateDistribution(){
 			total_distribution_arr[arr_count-1]=numAdd(total_distribution_arr[arr_count-1],parseFloat(swhlist[i].distribution));
 		}
 		last_bus_number=swhlist[i].bus_number;
+		last_order_id=swhlist[i].order_id;
 		last_work_date=swhlist[i].work_date;		
 	}
 	
