@@ -195,7 +195,7 @@
 						<div class="control-group">
 							<label class="control-label" for="new_light_downdip">*&nbsp;灯光下倾值</label>
 							<div class="controls">
-								<input type="text" title='灯光下倾值' onkeyup="return onlyNum(this);" class="input-medium" id="new_light_downdip" />&nbsp;
+								<input type="text" title='灯光下倾值'  class="input-medium" id="new_light_downdip" />&nbsp;
 							</div>
 						</div>
 					</div>
@@ -374,7 +374,7 @@
 						<div class="control-group">
 							<label class="control-label" for="edit_light_downdip">*&nbsp;灯光下倾值</label>
 							<div class="controls">
-								<input type="text" title='灯光下倾值' onkeyup="return onlyNum(this);" class="input-medium" id="edit_light_downdip" />&nbsp;
+								<input type="text" title='灯光下倾值'  class="input-medium" id="edit_light_downdip" />&nbsp;
 							</div>
 						</div>
 					</div>

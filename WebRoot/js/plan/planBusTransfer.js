@@ -6,7 +6,7 @@ $(document).ready(function () {
 		$("#transferHisdiv").hide();
 		$("#btn_transfer_out").attr("disabled","disabled");
 		$("#btn_transfer_in").attr("disabled","disabled");
-		$("#transfer_in_factory2").attr("disabled","disabled");
+		//$("#transfer_in_factory2").attr("disabled","disabled");
 		getFactorySelect();
 		//获取当前用户所属工厂，填充导入工厂值
 		getUserFactory();

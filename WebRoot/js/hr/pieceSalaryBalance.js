@@ -142,74 +142,140 @@ function initTable() {
             	field: 'MONTH',title: '&nbsp;&nbsp;月份&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-	        	return {css: {"padding-left": "3px", "padding-right": "2px"}};
+	        	return {css: {"padding-left": "3px", "padding-right": "2px","font-size":"13px"}};
 	        	}
             },{
             	field: 'STAFF_NUMBER',title: '&nbsp;&nbsp;工号&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'STAFF_NAME',title: '&nbsp;&nbsp;姓名&nbsp;&nbsp;<br/>',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'WORKSHOP_ORG',title: '&nbsp;&nbsp;车间&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: true,footerFormatter: totalTextFormatter
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'WORKGROUP_ORG',title: '&nbsp;&nbsp;班组&nbsp;&nbsp;&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'TEAM_ORG',title: '&nbsp;&nbsp;小班组&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'JOB',title: '&nbsp;&nbsp;岗位',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'STAFF_STATUS',title: '&nbsp;&nbsp;在职',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter
             },{
             	field: 'ATTENDANCE_DAYS',title: '出勤<br/>天数',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'ATTENDANCE_HOURS',title: '出勤<br/>小时数',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'PRODUCTION_QTY',title: '车间<br/>产量',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'PIECE_TOTAL',title: '计件<br/>产量',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'BONUS_TOTAL',title: '补贴车',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'PIECE_PAY_TOTAL',title: '纯计件<br/>工资',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'ECNWH_TOTAL',title: '技改<br/>工时',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'ECN_PAY_TOTAL',title: '技改<br/>工资',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'TMPWH_TOTAL',title: '额外<br/>工时',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'TMP_PAY_TOTAL',title: '额外<br/>工资',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'WWH_TOTAL',title: '等待<br/>工时',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'WAIT_PAY_TOTAL',title: '等待<br/>工资',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'PIECE_SALARY',title: '计件<br/>工资',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'DEDUCT_PAY_TOTAL',title: '考核<br/>扣款',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	},
                 formatter:function(value){
                 	return value.toFixed(2);
                 }
             },{
             	field: 'id',title: '实发计<br/>件工资',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	},
                 formatter:function(value, row, index){
                 	var piece_pay_total=row.piece_pay_total==undefined?0:parseFloat(row.piece_pay_total);
                 	var ecn_pay_total=row.ecn_pay_total==undefined?0:parseFloat(row.ecn_pay_total);
@@ -222,6 +288,9 @@ function initTable() {
             },{
             	field: 'id',title: '平均<br/>日薪',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	},
                 formatter:function(value, row, index){
                 	var piece_pay_total=row.piece_pay_total==undefined?0:parseFloat(row.piece_pay_total);
                 	var ecn_pay_total=row.ecn_pay_total==undefined?0:parseFloat(row.ecn_pay_total);
@@ -233,13 +302,22 @@ function initTable() {
                 }
             },{
             	field: 'STATUS',title: '状态',align: 'center',valign: 'middle',align: 'center',
-                sortable: true,visible: true,footerFormatter: totalTextFormatter
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'CALCULATOR',title: '操作人',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: false,footerFormatter: totalTextFormatter
+                sortable: false,visible: false,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             },{
             	field: 'CALCULATE_DATE',title: '操作时间',align: 'center',valign: 'middle',align: 'center',
-                sortable: false,visible: false,footerFormatter: totalTextFormatter
+                sortable: false,visible: false,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
             }
         ]
     ]

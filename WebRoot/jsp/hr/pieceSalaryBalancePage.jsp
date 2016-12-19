@@ -26,7 +26,7 @@
     <div id="bodyright" class="offset2" style="margin-left:10px">
     <legend style="margin: -5px auto;font-size:17px;line-height:2.3">计件工资结算</legend>
 		<div style="margin-top: -5px;margin-bottom:-25px">
-			<div class="control-group well" style="padding-top:10px;padding-bottom:2px">
+			<div class="control-group" style="padding-top:10px;padding-bottom:2px">
 				<table>
 					<tr>
 						<td width="60px" style="text-align: right">工厂：</td>
@@ -43,10 +43,9 @@
 						<td width="160px"><select id="subgroup" class="input-medium">
 						</select></td>
 						<td width="80px" style="text-align: right">工号/姓名：</td>
-						<td width="160px" style="padding-top:10px;"><input type="text" id="staff" class="input-medium" placeholder="请输入工号/姓名" /></td>
+						<td width="160px"><input type="text" id="staff" class="input-medium" placeholder="请输入工号/姓名" /></td>
 						<td width="100px" style="text-align: right">月份：</td>
-						<td colspan=2  style="padding-top:10px;">
-							<!-- <input type="text" id="mta_wdate" class="input-medium" onclick="WdatePicker({dateFmt:'yyyy-MM'})"/> -->
+						<td colspan=2>
 							<input type="text" id="month_start" class="input-small" onclick="WdatePicker({dateFmt:'yyyy-MM',onpicked:function(){changeMonth();},maxDate:cDate})" />
 							<span>-</span><input type="text" id="month_end" class="input-small" onclick="WdatePicker({dateFmt:'yyyy-MM',maxDate:llDate})" />
 						</td>
@@ -64,7 +63,7 @@
         </div>
 		<div class="container" style="height:200px;padding-left:0px;padding-right:0px;padding-top:0px">
 		<div id="toolbar"></div>
-		<table id="table" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
+		<table style="font-weight:normal" id="table" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
 	           data-show-toggle="false" data-show-columns="true" data-show-export="true" data-detail-view="false"
 	           data-detail-formatter="detailFormatter" data-minimum-count-columns="2" data-show-pagination-switch="true"
 	           data-pagination="true" data-id-field="id" data-page-list="[50, 100, 200, 500, ALL]"

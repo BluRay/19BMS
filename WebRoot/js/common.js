@@ -1863,5 +1863,5 @@ function getScript(url, callback) {
     head.appendChild(script);
     return undefined;
 }
-function getHeight() {return $(window).height() - 200;}
+function getHeight() {return $(window).height() - 175;}
 function getWidth() {return $(window).width()-220;}
