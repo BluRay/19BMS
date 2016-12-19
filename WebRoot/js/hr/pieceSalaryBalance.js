@@ -139,7 +139,7 @@ function initTable() {
         columns: [
         [
             {
-            	field: 'MONTH',title: '&nbsp;&nbsp;月份&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+            	field: 'MONTH',title: '&nbsp;&nbsp;&nbsp;月份&nbsp;&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
 	        	return {css: {"padding-left": "3px", "padding-right": "2px","font-size":"13px"}};

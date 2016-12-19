@@ -82,13 +82,12 @@
 .fixed-table-container thead th .th-inner,
 .fixed-table-container tbody td .th-inner {
     padding: 8px;
-    line-height: 15px;
+    line-height: 12px;
     vertical-align: top;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size:13px;
-    font-weight:normal;
+    font-size:12px;
 }
 
 .fixed-table-container thead th .sortable {
@@ -201,10 +200,11 @@
 .fixed-table-toolbar .bs-bars,
 .fixed-table-toolbar .search,
 .fixed-table-toolbar .columns {
-    position: relative;
+    position: absolute;
     margin-top: 10px;
     margin-bottom: 10px;
     line-height: 34px;
+    right:16px;top:122px;
 }
 
 .fixed-table-pagination li.disabled a {

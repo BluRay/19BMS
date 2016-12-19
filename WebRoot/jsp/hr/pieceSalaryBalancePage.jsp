@@ -25,7 +25,7 @@
 <div class="content-wrapper container">
     <div id="bodyright" class="offset2" style="margin-left:10px">
     <legend style="margin: -5px auto;font-size:17px;line-height:2.3">计件工资结算</legend>
-		<div style="margin-top: -5px;margin-bottom:-25px">
+		<div style="margin-top: -5px;margin-bottom:-15px">
 			<div class="control-group" style="padding-top:10px;padding-bottom:2px">
 				<table>
 					<tr>
@@ -33,9 +33,9 @@
 						<td width="160px"><select id="factory" class="input-medium"></select></td>
 						<td width="80px" style="text-align: right">车间：</td>
 						<td width="160px"><select id="workshop" class="input-medium"></select></td>
-						<td width="100px" style="text-align: right">班组：</td>
+						<td width="60px" style="text-align: right">班组：</td>
 						<td width="160px"><select id="group" class="input-medium"></select></td>
-						<td width="80px"></td>
+						<td width="50px"></td>
 						<td></td>
 					</tr>
 					<tr>
@@ -44,7 +44,7 @@
 						</select></td>
 						<td width="80px" style="text-align: right">工号/姓名：</td>
 						<td width="160px"><input type="text" id="staff" class="input-medium" placeholder="请输入工号/姓名" /></td>
-						<td width="100px" style="text-align: right">月份：</td>
+						<td width="60px" style="text-align: right">月份：</td>
 						<td colspan=2>
 							<input type="text" id="month_start" class="input-small" onclick="WdatePicker({dateFmt:'yyyy-MM',onpicked:function(){changeMonth();},maxDate:cDate})" />
 							<span>-</span><input type="text" id="month_end" class="input-small" onclick="WdatePicker({dateFmt:'yyyy-MM',maxDate:llDate})" />
