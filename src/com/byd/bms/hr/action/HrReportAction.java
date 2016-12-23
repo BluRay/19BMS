@@ -259,38 +259,38 @@ public class HrReportAction extends BaseAction<Object> {
 	/**
 	 * 获取计件工资列表；起始月份和结束月份不都等于上月 查询历史记录
 	 * @return
+	 * @throws UnsupportedEncodingException 
 	 */
-	public String getPieceSalaryList(){
+	public String getPieceSalaryList() throws UnsupportedEncodingException{
 		result=new HashMap<String,Object>();
 		JSONObject jo=JSONObject.fromObject(conditions);
 		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		for(Iterator it=jo.keys();it.hasNext();){
+		for(Iterator<?> it=jo.keys();it.hasNext();){
 			String key=(String) it.next();
 			conditionMap.put(key, jo.get(key));
 		}
 		String month_start=(String) conditionMap.get("monthStart");
-		String month_end=(String) conditionMap.get("monthEnd");
-		//String createTime=Util.format(new Date(), "yyyy-MM-dd HH:mm:ss");
+		//String month_end=(String) conditionMap.get("monthEnd");
 		String curMonth=Util.format(new Date(), "yyyy-MM");
 		String lastMonth=Util.format(Util.addMonth(new Date(), -1), "yyyy-MM");
 		
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		if(request.getParameter("offset")!=null)conditionMap.put("offset", Integer.valueOf(request.getParameter("offset")));
+		if(request.getParameter("limit")!=null)conditionMap.put("pageSize", Integer.valueOf(request.getParameter("limit")));
+		conditionMap.put("sort", request.getParameter("sort"));
+		conditionMap.put("order", request.getParameter("order"));
+		int totalCount=0;
 		
-		if(pager!=null){
-			conditionMap.put("offset",(pager.getCurPage() - 1) * pager.getPageSize());
-			conditionMap.put("pageSize", pager.getPageSize());
-			int totalCount=0;
-			if(!(month_start.equals(curMonth))&&!(month_start.equals(lastMonth))){
-				totalCount = hrDao.queryPieceSalaryHistoryCount(conditionMap);
-			}else
-			 totalCount = hrDao.queryPieceSalaryCount(conditionMap);
-			pager.setTotalCount(totalCount);
-			result.put("pager", pager);
-		}
 		if(!(month_start.equals(curMonth))&&!(month_start.equals(lastMonth))){
-			result.put("salaryList", hrDao.queryPieceSalaryHistory(conditionMap));
-		}else
-		result.put("salaryList", hrDao.queryPieceSalary(conditionMap));
-		
+			result.put("rows", hrDao.queryPieceSalaryHistory(conditionMap));
+			totalCount = hrDao.queryPieceSalaryHistoryCount(conditionMap);
+			result.put("total", totalCount);
+		}else{
+			result.put("rows", hrDao.queryPieceSalary(conditionMap));
+			totalCount = hrDao.queryPieceSalaryCount(conditionMap);
+			result.put("total", totalCount);
+		}
 		return SUCCESS;
 	}
 	/**

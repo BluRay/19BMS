@@ -74,6 +74,26 @@ $(document).ready(function() {
 
 function initPage() {
 	$("#export").hide();
+	var factory_param=getQueryString("factory")||"";
+	var staff_param=getQueryString("staff");
+	var month_param=getQueryString("month");
+	if(staff_param!=undefined && staff_param.trim().length>0){
+		$("#staff").val(staff_param);
+	}
+	if(month_param!=undefined && month_param.trim().length>0){
+		$("#date_start").val(month_param+"-01");
+		$("#date_end").val(getLastDayOfMonth(month_param));
+	}else{
+		var d = new Date();
+		/*
+		 * var eYear = d.getFullYear(); var eMon = d.getMonth(); if(eMon==0){
+		 * wDate=(eYear-1)+"-"+(12); }else wDate=(eYear)+"-"+(eMon<10?"0"+eMon:eMon);
+		 * $("#month_start").val(wDate); $("#month_end").val(wDate);
+		 */
+		$("#date_start").val(formatDate(d));
+		$("#date_end").val(formatDate(d));
+	}
+	
 	pageSize = 20;
 	getAuthorityFactorySelect("#factory", "", "noall");
 	var selectFactory = $("#factory :selected").text();
@@ -87,14 +107,6 @@ function initPage() {
 	var group = $("#group").val();
 	getChildOrgSelect("#subgroup", group, defaultTeam, "");
 
-	var d = new Date();
-	/*
-	 * var eYear = d.getFullYear(); var eMon = d.getMonth(); if(eMon==0){
-	 * wDate=(eYear-1)+"-"+(12); }else wDate=(eYear)+"-"+(eMon<10?"0"+eMon:eMon);
-	 * $("#month_start").val(wDate); $("#month_end").val(wDate);
-	 */
-	$("#date_start").val(formatDate(d));
-	$("#date_end").val(formatDate(d));
 	// 展开侧边栏
 	$("#hrPiece").find(".treemenu").addClass("collapsed");
 	$("#hr_pecie").addClass("in");

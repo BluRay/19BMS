@@ -137,8 +137,8 @@
 						<table id="attendanceTable" style="text-align:center;font-size:12px;table-layout:fixed;" class="table table-bordered table-striped" > <!--  -->
 							<thead>
 								<tr id="">
-									<th style="text-align:center;width:140px;padding-left:0px;padding-right:0px">订单</th>
 									<th style="text-align:center;width:120px;padding-left:0px;padding-right:0px">车号</th>
+									<th style="text-align:center;width:140px;padding-left:0px;padding-right:0px">订单</th>
 									<th style="text-align:center;width:60px;padding-left:0px;padding-right:0px">承包单价</th>
 									<th style="text-align:center;width:60px;padding-left:0px;padding-right:0px">补贴车</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">工厂</th>
@@ -166,8 +166,8 @@
 							<thead>
 								<tr id="">
 									<tr id="">
-									<th style="text-align:center;padding-left:0px;padding-right:0px">订单</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">车号</th>
+									<th style="text-align:center;padding-left:0px;padding-right:0px">订单</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">承包单价</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">补贴车</th>
 									<th style="text-align:center;padding-left:0px;padding-right:0px">工厂</th>

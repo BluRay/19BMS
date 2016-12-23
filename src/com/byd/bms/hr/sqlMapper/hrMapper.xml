@@ -383,8 +383,8 @@
 		and FIND_IN_SET(r.rewards_factory,#{orgStr})>0 and
 		FIND_IN_SET(substring_index(r.rewards_workshop, '车间', 1),#{orgStr})>0
 		<if test="staff_number!=null">
-			AND (r.staff_number LIKE CONCAT('%',#{staff_number},'%')
-			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+			AND r.staff_number LIKE CONCAT('%',#{staff_number},'%') 
+			AND (s.staff_number LIKE CONCAT('%',#{staff_number},'%') OR s.name LIKE CONCAT('%',#{staff_number},'%'))
 		</if>
 		GROUP BY s.name,r.rewards_factory,r.rewards_workshop
 		order by s.workgroup_org,s.team_org
@@ -412,8 +412,8 @@
 		FIND_IN_SET(substring_index(r.rewards_workshop, '车间', 1),#{orgStr})>0
 
 		<if test="staff_number!=null">
-			AND (r.staff_number LIKE CONCAT('%',#{staff_number},'%')
-			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+			AND r.staff_number LIKE CONCAT('%',#{staff_number},'%') 
+			AND (s.staff_number LIKE CONCAT('%',#{staff_number},'%') OR s.name LIKE CONCAT('%',#{staff_number},'%'))
 		</if>
 	</select>
 
@@ -438,8 +438,8 @@
 			and FIND_IN_SET(substring_index(r.rewards_workshop, '车间', 1),#{orgStr})>0
 		</if>
 		<if test="staff_number!=null">
-			AND (r.staff_number LIKE CONCAT('%',#{staff_number},'%')
-			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+			AND r.staff_number LIKE CONCAT('%',#{staff_number},'%') 
+			AND (s.staff_number LIKE CONCAT('%',#{staff_number},'%') OR s.name LIKE CONCAT('%',#{staff_number},'%'))
 		</if>
 		<if test="rewards_factory!=null">
 			AND r.rewards_factory = #{rewards_factory}
@@ -473,8 +473,8 @@
 			and FIND_IN_SET(substring_index(r.rewards_workshop, '车间', 1),#{orgStr})>0
 		</if>
 		<if test="staff_number!=null">
-			AND (r.staff_number LIKE CONCAT('%',#{staff_number},'%')
-			OR s.name LIKE CONCAT('%',#{staff_number},'%'))
+			AND r.staff_number LIKE CONCAT('%',#{staff_number},'%') 
+			AND (s.staff_number LIKE CONCAT('%',#{staff_number},'%') OR s.name LIKE CONCAT('%',#{staff_number},'%'))
 		</if>
 	</select>
 

@@ -1444,7 +1444,7 @@ function getDepartSelect(elementId, selectVal, selectFactory, selectType) {
  * orgType  组织结构类型
  * orgKind  
  */
-function getOrgAuthTree(treeId,orgType,orgKind,level){
+function getOrgAuthTree(treeId,orgType,orgKind,level,nodeName_default){
 	/*  ztree 配置信息 */
 	// zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
 	var setting = {
@@ -1507,13 +1507,19 @@ function getOrgAuthTree(treeId,orgType,orgKind,level){
 	                });
 	                zTreeObj = $.fn.zTree.init(treeId, setting, zNodes);
 	                var nodes = zTreeObj.getNodes();
+	                var select_node=null;
 	                if (nodes.length>0) {
-	                	zTreeObj.selectNode(nodes[0]);
+	                	if(nodeName_default!=undefined&&nodeName_default.trim().length>0){
+	                		select_node = zTreeObj.getNodeByParam("name", nodeName_default);
+	                	}else{
+	                		select_node=nodes[0];
+	                	}
+	                	zTreeObj.selectNode(select_node);
 	                }
 	                //zTreeObj.expandNode(nodes[0], true, false, true);
 	                //zTreeObj.expandAll(true);
 	                //ajaxQuery(nodes[0].id);
-	                expandLevel(zTreeObj,nodes[0],level); 
+	                expandLevel(zTreeObj,select_node,level); 
 	    		}else{
 	    		      zNodes.push(
 	                    		{id:0,pId:0,name:'无数据权限'}
@@ -1598,6 +1604,21 @@ function getFirstDayOfMonth(cdate) {
 	m = m < 10 ? "0" + m : m
 	d = d < 10 ? "0" + d : d
 	return y + "-" + m + "-" + d
+}
+
+function getLastDayOfMonth(dateString) {
+	var d_list=dateString.split("-");
+	var y=d_list[0];
+	var m=Number(d_list[1])+1;
+	var l_date=new Date(y+"/"+m+"/"+"0");
+	l_y = l_date.getFullYear()
+	l_m = l_date.getMonth() + 1
+	l_d = l_date.getDate()
+	l_m = l_m< 10 ? "0" + l_m :l_m
+	l_d = l_d < 10 ? "0" + l_d : l_d
+	
+	
+	return l_y + "-" + l_m + "-" + l_d;
 }
 
 function compareTime(beginTime,endTime){  

@@ -85,7 +85,7 @@ $(document)
 										// alert(staff.id);
 								addWorkHourItem(staff.id, staff.staff_number, staff.name,
 												staff.job, "", staff.team_org, staff.workgroup_org,
-												staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index)
+												staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
 								});
 							}
 							})
@@ -168,7 +168,7 @@ $(document)
 								// alert(staff.id);
 							addWorkHourItem(staff.id, staff.staff_number, staff.name,
 										staff.job, "", staff.team_org, staff.workgroup_org,
-										staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index)
+										staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
 							});
 							return item;
 						}
@@ -227,6 +227,8 @@ $(document)
 											$(tr).find(".staff_factory").html(
 													staff.plant_org);
 											$(tr).data("skill_parameter",staff.skill_parameter);
+											$(tr).data("status",staff.status);
+											$(tr).data("leave_date",staff.leave_date);
 										}
 									});
 					// 工时删除
@@ -532,14 +534,25 @@ function initPage() {
 }
 
 function addWorkHourItem(staffId, cardNo, staffName, staffPost, workHour,
-		subgroup_org, group_org, workshop_org, factory_org,skillParameter,distribution,index) {
+		subgroup_org, group_org, workshop_org, factory_org,skillParameter,distribution,index,status,leave_date) {
 	cardNo = cardNo || "";
+	staffId=staffId||"";
 	cardNoDisabled = "";
 	if (cardNo.trim().length > 0) {
 		cardNoDisabled = "disabled";
 	}
 	workHour = workHour || "";
 	distribution=distribution||0;
+	status=status||"";
+	leave_date=leave_date||"";
+	var leave_time=leave_date==""?0:new Date(leave_date.replace(/-/g,"/")).getTime();
+	var work_time=new Date($("#mta_wdate").val().replace(/-/g,"/")).getTime();
+	if(status=="离职"&&leave_time<=work_time){
+		alert(staffName+"已于"+leave_date+"离职，请联系人事科长重新维护班组成员承包单价！");
+		return false;
+	}
+	
+	
 	//alert(workshop);
 	var tr = $("<tr style='padding:5px'/>");
 	$("<td />")
@@ -582,6 +595,8 @@ function addWorkHourItem(staffId, cardNo, staffName, staffPost, workHour,
 	$("<td class='staff_workshop' />").html(workshop_org).appendTo(tr);
 	$("<td class='staff_factory' />").html(factory_org).appendTo(tr);
 	$(tr).data("skill_parameter",skillParameter)
+	$(tr).data("status",status);
+	$(tr).data("leave_date",leave_date)
 	$("#tb_workhour").append(tr);
 }
 
@@ -741,7 +756,7 @@ function ajaxGetDist(){
 		// alert(staff.id);
 	addWorkHourItem(staff.id, staff.staff_number, staff.name,
 				staff.job, "", staff.team_org, staff.workgroup_org,
-				staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index)
+				staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
 	});
 }
 
@@ -838,7 +853,7 @@ function zTreeOnClick(event, treeId, treeNode) {
 			// alert(staff.id);
 			addWorkHourItem(staff.id, staff.staff_number, staff.name,
 					staff.job, "", staff.team_org, staff.workgroup_org,
-					staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution)
+					staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
 		});
 	}
 	

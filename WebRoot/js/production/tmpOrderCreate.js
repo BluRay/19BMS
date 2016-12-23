@@ -63,8 +63,10 @@ $(document).ready(function() {
 		//alert(dutyUnit);
 		var factory=$("#new_factory :selected").text();
 		var workshop=$("#new_workshop :selected").text();
-		
-		if(acceptor!=acceptorSign){
+		if(!validateOrderSerialNo($("#new_order_serial").val())){
+			alert("你输入的派工流水号不符合工厂简码+四位年+两位月+四位流水的规则，如CS2016120001！");
+			return false;
+		}else if(acceptor!=acceptorSign){
 			alert("验收人和验收人签字不一致！");
 			return false;
 		}else		
@@ -157,6 +159,10 @@ $(document).ready(function() {
 		var acceptorSign=$("#edit_acceptor_sign").val();
 		if(acceptor!=acceptorSign){
 			alert("验收人和验收人签字不一致！");
+			return false;
+		}
+		if(!validateOrderSerialNo($("#edit_order_serial").val())){
+			alert("你输入的派工流水号不符合工厂简码+四位年+两位月+四位流水的规则，如CS2016120001！");
 			return false;
 		}
 		var flag=$("#editRecordForm").valid();
@@ -397,4 +403,19 @@ function emptyModal() {
 	$("#reason").val("");
 	$("#totalQty").val("");
 	$("#assignerCardNo").val("");
+}
+
+function validateOrderSerialNo(order_serial_no){
+	var flag=true;
+	var factory_code=order_serial_no.substring(0,2);
+	var series=order_serial_no.substring(2,12);
+	
+	var reg_num=/^\d{10}$/
+	var reg_char=/^[A-Z]{2}$/;
+	if(!reg_char.test(factory_code)||!reg_num.test(series)){
+		//alert("你输入的派工流水号不符合工厂简码+四位年+两位月+四位流水的规则，如CS2016120001！");
+		flag=false;
+	}
+	return flag;
+	
 }

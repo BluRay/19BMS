@@ -4,7 +4,7 @@
 	<div class="navbar-inner" style="min-height: 30px;">
 		<div class="container">
 			<div class="nav-collapse" >
-				<ul class="nav" style="text-align: center;">
+				<ul class="nav" style="text-align: center;left:70px">
 					<li><a class="brand" href="production!productionsearchbusinfo.action"><i class="fa fa-search"></i></a></li>
 					<!-- <li ><a href="/bms/site">首页</a></li> -->
 					<li id=""><a href="staff!staffManager.action">员工库</a></li>

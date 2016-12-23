@@ -3,113 +3,230 @@ var wDate="";//上一月份
 var llDate="";//上上个月份
 var month_start= null;
 var month_end = null;
+var data_url = "hrReport!getPieceSalaryList.action?";
+
 $(document).ready(function(){
+	$(".container").width(getWidth());
+	eachSeries(scripts, getScript, initTable);
 	month_start=document.getElementById("month_start");
 	month_end = document.getElementById("month_end");
 	initPage();
 	// 工厂切换事件
 	$("#factory").change(
-			function() {
-				var selectFactory = $("#factory :selected").text();
-				getWorkshopSelect_Auth("#workshop", null,
-						selectFactory, "noall");
-				getChildOrgSelect("#group", workshop, "",
-				"");
-				$("#subgroup").html(
-						"<option value=''>全部</option>");
-			});
+		function() {
+			var selectFactory = $("#factory :selected").text();
+			getWorkshopSelect_Auth("#workshop", null,selectFactory, "");
+			getChildOrgSelect("#group", workshop, "","");
+			$("#subgroup").html("<option value=''>全部</option>");
+		});
 	// 车间切换事件
 	$("#workshop").change(
-			function() {
-				var workshop = $("#workshop").val();
-				getChildOrgSelect("#group", workshop, "",
-						"");
-				$("#subgroup").html(
-						"<option value=''>全部</option>");
-				var group = $("#group").val();
-				if(group!=''){
-					$("#btnSave").css("display","none");
-				}else{
-					$("#btnSave").css("display","");
-				}
-			});
+		function() {
+			var workshop = $("#workshop").val();
+			getChildOrgSelect("#group", workshop, "","");
+			$("#subgroup").html("<option value=''>全部</option>");
+		});
 	// 班组切换事件
 	$("#group").change(function() {
 		var group = $("#group").val();
 		getChildOrgSelect("#subgroup", group, "", "noall");
-		if(group!=''){
-			$("#btnSave").css("display","none");
-		}else{
-			$("#btnSave").css("display","");
-		}
 	});
 	
-	$("#btnQuery").click(function(){
-		ajaxQuery(1);
-	});
-	
-/*	$("#export").click(function(){
-		ajaxQuery(0,"all")
-		htmlToExcel("tableResultAll", "", "","计件工资明细","计件工资明细");
-		return false;
-	});*/
-	
-	$("#btnSave").click(function(){	
-		$(".divLoading").addClass("fade in").show();
-		var workshopAll="";
-		$("#workshop option").each(function(){
-			workshopAll+=$(this).text()+",";
-		});
-		var workshop=$("#workshop :selected").text()=="全部"?workshopAll:$("#workshop :selected").text();
-		var workgroup=$("#group :selected").text()=="全部"?"":$("#group :selected").text();
-		var team=$("#subgroup :selected").text()=="全部"?"":$("#subgroup :selected").text();
-		var staff=$("#staff").val();
-		var staffId='';
-		if(staff.trim().length>0){
-			var trs=$("#tableResult tbody").find("tr");
-			staffId=$(trs[0]).data("staff_id");
-		}
-		//alert(staff);
-		
-		var conditions="{factory:'"+$("#factory :selected").text()+"',workshop:'"+
-		workshop+"',workgroup:'"+workgroup+ "',team:'"+team+"',staff:'"+staff+"',staffId:'"+staffId+
-		"',monthStart:'"+$("#month_start").val()+"',monthEnd:'"+$("#month_end").val()+"'}";
-		/*if($("#month_start").val()!=wDate||$("#month_end").val()!=wDate){
-			alert("只能结算上个月工资！");
-			return false;
-		}else*/
-		$.ajax({
-			url:"hrReport!savePieceSalaryHistory.action",
-			dataType : "json",
-			async:false,
-			type : "get",
-			data : {
-				"conditions":conditions
-			},
-			success : function(response) {
-				$(".divLoading").hide();
-				alert(response.message);
-				
-				
-			}
-		});
-	});
-	
-})	
+	$("#btnQuery").click(function () {
+		ajaxQuery();
+    });
+});
+
+//----------START bootstrap initTable ----------
+function initTable() {
+    $table.bootstrapTable({
+        height: getHeight(),
+        //url:data_url,
+        striped:true,
+        paginationVAlign:'bottom',
+        searchOnEnterKey:true,
+        fixedColumns: false,			//冻结列
+        fixedNumber: 0,					//冻结列数
+        queryParams:function(params) {
+        	var workshopAll="";
+        	$("#workshop option").each(function(){
+        		workshopAll+=$(this).text()+",";
+        	});
+        	var workshop=$("#workshop :selected").text()=="全部"?workshopAll:$("#workshop :selected").text();
+        	var workgroup=$("#group :selected").text()=="全部"?"":$("#group :selected").text();
+        	var team=$("#subgroup :selected").text()=="全部"?"":$("#subgroup :selected").text();
+        	var conditions="{factory:'"+$("#factory :selected").text()+"',workshop:'"+workshop
+        		+"',workgroup:'"+workgroup+"',staff:'"+$("#staff").val()+
+        		"',team:'"+team+ "',monthStart:'"+$("#month_start").val()+"',monthEnd:'"+$("#month_end").val()+"'}";
+        	params["conditions"] = conditions; 
+        	return params;
+        },
+        columns: [
+        [
+            {
+            	field: 'MONTH',title: '&nbsp;&nbsp;&nbsp;月份&nbsp;&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+	        	return {css: {"padding-left": "3px", "padding-right": "2px","font-size":"13px"}};
+	        	}
+            },{
+            	field: 'STAFF_NUMBER',title: '&nbsp;&nbsp;工号&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'STAFF_NAME',title: '&nbsp;&nbsp;姓名&nbsp;&nbsp;<br/>',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'WORKSHOP_ORG',title: '&nbsp;&nbsp;车间&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'WORKGROUP_ORG',title: '&nbsp;&nbsp;班组&nbsp;&nbsp;&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'TEAM_ORG',title: '&nbsp;&nbsp;小班组&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'JOB',title: '&nbsp;&nbsp;岗位',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'STAFF_STATUS',title: '&nbsp;&nbsp;在职',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'ATTENDANCE_DAYS',title: '出勤<br/>天数',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'ATTENDANCE_HOURS',title: '出勤<br/>小时数',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'PRODUCTION_QTY',title: '车间<br/>产量',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'PIECE_TOTAL',title: '计件<br/>产量',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'BONUS_TOTAL',title: '补贴车',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'PIECE_PAY_TOTAL',title: '纯计件<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'ECNWH_TOTAL',title: '技改<br/>工时',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'ECN_PAY_TOTAL',title: '技改<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'TMPWH_TOTAL',title: '额外<br/>工时',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'TMP_PAY_TOTAL',title: '额外<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'WWH_TOTAL',title: '等待<br/>工时',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'WAIT_PAY_TOTAL',title: '等待<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'PIECE_SALARY',title: '计件<br/>工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'DEDUCT_PAY_TOTAL',title: '考核<br/>扣款',align: 'center',valign: 'middle',align: 'center',
+                sortable: true,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	},
+                formatter:function(value){
+                	return value.toFixed(2);
+                }
+            },{
+            	field: 'id',title: '实发计<br/>件工资',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	},
+                formatter:function(value, row, index){
+                	var piece_pay_total=row.piece_pay_total==undefined?0:parseFloat(row.piece_pay_total);
+                	var ecn_pay_total=row.ecn_pay_total==undefined?0:parseFloat(row.ecn_pay_total);
+                	var tmp_pay_total=row.tmp_pay_total==undefined?0:parseFloat(row.tmp_pay_total);
+                	var wait_pay_total=row.wait_pay_total==undefined?0:parseFloat(row.wait_pay_total);
+                	var deduct_pay_total=row.deduct_pay_total==undefined?0:parseFloat(row.deduct_pay_total);               	
+                	var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
+                	return (parseFloat(piece_salary)+parseFloat(deduct_pay_total)).toFixed(2);
+                }
+            }
+        ]
+    ]
+    });    
+    $(window).resize(function () {
+        $table.bootstrapTable('resetView', {height: getHeight()});
+    });
+}
+//----------END bootstrap initTable ----------
 
 function initPage(){
-	pageSize=20;
 	getAuthorityFactorySelect("#factory", "", "noall");
 	var selectFactory = $("#factory :selected").text();
 	var defaultWorkshop=$("#d_workshop").val();
 	var defaultWorkgourp=$("#d_workgroup").val();
 	var defaultTeam=$("#d_team").val();
 	getWorkshopSelect_Auth("#workshop", defaultWorkshop, selectFactory, "noall");
-/*	 $('#workshop').multiselect({
-         buttonWidth: '150px',
-         buttonContainer: '<div class="btn-group input-medium btn-select " />'
-     });*/
-	//$("#workshop").attr("disabled",true);
 	var workshop = $("#workshop").val();
 	getChildOrgSelect("#group", workshop, defaultWorkgourp, "");
 	var group = $("#group").val();
@@ -141,8 +258,6 @@ function initPage(){
 	if($(span).hasClass("fa-angle-down")){
 		$(span).removeClass("fa-angle-down").addClass("fa-angle-up");
 	}
-
-	 //ajaxQuery(1);
 }
 
 function changeMonth(){
@@ -152,105 +267,15 @@ function changeMonth(){
 		$("#month_end").val(cDate).attr("disabled",true);
 	}else{
 		WdatePicker({'dateFmt':'yyyy-MM','maxDate':llDate,'el':'month_end'});
-		//$("#month_end").click();
 		$("#month_end").val(llDate);
 		$("#month_end").attr("disabled",false);
 	}
 }
 
-function ajaxQuery(targetPage,queryAll){
-	$(".divLoading").addClass("fade in").show();
+function ajaxQuery(){
 	var workshopAll="";
 	$("#workshop option").each(function(){
 		workshopAll+=$(this).text()+",";
 	});
-	//alert(workshopAll);
-	var workshop=$("#workshop :selected").text()=="全部"?workshopAll:$("#workshop :selected").text();
-	var workgroup=$("#group :selected").text()=="全部"?"":$("#group :selected").text();
-	var team=$("#subgroup :selected").text()=="全部"?"":$("#subgroup :selected").text();
-	var conditions="{factory:'"+$("#factory :selected").text()+"',workshop:'"+workshop
-		+"',workgroup:'"+workgroup+"',staff:'"+$("#staff").val()+
-		"',team:'"+team+ "',monthStart:'"+$("#month_start").val()+"',monthEnd:'"+$("#month_end").val()+"'}";
-	if(queryAll=="all"){
-	    data={
-			 "conditions" : conditions,
-			 "pager":null
-	    }	
-	    table=$("#tableResultAll tbody");
-	}else{
-		data={
-			  "conditions" : conditions,
-			 /* "pager.pageSize" : 20,
-			  "pager.curPage" : targetPage || 1	*/
-		}
-		table=$("#tableResult tbody");
-	}
-	$.ajax({
-		url:"hrReport!getPieceSalaryList.action",
-		dataType : "json",
-		async:false,
-		type : "get",
-		data : data,
-		success : function(response) {
-			
-			$(table).html("");
-			$.each(response.salaryList,function(index,salary){
-				var tr=$("<tr />");
-				$("<td />").html(salary.month).appendTo(tr);
-				$("<td />").html(salary.staff_number).appendTo(tr);
-				$("<td />").html(salary.staff_name).appendTo(tr);
-				$("<td />").html(salary.workshop_org).appendTo(tr);
-				$("<td />").html(salary.workgroup_org).appendTo(tr);
-				$("<td />").html(salary.team_org).appendTo(tr);
-				$("<td />").html(salary.job).appendTo(tr);
-				$("<td />").html(salary.status).appendTo(tr);
-				/*$("<td />").html(salary.skill_parameter).appendTo(tr);*/
-				$("<td />").html(salary.attendance_days).appendTo(tr);
-				$("<td />").html(salary.attendance_hours).appendTo(tr);
-				var piece_total=salary.piece_total==undefined?0:parseFloat(salary.piece_total);
-				var piece_pay_total=salary.piece_pay_total==undefined?0:parseFloat(salary.piece_pay_total);
-				var ecnwh_total=salary.ecnwh_total==undefined?0:parseFloat(salary.ecnwh_total);
-				var ecn_pay_total=salary.ecn_pay_total==undefined?0:parseFloat(salary.ecn_pay_total);
-				var tmpwh_total=salary.tmpwh_total==undefined?0:parseFloat(salary.tmpwh_total);
-				var tmp_pay_total=salary.tmp_pay_total==undefined?0:parseFloat(salary.tmp_pay_total);
-				var wwh_total=salary.wwh_total==undefined?0:parseFloat(salary.wwh_total);
-				var wait_pay_total=salary.wait_pay_total==undefined?0:parseFloat(salary.wait_pay_total);
-				var deduct_pay_total=salary.deduct_pay_total==undefined?0:parseFloat(salary.deduct_pay_total);
-				var production_qty=salary.production_qty==undefined?0:parseFloat(salary.production_qty);
-				$("<td />").html(production_qty.toFixed(2)).appendTo(tr);
-				if(piece_total.toFixed(2)!=production_qty.toFixed(2)){
-					$("<td style='background-color:yellow' />").html(piece_total.toFixed(2)).appendTo(tr);
-				}else{
-					$("<td />").html(piece_total.toFixed(2)).appendTo(tr);
-				}
-				
-				$("<td />").html(parseInt(salary.bonus_total).toFixed(2)).appendTo(tr);
-				$("<td />").html(piece_pay_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(ecnwh_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(ecn_pay_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(tmpwh_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(tmp_pay_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(wwh_total.toFixed(2)).appendTo(tr);
-				$("<td />").html(wait_pay_total.toFixed(2)).appendTo(tr);
-				var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
-				$("<td />").html(piece_salary.toFixed(2)).appendTo(tr);
-				$("<td />").html(deduct_pay_total.toFixed(2)).appendTo(tr);
-				$("<td />").html((parseFloat(piece_salary)+parseFloat(deduct_pay_total)).toFixed(2)).appendTo(tr);
-				/*var avg_salary=isNaN((piece_salary+deduct_pay_total)/salary.attendance_days)?"":((piece_salary+deduct_pay_total)/salary.attendance_days).toFixed(2);
-				$("<td />").html(avg_salary).appendTo(tr);*/
-				$(tr).data("staff_id",salary.staff_id);
-				$(table).append(tr);
-			});
-		/*	if(queryAll!="all"){
-				$("#total").html(response.pager.totalCount);
-				$("#total").attr("total", response.pager.totalCount);
-				$("#cur").attr("page", response.pager.curPage);
-				$("#cur").html(
-						"<a href=\"#\">" + response.pager.curPage + "</a>");
-				$("#pagination").show();
-			}*/
-			$(".divLoading").hide();
-		}
-		
-	})
+	$table.bootstrapTable('refresh', {url: data_url});
 }

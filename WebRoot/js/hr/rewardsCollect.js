@@ -9,21 +9,33 @@ function zTreeOnClick(event, treeId, treeNode) {
 };
 
 $(document).ready(function () {
+	
 	initPage();
 	function initPage(){
-		//获取系统时间 
-		var LSTR_ndate=new Date(); 
-		var LSTR_MM=LSTR_ndate.getMonth()+1;
-		var LSTR_DD=LSTR_ndate.getDate(); 
-		LSTR_MM=LSTR_MM >= 10?LSTR_MM:("0"+LSTR_MM);
-		$("#staff_date").val(getPreMonth(LSTR_ndate.getFullYear() + "-" + LSTR_MM + "-01"));
+		var factory_param=getQueryString("factory")||"";
+		var staff_param=getQueryString("staff");
+		var month_param=getQueryString("month");
+		if(staff_param!=undefined && staff_param.trim().length>0){
+			$("#staff_number").val(staff_param);
+		}
+		if(month_param!=undefined && month_param.trim().length>0){
+			$("#staff_date").val(month_param);
+		}else{
+			//获取系统时间 
+			var LSTR_ndate=new Date(); 
+			var LSTR_MM=LSTR_ndate.getMonth()+1;
+			var LSTR_DD=LSTR_ndate.getDate(); 
+			LSTR_MM=LSTR_MM >= 10?LSTR_MM:("0"+LSTR_MM);
+			$("#staff_date").val(getPreMonth(LSTR_ndate.getFullYear() + "-" + LSTR_MM + "-01"));
+		}
+	
 		
 		var jobType = $("#job_type").val();
 		getJobGradeSelect($("#job_grade"), '', '', jobType);
 		$("#hrPlan").find(".treemenu").addClass("collapsed");
 		$("#hr_pecie").addClass("in");
 		//ajaxTree();
-		getOrgAuthTree($("#staffTree"),"1,2,3,4",'1');
+		getOrgAuthTree($("#staffTree"),"1,2,3,4",'1',null,factory_param);
 		ajaxQuery();
 	}
 

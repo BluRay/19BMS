@@ -4,7 +4,11 @@ $(document).ready(function(){
 	
 	function initPage(){
 		pageSize=5;
-		getAuthorityFactorySelect("#factory", "", "noall");
+		var factory_param=getQueryString("factory")||"";
+		var staff_param=getQueryString("staff");
+		var month_param=getQueryString("month");
+	
+		getAuthorityFactorySelect("#factory", factory_param, "noall");
 		getBusNumberSelect('#bus_number');
 		var selectFactory = $("#factory :selected").text();
 		var defaultWorkshop=$("#d_workshop").val();
@@ -23,10 +27,20 @@ $(document).ready(function(){
 		var LSTR_MM=LSTR_ndate.getMonth()+1;
 		var LSTR_MM=LSTR_MM > 10?LSTR_MM:("0"+LSTR_MM)
 		$("#waitmanhourdate").val(getPreMonth(LSTR_ndate.getFullYear() + "-" + LSTR_MM + "-01"));
+		
 		$("#hr_pecie").addClass("in");
 		
 		$("#tableDiv").show();
 		$("#tableDiv2").hide();
+		
+		if(staff_param!=undefined && staff_param.trim().length>0){
+			$("#staff_number").val(staff_param);
+		}
+		if(month_param!=undefined && month_param.trim().length>0){
+			$("#date_start").val(month_param+"-01");
+			$("#date_end").val(getLastDayOfMonth(month_param));
+			ajaxQuery();
+		}
 	}
 	
 	$("#btnQuery").live("click",function(e){
@@ -234,8 +248,8 @@ function ajaxQuery(targetPage,queryAll){
 	    	    		for (var i=0;i<piece_Arr.length-1;i++){
 	    	    			var tr = $("<tr />");
 		    				if(i==0){
-		    					$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.order_desc).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.bus_number).appendTo(tr);
+			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.order_desc).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.standard_price).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.bonus).appendTo(tr);
 			    				$("<td rowspan="+(piece_Arr.length-1)+" style=\"padding-left:0px;padding-right:0px\" />").html(staff_info.plant_org).appendTo(tr);	

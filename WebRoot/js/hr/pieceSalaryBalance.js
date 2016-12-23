@@ -9,7 +9,8 @@ var data_url = "hrReport!getSubmitSalaryList.action?";
 $(document).ready(function(){
 	$(".container").width(getWidth());
     eachSeries(scripts, getScript, initTable);
-    
+    month_start=document.getElementById("month_start");
+	month_end = document.getElementById("month_end");
     initPage();
     // 工厂切换事件
 	$("#factory").change(
@@ -218,7 +219,11 @@ function initTable() {
                 sortable: true,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
-    	        	}
+    	        	},
+    	        formatter:function(value,row,index){
+                    	return "<a href=\"hrReport!pieceTimeReport.action?staff="+row.staff_number+"&factory="+$("#factory :selected").text()+
+        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+                    }	
             },{
             	field: 'ECNWH_TOTAL',title: '技改<br/>工时',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter,
@@ -230,7 +235,11 @@ function initTable() {
                 sortable: true,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
-    	        	}
+    	        	},
+    	        formatter:function(value,row,index){
+                    	return "<a href=\"hrReport!ecnReport.action?staff="+row.staff_number+"&factory="+$("#factory :selected").text()+
+        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+                    }
             },{
             	field: 'TMPWH_TOTAL',title: '额外<br/>工时',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter,
@@ -242,7 +251,11 @@ function initTable() {
                 sortable: true,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
-    	        	}
+    	        	},
+    	        formatter:function(value,row,index){
+        	        	return "<a href=\"hrReport!tmpReport.action?staff="+row.staff_number+"&factory="+$("#factory").val()+
+        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+        	        }		
             },{
             	field: 'WWH_TOTAL',title: '等待<br/>工时',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter,
@@ -260,15 +273,16 @@ function initTable() {
                 sortable: true,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
-    	        	}
+    	        	}   	        
             },{
             	field: 'DEDUCT_PAY_TOTAL',title: '考核<br/>扣款',align: 'center',valign: 'middle',align: 'center',
                 sortable: true,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
     	        	},
-                formatter:function(value){
-                	return value.toFixed(2);
+                formatter:function(value,row,index){
+                	return "<a href=\"hr!rewardsCollect.action?staff="+row.staff_number+"&factory="+$("#factory :selected").text()+
+    	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
                 }
             },{
             	field: 'id',title: '实发计<br/>件工资',align: 'center',valign: 'middle',align: 'center',
