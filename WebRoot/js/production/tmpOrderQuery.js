@@ -33,6 +33,7 @@ function initPage(){
 
 function ajaxQuery(targetPage){
 	var orderNo=$('#tmp_order_no').val();
+	var reason_content=$('#tmp_reason_content').val();
 	var applyDateStart=$('#create_start').val();
 	var applyDateEnd=$('#create_end').val();
 	var status=$('#status').val();
@@ -45,7 +46,7 @@ function ajaxQuery(targetPage){
 	var workshop=$("#q_workshop :selected").text()=="全部"?workshopAll:$("#q_workshop :selected").text();
 	var conditions = "{orderNo:'" + orderNo+"',applyDateStart:'"+applyDateStart+
 					"',applyDateEnd:'"+applyDateEnd+"',status:'"+status+
-					"',factory:'"+factory+"',workshop:'"+workshop+"'}";
+					"',factory:'"+factory+"',workshop:'"+workshop+"',reason_content:'"+reason_content+"'}";
 	$.ajax({
 		url: "tempOrder!orderList.action",
 	    dataType: "json",

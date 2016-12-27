@@ -33,6 +33,7 @@
 						<table>
 							<tr>
 								<td>派工流水号</td>
+								<td>作业原因/内容</td>
 								<td>申请日期</td>
 								<td>状态</td>
 								<td>制作工厂</td>
@@ -41,16 +42,13 @@
 								<td></td>
 							</tr>
 							<tr>
-								<td><input style="height: 30px;" type="text"
-									class="input-medium revise" placeholder="派工单号"
-									id="tmp_order_no" /></td>
-								<td><input id="create_start" type="text"
-									class="input-small" style="width: 98px" placeholder="开始日期..."
-									onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" /> <span
-									class="add-on" style="padding: 4px 0">至</span> <input
-									id="create_end" type="text" class="input-small"
-									style="width: 98px" placeholder="结束日期..."
-									onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" /> <span>&nbsp;</span></td>
+								<td><input style="height: 30px;" type="text"class="input-medium revise" placeholder="派工单号" id="tmp_order_no" /></td>
+								<td><input style="height: 30px;" type="text"class="input-medium revise" placeholder="作业原因/内容" id="tmp_reason_content" /></td>
+								<td><input id="create_start" type="text" class="input-small" style="width: 98px" placeholder="开始日期..." onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" />
+									<span class="add-on" style="padding: 4px 0">至</span> 
+									<input id="create_end" type="text" class="input-small" style="width: 98px" placeholder="结束日期..." onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" /> 
+									<span>&nbsp;</span>
+								</td>
 								<td><select name="" id="status" class="input-small carType">
 										<option value='all'>全部</option>
 										<option value='0'>已创建</option>
