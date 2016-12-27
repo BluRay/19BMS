@@ -210,6 +210,21 @@ function initTable() {
                 	var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
                 	return (parseFloat(piece_salary)+parseFloat(deduct_pay_total)).toFixed(2);
                 }
+            },{
+            	field: 'id',title: '&nbsp;&nbsp;平均&nbsp;&nbsp;<br/>&nbsp;&nbsp;工资&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	},
+                formatter:function(value, row, index){
+                	var piece_pay_total=row.piece_pay_total==undefined?0:parseFloat(row.piece_pay_total);
+                	var ecn_pay_total=row.ecn_pay_total==undefined?0:parseFloat(row.ecn_pay_total);
+                	var tmp_pay_total=row.tmp_pay_total==undefined?0:parseFloat(row.tmp_pay_total);
+                	var wait_pay_total=row.wait_pay_total==undefined?0:parseFloat(row.wait_pay_total);
+                	var deduct_pay_total=row.deduct_pay_total==undefined?0:parseFloat(row.deduct_pay_total);               	
+                	var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
+                	return ((parseFloat(piece_salary)+parseFloat(deduct_pay_total))/row.ATTENDANCE_DAYS).toFixed(2);
+                }
             }
         ]
     ]

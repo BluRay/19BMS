@@ -365,7 +365,9 @@
 		r.staff_number,s.name,s.workgroup_org,s.team_org,s.plant_org,s.workshop_org,r.rewards_factory,r.rewards_workshop,100
 		AS 'fullmark',sum(r.add) AS `add`,
 		SUM(deduct) AS
-		deduct,100+ifnull(sum(r.add),0)-ifnull(SUM(deduct),0) AS mark FROM
+		deduct,100+ifnull(sum(r.add),0)-ifnull(SUM(deduct),0) AS mark,
+		r.reasons,r.rewards_date,r.group_leader,r.gaffer,r.proposer
+		 FROM
 		BMS_HR_REWARDS r
 		LEFT JOIN BMS_HR_STAFF s ON r.staff_number = s.staff_number
 		WHERE
@@ -386,7 +388,7 @@
 			AND r.staff_number LIKE CONCAT('%',#{staff_number},'%') 
 			AND (s.staff_number LIKE CONCAT('%',#{staff_number},'%') OR s.name LIKE CONCAT('%',#{staff_number},'%'))
 		</if>
-		GROUP BY s.name,r.rewards_factory,r.rewards_workshop
+		GROUP BY r.rewards_date,s.name,r.rewards_factory,r.rewards_workshop
 		order by s.workgroup_org,s.team_org
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
@@ -394,7 +396,7 @@
 	</select>
 	<select id="getRewardsCollectTotalCount" resultType="int"
 		parameterType='Map'>
-		SELECT COUNT(distinct r.staff_number) FROM BMS_HR_REWARDS r
+		SELECT COUNT(r.staff_number) FROM BMS_HR_REWARDS r
 		LEFT JOIN BMS_HR_STAFF s ON r.staff_number = s.staff_number
 		WHERE
 		r.rewards_date LIKE CONCAT('%',#{staff_date},'%')

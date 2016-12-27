@@ -145,7 +145,14 @@ function ajaxQuery(targetPage){
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.add).appendTo(tr);
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.deduct).appendTo(tr);
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.mark).appendTo(tr);
-    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html("<button onclick = 'ajaxQueryDetail(\"" + staff.staff_number + "\",\"" + staff.rewards_factory + "\",\"" + staff.rewards_workshop + "\");' class='btn-link' style='font-size: 12px;'>明细</>").appendTo(tr);
+    				//$("<td style=\"padding-left:0px;padding-right:0px\" />").html("<button onclick = 'ajaxQueryDetail(\"" + staff.staff_number + "\",\"" + staff.rewards_factory + "\",\"" + staff.rewards_workshop + "\");' class='btn-link' style='font-size: 12px;'>明细</>").appendTo(tr);
+    				
+    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.reasons).appendTo(tr);
+    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.rewards_date).appendTo(tr);
+    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.group_leader).appendTo(tr);
+    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.gaffer).appendTo(tr);
+    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.proposer).appendTo(tr);
+    				
     				tr.data("id", staff.id==staff?"":staff.id);
     				reward_count++;
     				$("#attendanceTable tbody").append(tr);

@@ -2471,6 +2471,9 @@
 		<if test="status !=null and status !='all'">
 			and o.status = #{status}
 		</if>
+		<if test="reason_content !=null and reason_content !=''">
+			and o.reason_content like concat('%',#{reason_content},'%')
+		</if>
 		<if test="applyDateStart !=null and applyDateStart !=''">
 			<![CDATA[and substr(o.apply_date,1,10)>=#{applyDateStart}]]>
 		</if>

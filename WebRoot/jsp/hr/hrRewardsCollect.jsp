@@ -105,7 +105,13 @@
 									<th style="text-align:center;width:30px;padding-left:0px;padding-right:0px;">加分</th>
 									<th style="text-align:center;width:40px;padding-left:0px;padding-right:0px;">扣分</th>
 									<th style="text-align:center;width:60px;padding-left:0px;padding-right:0px;">本月车间<br>考核分数</th>
-									<th style="text-align:center;width:45px;padding-left:0px;padding-right:0px;">奖惩明细</th>
+<!-- 									<th style="text-align:center;width:45px;padding-left:0px;padding-right:0px;">奖惩明细</th> -->
+					
+					<th style="text-align:center;width:130px;">事由</th>
+					<th style="text-align:center;width:50px;">日期</th>
+					<th style="text-align:center;width:40px;">班组长</th>
+					<th style="text-align:center;width:30px;">领班</th>
+					<th style="text-align:center;width:50px;">处罚建议人</th>
 								</tr>
 							</thead>
 							<tbody>	
@@ -153,5 +159,8 @@
 		
 	</div>
 	</div>
+	<script>
+var $table = $('#table'),$remove = $('#remove'),selections = [];
+</script>
 </body>
 </html>
