@@ -1,5 +1,6 @@
 package com.byd.bms.production.action;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,12 +10,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.xwork.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts2.ServletActionContext;
 
 import com.byd.bms.production.dao.IProductionDao;
 import com.byd.bms.production.entity.BmsTempOrder;
@@ -98,24 +102,27 @@ public class TempOrderAction extends BaseAction<Object> {
 	/**
 	 * 获取临时派工单列表
 	 * @return
+	 * @throws UnsupportedEncodingException 
 	 */
-	public String orderList(){
+	public String orderList() throws UnsupportedEncodingException{
 		result=new HashMap<String,Object>();
 		BmsBaseUser user=getUser();
 		JSONObject jo=JSONObject.fromObject(conditions);
 		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		for(Iterator it=jo.keys();it.hasNext();){
+		for(Iterator<?> it=jo.keys();it.hasNext();){
 			String key=(String) it.next();
-			System.out.println(key);
 			conditionMap.put(key, jo.get(key));
 		}
 		conditionMap.put("applier", user.getDisplay_name());
-		conditionMap.put("offset",(pager.getCurPage() - 1) * pager.getPageSize());
-		conditionMap.put("pageSize", pager.getPageSize());
-		result.put("dataList", productionDao.getTmpOrderList(conditionMap));
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		if(request.getParameter("offset")!=null)conditionMap.put("offset", Integer.valueOf(request.getParameter("offset")));
+		if(request.getParameter("limit")!=null)conditionMap.put("pageSize", Integer.valueOf(request.getParameter("limit")));
+		conditionMap.put("sort", request.getParameter("sort"));
+		conditionMap.put("order", request.getParameter("order"));
+		result.put("rows", productionDao.getTmpOrderList(conditionMap));
 		int totalCount = productionDao.getTmpOrderCount(conditionMap);
-		pager.setTotalCount(totalCount);
-		result.put("pager", pager);
+		result.put("total", totalCount);
 		return SUCCESS;
 	}
 	/**
