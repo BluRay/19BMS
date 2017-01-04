@@ -362,15 +362,18 @@
 	<select id="getRewardsCollectList" resultType="Map"
 		parameterType='Map'>
 		SELECT
+		r1.`add` as add_,r1.deduct as deduct_,r1.reasons,r1.rewards_date,r1.group_leader,r1.gaffer,r1.proposer,
+		
 		r.staff_number,s.name,s.workgroup_org,s.team_org,s.plant_org,s.workshop_org,r.rewards_factory,r.rewards_workshop,100
 		AS 'fullmark',sum(r.add) AS `add`,
-		SUM(deduct) AS
-		deduct,100+ifnull(sum(r.add),0)-ifnull(SUM(deduct),0) AS mark,
-		r.reasons,r.rewards_date,r.group_leader,r.gaffer,r.proposer
+		SUM(r.deduct) AS
+		deduct,100+ifnull(sum(r.add),0)-ifnull(SUM(r.deduct),0) AS mark
 		 FROM
-		BMS_HR_REWARDS r
-		LEFT JOIN BMS_HR_STAFF s ON r.staff_number = s.staff_number
+		BMS_HR_REWARDS r1
+		LEFT JOIN BMS_HR_STAFF s ON r1.staff_number = s.staff_number
+		LEFT JOIN BMS_HR_REWARDS r ON r.staff_number = r1.staff_number
 		WHERE
+		r1.rewards_date LIKE CONCAT(#{staff_date},'%') and
 		r.rewards_date LIKE CONCAT(#{staff_date},'%')
 		<!-- <if test="orgType==1 or orgType==2"> and s.plant_org = ( SELECT o.name 
 			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==3 "> 
@@ -382,14 +385,14 @@
 			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> <if test="orgType==6 "> 
 			and FIND_IN_SET(s.plant_org,#{orgStr})>0 and s.team_org = ( SELECT o.name 
 			FROM BMS_BASE_ORG o WHERE o.id = #{org_id}) </if> -->
-		and FIND_IN_SET(r.rewards_factory,#{orgStr})>0 and
-		FIND_IN_SET(substring_index(r.rewards_workshop, '车间', 1),#{orgStr})>0
+		and FIND_IN_SET(r1.rewards_factory,#{orgStr})>0 and
+		FIND_IN_SET(substring_index(r1.rewards_workshop, '车间', 1),#{orgStr})>0
 		<if test="staff_number!=null">
-			AND r.staff_number LIKE CONCAT('%',#{staff_number},'%') 
+			AND r1.staff_number LIKE CONCAT('%',#{staff_number},'%') 
 			AND (s.staff_number LIKE CONCAT('%',#{staff_number},'%') OR s.name LIKE CONCAT('%',#{staff_number},'%'))
 		</if>
-		GROUP BY r.rewards_date,s.name,r.rewards_factory,r.rewards_workshop
-		order by s.workgroup_org,s.team_org
+		GROUP BY r1.rewards_date,s.name,r1.rewards_factory,r1.rewards_workshop
+		order by r1.staff_number ASC,r1.rewards_date DESC,s.workgroup_org,s.team_org
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
 		</if>

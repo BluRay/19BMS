@@ -337,11 +337,11 @@ function ajaxQuery(targetPage) {
 										
 									});
 					$("#tableResult").show();
-					$("#total").html(response.pager.totalCount);
-					$("#total").attr("total", response.pager.totalCount);
-					$("#cur").attr("page", response.pager.curPage);
+					$("#total").html(response.total);
+					$("#total").attr("total", response.total);
+					$("#cur").attr("page", (targetPage || 1));
 					$("#cur").html(
-							"<a href=\"#\">" + response.pager.curPage + "</a>");
+							"<a href=\"#\">" + (targetPage || 1) + "</a>");
 					$("#pagination").show();
 
 					$("#checkall").attr("checked", false);

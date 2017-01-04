@@ -1,4 +1,5 @@
 var initflag=0;
+var data_url = "hr!getRewardsCollectList.action?";
 
 function zTreeBeforeClick(treeId, treeNode, clickFlag) {
 	
@@ -9,7 +10,9 @@ function zTreeOnClick(event, treeId, treeNode) {
 };
 
 $(document).ready(function () {
-	
+	//$(".container").width(getWidth1());
+    eachSeries(scripts, getScript, initTable);
+    
 	initPage();
 	function initPage(){
 		var factory_param=getQueryString("factory")||"";
@@ -61,7 +64,7 @@ $(document).ready(function () {
  * 通过org_id查询所有员工信息
  * @param id
  */
-function ajaxQuery(targetPage){
+function ajaxQuery_(targetPage){
 	$("#divBulkAdd").hide();
 	$("#tableDiv").show();
 	$(".divLoading").addClass("fade in").show();
@@ -147,8 +150,12 @@ function ajaxQuery(targetPage){
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.mark).appendTo(tr);
     				//$("<td style=\"padding-left:0px;padding-right:0px\" />").html("<button onclick = 'ajaxQueryDetail(\"" + staff.staff_number + "\",\"" + staff.rewards_factory + "\",\"" + staff.rewards_workshop + "\");' class='btn-link' style='font-size: 12px;'>明细</>").appendTo(tr);
     				
-    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.reasons).appendTo(tr);
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.rewards_date).appendTo(tr);
+    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.reasons).appendTo(tr);
+    				
+    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.add_).appendTo(tr);
+    				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.deduct_).appendTo(tr);
+    				
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.group_leader).appendTo(tr);
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.gaffer).appendTo(tr);
     				$("<td style=\"padding-left:0px;padding-right:0px\" />").html(staff.proposer).appendTo(tr);
@@ -259,3 +266,194 @@ function getPreMonth(date) {
     var t2 = year2 + '-' + month2;
     return t2;
 }
+
+//----------START bootstrap initTable ----------
+function initTable() {
+    $table.bootstrapTable({
+        height: getHeight1(),
+        url:data_url,
+        striped:true,
+        paginationVAlign:'bottom',
+        searchOnEnterKey:true,
+        fixedColumns: false,			//冻结列
+        fixedNumber: 0,					//冻结列数
+        queryParams:function(params) {
+        	var nodes = zTreeObj.getSelectedNodes();
+        	var treeNode = nodes[0];
+        	var strArr = [];
+        	str = '奖惩汇总：';
+        	orgStr = '';
+        	strArr.push(treeNode.name);
+        	var parentNode = treeNode.getParentNode();
+        	while (parentNode!=null){
+        		strArr.push(parentNode.name);
+        		parentNode = parentNode.getParentNode();
+        	}
+        	strArr.reverse();
+        	for(var i=0;i<strArr.length;i++){
+        		if(i==0){
+        			str += strArr[i];
+        			orgStr += strArr[i];
+        		}else{
+        			str += '->'+strArr[i];
+        			orgStr += ','+strArr[i];
+        		}
+        	}
+        	if(treeNode.org_type=='0'){
+        		var childrenNodes = treeNode.children;
+                for (var x = 0; x < childrenNodes.length; x++) {
+                	orgStr += ',' + childrenNodes[x].name;
+                }
+        	}
+        	if(treeNode.org_type == '1'||treeNode.org_type == '2'){
+        		factory = treeNode.displayName;
+        		var childrenNodes=treeNode.children[0].children;
+        		$.each(childrenNodes,function(index,childrenNode){
+        			orgStr+=","+childrenNode.displayName;
+        		});
+        		
+        	}
+        	if(treeNode.org_type == '3'){
+        		var childrenNodes=treeNode.children;
+        		$.each(childrenNodes,function(index,childrenNode){
+        			orgStr+=","+childrenNode.displayName;
+        		});
+        	}
+        	
+        	$("#staffListTitle").html(str);
+        	
+        	var org_id = nodes[0].id;
+        	var orgType = nodes[0].org_type;
+        	var staff_number = $("#staff_number").val();
+        	
+        	var conditions="{org_id:'"+org_id+"',orgType:'"+orgType
+        		+"',staff_number:'"+staff_number+"',staff_date:'"+$("#staff_date").val()+
+        		"',orgStr:'"+orgStr+"'}";
+        	params["conditions"] = conditions; 
+        	return params;
+        },
+        columns: [
+        [
+            {
+            	field: 'staff_number',title: '&nbsp;&nbsp;&nbsp;工号&nbsp;&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+	        	return {css: {"padding-left": "3px", "padding-right": "2px","font-size":"13px"}};
+	        	}
+            },{
+            	field: 'name',title: '&nbsp;&nbsp;姓名&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'workgroup_org',title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;班组&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'team_org',title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;小班组&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'rewards_factory',title: '&nbsp;&nbsp;奖惩工厂&nbsp;&nbsp;&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'rewards_workshop',title: '&nbsp;&nbsp;奖惩车间&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'fullmark',title: '&nbsp;&nbsp;正常考<br>核分数',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'add',title: '&nbsp;&nbsp;加分',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter
+            },{
+            	field: 'deduct',title: '扣分',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'mark',title: '本月车间<br>考核分数',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'rewards_date',title: '日期',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'reasons',title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;事由&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'add_',title: '奖励',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'deduct_',title: '减分',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'group_leader',title: '班组长',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            },{
+            	field: 'gaffer',title: '领班',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}/*,
+    	        formatter:function(value,row,index){
+                    	return "<a href=\"hrReport!ecnReport.action?staff="+row.staff_number+"&factory="+$("#factory :selected").text()+
+        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+                    }*/
+            },{
+            	field: 'proposer',title: '处罚建议人',align: 'center',valign: 'middle',align: 'center',
+                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+                cellStyle:function cellStyle(value, row, index, field) {
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	}
+            }
+        ]
+    ]
+    });    
+    $(window).resize(function () {
+        $table.bootstrapTable('resetView', {height: getHeight1()});
+    });
+}
+//----------END bootstrap initTable ----------
+
+function ajaxQuery(){
+	/*var workshopAll="";
+	$("#workshop option").each(function(){
+		workshopAll+=$(this).text()+",";
+	});*/
+	$table.bootstrapTable('refresh', {url: data_url});
+}
+
+function getHeight1() {return $(window).height() - 160;}
+function getWidth1() {return $(window).width()-460;}

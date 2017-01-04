@@ -123,7 +123,6 @@ public class TempOrderAction extends BaseAction<Object> {
 		result.put("rows", productionDao.getTmpOrderList(conditionMap));
 		int totalCount = productionDao.getTmpOrderCount(conditionMap);
 		result.put("total", totalCount);
-		if(pager != null)result.put("curPage", String.valueOf(pager.getCurPage()));
 		return SUCCESS;
 	}
 	/**

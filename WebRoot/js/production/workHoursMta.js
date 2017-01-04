@@ -756,8 +756,9 @@ function ajaxQuery(targetPage) {
 		type : "get",
 		data : {
 			"conditions" : conditions,
-			"pager.pageSize" : 10,
-			"pager.curPage" : targetPage || 1
+			"limit" : 10,
+			"offset" : 10*((targetPage || 1)-1)
+			//"pager.curPage" : targetPage ||1
 		},
 		success : function(response) {
 			$("#tableResult tbody").html("");
@@ -855,8 +856,8 @@ function ajaxQuery(targetPage) {
 					$("#tableResult").show();
 					$("#total").html(response.total);
 					$("#total").attr("total", response.total);
-					$("#cur").attr("page", response.curPage);
-					$("#cur").html("<a href=\"#\">" + response.curPage + "</a>");
+					$("#cur").attr("page", (targetPage || 1));
+					$("#cur").html("<a href=\"#\">" + (targetPage || 1) + "</a>");
 					$("#pagination").show();
 					$("#checkall").attr("checked", false);
 

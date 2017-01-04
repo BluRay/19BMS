@@ -22,7 +22,7 @@ opacity:0
 			</a>
 		</li>
 		<li id="techtransConfig">
-			<a href="ecnDocumentTask!maintain.action" class="js-sub-menu-toggle">
+			<a href="techTask!taskAssessPage.action" class="js-sub-menu-toggle">
 				<i class="fa fa-share-alt fw"></i><span class="text">技改任务分配</span>
 			</a>
 		</li>

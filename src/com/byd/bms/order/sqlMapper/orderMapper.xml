@@ -276,7 +276,38 @@
 	</select>
 	
 	<select id="getOrderConfigAllotList" parameterType="Map" resultType="com.byd.bms.order.entity.BmsOrderConfigAllot">
-		SELECT o.id AS o_id,o.production_qty,f.id as factory_id,a.order_config_id,a.product_qty,a.sequence,a.busnum_start,a.busnum_end,
+		SELECT o.id AS o_id,o.production_qty,o.factory_id,a.order_config_id,a.product_qty,a.sequence,a.busnum_start,a.busnum_end,
+		o.order_id,o.order_name,o.order_no,o.order_qty,o.delivery_date,o.color,o.seats,o.factory_name,o.bus_type,
+		c.order_config_name,c.customer,c.config_file 
+		FROM (
+			SELECT o.id,sum(o.production_qty) production_qty,o.order_id,o.factory_id,
+			b.order_name,b.order_no,b.order_qty,b.delivery_date,b.color,b.seats,f.factory_name,t.bus_type_code as bus_type
+			FROM BMS_FACTORY_ORDER o
+			LEFT JOIN BMS_ORDER b ON o.order_id = b.id 
+			LEFT JOIN BMS_BASE_FACTORY f ON o.factory_id = f.id 
+			LEFT JOIN BMS_BASE_BUS_TYPE t ON b.bus_type_id = t.id
+			where 1=1
+			<if test="search_order_no!=null">
+			and b.order_no like CONCAT('%',#{search_order_no},'%')   
+			</if>
+			<if test="search_order_name!=null">
+			and b.order_name like CONCAT('%',#{search_order_name},'%')   
+			</if>
+			<if test="search_productive_year!=null">
+			and b.productive_year = #{search_productive_year} 
+			</if>
+			<if test="search_factory!=null">
+			and o.factory_id = #{search_factory} 
+			</if>
+			<if test="order_id!=null">
+			and o.id = #{order_id} 
+			</if>
+			group by o.order_id,o.factory_id) o
+			LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.order_id = a.order_id AND o.factory_id = a.factory_id			
+			LEFT JOIN BMS_ORDER_CONFIG c ON a.order_config_id = c.id where 1=1 AND (a.product_qty !=0 OR a.product_qty IS NULL)
+			ORDER BY o.order_id DESC,o.id DESC
+		
+		<!-- SELECT o.id AS o_id,o.production_qty,f.id as factory_id,a.order_config_id,a.product_qty,a.sequence,a.busnum_start,a.busnum_end,
 		b.id as order_id,b.order_name,b.order_no,b.order_qty,b.delivery_date,b.color,b.seats,f.factory_name,t.bus_type_code as bus_type,
 		c.order_config_name,c.customer,c.config_file FROM BMS_FACTORY_ORDER o
 			LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.order_id = a.order_id AND o.factory_id = a.factory_id
@@ -286,26 +317,55 @@
 			LEFT JOIN BMS_ORDER_CONFIG c ON a.order_config_id = c.id where 1=1 AND (a.product_qty !=0 OR a.product_qty IS NULL)
 		<if test="search_order_no!=null">
 			and b.order_no like CONCAT('%',#{search_order_no},'%')   
-		</if>
-		<if test="search_order_name!=null">
+			</if>
+			<if test="search_order_name!=null">
 			and b.order_name like CONCAT('%',#{search_order_name},'%')   
-		</if>
-		<if test="search_productive_year!=null">
+			</if>
+			<if test="search_productive_year!=null">
 			and b.productive_year = #{search_productive_year} 
-		</if>
-		<if test="search_factory!=null">
+			</if>
+			<if test="search_factory!=null">
 			and o.factory_id = #{search_factory} 
-		</if>
-		<if test="order_id!=null">
+			</if>
+			<if test="order_id!=null">
 			and o.id = #{order_id} 
-		</if>
-		ORDER BY b.id DESC,o.id DESC
+			</if>
+		ORDER BY b.id DESC,o.id DESC -->
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize} 
 		</if>
 	</select>
 	<select id="getOrderConfigAllotTotalCount" parameterType="Map" resultType="int">
 		SELECT count(o.id)
+		FROM (
+			SELECT o.id,sum(o.production_qty) production_qty,o.order_id,o.factory_id,
+			b.order_name,b.order_no,b.order_qty,b.delivery_date,b.color,b.seats,f.factory_name,t.bus_type_code as bus_type
+			FROM BMS_FACTORY_ORDER o
+			LEFT JOIN BMS_ORDER b ON o.order_id = b.id 
+			LEFT JOIN BMS_BASE_FACTORY f ON o.factory_id = f.id 
+			LEFT JOIN BMS_BASE_BUS_TYPE t ON b.bus_type_id = t.id
+			where 1=1
+			<if test="search_order_no!=null">
+			and b.order_no like CONCAT('%',#{search_order_no},'%')   
+			</if>
+			<if test="search_order_name!=null">
+			and b.order_name like CONCAT('%',#{search_order_name},'%')   
+			</if>
+			<if test="search_productive_year!=null">
+			and b.productive_year = #{search_productive_year} 
+			</if>
+			<if test="search_factory!=null">
+			and o.factory_id = #{search_factory} 
+			</if>
+			<if test="order_id!=null">
+			and o.id = #{order_id} 
+			</if>
+			group by o.order_id,o.factory_id) o
+			LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.order_id = a.order_id AND o.factory_id = a.factory_id			
+			LEFT JOIN BMS_ORDER_CONFIG c ON a.order_config_id = c.id where 1=1 AND (a.product_qty !=0 OR a.product_qty IS NULL)
+			
+	
+		<!-- SELECT count(o.id)
 		FROM BMS_FACTORY_ORDER o
 			LEFT JOIN BMS_ALLOT_FACTORY_ORDER_CONFIG a ON o.order_id = a.order_id AND o.factory_id = a.factory_id
 			LEFT JOIN BMS_ORDER b ON o.order_id = b.id 
@@ -327,7 +387,7 @@
 		<if test="order_id!=null">
 			and o.id = #{order_id} 
 		</if>
-		ORDER BY b.id DESC,o.id DESC
+		ORDER BY b.id DESC,o.id DESC -->
 	</select>
 	
 	<select id="getOrderReviewList" parameterType="Map" resultType="com.byd.bms.order.entity.BmsOrderReviewResults">
@@ -381,7 +441,7 @@
 	
 	<select id="getOrderList" parameterType="Map" resultMap="orderMap">
 		<!-- select o.*,t.bus_type_code from BMS_ORDER o LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id where 1=1 -->
-		SELECT (d.busnum_end-d.busnum_start+1) production_qty,f.busnum_start,f.busnum_end,a.factory_name area,a.id AS 'factory_id',a.factory_name,d.edit_date,u.username as 'user_name',
+		SELECT f.production_qty,f.busnum_start,f.busnum_end,a.factory_name area,a.id AS 'factory_id',a.factory_name,d.edit_date,u.username as 'user_name',
 		(SELECT COUNT(id) FROM BMS_PLAN_PRODUCTION_PLAN WHERE order_id = f.order_id) AS issed_qty,t.bus_type_code,o.*,CONCAT(o.order_name,t.bus_type_code,o.order_qty,'台') AS 'order_name_str',d.bus_number_start,(d.bus_number_start+d.busnum_end-d.busnum_start) bus_number_end
 			FROM BMS_FACTORY_ORDER f 
 			LEFT JOIN BMS_BASE_FACTORY a ON f.factory_id = a.id 

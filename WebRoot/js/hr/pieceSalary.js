@@ -35,6 +35,47 @@ $(document).ready(function(){
 	$("#btnQuery").click(function () {
 		ajaxQuery();
     });
+	
+	$("#btnSave").click(function(){	
+		$(".divLoading").addClass("fade in").show();
+		var workshopAll="";
+		$("#workshop option").each(function(){
+			workshopAll+=$(this).text()+",";
+		});
+		var workshop=$("#workshop :selected").text()=="全部"?workshopAll:$("#workshop :selected").text();
+		var workgroup=$("#group :selected").text()=="全部"?"":$("#group :selected").text();
+		var team=$("#subgroup :selected").text()=="全部"?"":$("#subgroup :selected").text();
+		var staff=$("#staff").val();
+		var staffId='';
+		if(staff.trim().length>0){
+			var trs=$("#tableResult tbody").find("tr");
+			staffId=$(trs[0]).data("staff_id");
+		}
+		//alert(staff);
+		
+		var conditions="{factory:'"+$("#factory :selected").text()+"',workshop:'"+
+		workshop+"',workgroup:'"+workgroup+ "',team:'"+team+"',staff:'"+staff+"',staffId:'"+staffId+
+		"',monthStart:'"+$("#month_start").val()+"',monthEnd:'"+$("#month_end").val()+"'}";
+		/*if($("#month_start").val()!=wDate||$("#month_end").val()!=wDate){
+			alert("只能结算上个月工资！");
+			return false;
+		}else*/
+		$.ajax({
+			url:"hrReport!savePieceSalaryHistory.action",
+			dataType : "json",
+			async:false,
+			type : "get",
+			data : {
+				"conditions":conditions
+			},
+			success : function(response) {
+				$(".divLoading").hide();
+				alert(response.message);
+				
+				
+			}
+		});
+	});
 });
 
 //----------START bootstrap initTable ----------
@@ -143,7 +184,11 @@ function initTable() {
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
-    	        	}
+    	        	},
+    	        formatter:function(value,row,index){
+                    	return "<a href=\"hrReport!pieceTimeReport.action?staff="+row.staff_number+"&factory="+$("#factory :selected").text()+
+        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+                    }
             },{
             	field: 'ECNWH_TOTAL',title: '技改<br/>工时',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
@@ -155,7 +200,11 @@ function initTable() {
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
-    	        	}
+    	        	},
+    	        formatter:function(value,row,index){
+                    	return "<a href=\"hrReport!ecnReport.action?staff="+row.staff_number+"&factory="+$("#factory :selected").text()+
+        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+                    }
             },{
             	field: 'TMPWH_TOTAL',title: '额外<br/>工时',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
@@ -167,7 +216,11 @@ function initTable() {
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
-    	        	}
+    	        	},
+    	        formatter:function(value,row,index){
+        	        	return "<a href=\"hrReport!tmpReport.action?staff="+row.staff_number+"&factory="+$("#factory").val()+
+        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+        	        }
             },{
             	field: 'WWH_TOTAL',title: '等待<br/>工时',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
@@ -192,9 +245,10 @@ function initTable() {
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
     	        	},
-                formatter:function(value){
-                	return value.toFixed(2);
-                }
+                formatter:function(value,row,index){
+                    	return "<a href=\"hr!rewardsCollect.action?staff="+row.staff_number+"&factory="+$("#factory :selected").text()+
+        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+                    }
             },{
             	field: 'id',title: '实发计<br/>件工资',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,

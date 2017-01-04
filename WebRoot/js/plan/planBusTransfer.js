@@ -18,7 +18,7 @@ $(document).ready(function () {
 			var id = $(this).attr("id");
 			if(id != "0"){
 				if($('#check_' + id).is(':checked')==true){
-					bus_numbers+=$(this).attr("id")+",";
+					bus_numbers+=$(this).attr("id")+"|"+$(this).data("order_id")+"|"+$(this).data("order_no")+",";
 				}
 			}			
 		});
@@ -246,6 +246,9 @@ function ajaxQueryIn(targetPage){
     			$("<td style=\"text-align:center;\" />").html("").appendTo(tr);
     			$("<td style=\"text-align:center;\" />").html((value.status==0)?"正常":"冻结").appendTo(tr);
     			/*$("<td style=\"text-align:center;\" />").html(value.factory_name).appendTo(tr);*/
+    			
+    			$(tr).data("order_id",value.order_id);
+    			$(tr).data("order_no",value.order_no);
     			$("#tableBusInfoIn tbody").append(tr);
     			
     		});

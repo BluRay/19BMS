@@ -754,7 +754,7 @@
 		]]>
 	</insert>
 	<select id="getBusInfo" parameterType="String" resultType="Map">
-		SELECT b.factory_id,b.status FROM BMS_PLAN_BUS b WHERE b.bus_number =
+		SELECT b.factory_id,b.status,b.order_id FROM BMS_PLAN_BUS b WHERE b.bus_number =
 		#{bus_number}
 	</select>
 
@@ -778,7 +778,7 @@
 	<select id="getBusTransferInList" parameterType="Map"
 		resultType="Map">
 		SELECT
-		t.bus_number,t.tfrom_factory_id,b.vin,b.status,o.order_name,c.order_config_name,c.customer,f.factory_name
+		t.bus_number,t.tfrom_factory_id,b.vin,b.status,o.id order_id,o.order_no,o.order_name,c.order_config_name,c.customer,f.factory_name
 		FROM BMS_PLAN_BUS_TRANSFER_LOG t
 		LEFT OUTER JOIN BMS_PLAN_BUS b ON
 		t.bus_number = b.bus_number
@@ -786,7 +786,7 @@
 		o.id LEFT OUTER JOIN BMS_ORDER_CONFIG c ON b.order_cofig_id = c.id
 		LEFT OUTER JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id
 		WHERE
-		tto_factory_id = #{factory_id_in} AND b.status = 1
+		tto_factory_id = #{factory_id_in} AND b.status = 1 and tto_people_id=0
 		<if test="busNumbers!=''">
 			AND t.bus_number IN
 			<foreach item="item" index="index" collection="busNumbers"
@@ -1771,4 +1771,40 @@
 		</if>
 
 	</update>
+	
+	<update id="updateFactoryOrderProQty" parameterType="Map">
+		update BMS_FACTORY_ORDER o 
+		set o.production_qty=o.production_qty-1
+		where o.id=(select id from
+		(select o.id,'1' as sort from BMS_FACTORY_ORDER o 
+		left join BMS_FACTORY_ORDER_DETAIL d on o.id=d.factory_order_id
+		where  o.factory_id=#{factory_id} and o.order_id=#{order_id}
+		and (d.busnum_start&lt;=cast(#{bus_series} as signed) and d.busnum_end>=cast(#{bus_series} as signed))
+		union all 
+		select id,'2' as sort from BMS_FACTORY_ORDER o
+		where  o.factory_id=#{factory_id} and o.order_id=#{order_id}
+		order by sort limit 1) tmp)
+	</update>
+	
+	<update id="insertFactoryOrder" parameterType="Map">
+		insert into BMS_FACTORY_ORDER (order_id,factory_id,production_qty) values(#{order_id},#{factory_id},1)
+	</update>
+	
+	<update id="updateFactoryOrder" parameterType="String">
+		update BMS_FACTORY_ORDER set production_qty=production_qty+1 
+		where id=#{factory_order_id}
+	</update>
+	
+	<select id="queryFactoryOrderId" parameterType="Map" resultType="Map">
+		select id from
+		(select o.id,'1' as sort from BMS_FACTORY_ORDER o 
+		left join BMS_FACTORY_ORDER_DETAIL d on o.id=d.factory_order_id
+		where  o.factory_id=#{factory_id} and o.order_id=#{order_id}
+		and (d.busnum_start&lt;=cast(#{bus_series} as signed) and d.busnum_end>=cast(#{bus_series} as signed))
+		union all 
+		select id,'2' as sort from BMS_FACTORY_ORDER o
+		where  o.factory_id=#{factory_id} and o.order_id=#{order_id}
+		order by sort limit 1) tmp
+	</select>
+	
 </mapper>

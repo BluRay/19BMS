@@ -142,4 +142,27 @@ public interface IPlanDao {
 	public Map<String,String> queryBusByVin(Map<String, Object> cdmap);//根据vin查询车辆信息
 	public void updateVinMotor(Map<String, Object> cdmap);//更新vin号对应的vin、左右电机号
 	public void updateBusVinMotor(Map<String, Object> cdmap);//更新vin号对应的vin、左右电机号
+	/**
+	 * ADDED BY XJW ON 2016/12/27 
+	 * 根据车号流水、工厂、年份更新对应的工厂订单生产数量（每次调出一台车，对应生产数量减一）
+	 * @param condmap
+	 */
+	public void updateFactoryOrderProQty(Map<String, Object> condmap);
+	/**
+	 * 根据order_id、调入工厂新增一行工厂订单记录
+	 * @param queryMap
+	 */
+	public void insertFactoryOrder(Map<String, Object> queryMap);
+	/**
+	 * 根据工厂订单id更新工厂订单生产数量（每次调入一台车，对应生产数量减一）
+	 * @param factory_order_id
+	 */
+	public void updateFactoryOrder(String factory_order_id);
+	/**
+	 * 根据车号、调入工厂查询对应的工厂订单
+	 * @param queryMap
+	 * @return
+	 */
+	public List<Map<String, Object>> queryFactoryOrderId(Map<String, Object> queryMap);
+	
 }

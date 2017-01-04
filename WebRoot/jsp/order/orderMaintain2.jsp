@@ -2,6 +2,7 @@
 <%@ taglib prefix="s" uri="/struts-tags"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<%long _systime= new java.util.Date().getTime();%>
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
@@ -18,7 +19,7 @@
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/json2.js"></script>
-<script type="text/javascript" src="js/order/orderMaintain2.js?timestamp="+new Date().getTime()></script>
+<script type="text/javascript" src="js/order/orderMaintain2.js?timestamp=<%=_systime%>"></script>
 <script type="text/javascript" src="js/jsrender.min.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 

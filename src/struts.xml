@@ -125,4 +125,5 @@
 	 <include file="struts-production.xml"></include>
 	 <include file="struts-hr.xml"></include>
 	 <include file="struts-email.xml"></include>
+	 <include file="struts-tech.xml"></include>
 </struts>

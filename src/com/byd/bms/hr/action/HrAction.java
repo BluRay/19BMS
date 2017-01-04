@@ -298,7 +298,7 @@ public class HrAction extends BaseAction<Object>{
 		response.setContentType("text/html;charset=utf-8");
 		PrintWriter out = null;
 		
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		/*Map<String, Object> conditionMap = new HashMap<String, Object>();
 		conditionMap.put("org_id", request.getParameter("org_id"));
 		conditionMap.put("orgType", request.getParameter("orgType"));
 		conditionMap.put("staff_date", request.getParameter("staff_date"));
@@ -308,26 +308,39 @@ public class HrAction extends BaseAction<Object>{
 		if (pager != null){
 			conditionMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());
 			conditionMap.put("pageSize", pager.getPageSize());
+		}*/
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		Map<String,Object> conditionMapAll=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
+			conditionMap.put(key, jo.get(key));
 		}
+		conditionMapAll.putAll(conditionMap);
 		
 		List list = hrDao.getRewardsCollectList(conditionMap);
-		int totalCount=hrDao.getRewardsCollectTotalCount(conditionMap);
+		int totalCount=hrDao.getRewardsCollectTotalCount(conditionMapAll);
 		
-		Map<String, String> page_map = new HashMap<String, String>();  
+		/*Map<String, String> page_map = new HashMap<String, String>();  
 		if (pager != null){
 			pager.setTotalCount(totalCount);						
 			page_map.put("totalCount", String.valueOf(pager.getTotalCount()));
 			page_map.put("curPage", String.valueOf(pager.getCurPage()));
 			page_map.put("pageSize", String.valueOf(pager.getPageSize()));
 		}
-		JSONObject json = Util.dataListToJson(true, "查询成功", list, page_map);
+		JSONObject json = Util.dataListToJson(true, "查询成功", list, page_map);*/
+		
+		Map result=new HashMap<String,Object>();
+		result.put("total", totalCount);
+		result.put("rows", list);
+		JSONObject jsonObject = JSONObject.fromObject(result);
 		
 		try {
 			out = response.getWriter();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		out.print(json);
+		out.print(jsonObject);
 		return null;
 		
 	}

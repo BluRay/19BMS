@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<struts>
+	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
+	<package name="techModel" extends="json-default" >
+		<action name="techTask" class="techTaskAction">
+			<result name="assessPage">/jsp/techtrans/taskAssessPage.jsp</result>
+			<result name="taskMaintainPage">/jsp/techtrans/techTaskMaintain.jsp</result>
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		
+	</package>
+</struts>	
+		

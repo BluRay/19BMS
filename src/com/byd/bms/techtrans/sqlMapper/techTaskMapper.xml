@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byd.bms.techtrans.dao.ITechTaskDao">
+
+
+	<select id="queryTechTaskList" parameterType="Map" resultType="Map">
+	<![CDATA[
+		SELECT t.*,concat(d.order_no,'<br />',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
+		d.factory,d.tech_list,d.time_list,d.single_time_total,d.time_total
+		FROM BMS_TECH_TASK t
+		LEFT JOIN BMS_TECH_TASK_DETAIL d ON t.id=d.tech_task_id
+		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
+		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
+		WHERE 1=1
+		]]>
+		<if test="task_content !=null and task_content !=''">
+			and t.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			and d.order_no=#{order_no}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and d.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(d.tech_list,#{workshop})>0
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and t.edit_date !=''
+		</if>
+		<if test="status=='已分配'">
+			and t.assign_date !=''
+		</if>
+		<if test="status=='已评估'">
+			and t.assess_date !=''
+		</if>
+		<if test="status=='已完成'">
+			and t.finish_date !=''
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	
+	<select id="queryTechTaskMaintainList" parameterType="Map" resultType="Map">
+		SELECT t.*
+		FROM BMS_TECH_TASK t
+		WHERE 1=1
+		<if test="task_content !=null and task_content !=''">
+			and t.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and t.edit_date !=''
+		</if>
+		<if test="status=='已分配'">
+			and t.assign_date !=''
+		</if>
+		<if test="status=='已评估'">
+			and t.assess_date !=''
+		</if>
+		<if test="status=='已完成'">
+			and t.finish_date !=''
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	
+	<select id="queryTechTaskMaintainListTotalCount" parameterType="Map" resultType="int">
+		SELECT count(t.id)
+		FROM BMS_TECH_TASK t
+		WHERE 1=1
+		<if test="task_content !=null and task_content !=''">
+			and t.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and t.edit_date !=''
+		</if>
+		<if test="status=='已分配'">
+			and t.assign_date !=''
+		</if>
+		<if test="status=='已评估'">
+			and t.assess_date !=''
+		</if>
+		<if test="status=='已完成'">
+			and t.finish_date !=''
+		</if>
+	</select>
+	
+	<select id="queryTechTaskListCount" parameterType="Map" resultType="int">
+		SELECT count(t.id)
+		FROM BMS_TECH_TASK t
+		LEFT JOIN BMS_TECH_TASK_DETAIL d ON t.id=d.tech_task_id
+		WHERE 1=1
+		<if test="task_content !=null and task_content !=''">
+			and t.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			and d.order_no=#{order_no}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and d.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(d.tech_list,#{workshop})>0
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and t.edit_date !=''
+		</if>
+		<if test="status=='已分配'">
+			and t.assign_date !=''
+		</if>
+		<if test="status=='已评估'">
+			and t.assess_date !=''
+		</if>
+		<if test="status=='已完成'">
+			and t.finish_date !=''
+		</if>
+	</select>
+	
+	<select id="queryTechList" parameterType="Map" resultType="Map">
+		<![CDATA[		
+		SELECT concat(d.order_no,'<br>',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
+		group_concat(d.factory,'||',d.tech_list separator ';') tech_detail_list
+		FROM BMS_TECH_TASK_DETAIL d 
+		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
+		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
+		WHERE d.tech_task_id=#{task_id} 
+		group by d.order_no
+		]]>
+	</select>
+	
+	<select id="queryFactoryOrderList" parameterType="Map" resultType="Map">
+		SELECT concat(o.order_no,' ',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
+		group_concat(f.factory_name,'||','' separator ';') tech_detail_list
+		FROM BMS_ORDER o
+		LEFT JOIN BMS_FACTORY_ORDER fo ON o.id=fo.order_id
+		LEFT JOIN BMS_BASE_BUS_TYPE bt ON bt.id=o.bus_type_id
+		LEFT JOIN BMS_BASE_FACTORY f ON f.id=fo.factory_id
+		WHERE o.order_no=#{order_no}
+		GROUP BY o.order_no
+	</select>
+</mapper>

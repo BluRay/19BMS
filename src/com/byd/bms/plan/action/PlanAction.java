@@ -3569,19 +3569,44 @@ public class PlanAction extends BaseAction<Object> {
 		String bus_numbers = request.getParameter("bus_number");
 		//调整入工厂
 		String transfer_in_factory = request.getParameter("transfer_in_factory");
+		
 		String[] busNumberList = bus_numbers.split(",");
 		for(int i=0;i<busNumberList.length;i++){
+			String[] bus_order=busNumberList[i].split("\\|");//传输格式：bus_number|order_id|order_no
 			Map<String,Object> conditionMap=new HashMap<String,Object>();
 			conditionMap.put("factory_id", transfer_in_factory);
-			conditionMap.put("bus_number", busNumberList[i]);
+			conditionMap.put("bus_number", bus_order[0]);
 			conditionMap.put("status", "0");
 			planDao.updatePlanBusTranIn(conditionMap);
 			//更新调出记录【BMS_PLAN_BUS_TRANSFER_LOG】
 			PlanBusTransfer busTransfer = new PlanBusTransfer();
-			busTransfer.setBus_number(busNumberList[i]);
+			busTransfer.setBus_number(bus_order[0]);
 			busTransfer.setTto_date(curTime);
 			busTransfer.setTto_people_id(userid);
-			planDao.updateBusTransferLog(busTransfer);			
+			planDao.updateBusTransferLog(busTransfer);	
+			
+
+			/**
+			 * added by xjw on 2016/12/27
+			 * 调入时，先根据车号、调入工厂查询是否存在对应的工厂订单，不存在新增一行工厂订单记录，存在则将该记录的生产数量加一
+			 */
+			Map<String, Object> queryMap=new HashMap<String,Object>();
+			String[] bus_info=busNumberList[i].split("-");
+			String order_no=bus_order[2];
+			int order_id=Integer.parseInt(bus_order[1]);
+			queryMap.put("order_no", order_no);			
+			queryMap.put("order_id", order_id);
+			queryMap.put("factory_id", transfer_in_factory);
+			queryMap.put("bus_series", bus_info[3]);
+			List<Map<String, Object>> facOrderList=planDao.queryFactoryOrderId(queryMap);
+			if(facOrderList==null ||facOrderList.size()==0){//不存在新增一行工厂订单记录
+				planDao.insertFactoryOrder(queryMap);
+			}
+			if(facOrderList.size()>0){//存在则将该记录的生产数量加一
+				String factory_order_id=String.valueOf(facOrderList.get(0).get("id"));
+				planDao.updateFactoryOrder(factory_order_id);
+			}
+			
 		}
 		
 		JSONObject json = Util.dataListToJson(true,"车辆调入成功！",null,null);
@@ -3656,6 +3681,17 @@ public class PlanAction extends BaseAction<Object> {
 			busTransfer.setTfrom_people_id(userid);
 			planDao.insertBusTransferLog(busTransfer);
 			
+			/**
+			 * added by xjw on 16/12/27
+			 * 车辆调出后需调整调出工厂车号流水对应的工厂订单生产数量
+			 */
+			Map<String,Object> condmap=new HashMap<String,Object>();
+			String[] bus_info=busNumberList[i].split("-");
+			condmap.put("bus_series", bus_info[3]);
+			condmap.put("year", bus_info[2]);
+			condmap.put("factory_id", fromFactoryId);
+			condmap.put("order_id", busInfoMap.get("order_id"));
+			planDao.updateFactoryOrderProQty(condmap);
 		}
 
 		JSONObject json = Util.dataListToJson(true,"车辆调出成功！",null,null);

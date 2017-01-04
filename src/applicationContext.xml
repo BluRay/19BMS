@@ -468,4 +468,19 @@
 		<property name="hrDao" ref="hrDao"></property>
 	</bean>
 	<!-- hr model end-->
+	
+	<!-- added by xjw 2016/12/28  技改模块 第二版 -->
+	<bean id="techSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+	    <property name="configLocation" value="classpath:com/byd/bms/techtrans/sqlMapper/mybatis_tech_config.xml" />  
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="techTaskDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.byd.bms.techtrans.dao.ITechTaskDao"/>
+		<property name="sqlSessionFactory" ref="techSqlSessionFactory" />
+	</bean>
+	<bean id="techTaskAction" class="com.byd.bms.techtrans.action.TechTaskAction" scope="prototype">
+		<property name="techTaskDao" ref="techTaskDao"></property>
+	</bean>
+	
+	
 </beans>

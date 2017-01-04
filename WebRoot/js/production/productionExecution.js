@@ -62,7 +62,7 @@ $(document).ready(function () {
 		//alert("onlineflag = " + onlineflag + "\n offlineflag = " + offlineflag + 
 		//		"\n repair = " + repair + "\n ecn = " + ecn);
 		
-		if(cur_key_name.indexOf("下线")>=0){
+		if(cur_key_name.indexOf("下线")>=0&&$('#exec_workshop :selected').text()=='底盘'){
 			//alert(cur_key_name);
 			$.each(parts_list,function(i,parts){
 				if(parts.parts_num==undefined||parts.parts_num.trim().length==0){
