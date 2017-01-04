@@ -195,7 +195,7 @@ function ajaxQuery(targetPage) {
 					$("#tableResult tbody").html("");
 					$
 							.each(
-									response.dataList,
+									response.rows,
 									function(index, value) {
 										var tmpOrderNum = value.tmp_order_no == undefined ? ""
 												: value.tmp_order_no;
@@ -270,11 +270,11 @@ function ajaxQuery(targetPage) {
 										$(tr).data("approver", approver);
 									});
 					$("#tableResult").show();
-					$("#total").html(response.pager.totalCount);
-					$("#total").attr("total", response.pager.totalCount);
-					$("#cur").attr("page", response.pager.curPage);
+					$("#total").html(response.toal);
+					$("#total").attr("total", response.total);
+					$("#cur").attr("page", response.curPage);
 					$("#cur").html(
-							"<a href=\"#\">" + response.pager.curPage + "</a>");
+							"<a href=\"#\">" + response.curPage + "</a>");
 					$("#pagination").show();
 
 					$("#checkall").attr("checked", false);

@@ -269,7 +269,7 @@ function ajaxQuery(targetPage) {
 					$("#tableResult tbody").html("");
 					$
 							.each(
-									response.dataList,
+									response.rows,
 									function(index, value) {
 										var reasonContent = value.reason_content == undefined ? ""
 												: value.reason_content;

@@ -21,7 +21,7 @@
 </head>
 <body style="font-family: 'Microsoft YaHei';">
 <%@ include file="../common/head.jsp"%>
-<%@ include file="../common/general_hr_left.jsp"%> 
+<%@ include file="../common/general_production_left.jsp"%> 
 <div class="content-wrapper container">
     <div id="bodyright" class="offset2" style="margin-left:10px">
     <legend style="margin: -5px auto;font-size:17px;line-height:2.3">临时派工单</legend>

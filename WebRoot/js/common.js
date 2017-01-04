@@ -1826,7 +1826,7 @@ var scripts = [
         };
         iterate();
     };
-setTimeout(function () {$table.bootstrapTable('resetView');}, 200);
+/**setTimeout(function () {$table.bootstrapTable('resetView');}, 200);
 $table.on('check.bs.table uncheck.bs.table ' + 'check-all.bs.table uncheck-all.bs.table', function () {
     $remove.prop('disabled', !$table.bootstrapTable('getSelections').length);
     selections = getIdSelections();
@@ -1843,6 +1843,7 @@ $remove.click(function () {
     $table.bootstrapTable('remove', {field: 'id',values: ids});
     $remove.prop('disabled', true);
 });
+**/
 function getIdSelections() {
     return $.map($table.bootstrapTable('getSelections'), function (row) {return row.id});
 }

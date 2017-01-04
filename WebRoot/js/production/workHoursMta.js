@@ -750,66 +750,46 @@ function ajaxQuery(targetPage) {
 			+ applyDateStart + "',applyDateEnd:'" + applyDateEnd + "',status:'"
 			+ status + "',factory:'" + factory + "',workshop:'" + workshop
 			+ "'}";
-	$
-			.ajax({
-				url : "tempOrder!orderList.action",
-				dataType : "json",
-				type : "get",
-				data : {
-					"conditions" : conditions,
-					"pager.pageSize" : 10,
-					"pager.curPage" : targetPage || 1
-				},
-				success : function(response) {
-					$("#tableResult tbody").html("");
-					$
-							.each(
-									response.dataList,
-									function(index, value) {
-										var tmpOrderNum=value.tmp_order_no == undefined ? ""
-												: value.tmp_order_no;
-										var orderSerialNo= value.order_serial_no == undefined ? ""
-												: value.order_serial_no;
-										var reasonContent = value.reason_content == undefined ? ""
-												: value.reason_content;
-										var sapOrder = value.sap_order == undefined ? ""
-												: value.sap_order;
-										var totalQty = value.total_qty == undefined ? ""
-												: value.total_qty;
-										var singleHour = value.single_hour == undefined ? ""
-												: value.single_hour;
-										var labors = value.labors == undefined ? ""
-												: value.labors;
-										var totalHour = parseFloat(value.single_hour)*parseFloat(value.total_qty);
-										var status = value.status == undefined ? ""
-												: status_arr[value.status];
-										var applyDate = value.apply_date == undefined ? ""
-												: value.apply_date;
-										var approver = value.approver == undefined ? ""
-												: value.approver;
-										var approverCardNo = value.card_number == undefined ? ""
-												: value.card_number;
-										var approverId = value.approve_id == undefined ? ""
-												: value.approve_id;
-										var approveDate = value.approve_date == undefined ? ""
-												: value.approve_date;
-										var readyQty = value.finished_qty == undefined ? 0
-												: value.finished_qty;
-										var workhourTotal=value.workhour_total==undefined?0:value.workhour_total;
-										var tr = $("<tr />");
-										$("<td />")
-												.html(
-														"<a href=\"javascript:void(window.open('tempOrder!tempOrderInfoPage.action?tempOrderId="
-																+ value.id
-																+ "','newwindow','width=700,height=600,toolbar= no, menubar=no,scrollbars=no,resizable=no,location=no,status=no,top=150,left=280'))\" style='cusor:pointer'>"
-																+ orderSerialNo
-																+ "</a>")
-												.appendTo(tr);
-										$("<td />").html(sapOrder).appendTo(tr)
-										$("<td width='300px' style=\"table-layout:fixed;word-break:break-all;width:300px\"/>").html(reasonContent)
-												.appendTo(tr);
-										$("<td />").html(totalQty).appendTo(tr);
-										$("<td />").html(readyQty).appendTo(tr);
+	$.ajax({
+		url : "tempOrder!orderList.action",
+		dataType : "json",
+		type : "get",
+		data : {
+			"conditions" : conditions,
+			"pager.pageSize" : 10,
+			"pager.curPage" : targetPage || 1
+		},
+		success : function(response) {
+			$("#tableResult tbody").html("");
+			$.each(response.rows,function(index, value) {
+				var tmpOrderNum=value.tmp_order_no == undefined ? "": value.tmp_order_no;
+				var orderSerialNo= value.order_serial_no == undefined ? "": value.order_serial_no;
+				var reasonContent = value.reason_content == undefined ? "": value.reason_content;
+				var sapOrder = value.sap_order == undefined ? "": value.sap_order;
+				var totalQty = value.total_qty == undefined ? "": value.total_qty;
+				var singleHour = value.single_hour == undefined ? "": value.single_hour;
+				var labors = value.labors == undefined ? "": value.labors;
+				var totalHour = parseFloat(value.single_hour)*parseFloat(value.total_qty);
+				var status = value.status == undefined ? "": status_arr[value.status];
+				var applyDate = value.apply_date == undefined ? "": value.apply_date;
+				var approver = value.approver == undefined ? "": value.approver;
+				var approverCardNo = value.card_number == undefined ? "": value.card_number;
+				var approverId = value.approve_id == undefined ? "": value.approve_id;
+				var approveDate = value.approve_date == undefined ? "": value.approve_date;
+				var readyQty = value.finished_qty == undefined ? 0: value.finished_qty;
+				var workhourTotal=value.workhour_total==undefined?0:value.workhour_total;
+				var tr = $("<tr />");
+				$("<td />").html(
+								"<a href=\"javascript:void(window.open('tempOrder!tempOrderInfoPage.action?tempOrderId="
+										+ value.id
+										+ "','newwindow','width=700,height=600,toolbar= no, menubar=no,scrollbars=no,resizable=no,location=no,status=no,top=150,left=280'))\" style='cusor:pointer'>"
+										+ orderSerialNo
+										+ "</a>").appendTo(tr);
+				$("<td />").html(sapOrder).appendTo(tr)
+				$("<td width='300px' style=\"table-layout:fixed;word-break:break-all;width:300px\"/>").html(reasonContent)
+						.appendTo(tr);
+				$("<td />").html(totalQty).appendTo(tr);
+				$("<td />").html(readyQty).appendTo(tr);
 										if (totalQty!=readyQty&&(status =='已驳回' ||status=='已评估')){
 											$("<td />")
 													.html(
@@ -873,13 +853,11 @@ function ajaxQuery(targetPage) {
 										$(tr).data("workshop",value.workshop);
 									});
 					$("#tableResult").show();
-					$("#total").html(response.pager.totalCount);
-					$("#total").attr("total", response.pager.totalCount);
-					$("#cur").attr("page", response.pager.curPage);
-					$("#cur").html(
-							"<a href=\"#\">" + response.pager.curPage + "</a>");
+					$("#total").html(response.total);
+					$("#total").attr("total", response.total);
+					$("#cur").attr("page", response.curPage);
+					$("#cur").html("<a href=\"#\">" + response.curPage + "</a>");
 					$("#pagination").show();
-
 					$("#checkall").attr("checked", false);
 
 				}
