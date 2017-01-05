@@ -8,7 +8,7 @@ var data_url = "hrReport!getSubmitSalaryList.action?";
 
 $(document).ready(function(){
 	$(".container").width(getWidth());
-    eachSeries(scripts, getScript, initTable);
+    //eachSeries(scripts, getScript, initTable);
     month_start=document.getElementById("month_start");
 	month_end = document.getElementById("month_end");
     initPage();
@@ -67,6 +67,10 @@ $(document).ready(function(){
 	});
 	
 	$("#btnQuery").click(function () {
+		$("#btnQuery").attr("disabled","disabled");
+    	$("#btnReject").attr("disabled","disabled");
+		$("#btnSave").attr("disabled","disabled");
+		eachSeries(scripts, getScript, initTable);
 		ajaxQuery();
     });
 	
@@ -335,7 +339,17 @@ function initTable() {
             }
         ]
     ]
-    });    
+    });
+    $table.on('load-success.bs.table',function(){
+    	$("#btnQuery").removeAttr("disabled");
+		$("#btnReject").removeAttr("disabled");
+		$("#btnSave").removeAttr("disabled");
+    });
+    $table.on('page-change.bs.table',function(){
+    	$("#btnQuery").attr("disabled","disabled");
+    	$("#btnReject").attr("disabled","disabled");
+		$("#btnSave").attr("disabled","disabled");
+    });
     $(window).resize(function () {
         $table.bootstrapTable('resetView', {height: getHeight()});
     });
