@@ -40,13 +40,7 @@
 				<legend style="margin: 0 auto;">技改工时查看</legend>
 				<div role="tabpanel" >
 					<ul class="nav nav-pills" role="tablist" style="height: 30px">
-						<li role="presentation" class="active">
-							<a href="#workhour_detail" aria-controls="painting" role="tab" data-toggle="tab" onclick="generateWhDetailTb()">工时明细</a>
-						</li>
-						<li role="presentation">
-							<a href="#workhour_assess" aria-controls="bottom" role="tab" data-toggle="tab" onclick="generateAssignDetailTb()">工时分配</a>
-						</li>
-						<li role="presentation">
+						<li role="presentation"  class="active">
 							<a href="#workhour_BaseInfo" aria-controls="bottom" role="tab" data-toggle="tab" onclick="generateBaseInfo()">基本信息</a>
 						</li>
 						<li role="presentation">
@@ -55,13 +49,16 @@
 						<li role="presentation">
 							<a href="#workhour_Range" aria-controls="bottom" role="tab" data-toggle="tab" onclick="generateRange()">技改范围</a>
 						</li>
+						<li role="presentation">
+							<a href="#workhour_detail" aria-controls="painting" role="tab" data-toggle="tab" onclick="generateWhDetailTb()">工时明细</a>
+						</li>
+						<li role="presentation">
+							<a href="#workhour_assess" aria-controls="bottom" role="tab" data-toggle="tab" onclick="generateAssignDetailTb()">工时分配</a>
+						</li>
 					</ul>
-					<input type="hidden" id="ecnTaskId" value="<s:property value='taskid' />">
-					<input type="hidden" id="ecnNumber" value="<s:property value='configStr' />">
-					<input type="hidden" id="singleHour" value="<s:property value='configStr1' />">
 					<!-- Tab panes -->
 					<div class="tab-content" style="height:500px;overflow:auto">
-						<div role="tabpanel" class="tab-pane active" id="workhour_detail">
+						<div role="tabpanel" class="tab-pane" id="workhour_detail">
 							<table id="whtable" class="table table-bordered" style="text-align: center; font-size: 12px;">
 								<thead>
 									<tr>
@@ -101,50 +98,50 @@
 							</table>
 						</div>
 						
-						<div role="tabpanel" class="tab-pane " id="workhour_BaseInfo">
+						<div role="tabpanel" class="tab-pane active" id="workhour_BaseInfo">
 							<div class="control-group">
 							<table>
 							<tr>
-								<td>技改任务：</td><td colspan=3><input type="text" style="width:410px;height:18px"></input></td>
+								<td>技改任务：</td><td colspan=3><input id="task_content" type="text" style="width:410px;height:18px"></input></td>
 							</tr>
 							<tr>
-								<td>技改单号：</td><td><input type="text" style="width:150px;height:18px"></input></td>
-								<td>技改点数：</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>技改单号：</td><td><input id="tech_order_no" type="text" style="width:150px;height:18px"></input></td>
+								<td>技改点数：</td><td><input id="tech_point_num" type="text" style="width:150px;height:18px"></input></td>
 							</tr>
 							<tr>
-								<td>变更单类型：</td><td><input type="text" style="width:150px;height:18px"></input></td>
-								<td>技改类型：</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>变更单类型：</td><td><input id="tech_order_type" type="text" style="width:150px;height:18px"></input></td>
+								<td>技改类型：</td><td><input id="tech_type" type="text" style="width:150px;height:18px"></input></td>
 							</tr>
 							<tr>
-								<td>技改单日期：</td><td><input type="text" style="width:150px;height:18px"></input></td>
-								<td>责任单位：</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>技改单日期：</td><td><input id="tech_date" type="text" style="width:150px;height:18px"></input></td>
+								<td>责任单位：</td><td><input id="duty_unit" type="text" style="width:150px;height:18px"></input></td>
 							</tr>
 							<tr>
-								<td>重大变更：</td><td><input type="text" style="width:150px;height:18px"></input></td>
-								<td>重复变更：</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>重大变更：</td><td><input id="major_change" type="checkbox"></td>
+								<td>重复变更：</td><td><input id="repeat_change" type="checkbox"></td>
 							</tr>
 							<tr>
-								<td>顾客变更：</td><td><input type="text" style="width:150px;height:18px"></input></td>
-								<td>顾客变更单号：</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>顾客变更：</td><td><input id="custom_change" type="checkbox"></input></td>
+								<td>顾客变更单号：</td><td><input id="custom_change_no" type="text" style="width:150px;height:18px"></input></td>
 							</tr>
 							<tr>
-								<td>技改单附件：</td><td><input type="text" style="width:150px;height:18px"></input></td>
-								<td>顾客变更单附件：</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>技改单附件：</td><td>查看</td>
+								<td>顾客变更单附件：</td><td>查看</td>
 							</tr>
 							<tr>
-								<td>任务创建时间：</td><td><input type="text" style="width:150px;height:18px"></input></td>
-								<td>任务分配时间：</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>任务创建时间：</td><td><input id="tech_date" type="text" style="width:150px;height:18px"></input></td>
+								<td>任务分配时间：</td><td><input id="assign_date" type="text" style="width:150px;height:18px"></input></td>
 							</tr>
 							<tr>
-								<td>物料确认时间：</td><td><input type="text" style="width:150px;height:18px"></input></td>
-								<td>工时评估时间：</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>物料确认时间：</td><td><input id="material_check_date" type="text" style="width:150px;height:18px"></input></td>
+								<td>工时评估时间：</td><td><input id="assess_date" type="text" style="width:150px;height:18px"></input></td>
 							</tr>
 							<tr>
-								<td>前段分配人：</td><td><input type="text" style="width:150px;height:18px"></input></td>
-								<td>前段分配时间：</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>前段分配人：</td><td><input id="preassigner_id" type="text" style="width:150px;height:18px"></input></td>
+								<td>前段分配时间：</td><td><input id="preassign_date" type="text" style="width:150px;height:18px"></input></td>
 							</tr>
 							<tr>
-								<td>完成时间</td><td><input type="text" style="width:150px;height:18px"></input></td>
+								<td>完成时间</td><td><input id="finish_date" type="text" style="width:150px;height:18px"></input></td>
 								<td></td><td></td>
 							</tr>
 							</table>

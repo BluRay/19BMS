@@ -2,32 +2,63 @@ var whList=[];
 var baseInfo={};
 var assignList=[];
 $(document).ready(function(){
-	var ecnTaskId=$("#ecnTaskId").val();
-	var ecnNumber=$("#ecnNumber").val();
-	var singleHour=$("#singleHour").val();
-	//getBaseInfo(ecnTaskId,singleHour,ecnNumber);
-	generateWhDetailTb();
-	$(".assing_hour").live("mouseover",function(e){
-		
-	});
+	var ecnTaskId = GetQueryString('taskid');
+	getBaseInfo(ecnTaskId);
+	//generateWhDetailTb();
+	
 })
-function getBaseInfo(ecnTaskId,singleHour,ecnNumber){
+
+function getBaseInfo(ecnTaskId){
 	$.ajax({
-		type: "get",
-		dataType: "json",
-		url: "ecnDocumentTask!getEcnWorkTimeInfo.action",
-		async:false,
-	    data: {
-			"taskid":ecnTaskId,
-			"configStr":singleHour,
-			"configStr1":ecnNumber
-		},
-	    success:function (response) {
-	    	baseInfo=response.baseInfo;
-	    	assignList=response.assignList;
-	    	whList=response.whList;
-	    },
-	    error:function(){alertError();}
+        url: "techTask!getTaskInfo.action",
+        dataType: "json",
+        type: "get",
+        data: {
+        	"taskid":ecnTaskId
+        },
+        success: function(response) {
+        	$.each(response.dataBaseInfo, function(index, value){
+        		$("#task_content").val(value.TASK_CONTENT);
+        		$("#tech_order_no").val(value.TECH_ORDER_NO);
+        		$("#tech_point_num").val(value.TECH_POINT_NUM);
+        		$("#tech_order_type").val(value.TECH_ORDER_TYPE);
+        		$("#tech_type").val(value.TECH_TYPE);
+        		$("#tech_date").val(value.TECH_DATE);
+        		$("#duty_unit").val(value.DUTY_UNIT);
+        		(value.MAJOR_CHANGE=="Y")?$("#major_change").attr("checked", true):$("#major_change").attr("checked", false);
+        		(value.REPEAT_CHANGE=="Y")?$("#repeat_change").attr("checked", true):$("#repeat_change").attr("checked", false);
+        		(value.CUSTOM_CHANGE=="Y")?$("#custom_change").attr("checked", true):$("#custom_change").attr("checked", false);
+        		$("#custom_change_no").val(value.CUSTOM_CHANGE_NO);
+        		$("#tech_date").val(value.TECH_DATE);
+        		$("#assign_date").val(value.ASSIGN_DATE);
+        		$("#material_check_date").val(value.MATERIAL_CHECK_DATE);
+        		$("#assess_date").val(value.ASSESS_DATE);
+        		$("#preassigner_id").val(value.PREASSIGNER_ID);
+        		$("#preassign_date").val(value.PREASSIGN_DATE);
+        		$("#finish_date").val(value.FINISH_DATE);
+        	});
+        	$.each(response.dataMaterielInfo,function (index,value) {
+        		var tr = $("<tr id= '"+value.ID+"'/>");
+        		$("<td />").html(value.SAP_NO).appendTo(tr);
+        		$("<td />").html(value.MATERIAL_DESC).appendTo(tr);
+        		$("<td />").html(value.MATERIAL_TYPE).appendTo(tr);
+        		$("<td />").html(value.MATERIAL_SPEC).appendTo(tr);
+        		$("<td />").html(value.UNIT).appendTo(tr);
+        		$("<td />").html(value.SUPPLIER_CODE).appendTo(tr);
+        		$("<td />").html(value.SINGLE_LOSS).appendTo(tr);
+        		$("<td />").html(value.LEVEL_USAGE).appendTo(tr);
+        		$("<td />").html(value.SINGLE_WEIGHT).appendTo(tr);
+        		$("<td />").html(value.SINGLE_USAGE).appendTo(tr);
+        		$("<td />").html(value.WORKSHOP).appendTo(tr);
+        		$("<td />").html(value.PROCESS).appendTo(tr);
+        		$("<td />").html(value.ASSEMB_SITE).appendTo(tr);
+        		$("<td />").html(value.REMARK).appendTo(tr);
+        		$("<td />").html("-").appendTo(tr);
+        		$("<td />").html("-").appendTo(tr);
+        		
+        		$("#MaterielInfoTable tbody").append(tr);	
+        	});
+        }
 	});
 }
 
@@ -103,4 +134,10 @@ function generateAssignDetailTb(){
 	$("<td style='color:blue' />").html(total_real_hour.toFixed(2)).appendTo(tr);	
 	$("#assigntable tbody").append(tr);
 	
-}	
+}
+function GetQueryString(name) {
+	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+	var r = window.location.search.substr(1).match(reg);
+	if (r != null) return unescape(r[2]);
+	return null;
+}
