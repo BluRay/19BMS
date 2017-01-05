@@ -8,6 +8,7 @@
 		<action name="techTask" class="techTaskAction">
 			<result name="assessPage">/jsp/techtrans/taskAssessPage.jsp</result>
 			<result name="taskMaintainPage">/jsp/techtrans/techTaskMaintain.jsp</result>
+			<result name="techTaskInfoPage">/jsp/techtrans/techTaskInfoPage.jsp</result>
 			<result type="json">
 				<param name="root">result</param>
 			</result>

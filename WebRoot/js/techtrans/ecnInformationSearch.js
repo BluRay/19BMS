@@ -189,7 +189,7 @@ function ajaxQuery(targetPage){
 					var url="ecnDocumentTask!ecnWorkTimeInfoPage.action?taskid="+value.ecn_task_id+
 					"&configStr="+value.already+"&configStr1="+value.total_hours+"";
 					$("<td id='ecn_task_" + ecn_task_id_index + "' rowspan='1' " + "/>")
-						.html("<a href=\"javascript:void(window.open('"+url+"','newwindow','width=700;height=600;top=150,left=280'))\" " +
+						.html("<a href=\"javascript:void(window.open('"+url+"','newwindow','width=950;height=600;top=150,left=280'))\" " +
 						"style='cusor:pointer'>"+"任务："+
 							value.task_number+"</a>").appendTo(tr);
 					ecn_task_id = "#ecn_task_" + ecn_task_id_index;

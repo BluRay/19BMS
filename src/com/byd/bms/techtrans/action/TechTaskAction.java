@@ -98,6 +98,15 @@ public class TechTaskAction extends BaseAction<Object> {
 	public String taskMaintainPage() {
 		return "taskMaintainPage";
 	}
+	
+	/**
+	 * 技改任务查询明细界面
+	 * 
+	 * @return
+	 */
+	public String techTaskInfoPage() {
+		return "techTaskInfoPage";
+	}
 
 	/**
 	 * 获得技改任务维护列表

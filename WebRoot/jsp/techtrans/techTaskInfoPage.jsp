@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
 <meta http-equiv="expires" content="0" />
-<title>BMS - 技改工时</title>
+<title>BMS - 技改明细</title>
 <!-- Le styles -->
 <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
 <link href="css/bootstrap-responsive.css" rel="stylesheet">
@@ -16,7 +16,7 @@
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
-<script type="text/javascript" src="js/techtrans/ecnWorkTimeInfo.js"></script>
+<script type="text/javascript" src="js/techtrans/techTaskInfoPage.js"></script>
 <style type="text/css">
 .section-head {
     border-left: 7px solid #000;
