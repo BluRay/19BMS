@@ -1,55 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.byd.bms.techtrans.dao.ITechTaskDao">
-
-
-	<select id="queryTechTaskList" parameterType="Map" resultType="Map">
-	<![CDATA[
-		SELECT t.*,concat(d.order_no,'<br />',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
-		d.factory,d.tech_list,d.time_list,d.single_time_total,d.time_total
-		FROM BMS_TECH_TASK t
-		LEFT JOIN BMS_TECH_TASK_DETAIL d ON t.id=d.tech_task_id
-		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
-		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
-		WHERE 1=1
-		]]>
-		<if test="task_content !=null and task_content !=''">
-			and t.task_content like (concat('%',#{task_content},'%'))
-		</if>
-		<if test="tech_order_no !=null and tech_order_no !=''">
-			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
-		</if>
-		<if test="order_no !=null and order_no !=''">
-			and d.order_no=#{order_no}
-		</if>
-		<if test="factory !=null and factory !=''">
-			and d.factory=#{factory}
-		</if>
-		<if test="workshop !=null and workshop !=''">
-			and find_in_set(d.tech_list,#{workshop})>0
-		</if>
-		<if test="tech_date_start !=null and tech_date_start !=''">
-			and t.tech_date>=#{tech_date_start} 
-		</if>
-		<if test="tech_date_end !=null and tech_date_end !=''">
-			and t.tech_date&lt;=#{tech_date_end} 
-		</if>
-		<if test="status=='已创建'">
-			and t.edit_date !=''
-		</if>
-		<if test="status=='已分配'">
-			and t.assign_date !=''
-		</if>
-		<if test="status=='已评估'">
-			and t.assess_date !=''
-		</if>
-		<if test="status=='已完成'">
-			and t.finish_date !=''
-		</if>
-		<if test="offset!=null">
-			LIMIT #{offset} ,#{pageSize} 
-		</if>
-	</select>
 	
 	<!--技改任务维护-查询 -->
 	<select id="queryTechTaskMaintainList" parameterType="Map" resultType="Map">
@@ -194,6 +145,62 @@
 		]]>
 	</insert>
 	
+	<select id="queryTaskBaseInfo" parameterType="Map" resultType="Map">
+		SELECT * FROM BMS_TECH_TASK t WHERE t.id = #{taskid}
+	</select>
+	
+	<select id="queryTaskMaterielInfo" parameterType="Map" resultType="Map">
+		SELECT * FROM BMS_TECH_MATERIAL t WHERE t.tech_task_id = #{taskid}
+	</select>
+	
+	<select id="queryTechTaskList" parameterType="Map" resultType="Map">
+	<![CDATA[
+		SELECT t.*,concat(d.order_no,'<br />',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
+		d.factory,d.tech_list,d.time_list,d.single_time_total,d.time_total
+		FROM BMS_TECH_TASK t
+		LEFT JOIN BMS_TECH_TASK_DETAIL d ON t.id=d.tech_task_id
+		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
+		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
+		WHERE 1=1
+		]]>
+		<if test="task_content !=null and task_content !=''">
+			and t.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			and d.order_no=#{order_no}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and d.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and find_in_set(d.tech_list,#{workshop})>0
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and t.edit_date !=''
+		</if>
+		<if test="status=='已分配'">
+			and t.assign_date !=''
+		</if>
+		<if test="status=='已评估'">
+			and t.assess_date !=''
+		</if>
+		<if test="status=='已完成'">
+			and t.finish_date !=''
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	
 	<select id="queryTechTaskListCount" parameterType="Map" resultType="int">
 		SELECT count(t.id)
 		FROM BMS_TECH_TASK t
@@ -237,7 +244,8 @@
 	<select id="queryTechList" parameterType="Map" resultType="Map">
 		<![CDATA[		
 		SELECT concat(d.order_no,'<br>',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
-		group_concat(d.factory,'||',d.tech_list separator ';') tech_detail_list
+		group_concat(d.factory,'||',d.tech_list separator ';') tech_detail_list,
+		group_concat(d.factory,'||',(select count(f.bus_number) from BMS_TECH_TASK_FOLLOW f where f.confirmor_date is not null and f.confirmor_date !='' and f.factory=d.factory and f.order_no=d.order_no)  separator ';') follow_detail
 		FROM BMS_TECH_TASK_DETAIL d 
 		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
 		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
@@ -257,11 +265,538 @@
 		GROUP BY o.order_no
 	</select>
 	
-	<select id="queryTaskBaseInfo" parameterType="Map" resultType="Map">
-		SELECT * FROM BMS_TECH_TASK t WHERE t.id = #{taskid}
+	<select id="queryTechBusNum_All" parameterType="Map" resultType="Map">
+		SELECT concat('{',group_concat('"',workshop,'":',online_count separator ','),'}') tech_bus_info
+		FROM(
+		SELECT count(b.bus_number) online_count, '焊装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.welding_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.welding_online_date is not null and b.welding_online_date !=''
+		and o.order_no=#{order_no} 	and f.factory_name in (#{factory_list})
+		union all
+		SELECT count(b.bus_number) online_count,'玻璃钢' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.welding_offline_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.welding_offline_date is not null and b.welding_offline_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT count(b.bus_number) online_count,'涂装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.painting_offline_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.painting_offline_date is not null and b.painting_offline_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT count(b.bus_number) online_count,'底盘' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.chassis_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.chassis_online_date is not null and b.chassis_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT  count(b.bus_number) online_count,'总装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.assembly_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.assembly_online_date is not null and b.assembly_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT  count(b.bus_number) online_count,'检测线' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.testline_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.testline_online_date is not null and b.testline_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		) tmp
 	</select>
 	
-	<select id="queryTaskMaterielInfo" parameterType="Map" resultType="Map">
-		SELECT * FROM BMS_TECH_MATERIAL t WHERE t.tech_task_id = #{taskid}
+	<select id="queryTechBusNum_After" parameterType="Map" resultType="Map">
+		SELECT concat('{',group_concat('"',workshop,'":',online_count separator ','),'}') tech_bus_info
+		FROM(
+		SELECT count(b.bus_number) online_count, '焊装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.welding_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.welding_online_date is not null and b.welding_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT count(b.bus_number) online_count,'玻璃钢' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.welding_offline_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.welding_offline_date is not null and b.welding_offline_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT count(b.bus_number) online_count,'涂装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.painting_offline_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.painting_offline_date is not null and b.painting_offline_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT count(b.bus_number) online_count,'底盘' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.chassis_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.chassis_online_date is not null and b.chassis_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT  count(b.bus_number) online_count,'总装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.assembly_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.assembly_online_date is not null and b.assembly_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT  count(b.bus_number) online_count,'检测线' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.testline_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.testline_online_date is not null and b.testline_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		) tmp
+		where tmp.workshop in 
+		<foreach item="item" index="index" collection="node_list"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
 	</select>
+	
+	<select id="queryTechBusNum_Pre" parameterType="Map" resultType="Map">
+		SELECT concat('{',group_concat('"',workshop,'":',online_count separator ','),'}') tech_bus_info
+		FROM(
+		<foreach collection="node_list" item="item" index="index" separator=" union all ">
+			<if test="item=='焊装'">			
+			SELECT count(b.bus_number) online_count, '焊装' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.welding_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.welding_online_date is not null and b.welding_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='玻璃钢'">			
+			SELECT count(b.bus_number) online_count, '玻璃钢' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.welding_offline_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.welding_offline_date is not null and b.welding_offline_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='涂装'">			
+			SELECT count(b.bus_number) online_count, '涂装' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.painting_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.painting_online_date is not null and b.painting_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='底盘'">			
+			SELECT count(b.bus_number) online_count, '底盘' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.chassis_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.chassis_online_date is not null and b.chassis_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='总装'">			
+			SELECT count(b.bus_number) online_count, '总装' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.assembly_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.assembly_online_date is not null and b.assembly_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='检测线'">			
+			SELECT count(b.bus_number) online_count, '检测线' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.testline_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.testline_online_date is not null and b.testline_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+		</foreach>
+		)tmp
+	</select>
+	
+	<select id="queryTechBusList_All" parameterType="Map" resultType="Map">
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'焊装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.welding_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.welding_online_date is not null and b.welding_online_date !=''
+		and o.order_no=#{order_no} 	and f.factory_name in (#{factory_list})
+		union all
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'玻璃钢' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.welding_offline_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.welding_offline_date is not null and b.welding_offline_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'涂装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.painting_offline_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.painting_offline_date is not null and b.painting_offline_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'底盘' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.chassis_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.chassis_online_date is not null and b.chassis_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'总装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.assembly_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.assembly_online_date is not null and b.assembly_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'检测线' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.testline_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.testline_online_date is not null and b.testline_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+	</select>
+	
+	<select id="queryTechBusList_After" parameterType="Map" resultType="Map">
+		SELECT tmp.*
+		FROM(
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory, '焊装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.welding_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.welding_online_date is not null and b.welding_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'玻璃钢' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.welding_offline_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.welding_offline_date is not null and b.welding_offline_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'涂装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.painting_offline_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.painting_offline_date is not null and b.painting_offline_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'底盘' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.chassis_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.chassis_online_date is not null and b.chassis_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT  #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'总装' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.assembly_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.assembly_online_date is not null and b.assembly_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		union all
+		SELECT  #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory,'检测线' workshop
+		FROM BMS_PLAN_BUS b
+		LEFT JOIN BMS_ORDER o on b.order_id=o.id
+		LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+		WHERE substring(b.testline_online_date,1,10)&lt;#{tech_date} and b.dispatch_date is null and b.testline_online_date is not null and b.testline_online_date !=''
+		and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+		) tmp
+		where tmp.workshop in 
+		<foreach item="item" index="index" collection="node_list"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="queryTechBusList_Pre" parameterType="Map" resultType="Map">
+		SELECT tmp.*
+		FROM(
+		<foreach collection="node_list" item="item" index="index" separator=" union all ">
+			<if test="item=='焊装'">			
+			SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory, '焊装' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.welding_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.welding_online_date is not null and b.welding_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='玻璃钢'">			
+			SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory, '玻璃钢' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.welding_offline_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.welding_offline_date is not null and b.welding_offline_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='涂装'">			
+			SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory, '涂装' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.painting_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.painting_online_date is not null and b.painting_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='底盘'">			
+			SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory, '底盘' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.chassis_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.chassis_online_date is not null and b.chassis_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='总装'">			
+			SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory, '总装' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.assembly_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.assembly_online_date is not null and b.assembly_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no}  and f.factory_name in (#{factory_list})
+			</if>
+			
+			<if test="item=='检测线'">			
+			SELECT #{tech_task_id} tech_task_id,b.bus_number,o.order_no,f.factory_name factory, '检测线' workshop
+			FROM BMS_PLAN_BUS b
+			LEFT JOIN BMS_ORDER o on b.order_id=o.id
+			LEFT JOIN BMS_BASE_FACTORY f on f.id=b.factory_id
+			WHERE substring(b.testline_online_date,1,10)&lt;=#{tech_date} and b.dispatch_date is null and b.testline_online_date is not null and b.testline_online_date !=''
+			<if test="switch_node=='玻璃钢'">
+			and (b.welding_offline_date is null or b.welding_offline_date ='' or substring(b.welding_offline_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='涂装'">
+			and (b.painting_online_date is null or b.painting_online_date ='' or substring(b.painting_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='底盘'">
+			and (b.chassis_online_date is null or b.chassis_online_date ='' or substring(b.chassis_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='总装'">
+			and (b.assembly_online_date is null or b.assembly_online_date ='' or substring(b.assembly_online_date,1,10) >#{tech_date})
+			</if>
+			<if test="switch_node=='检测线'">
+			and (b.testline_online_date is null or b.testline_online_date ='' or substring(b.testline_online_date,1,10) >#{tech_date})
+			</if>
+			and o.order_no=#{order_no} and f.factory_name in (#{factory_list})
+			</if>
+		</foreach>
+		)tmp
+	</select>
+	
+	<insert id="insertTechFollowBus" useGeneratedKeys="true" parameterType="java.util.List">
+		<selectKey resultType="long" keyProperty="id" order="AFTER">  
+        SELECT  
+        LAST_INSERT_ID()  
+    	</selectKey>
+		insert into BMS_TECH_TASK_FOLLOW (tech_task_id,bus_number,order_no,factory,workshop)
+		values
+		<foreach collection="list" item="item" index="index" separator="," >  
+        (#{item.tech_task_id},#{item.bus_number},#{item.order_no},#{item.factory},#{item.workshop})  
+    </foreach> 
+	</insert>
+	
+	<insert id="insertTechTaskDetail" useGeneratedKeys="true" parameterType="Map">
+		insert into BMS_TECH_TASK_DETAIL (tech_task_id,order_no,factory,tech_list)
+		values (#{tech_task_id},#{order_no},#{factory_list},#{tech_list})  
+
+	</insert>
+	
+	<update id="deleteTechFollowBus" parameterType="Map">
+		delete from BMS_TECH_TASK_FOLLOW where tech_task_id=#{tech_task_id}
+		<if test="order_no !=null and order_no !=''">
+			and order_no=#{order_no}
+		</if>
+		<if test="factory_list !=null and factory_list !=''">
+			and find_in_set(factory,#{factory_list})>0
+		</if>
+	</update>
+	
+	<update id="deleteTechTaskDetail" parameterType="list">
+		delete from BMS_TECH_TASK_DETAIL where tech_task_id=#{tech_task_id}
+		<if test="order_no !=null and order_no !=''">
+			and order_no=#{order_no}
+		</if>
+		<if test="factory_list !=null and factory_list !=''">
+			and find_in_set(factory,#{factory_list})>0
+		</if>
+	</update>
 </mapper>

@@ -188,8 +188,8 @@
 						<label class="control-label" for="" style="font-weight:bold">切换节点：</label>
 						<div class="controls">
 							<select id="switch_node" class="input-medium">
-								<option value='自制件'>自制件</option>
-								<option value='部件'>部件</option>
+<!-- 								<option value='自制件'>自制件</option>
+								<option value='部件'>部件</option> -->
 								<option value='焊装'>焊装</option>
 								<option value='玻璃钢'>玻璃钢</option>
 								<option value='涂装'>涂装</option>
