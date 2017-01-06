@@ -6,12 +6,21 @@
 	<constant name="struts.custom.i18n.resources" value="globalMessages"></constant>
 	<package name="techModel" extends="json-default" >
 		<action name="techTask" class="techTaskAction">
-			<result name="assessPage">/jsp/techtrans/taskAssessPage.jsp</result>
-			<result name="taskMaintainPage">/jsp/techtrans/techTaskMaintain.jsp</result>
-			<result name="techTaskInfoPage">/jsp/techtrans/techTaskInfoPage.jsp</result>
+			<!-- by xjw start -->
+			<result name="assignPage">/jsp/techtrans/taskAssignPage.jsp</result>
+			<result name="assignPrePage">/jsp/techtrans/taskAssignPrePage.jsp</result>
 			<result type="json">
 				<param name="root">result</param>
 			</result>
+			<!-- by xjw end -->
+			
+			<!-- by yk start -->
+			<result name="techTaskInfoPage">/jsp/techtrans/techTaskInfoPage.jsp</result>
+			<!-- by yk end -->
+			
+			<!-- by wx start -->
+			<result name="taskMaintainPage">/jsp/techtrans/techTaskMaintain.jsp</result>
+			<!-- by wx end -->	
 		</action>
 		
 	</package>

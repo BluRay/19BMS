@@ -149,7 +149,7 @@ function initTable() {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
     	        	}
             },{
-            	field: 'STAFF_STATUS',title: '&nbsp;&nbsp;在职',align: 'center',valign: 'middle',align: 'center',
+            	field: 'STATUS',title: '&nbsp;&nbsp;在职',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter
             },{
             	field: 'ATTENDANCE_DAYS',title: '出勤<br/>天数',align: 'center',valign: 'middle',align: 'center',
@@ -236,11 +236,21 @@ function initTable() {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
     	        	}
             },{
-            	field: 'PIECE_SALARY',title: '计件<br/>工资',align: 'center',valign: 'middle',align: 'center',
+            	//var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
+            	field: 'id',title: '计件<br/>工资',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
     	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
-    	        	}
+    	        	},
+	        	formatter:function(value, row, index){
+                	var piece_pay_total=row.piece_pay_total==undefined?0:parseFloat(row.piece_pay_total);
+                	var ecn_pay_total=row.ecn_pay_total==undefined?0:parseFloat(row.ecn_pay_total);
+                	var tmp_pay_total=row.tmp_pay_total==undefined?0:parseFloat(row.tmp_pay_total);
+                	var wait_pay_total=row.wait_pay_total==undefined?0:parseFloat(row.wait_pay_total);
+                	var deduct_pay_total=row.deduct_pay_total==undefined?0:parseFloat(row.deduct_pay_total);               	
+                	var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
+                	return (parseFloat(piece_salary)).toFixed(2);
+                }
             },{
             	field: 'DEDUCT_PAY_TOTAL',title: '考核<br/>扣款',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,

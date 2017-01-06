@@ -41,19 +41,19 @@
 				<div role="tabpanel" >
 					<ul class="nav nav-pills" role="tablist" style="height: 30px">
 						<li role="presentation"  class="active">
-							<a href="#workhour_BaseInfo" aria-controls="bottom" role="tab" data-toggle="tab" onclick="generateBaseInfo()">基本信息</a>
+							<a href="#workhour_BaseInfo" aria-controls="bottom" role="tab" data-toggle="tab" onclick="">基本信息</a>
 						</li>
 						<li role="presentation">
-							<a href="#workhour_MaterielInfo" aria-controls="bottom" role="tab" data-toggle="tab" onclick="generateMaterielInfo()">物料信息</a>
+							<a href="#workhour_MaterielInfo" aria-controls="bottom" role="tab" data-toggle="tab" onclick="">物料信息</a>
 						</li>
 						<li role="presentation">
-							<a href="#workhour_Range" aria-controls="bottom" role="tab" data-toggle="tab" onclick="generateRange()">技改范围</a>
+							<a href="#workhour_Range" aria-controls="bottom" role="tab" data-toggle="tab" onclick="">技改范围</a>
 						</li>
 						<li role="presentation">
-							<a href="#workhour_detail" aria-controls="painting" role="tab" data-toggle="tab" onclick="generateWhDetailTb()">工时明细</a>
+							<a href="#workhour_detail" aria-controls="painting" role="tab" data-toggle="tab" onclick="">工时明细</a>
 						</li>
 						<li role="presentation">
-							<a href="#workhour_assess" aria-controls="bottom" role="tab" data-toggle="tab" onclick="generateAssignDetailTb()">工时分配</a>
+							<a href="#workhour_assess" aria-controls="bottom" role="tab" data-toggle="tab" onclick="">工时分配</a>
 						</li>
 					</ul>
 					<!-- Tab panes -->
@@ -184,7 +184,7 @@
 								<input style="vertical-align:middle;margin-top:-2px;" name="switch_type" id="type3" type="radio">节点后切换&nbsp;&nbsp;
 							</label>
 							<label class="control-label" for=""><b>&nbsp;&nbsp;&nbsp;&nbsp;切换节点：</b>
-								<select style="width:100px"></select>
+								<input id="switch_node" type="text" style="width:150px;height:18px"></input>
 							</label>
 							<label class="control-label" for=""><b>&nbsp;&nbsp;&nbsp;&nbsp;实施范围：</b>
 								<ul class="nav nav-tabs" id="new_tab" role="tablist" style="height: 38px;margin-left:17px;">
@@ -192,21 +192,26 @@
 									<li><a href="#new_task1" data-toggle="tab" style="font-size: 14px; color: #333">订单2</a></li>
 								</ul>
 							</label>
-							<label class="control-label" for=""><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;订单：</b></label>
-							<table id="RangeTable" class="table table-bordered table-striped" style="text-align: center;margin-left:17px; font-size: 12px;width:96%;max-width:96%">
+							<table id="RangeTable" class="table table-bordered table-striped" style="text-align: center;margin-left:17px; font-size: 12px;width:96%;max-width:96%;margin-top:-21px">
 								<thead>
 									<tr>
-									<th>车间</th>
-									<th>自制件</th>
-									<th>部件</th>
-									<th>焊装</th>
-									<th>玻璃钢</th>
-									<th>涂装</th>
-									<th>底盘</th>
-									<th>总装</th>
+									<th>车间</th><th>自制件</th><th>部件</th><th>焊装</th>
+									<th>玻璃钢</th><th>涂装</th><th>底盘</th><th>总装</th>
 									</tr>
 								</thead>
 								<tbody>
+									<tr>
+									<td>技改台数</td><td id="tech_zzj"></td><td id="tech_bj"></td><td id="tech_hz"></td>
+									<td id="tech_blg"></td><td id="tech_tz"></td><td id="tech_dp"></td><td id="tech_zz"></td>
+									</tr>
+									<tr>
+									<td>完成台数</td><td id="finish_zzj"></td><td id="finish_bj"></td><td id="finish_hz"></td>
+									<td id="finish_blg"></td><td id="finish_tz"></td><td id="finish_dp"></td><td id="finish_zz"></td>
+									</tr>
+									<tr>
+									<td>技改工时</td><td id="time_zzj"></td><td id="time_bj"></td><td id="time_hz"></td>
+									<td id="time_blg"></td><td id="time_tz"></td><td id="time_dp"></td><td id="time_zz"></td>
+									</tr>
 								</tbody>
 							</table>
 							

@@ -1,6 +1,7 @@
 var whList=[];
 var baseInfo={};
 var assignList=[];
+var dataOrderInfo = [];
 $(document).ready(function(){
 	var ecnTaskId = GetQueryString('taskid');
 	getBaseInfo(ecnTaskId);
@@ -36,6 +37,11 @@ function getBaseInfo(ecnTaskId){
         		$("#preassigner_id").val(value.PREASSIGNER_ID);
         		$("#preassign_date").val(value.PREASSIGN_DATE);
         		$("#finish_date").val(value.FINISH_DATE);
+        		
+        		if(value.SWITCH_MODE=="全部切换")$("#type1").attr("checked", true);
+        		if(value.SWITCH_MODE=="节点前切换")$("#type2").attr("checked", true);
+        		if(value.SWITCH_MODE=="节点后切换")$("#type2").attr("checked", true);
+        		$("#switch_node").val(value.SWITCH_NODE);
         	});
         	$.each(response.dataMaterielInfo,function (index,value) {
         		var tr = $("<tr id= '"+value.ID+"'/>");
@@ -58,6 +64,89 @@ function getBaseInfo(ecnTaskId){
         		
         		$("#MaterielInfoTable tbody").append(tr);	
         	});
+        	
+        	$("#new_tab").html('');
+        	dataOrderInfo = response.dataOrderInfo;
+        	$.each(response.dataOrderInfo,function (index,value) {
+        		if(index==0){
+        			var paramHtml = '<li class="active"><a href="#new_task1" onclick="showOrderInfo('+(index)+');" data-toggle="tab" style="font-size: 14px; color: #333">'+value.order_no+'</a></li>';
+            		$(paramHtml).appendTo("#new_tab");
+            		//var tech_str = '{' + value.TECH_LIST + '}';
+            		var tech_str = '{"自制件":11,"焊装":10,"玻璃钢":10,"涂装":10}';
+            		var obj = JSON.parse(tech_str);
+            		$("#tech_zzj").html(obj.自制件);
+            		$("#tech_bj").html(obj.部件);
+            		$("#tech_hz").html(obj.焊装);
+            		$("#tech_blg").html(obj.玻璃钢);
+            		$("#tech_tz").html(obj.涂装);
+            		$("#tech_dp").html(obj.底盘);
+            		$("#tech_zz").html(obj.总装);
+            		showOrderInfo(0);
+        		}else{
+        			var paramHtml = '<li><a href="#new_task1" onclick="showOrderInfo('+(index)+');" data-toggle="tab" style="font-size: 14px; color: #333">'+value.order_no+'</a></li>';
+            		$(paramHtml).appendTo("#new_tab");
+        		}
+        	});
+        }
+	});
+}
+
+function showOrderInfo(index){
+	//alert(dataOrderInfo[index].TECH_LIST);
+	//var tech_str = '{"自制件":"11","部件":"12","焊装":"13","玻璃钢":"14","涂装":"15","底盘":"16","总装":"17"}';
+	var tech_str = dataOrderInfo[index].TECH_LIST;
+	$("#tech_zzj").html("");$("#tech_bj").html("");$("#tech_hz").html("");
+	$("#tech_blg").html("");$("#tech_tz").html("");
+	$("#tech_dp").html("");$("#tech_zz").html("");
+	if(tech_str != ""){
+		tech_str = tech_str.replace(/:/g,'":"');
+		tech_str = tech_str.replace(/,/g,'","');
+		tech_str = '{"' + tech_str + '"}';
+		var obj = JSON.parse(tech_str);
+		$("#tech_zzj").html(obj.自制件);$("#tech_bj").html(obj.部件);$("#tech_hz").html(obj.焊装);
+		$("#tech_blg").html(obj.玻璃钢);$("#tech_tz").html(obj.涂装);
+		$("#tech_dp").html(obj.底盘);$("#tech_zz").html(obj.总装);
+	}
+	var tech_str = dataOrderInfo[index].TIME_LIST;
+	$("#time_zzj").html("");$("#time_bj").html("");$("#time_hz").html("");
+	$("#time_blg").html("");$("#time_tz").html("");
+	$("#time_dp").html("");$("#time_zz").html("");
+	if(tech_str != ""){
+		tech_str = tech_str.replace(/:/g,'":"');
+		tech_str = tech_str.replace(/,/g,'","');
+		tech_str = '{"' + tech_str + '"}';
+		var obj = JSON.parse(tech_str);
+		$("#time_zzj").html(obj.自制件);$("#time_bj").html(obj.部件);$("#time_hz").html(obj.焊装);
+		$("#time_blg").html(obj.玻璃钢);$("#time_tz").html(obj.涂装);
+		$("#time_dp").html(obj.底盘);$("#time_zz").html(obj.总装);
+	}
+	
+	//获取订单完成数量
+	$.ajax({
+        url: "techTask!getTaskOrderFinishInfo.action",
+        dataType: "json",
+        type: "get",
+        data: {
+        	"taskid":dataOrderInfo[index].TECH_TASK_ID,
+        	"order_no":dataOrderInfo[index].ORDER_NO
+        },
+        success: function(response) {
+        	//alert(response.dataOrderFinishInfo[0].FINISH_STR);
+        	var tech_str = response.dataOrderFinishInfo[0].FINISH_STR;
+        	$("#finish_zzj").html("");$("#finish_bj").html("");$("#finish_hz").html("");
+        	$("#finish_blg").html("");$("#finish_tz").html("");
+        	$("#finish_dp").html("");$("#finish_zz").html("");
+        	if(tech_str != ""){
+	        	tech_str = tech_str.replace(/:/g,'":"');
+	        	tech_str = tech_str.replace(/,/g,'","');
+	        	tech_str = '{"' + tech_str + '"}';
+	        	//alert(tech_str);
+	        	var obj = JSON.parse(tech_str);
+	        	
+	        	$("#finish_zzj").html(obj.自制件);$("#finish_bj").html(obj.部件);$("#finish_hz").html(obj.焊装);
+	        	$("#finish_blg").html(obj.玻璃钢);$("#finish_tz").html(obj.涂装);
+	        	$("#finish_dp").html(obj.底盘);$("#finish_zz").html(obj.总装);
+        	}
         }
 	});
 }

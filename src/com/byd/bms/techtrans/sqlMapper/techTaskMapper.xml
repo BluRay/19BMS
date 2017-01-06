@@ -1,157 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.byd.bms.techtrans.dao.ITechTaskDao">
-	
-	<!--技改任务维护-查询 -->
-	<select id="queryTechTaskMaintainList" parameterType="Map" resultType="Map">
-		SELECT t.*
-		FROM BMS_TECH_TASK t
-		WHERE 1=1
-		<if test="task_content !=null and task_content !=''">
-			and t.task_content like (concat('%',#{task_content},'%'))
-		</if>
-		<if test="tech_order_no !=null and tech_order_no !=''">
-			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
-		</if>
-		<if test="tech_date_start !=null and tech_date_start !=''">
-			and t.tech_date>=#{tech_date_start} 
-		</if>
-		<if test="tech_date_end !=null and tech_date_end !=''">
-			and t.tech_date&lt;=#{tech_date_end} 
-		</if>
-		<if test="status=='已创建'">
-			and t.edit_date !=''
-		</if>
-		<if test="status=='已分配'">
-			and t.assign_date !=''
-		</if>
-		<if test="status=='已评估'">
-			and t.assess_date !=''
-		</if>
-		<if test="status=='已完成'">
-			and t.finish_date !=''
-		</if>
-		<if test="offset!=null">
-			LIMIT #{offset} ,#{pageSize} 
-		</if>
-	</select>
-	
-	<!--技改任务维护-单条查询 -->
-	<select id="querySingleTechTaskMaintain" parameterType="Map" resultType="Map">
-		SELECT t.*
-		FROM BMS_TECH_TASK t
-		WHERE 1=1
-		AND t.id = #{id}
-	</select>
-	
-	<!--技改任务维护-查询totalcount -->
-	<select id="queryTechTaskMaintainListTotalCount" parameterType="Map" resultType="int">
-		SELECT count(t.id)
-		FROM BMS_TECH_TASK t
-		WHERE 1=1
-		<if test="task_content !=null and task_content !=''">
-			and t.task_content like (concat('%',#{task_content},'%'))
-		</if>
-		<if test="tech_order_no !=null and tech_order_no !=''">
-			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
-		</if>
-		<if test="tech_date_start !=null and tech_date_start !=''">
-			and t.tech_date>=#{tech_date_start} 
-		</if>
-		<if test="tech_date_end !=null and tech_date_end !=''">
-			and t.tech_date&lt;=#{tech_date_end} 
-		</if>
-		<if test="status=='已创建'">
-			and t.edit_date !=''
-		</if>
-		<if test="status=='已分配'">
-			and t.assign_date !=''
-		</if>
-		<if test="status=='已评估'">
-			and t.assess_date !=''
-		</if>
-		<if test="status=='已完成'">
-			and t.finish_date !=''
-		</if>
-	</select>
-	
-	<!--查询变更物料清单 -->
-	<select id="queryChangedMaterialList" parameterType="Map" resultType="Map">
-		SELECT t.*
-		FROM BMS_TECH_MATERIAL t
-		WHERE 1=1
-		and t.tech_task_id = #{tech_task_id}
-	</select>
-	
-	<!--新增变更物料清单 -->
-	<insert id="addChangedMaterialList" useGeneratedKeys="true" parameterType="List">
-		<selectKey resultType="int" keyProperty="id" order="AFTER">
-			SELECT
-			LAST_INSERT_ID()
-		</selectKey>
-		<foreach collection="list" index="index" item="item"
-			separator=";">
-			INSERT INTO
-			BMS_TECH_MATERIAL(tech_task_id,sap_no,material_desc,material_type,material_spec,unit,supplier_code,single_loss,level_usage,single_weight,single_usage,workshop,process,assemb_site,remark)
-			VALUES(#{item.tech_task_id},#{item.sap_no},#{item.material_desc},#{item.material_type},#{item.material_spec},#{item.unit},#{item.supplier_code},#{item.single_loss},#{item.level_usage},#{item.single_weight},#{item.single_usage},#{item.workshop},#{item.process},#{item.assemb_site},#{item.remark})
-		</foreach>
-	</insert>
-	
-	<!--删除变更物料清单 -->
-	<update id="deleteChangedMaterialList" parameterType="Map">
-		<![CDATA[
-			delete from BMS_TECH_MATERIAL where tech_task_id= #{tech_task_id}
-		]]>
-	</update>
-	
-	<!-- 技改任务维护-修改 -->
-	<update id="updateTechTaskMaintain" parameterType="List">
-		<foreach collection="list" index="index" item="item"
-			separator=";">
-			UPDATE BMS_TECH_TASK
-			SET task_content = #{item.task_content}
-			,tech_order_no = #{item.tech_order_no}
-			,tech_point_num = #{item.tech_point_num}
-			,tech_order_type = #{item.tech_order_type}
-			,tech_type = #{item.tech_type}
-			,tech_date = #{item.tech_date}
-			,duty_unit = #{item.duty_unit}
-			,major_change = #{item.major_change}
-			,repeat_change = #{item.repeat_change}
-			,custom_change = #{item.custom_change}
-			,custom_change_no = #{item.custom_change_no}
-			<if test="item.tech_order_file !=null and item.tech_order_file !=''">
-			,tech_order_file = #{item.tech_order_file}
-			</if>
-			<if test="item.custom_change_file !=null and item.custom_change_file !=''">
-			,custom_change_file = #{item.custom_change_file}
-			</if>
-			,editor_id = #{item.editor_id}
-			,edit_date = #{item.edit_date}
-			WHERE id = #{item.id}
-		</foreach>
-	</update>
-	
-	<!--技改任务维护-新增 -->
-	<insert id="addTechTaskMaintain" useGeneratedKeys="true" parameterType="map">
-		<selectKey resultType="int" keyProperty="id" order="AFTER">
-			SELECT
-			LAST_INSERT_ID() as id
-		</selectKey>
-		<![CDATA[
-			INSERT INTO
-			BMS_TECH_TASK(task_content,tech_order_no,tech_point_num,tech_order_type,tech_type,tech_date,duty_unit,major_change,repeat_change,custom_change,custom_change_no,tech_order_file,custom_change_file,editor_id,edit_date)
-			VALUES(#{task_content},#{tech_order_no},#{tech_point_num},#{tech_order_type},#{tech_type},#{tech_date},#{duty_unit},#{major_change},#{repeat_change},#{custom_change},#{custom_change_no},#{tech_order_file},#{custom_change_file},#{editor_id},#{edit_date})
-		]]>
-	</insert>
-	
-	<select id="queryTaskBaseInfo" parameterType="Map" resultType="Map">
-		SELECT * FROM BMS_TECH_TASK t WHERE t.id = #{taskid}
-	</select>
-	
-	<select id="queryTaskMaterielInfo" parameterType="Map" resultType="Map">
-		SELECT * FROM BMS_TECH_MATERIAL t WHERE t.tech_task_id = #{taskid}
-	</select>
+<!--  ###################  by xjw  start  ###############  -->
 	
 	<select id="queryTechTaskList" parameterType="Map" resultType="Map">
 	<![CDATA[
@@ -196,9 +46,11 @@
 		<if test="status=='已完成'">
 			and t.finish_date !=''
 		</if>
+		order by t.tech_date desc
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize} 
 		</if>
+		
 	</select>
 	
 	<select id="queryTechTaskListCount" parameterType="Map" resultType="int">
@@ -799,4 +651,200 @@
 			and find_in_set(factory,#{factory_list})>0
 		</if>
 	</update>
+	
+	<update id="updateTechTaskInfo" parameterType="Map">
+		update BMS_TECH_TASK
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="switch_mode !=null">
+				switch_mode=#{switch_mode},
+			</if>
+			<if test="switch_node !=null">
+				switch_node=#{switch_node},
+			</if>
+			<if test="editor_id !=null">
+				assigner_id=#{editor_id},
+			</if>
+			<if test="edit_date !=null">
+				assign_date=#{edit_date},
+			</if>
+		</trim>
+		where id=#{tech_task_id}
+	</update>
+	
+<!--  ###################  by xjw  end  ###############  -->
+	
+	
+	
+<!--  ###################  by yk  start  ###############  -->
+	
+	<select id="queryTaskBaseInfo" parameterType="Map" resultType="Map">
+		SELECT * FROM BMS_TECH_TASK t WHERE t.id = #{taskid}
+	</select>
+	
+	<select id="queryTaskMaterielInfo" parameterType="Map" resultType="Map">
+		SELECT * FROM BMS_TECH_MATERIAL t WHERE t.tech_task_id = #{taskid}
+	</select>
+	
+	<select id="queryTaskOrderInfo" parameterType="Map" resultType="Map">
+		SELECT * FROM BMS_TECH_TASK_DETAIL t WHERE t.tech_task_id = #{taskid}
+	</select>
+	
+	<select id="queryTaskOrderFinishInfo" parameterType="Map" resultType="Map">
+		SELECT GROUP_CONCAT(S.finish) AS FINISH_STR FROM (
+		SELECT (CONCAT(t.workshop,':',COUNT(t.id))) AS finish FROM BMS_TECH_TASK_FOLLOW t 
+		WHERE t.tech_task_id = #{taskid} AND t.order_no = #{order_no} GROUP BY workshop
+		) S
+	</select>
+	
+<!--  ###################  by yk  end  ###############  -->
+	
+	
+	
+<!--  ###################  by wx  start  ###############  -->
+	
+	<!--技改任务维护-查询 -->
+	<select id="queryTechTaskMaintainList" parameterType="Map" resultType="Map">
+		SELECT t.*
+		FROM BMS_TECH_TASK t
+		WHERE 1=1
+		<if test="task_content !=null and task_content !=''">
+			and t.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and t.edit_date !=''
+		</if>
+		<if test="status=='已分配'">
+			and t.assign_date !=''
+		</if>
+		<if test="status=='已评估'">
+			and t.assess_date !=''
+		</if>
+		<if test="status=='已完成'">
+			and t.finish_date !=''
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	
+	<!--技改任务维护-单条查询 -->
+	<select id="querySingleTechTaskMaintain" parameterType="Map" resultType="Map">
+		SELECT t.*
+		FROM BMS_TECH_TASK t
+		WHERE 1=1
+		AND t.id = #{id}
+	</select>
+	
+	<!--技改任务维护-查询totalcount -->
+	<select id="queryTechTaskMaintainListTotalCount" parameterType="Map" resultType="int">
+		SELECT count(t.id)
+		FROM BMS_TECH_TASK t
+		WHERE 1=1
+		<if test="task_content !=null and task_content !=''">
+			and t.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and t.edit_date !=''
+		</if>
+		<if test="status=='已分配'">
+			and t.assign_date !=''
+		</if>
+		<if test="status=='已评估'">
+			and t.assess_date !=''
+		</if>
+		<if test="status=='已完成'">
+			and t.finish_date !=''
+		</if>
+	</select>
+	
+	<!--查询变更物料清单 -->
+	<select id="queryChangedMaterialList" parameterType="Map" resultType="Map">
+		SELECT t.*
+		FROM BMS_TECH_MATERIAL t
+		WHERE 1=1
+		and t.tech_task_id = #{tech_task_id}
+	</select>
+	
+	<!--新增变更物料清单 -->
+	<insert id="addChangedMaterialList" useGeneratedKeys="true" parameterType="List">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			INSERT INTO
+			BMS_TECH_MATERIAL(tech_task_id,sap_no,material_desc,material_type,material_spec,unit,supplier_code,single_loss,level_usage,single_weight,single_usage,workshop,process,assemb_site,remark)
+			VALUES(#{item.tech_task_id},#{item.sap_no},#{item.material_desc},#{item.material_type},#{item.material_spec},#{item.unit},#{item.supplier_code},#{item.single_loss},#{item.level_usage},#{item.single_weight},#{item.single_usage},#{item.workshop},#{item.process},#{item.assemb_site},#{item.remark})
+		</foreach>
+	</insert>
+	
+	<!--删除变更物料清单 -->
+	<update id="deleteChangedMaterialList" parameterType="Map">
+		<![CDATA[
+			delete from BMS_TECH_MATERIAL where tech_task_id= #{tech_task_id}
+		]]>
+	</update>
+	
+	<!-- 技改任务维护-修改 -->
+	<update id="updateTechTaskMaintain" parameterType="List">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_TECH_TASK
+			SET task_content = #{item.task_content}
+			,tech_order_no = #{item.tech_order_no}
+			,tech_point_num = #{item.tech_point_num}
+			,tech_order_type = #{item.tech_order_type}
+			,tech_type = #{item.tech_type}
+			,tech_date = #{item.tech_date}
+			,duty_unit = #{item.duty_unit}
+			,major_change = #{item.major_change}
+			,repeat_change = #{item.repeat_change}
+			,custom_change = #{item.custom_change}
+			,custom_change_no = #{item.custom_change_no}
+			<if test="item.tech_order_file !=null and item.tech_order_file !=''">
+			,tech_order_file = #{item.tech_order_file}
+			</if>
+			<if test="item.custom_change_file !=null and item.custom_change_file !=''">
+			,custom_change_file = #{item.custom_change_file}
+			</if>
+			,editor_id = #{item.editor_id}
+			,edit_date = #{item.edit_date}
+			WHERE id = #{item.id}
+		</foreach>
+	</update>
+	
+	<!--技改任务维护-新增 -->
+	<insert id="addTechTaskMaintain" useGeneratedKeys="true" parameterType="map">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID() as id
+		</selectKey>
+		<![CDATA[
+			INSERT INTO
+			BMS_TECH_TASK(task_content,tech_order_no,tech_point_num,tech_order_type,tech_type,tech_date,duty_unit,major_change,repeat_change,custom_change,custom_change_no,tech_order_file,custom_change_file,editor_id,edit_date)
+			VALUES(#{task_content},#{tech_order_no},#{tech_point_num},#{tech_order_type},#{tech_type},#{tech_date},#{duty_unit},#{major_change},#{repeat_change},#{custom_change},#{custom_change_no},#{tech_order_file},#{custom_change_file},#{editor_id},#{edit_date})
+		]]>
+	</insert>
+	
+<!--  ###################  by wx  end  ###############  -->
+	
 </mapper>

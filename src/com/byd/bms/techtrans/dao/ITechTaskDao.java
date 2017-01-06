@@ -4,28 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 public interface ITechTaskDao {
-
-	/**
-	 * 技改任务维护
-	 */
-	public List<Map<String,Object>> querySingleTechTaskMaintain(Map<String,Object> conditionMap);
-	public int addTechTaskMaintain(Map<String, Object> conditionMap);
-	public int updateTechTaskMaintain(List<Map<String, Object>> conditionList);
-	public int addChangedMaterialList(List<Map<String, Object>> conditionList);
-	public int deleteChangedMaterialList(Map<String,Object> conditionMap);
-	public List<Map<String,Object>> queryChangedMaterialList(Map<String,Object> conditionMap);	
-	public List<Map<String,String>> queryTaskBaseInfo(Map<String, Object> conditionMap);	
-	public List<Map<String,String>> queryTaskMaterielInfo(Map<String, Object> conditionMap);
 	
+	//by xjw start	
 	/**
 	 * 技改任务列表查询
 	 */
 	public List<Map<String,Object>> queryTechTaskList(Map<String,Object> conditionMap);
-	/**
-	 * 技改任务维护查询
-	 */
-	public List<Map<String,Object>> queryTechTaskMaintainList(Map<String,Object> conditionMap);
-	public int queryTechTaskMaintainListTotalCount(Map<String,Object> conditionMap);
 	/**
 	 * 技改任务列表数量查询
 	 * @param conditionMap
@@ -103,4 +87,38 @@ public interface ITechTaskDao {
 	 * @param conditionMap
 	 */
 	public void insertTechTaskDetail(Map<String, Object> conditionMap);
+	/**
+	 * 更新技改任务表中的数据
+	 * @param cdmap
+	 */
+	public void updateTechTaskInfo(Map<String, Object> cdmap);
+	//by xjw end
+	 
+	
+	//by yk start
+	public List<Map<String,String>> queryTaskBaseInfo(Map<String, Object> conditionMap);	
+	public List<Map<String,String>> queryTaskMaterielInfo(Map<String, Object> conditionMap);
+	public List<Map<String,String>> queryTaskOrderInfo(Map<String, Object> conditionMap);
+	public List<Map<String,String>> queryTaskOrderFinishInfo(Map<String, Object> conditionMap);
+	//by yk end
+	
+	
+	//by wx start
+	/**
+	 * 技改任务维护查询
+	 */
+	public List<Map<String,Object>> queryTechTaskMaintainList(Map<String,Object> conditionMap);
+	public int queryTechTaskMaintainListTotalCount(Map<String,Object> conditionMap);
+	/**
+	 * 技改任务维护
+	 */
+	public List<Map<String,Object>> querySingleTechTaskMaintain(Map<String,Object> conditionMap);
+	public int addTechTaskMaintain(Map<String, Object> conditionMap);
+	public int updateTechTaskMaintain(List<Map<String, Object>> conditionList);
+	public int addChangedMaterialList(List<Map<String, Object>> conditionList);
+	public int deleteChangedMaterialList(Map<String,Object> conditionMap);
+	public List<Map<String,Object>> queryChangedMaterialList(Map<String,Object> conditionMap);	
+	
+	//by wx end
+
 }

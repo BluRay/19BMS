@@ -210,7 +210,10 @@ function ajaxQuery(targetPage){
 				$("<td />").html(data.factory||"").appendTo(tr);
 				$("<td />").html(data.switch_node||"").appendTo(tr);
 				$("<td />").html(data.tech_list||"").appendTo(tr);
-				$("<td />").html("<i name='edit' class=\"fa fa-pencil\" title=\"分配\" style=\"cursor: pointer;text-align: center;\" onclick='ajaxEdit(" + data.id + ")'></i>").appendTo(tr);
+				if(data.assess_date.trim().length==0){
+					$("<td />").html("<i name='edit' class=\"fa fa-pencil\" title=\"分配\" style=\"cursor: pointer;text-align: center;\" onclick='ajaxEdit(" + data.id + ")'></i>").appendTo(tr);
+				}
+				
 				$("#techTaskList tbody").append(tr);
 				$(tr).data("task_id",data.id);
 			});
@@ -560,7 +563,7 @@ function asessTechTask(){
 		}
 	});
 	$.ajax({
-		url:"techTask!asessTechTask.action",
+		url:"techTask!assignTechTask.action",
 		dataType:"json",
 		type:"post",
 		async:false,

@@ -19,7 +19,7 @@
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/jquery.form.js"></script>
-<script type="text/javascript" src="js/techtrans/taskAssess.js?timestamp=<%=_systime%>"></script>
+<script type="text/javascript" src="js/techtrans/taskAssign.js?timestamp=<%=_systime%>"></script>
 <script type="text/javascript" src="js/jsrender.min.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 <link type="text/css" rel="stylesheet" href="js/datePicker/skin/WdatePicker.css">

@@ -128,6 +128,226 @@ public class TechTaskAction extends BaseAction<Object> {
 		this.conditions = conditions;
 	}
 	
+	// ############# by xjw start ##############//
+
+	/**
+	 * 技改任务分配界面
+	 * 
+	 * @return
+	 */
+	public String taskAssignPage() {
+		return "assignPage";
+	}
+
+	/**
+	 * 技改任务列表查询
+	 * @return
+	 */
+	public String getTaskList(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		int totalCount=techTaskDao.queryTechTaskListCount(conditionMap);
+		
+		if (pager != null){
+			conditionMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());
+			conditionMap.put("pageSize", pager.getPageSize());
+		}
+		List<Map<String,Object>> data_list=techTaskDao.queryTechTaskList(conditionMap);		
+		if (pager != null){
+			pager.setTotalCount(totalCount);			
+		}
+		result.put("pager", pager);
+		result.put("dataList", data_list);
+		return SUCCESS;
+	}
+	
+	/**
+	 * 查询技改实施范围信息列表
+	 * @return
+	 */
+	public String getTechList(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		List<Map<String,Object>> data_list=techTaskDao.queryTechList(conditionMap);
+		result.put("dataList", data_list);
+		return SUCCESS;
+	}
+	/**
+	 * 输入订单编号，查询工厂订单列表
+	 * @return
+	 */
+	public String getOrderList(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		List<Map<String,Object>> data_list=techTaskDao.queryFactoryOrderList(conditionMap);
+		result.put("dataList", data_list);
+		return SUCCESS;
+	}
+	/**
+	 * 勾选工厂后查询该工厂各车间技改车辆数
+	 * @param conditions:{'order_no':xx,'factory_list':xx,'tech_date':xx,
+	 * 'switch_mode':xx,'switch_node':xx,'node_list':xx}
+	 * @return
+	 */
+	public String getTechBusNum(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		List<String> node_list=new ArrayList<String>();
+		String nodes=(String) conditionMap.get("node_list");
+		node_list=Arrays.asList(nodes.split(","));
+		conditionMap.put("node_list", node_list);
+		List<Map<String,Object>> data_list=null;
+		if(conditionMap.containsKey("switch_mode")){
+			if("全部切换".equals(conditionMap.get("switch_mode"))){
+				data_list=techTaskDao.queryTechBusNum_All(conditionMap);
+			}
+			if("节点前切换".equals(conditionMap.get("switch_mode"))){
+				data_list=techTaskDao.queryTechBusNum_Pre(conditionMap);
+			}
+			if("节点间切换".equals(conditionMap.get("switch_mode"))){
+				data_list=techTaskDao.queryTechBusNum_After(conditionMap);
+			}
+		}
+		result.put("dataList", data_list);		
+		return SUCCESS;
+	}
+	/**
+	 * 技改任务确认分配，先根据技改任务id、订单、工厂删除原有记录（表BMS_TECH_TASK_DETAIL、BMS_TECH_TASK_FOLLOW）
+	 * @return
+	 */
+	public String assignTechTask(){
+		result=new HashMap<String,Object>();
+		//JSONObject jo=JSONObject.fromObject(conditions);
+		JSONArray jsa=JSONArray.fromObject(conditions);
+		Map<String,Object> cdmap=new HashMap<String,Object>();
+		try{
+			for(Object o:jsa){
+				JSONObject jo=(JSONObject)o;
+				Map<String,Object> conditionMap=new HashMap<String,Object>();
+				for(Iterator it=jo.keys();it.hasNext();){
+					String key=(String) it.next();
+					conditionMap.put(key, jo.get(key));
+				}
+				String switch_mode=(String) conditionMap.get("switch_mode");
+				String switch_node=(String) conditionMap.get("switch_node");
+				int tech_task_id=(int) conditionMap.get("tech_task_id");
+				cdmap.put("switch_mode", switch_mode);
+				cdmap.put("switch_node", switch_node);
+				cdmap.put("tech_task_id", tech_task_id);
+				
+				List<String> node_list=new ArrayList<String>();
+				String nodes=(String) conditionMap.get("node_list");
+				node_list=Arrays.asList(nodes.split(","));
+				conditionMap.put("node_list", node_list);
+				List<Map<String,Object>> followList=new ArrayList<Map<String,Object>>();
+				
+				//删除技改跟进表中（BMS_TECH_TASK_FOLLOW）未跟进工厂的技改车辆
+				int i=techTaskDao.deleteTechFollowBus(conditionMap);
+				//删除技改明细中（BMS_TECH_TASK_DETAIL）技改明细
+				techTaskDao.deleteTechTaskDetail(conditionMap);
+				//查询需要技改的车辆信息
+				if("全部切换".equals(switch_mode)){
+					followList=techTaskDao.queryTechBusList_All(conditionMap);
+				}
+				if("节点前切换".equals(switch_mode)){
+					followList=techTaskDao.queryTechBusList_Pre(conditionMap);
+				}
+				if("节点间切换".equals(switch_mode)){
+					followList=techTaskDao.queryTechBusList_After(conditionMap);
+				}
+				//往技改跟进表中（BMS_TECH_TASK_FOLLOW）插入查询到的技改车辆信息
+				if(followList.size()>0){
+					i=techTaskDao.insertTechFollowBus(followList);
+				}
+				//插入技改明细
+				techTaskDao.insertTechTaskDetail(conditionMap);										
+			}	
+			int editor_id=getUser().getId();
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String curTime = df.format(new Date());
+			cdmap.put("editor_id", editor_id);
+			cdmap.put("edit_date", curTime);
+			//修改技改任务相关内容
+			techTaskDao.updateTechTaskInfo(cdmap);
+			
+			result.put("message", "分配成功！");
+			result.put("success", true);
+		}catch(Exception e){
+			result.put("message", "分配失败！");
+			result.put("success", false);
+		}
+	
+		return SUCCESS;
+	}
+	
+	/**
+	 *  技改分配前段页面
+	 * @return
+	 */
+	public String taskAssignPrePage(){
+		return "assignPrePage";
+	}
+	
+	// ############# by xjw end #############//	
+	
+	
+	// ############# by yk start #############//	
+		
+	public String getTaskInfo() throws UnsupportedEncodingException{
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		String taskid = request.getParameter("taskid");
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		conditionMap.put("taskid", taskid);
+		List<Map<String,String>> dataBaseInfo = techTaskDao.queryTaskBaseInfo(conditionMap);
+		List<Map<String,String>> dataMaterielInfo = techTaskDao.queryTaskMaterielInfo(conditionMap);
+		List<Map<String,String>> dataOrderInfo = techTaskDao.queryTaskOrderInfo(conditionMap);
+		
+		result=new HashMap<String,Object>();		
+		result.put("dataBaseInfo", dataBaseInfo);
+		result.put("dataMaterielInfo", dataMaterielInfo);
+		result.put("dataOrderInfo", dataOrderInfo);
+		return SUCCESS;
+	}
+	public String getTaskOrderFinishInfo() throws UnsupportedEncodingException{
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		String taskid = request.getParameter("taskid");
+		String order_no = request.getParameter("order_no");
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		conditionMap.put("taskid", taskid);
+		conditionMap.put("order_no", order_no);
+		List<Map<String,String>> dataOrderFinishInfo = techTaskDao.queryTaskOrderFinishInfo(conditionMap);
+		result=new HashMap<String,Object>();		
+		result.put("dataOrderFinishInfo", dataOrderFinishInfo);
+		return SUCCESS;
+	}
+	
+	// ############# by yk end #############//	
+	
+	
+	// ############# by wx start #############//	
+	
 	/**
 	 * 技改任务查询明细界面
 	 * 
@@ -532,20 +752,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		return null;
 	}
 
-	public String getTaskInfo() throws UnsupportedEncodingException{
-		HttpServletRequest request = ServletActionContext.getRequest();
-		request.setCharacterEncoding("UTF-8");
-		String taskid = request.getParameter("taskid");
-		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		conditionMap.put("taskid", taskid);
-		List<Map<String,String>> dataBaseInfo = techTaskDao.queryTaskBaseInfo(conditionMap);
-		List<Map<String,String>> dataMaterielInfo = techTaskDao.queryTaskMaterielInfo(conditionMap);
-		
-		result=new HashMap<String,Object>();		
-		result.put("dataBaseInfo", dataBaseInfo);
-		result.put("dataMaterielInfo", dataMaterielInfo);
-		return SUCCESS;
-	}
+
 	
 	private String saveFileMethod(File f){
 		String filepath="";
@@ -584,15 +791,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		return filepath;
 	}
 	
-	/**
-	 * 技改任务分配界面
-	 * 
-	 * @return
-	 */
-	public String taskAssessPage() {
-		return "assessPage";
-	}
-
+	
 	/**
 	 * 技改任务维护界面
 	 * 
@@ -602,144 +801,8 @@ public class TechTaskAction extends BaseAction<Object> {
 		return "taskMaintainPage";
 	}
 
-	/**
-	 * 技改任务列表查询
-	 * @return
-	 */
-	public String getTaskList(){
-		result=new HashMap<String,Object>();
-		JSONObject jo=JSONObject.fromObject(conditions);
-		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		for(Iterator it=jo.keys();it.hasNext();){
-			String key=(String) it.next();
-			conditionMap.put(key, jo.get(key));
-		}
-		int totalCount=techTaskDao.queryTechTaskListCount(conditionMap);
-		
-		if (pager != null){
-			conditionMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());
-			conditionMap.put("pageSize", pager.getPageSize());
-		}
-		List<Map<String,Object>> data_list=techTaskDao.queryTechTaskList(conditionMap);		
-		if (pager != null){
-			pager.setTotalCount(totalCount);			
-		}
-		result.put("pager", pager);
-		result.put("dataList", data_list);
-		return SUCCESS;
-	}
+	// ############# by wx end #############//	
 	
-	/**
-	 * 查询技改实施范围信息列表
-	 * @return
-	 */
-	public String getTechList(){
-		result=new HashMap<String,Object>();
-		JSONObject jo=JSONObject.fromObject(conditions);
-		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		for(Iterator it=jo.keys();it.hasNext();){
-			String key=(String) it.next();
-			conditionMap.put(key, jo.get(key));
-		}
-		List<Map<String,Object>> data_list=techTaskDao.queryTechList(conditionMap);
-		result.put("dataList", data_list);
-		return SUCCESS;
-	}
-	/**
-	 * 输入订单编号，查询工厂订单列表
-	 * @return
-	 */
-	public String getOrderList(){
-		result=new HashMap<String,Object>();
-		JSONObject jo=JSONObject.fromObject(conditions);
-		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		for(Iterator it=jo.keys();it.hasNext();){
-			String key=(String) it.next();
-			conditionMap.put(key, jo.get(key));
-		}
-		List<Map<String,Object>> data_list=techTaskDao.queryFactoryOrderList(conditionMap);
-		result.put("dataList", data_list);
-		return SUCCESS;
-	}
-	/**
-	 * 勾选工厂后查询该工厂各车间技改车辆数
-	 * @param conditions:{'order_no':xx,'factory_list':xx,'tech_date':xx,
-	 * 'switch_mode':xx,'switch_node':xx,'node_list':xx}
-	 * @return
-	 */
-	public String getTechBusNum(){
-		result=new HashMap<String,Object>();
-		JSONObject jo=JSONObject.fromObject(conditions);
-		Map<String,Object> conditionMap=new HashMap<String,Object>();
-		for(Iterator it=jo.keys();it.hasNext();){
-			String key=(String) it.next();
-			conditionMap.put(key, jo.get(key));
-		}
-		List<String> node_list=new ArrayList<String>();
-		String nodes=(String) conditionMap.get("node_list");
-		node_list=Arrays.asList(nodes.split(","));
-		conditionMap.put("node_list", node_list);
-		List<Map<String,Object>> data_list=null;
-		if(conditionMap.containsKey("switch_mode")){
-			if("全部切换".equals(conditionMap.get("switch_mode"))){
-				data_list=techTaskDao.queryTechBusNum_All(conditionMap);
-			}
-			if("节点前切换".equals(conditionMap.get("switch_mode"))){
-				data_list=techTaskDao.queryTechBusNum_Pre(conditionMap);
-			}
-			if("节点间切换".equals(conditionMap.get("switch_mode"))){
-				data_list=techTaskDao.queryTechBusNum_After(conditionMap);
-			}
-		}
-		result.put("dataList", data_list);		
-		return SUCCESS;
-	}
-	/**
-	 * 技改任务确认分配，先根据技改任务id、订单、工厂删除原有记录（表BMS_TECH_TASK_DETAIL、BMS_TECH_TASK_FOLLOW）
-	 * @return
-	 */
-	public String asessTechTask(){
-		result=new HashMap<String,Object>();
-		//JSONObject jo=JSONObject.fromObject(conditions);
-		JSONArray jsa=JSONArray.fromObject(conditions);
-		try{
-			for(Object o:jsa){
-				JSONObject jo=(JSONObject)o;
-				Map<String,Object> conditionMap=new HashMap<String,Object>();
-				for(Iterator it=jo.keys();it.hasNext();){
-					String key=(String) it.next();
-					conditionMap.put(key, jo.get(key));
-				}
-				String switch_mode=(String) conditionMap.get("switch_mode");
-				List<String> node_list=new ArrayList<String>();
-				String nodes=(String) conditionMap.get("node_list");
-				node_list=Arrays.asList(nodes.split(","));
-				conditionMap.put("node_list", node_list);
-				List<Map<String,Object>> followList=new ArrayList<Map<String,Object>>();
-				int i=techTaskDao.deleteTechFollowBus(conditionMap);
-				techTaskDao.deleteTechTaskDetail(conditionMap);
-				if("全部切换".equals(switch_mode)){
-					followList=techTaskDao.queryTechBusList_All(conditionMap);
-				}
-				if("节点前切换".equals(switch_mode)){
-					followList=techTaskDao.queryTechBusList_Pre(conditionMap);
-				}
-				if("节点间切换".equals(switch_mode)){
-					followList=techTaskDao.queryTechBusList_After(conditionMap);
-				}
-				if(followList.size()>0){
-					i=techTaskDao.insertTechFollowBus(followList);
-				}
-				techTaskDao.insertTechTaskDetail(conditionMap);	
-						
-			}	
-			result.put("message", "分配成功！");
-			result.put("success", true);
-		}catch(Exception e){
-			result.put("message", "分配失败！");
-			result.put("success", false);
-		}
 	
-		return SUCCESS;
-	}
+
 }
