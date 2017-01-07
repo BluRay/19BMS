@@ -125,8 +125,8 @@
 								<td>顾客变更单号：</td><td><input id="custom_change_no" type="text" style="width:150px;height:18px"></input></td>
 							</tr>
 							<tr>
-								<td>技改单附件：</td><td>查看</td>
-								<td>顾客变更单附件：</td><td>查看</td>
+								<td>技改单附件：</td><td id="td_tech_order_file"><a href="#" target="view_window" id="tech_order_file">查看</a></td>
+								<td>顾客变更单附件：</td><td id="td_custom_change_file"><a href="#" target="view_window" id="custom_change_file">查看</a></td>
 							</tr>
 							<tr>
 								<td>任务创建时间：</td><td><input id="tech_date" type="text" style="width:150px;height:18px"></input></td>

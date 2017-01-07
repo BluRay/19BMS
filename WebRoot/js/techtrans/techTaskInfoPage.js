@@ -5,8 +5,6 @@ var dataOrderInfo = [];
 $(document).ready(function(){
 	var ecnTaskId = GetQueryString('taskid');
 	getBaseInfo(ecnTaskId);
-	//generateWhDetailTb();
-	
 })
 
 function getBaseInfo(ecnTaskId){
@@ -37,6 +35,8 @@ function getBaseInfo(ecnTaskId){
         		$("#preassigner_id").val(value.PREASSIGNER_ID);
         		$("#preassign_date").val(value.PREASSIGN_DATE);
         		$("#finish_date").val(value.FINISH_DATE);
+                (value.TECH_ORDER_FILE=="")?$("#td_tech_order_file").html("无附件"):$("#tech_order_file").attr("href", value.TECH_ORDER_FILE);
+                (value.CUSTOM_CHANGE_FILE=="")?$("#td_custom_change_file").html("无附件"):$("#custom_change_file").attr("href", value.CUSTOM_CHANGE_FILE);
         		
         		if(value.SWITCH_MODE=="全部切换")$("#type1").attr("checked", true);
         		if(value.SWITCH_MODE=="节点前切换")$("#type2").attr("checked", true);
@@ -72,15 +72,20 @@ function getBaseInfo(ecnTaskId){
         			var paramHtml = '<li class="active"><a href="#new_task1" onclick="showOrderInfo('+(index)+');" data-toggle="tab" style="font-size: 14px; color: #333">'+value.order_no+'</a></li>';
             		$(paramHtml).appendTo("#new_tab");
             		//var tech_str = '{' + value.TECH_LIST + '}';
-            		var tech_str = '{"自制件":11,"焊装":10,"玻璃钢":10,"涂装":10}';
-            		var obj = JSON.parse(tech_str);
-            		$("#tech_zzj").html(obj.自制件);
-            		$("#tech_bj").html(obj.部件);
-            		$("#tech_hz").html(obj.焊装);
-            		$("#tech_blg").html(obj.玻璃钢);
-            		$("#tech_tz").html(obj.涂装);
-            		$("#tech_dp").html(obj.底盘);
-            		$("#tech_zz").html(obj.总装);
+            		//var tech_str = '{"自制件":11,"焊装":10,"玻璃钢":10,"涂装":10}';
+                    var tech_str = value.TECH_LIST;
+                    $("#tech_zzj").html("");$("#tech_bj").html("");$("#tech_hz").html("");
+                    $("#tech_blg").html("");$("#tech_tz").html("");
+                    $("#tech_dp").html("");$("#tech_zz").html("");
+                    if(tech_str != ""){
+                        tech_str = tech_str.replace(/:/g,'":"');
+                        tech_str = tech_str.replace(/,/g,'","');
+                        tech_str = '{"' + tech_str + '"}';
+                        var obj = JSON.parse(tech_str);
+                        $("#tech_zzj").html(obj.自制件);$("#tech_bj").html(obj.部件);$("#tech_hz").html(obj.焊装);
+                        $("#tech_blg").html(obj.玻璃钢);$("#tech_tz").html(obj.涂装);
+                        $("#tech_dp").html(obj.底盘);$("#tech_zz").html(obj.总装);
+                    }
             		showOrderInfo(0);
         		}else{
         			var paramHtml = '<li><a href="#new_task1" onclick="showOrderInfo('+(index)+');" data-toggle="tab" style="font-size: 14px; color: #333">'+value.order_no+'</a></li>';
@@ -151,79 +156,6 @@ function showOrderInfo(index){
 	});
 }
 
-function generateWhDetailTb(){
-	$("#whtable tbody").html("");
-	var date_id="";
-	var last_work_date="";
-	$.each(whList,function(index,workhour){
-		var tr=$("<tr />");
-
-		var rowspan=parseInt($(date_id).attr("rowspan"));
-		if(workhour.work_date==last_work_date){
-			$(date_id).attr("rowspan",rowspan+1);
-		}else{
-			date_id="#date_"+index;
-			$("<td id='date_"+index+"' rowspan='1' />").html(workhour.work_date).appendTo(tr);
-		}
-		last_work_date=workhour.work_date;
-		$("<td />").html(workhour.staff_number).appendTo(tr);
-		$("<td />").html(workhour.staff_name).appendTo(tr);
-		$("<td />").html(workhour.job).appendTo(tr);
-		$("<td />").html(workhour.work_hour).appendTo(tr);
-		$("<td />").html(workhour.editor).appendTo(tr);
-		$("<td />").html(workhour.edit_date).appendTo(tr);
-		$("<td />").html(workhour.approver).appendTo(tr);
-		$("<td />").html(workhour.approve_date).appendTo(tr);		
-		$("#whtable tbody").append(tr);
-	});
-	
-}
-
-function generateAssignDetailTb(){
-	$("#assigntable tbody").html("");
-	var total_assign=0;
-	var total_hours=0;
-	var total_real_hour=0;
-	$.each(assignList,function(index,workhour){
-		var assign_hour=parseFloat(workhour.total_hour)*parseFloat(workhour.skill_parameter);
-		total_assign+=assign_hour;
-		total_hours+=workhour.total_hour;
-	});
-	$.each(assignList,function(index,workhour){
-		var tr=$("<tr />");
-		$("<td />").html(workhour.staff_number).appendTo(tr);
-		$("<td />").html(workhour.staff_name).appendTo(tr);
-		$("<td />").html(workhour.workshop_org).appendTo(tr);
-		$("<td />").html(workhour.workgroup_org).appendTo(tr);
-		$("<td />").html(workhour.job).appendTo(tr);
-		$("<td />").html(workhour.total_hour).appendTo(tr);
-		$("<td />").html(workhour.skill_parameter).appendTo(tr);
-		var assign_hour=parseFloat(workhour.total_hour)*parseFloat(workhour.skill_parameter);
-		var real_hour="";
-		var singleHour=parseFloat(baseInfo.single_hour);
-		var ecnNumber=parseFloat(baseInfo.ecn_number);
-		if(!isNaN(singleHour)&&!isNaN(ecnNumber)){
-			real_hour=(assign_hour/total_assign*(ecnNumber*singleHour)).toFixed(2);
-		}
-		var ass_html="<i rel=\"tooltip\" style='color:blue' data-original-title=\"个人总工时*技能系数*订单总工时/SUM(个人总工时*技能系数)\">"+
-		real_hour+"</i>";
-		
-		$("<td class='assing_hour'/>").html(ass_html).appendTo(tr);
-		$("#assigntable tbody").append(tr);
-		total_real_hour+=parseFloat(real_hour);
-	});
-	var tr = $("<tr style='padding:5px'/>");
-	$("<td />").html("").appendTo(tr);
-	$("<td />").html("").appendTo(tr);
-	$("<td />").html("").appendTo(tr);
-	$("<td />").html("").appendTo(tr);
-	$("<td />").html("合计：").appendTo(tr);
-	$("<td />").html(total_hours.toFixed(2)).appendTo(tr);
-	$("<td />").html("").appendTo(tr);
-	$("<td style='color:blue' />").html(total_real_hour.toFixed(2)).appendTo(tr);	
-	$("#assigntable tbody").append(tr);
-	
-}
 function GetQueryString(name) {
 	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
 	var r = window.location.search.substr(1).match(reg);

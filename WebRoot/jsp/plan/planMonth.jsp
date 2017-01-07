@@ -63,7 +63,7 @@
 				<thead>
 					<tr>
 						<th rowspan="2" style="text-align:center;" width="70px">计划调整</th>
-						<th style="text-align:center;" width="48px">2015</th>
+						<th style="text-align:center;" width="48px">月计划</th>
 						<th style="text-align:center;" width="35px">日期</th>
 						<th width="23px">1</th><th width="23px">2</th><th width="23px">3</th>
 						<th width="23px">4</th><th width="23px">5</th><th width="23px">6</th>

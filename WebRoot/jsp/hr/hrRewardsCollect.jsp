@@ -92,7 +92,7 @@ input[type="text"] {
 									id="staff_number" placeholder="工号或姓名..."
 									style="height: 30px; width: 120px;" type="text"
 									class="input-small carSeries" /></td>
-								<td style="padding-top: 8px; width: 50px;">&nbsp;&nbsp;月份：</td>
+								<td style="padding-top: 8px; width: 70px;">&nbsp;&nbsp;月份：</td>
 								<td style="padding-top: 8px; width: 120px;"><input
 									id="staff_date" placeholder="月份..."
 									onclick="WdatePicker({el:'staff_date',dateFmt:'yyyy-MM'});"

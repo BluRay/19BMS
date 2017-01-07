@@ -1810,11 +1810,12 @@ function select_selectOption(elementId,value){
 
 //----------START Bootstrap Script ----------
 var scripts = [
-        location.search.substring(1) || 'js/bootstrap-table.js','js/bootstrap-table-fixed-columns.js',
+        'js/bootstrap-table.js','js/bootstrap-table-fixed-columns.js',
         'js/bootstrap-table-export.js','js/tableExport.js',
         'js/bootstrap-table-editable.js','js/bootstrap-editable.js'
     ],
     eachSeries = function (arr, iterator, callback) {
+    	//console.log("---->arr.length=" + arr.length);
         callback = callback || function () {};
         if (!arr.length) {return callback();}
         var completed = 0;
