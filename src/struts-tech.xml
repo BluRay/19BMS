@@ -16,6 +16,7 @@
 			
 			<!-- by yk start -->
 			<result name="techTaskInfoPage">/jsp/techtrans/techTaskInfoPage.jsp</result>
+			<result name="techTaskMaterialCheck">/jsp/techtrans/techTaskMaterialCheck.jsp</result>
 			<!-- by yk end -->
 			
 			<!-- by wx start -->

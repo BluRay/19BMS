@@ -58,7 +58,7 @@ function initTable() {
             	field: 'ORDER_SERIAL_NO',title: '派工流水号',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-	        	return {css: {"padding-left": "3px", "padding-right": "2px","font-size":"13px"}};
+	        	return {css: {"padding-left": "3px", "padding-right": "2px","font-size":"12px"}};
 	        	},
 	        	formatter:function(value, row, index){
 	        		return "<a href=\"javascript:void(window.open('tempOrder!tempOrderInfoPage.action?tempOrderId="+row.id+
@@ -68,37 +68,37 @@ function initTable() {
             	field: 'REASON_CONTENT',title: '作业原因/内容',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	}
             },{
             	field: 'SAP_ORDER',title: '&nbsp;&nbsp;工单号&nbsp;&nbsp;<br/>',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	}
             },{
             	field: 'TOTAL_QTY',title: '&nbsp;&nbsp;总数量&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	}
             },{
-            	field: 'DELETED',title: '&nbsp;&nbsp;已完成&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
+            	field: 'FINISHED_QTY',title: '&nbsp;&nbsp;已完成&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	}
             },{
             	field: 'SINGLE_HOUR',title: '&nbsp;&nbsp;工时&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	}
             },{
             	field: 'LABORS',title: '所需人力',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	}
             },{
             	field: 'TOTAL_HOURS',title: '总工时',align: 'center',valign: 'middle',align: 'center',
@@ -107,25 +107,25 @@ function initTable() {
             	field: 'FACTORY',title: '制作工厂',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	}
             },{
             	field: 'WORKSHOP',title: '制作车间',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	}
             },{
             	field: 'DUTY_UNIT',title: '责任单位',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	}
             },{
             	field: 'STATUS',title: '状态',align: 'center',valign: 'middle',align: 'center',
                 sortable: false,visible: true,footerFormatter: totalTextFormatter,
                 cellStyle:function cellStyle(value, row, index, field) {
-    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
     	        	},
 	        	formatter:function(value, row, index){
 	        		var status_arr={"0":"已创建","2":"已分配","3":"已评估","5":"已完成","6":"已驳回"};

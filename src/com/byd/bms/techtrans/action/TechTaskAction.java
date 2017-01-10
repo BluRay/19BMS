@@ -312,7 +312,10 @@ public class TechTaskAction extends BaseAction<Object> {
 	
 	
 	// ############# by yk start #############//	
-		
+	public String techTaskMaterialCheck(){
+		return "techTaskMaterialCheck";
+	}
+	
 	public String getTaskInfo() throws UnsupportedEncodingException{
 		HttpServletRequest request = ServletActionContext.getRequest();
 		request.setCharacterEncoding("UTF-8");
