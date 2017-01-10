@@ -30,37 +30,31 @@ $(document).ready(function () {
 			}
 		});
 
-		$("#new_tab").html("<li><i id=\"add_tech_detail\" class=\"fa fa-plus\" style=\"cursor: pointer; padding-top: 12px; color: blue;\"></i></li>");
-		var is_follow=false;
+		$("#new_tab").html("<li></li>");
+		//var is_follow=false;
 		var tech_list=getTechList(task_id);
 		$.each(tech_list,function(i,tech_detail){
 			var order_desc=tech_detail.order_desc;
 			var tech_detail_list=tech_detail.tech_detail_list;
 			var follow_detail=tech_detail.follow_detail;
-			addTechDetail(order_desc,tech_detail_list,follow_detail);
-			$.each(follow_detail.split(";"),function(i,follow){
-				//alert(follow.split("||")[1]);
-				if(follow.split("||")[1]>0){
-					is_follow=true;
-					return false;
-				}
-			})
+			addTechDetail(order_desc,tech_detail_list,follow_detail);		
 		});		
 		var mode_index=0;
+		//节点前切换
 		if(switch_mode=='节点前切换'){
 			mode_index=1;
-			$("#div_switch_node").css("display","");
+			//$("#div_switch_node").css("display","");
 			$("#switch_node").val(switch_node);
 		}
-		if(switch_mode=='节点间切换'){
+		//节点后切换
+		if(switch_mode=='节点后切换'){
 			mode_index=2;
-			$("#div_switch_node").css("display","");
+			//$("#div_switch_node").css("display","");
 			$("#switch_node").val(switch_node);
 		}
 		$("[name=switch_mode]").eq(mode_index).attr('checked',true);
-		if(is_follow){
-			$("[name=switch_mode]").attr("disabled",true);
-		}
+		$("[name=switch_mode]").attr("disabled",true);
+		
 		$("#v_task_content").html(task_content);
 		$("#v_tech_order_no").html(tech_order_no);
 		$("#assessModal").data("tech_date",tech_date);
@@ -74,6 +68,7 @@ $(document).ready(function () {
 	//选择切换方式为‘节点前切换’和‘节点间切换’展示切换节点
 	$('input:radio[name="switch_mode"]').change(function(){
 		//alert($(this).val());
+		//全部切换
 		if($(this).val()=='全部切换'){
 			$("#div_switch_node").hide();
 		}else{
@@ -89,64 +84,6 @@ $(document).ready(function () {
 		var taskNum=$(e.target).attr("id").split("_")[1];
 		$("#tech_factory_"+taskNum).remove();//清除工厂技改分配明细		
 		
-	});
-
-	/**
-	 * 选中工厂复选框，查询该订单工厂的技改车辆信息
-	 */
-	$("input[name='new_tecn_flag']").live("click",function(e){
-		var tb=$(e.target).parent("div").next("table");
-		var tr_body=$(tb).find("tr").eq(1);
-		if($(this).attr("checked")){
-			//alert("选中:"+$(this).data("tech_detail"));
-			var order_no=$(e.target).parent("div").parent("div").parent("div").find(".assess_order_no").val();
-			var factory=$(e.target).parent("div").find("span").html();
-			var tech_date=$("#assessModal").data("tech_date");
-			var switch_mode=$("input[name='switch_mode']:checked").val();
-			var switch_node=$("#switch_node").val()||"";
-			var node_list="";
-			var node_index=switch_node_arr.indexOf(switch_node);
-			if(switch_mode=='节点前切换'){
-				node_list=switch_node_arr.substring(0,node_index-1)
-			}
-			if(switch_mode=='节点间切换'){				
-				node_list=switch_node_arr.substring(node_index,switch_node_arr.length)
-			}
-			//alert(order_no);
-			var datalist=getTechBusNum(order_no,factory,tech_date,switch_mode,switch_node,node_list);
-			//alert($(tr_body).html());
-			var tech_info=JSON.parse(datalist[0].tech_bus_info);
-			$(tr_body).html("<td>"+(tech_info['自制件']||'')+"</td><td>"+(tech_info['部件']||'')+"</td><td>"+
-					(tech_info['焊装']||'')+"</td><td>"+(tech_info['玻璃钢']||'')+"</td><td>"+(tech_info['涂装']||'')+"</td><td>"+
-					(tech_info['底盘']||'')+"</td><td>"+(tech_info['总装']||'')+"</td><td>"+(tech_info['检测线']||'')+"</td>");
-			
-		}else{
-			$(tr_body).html("<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>");
-		}
-	});
-	/**
-	 * 变更切换方式，将所有工厂技改明细清空，提示“切换方式已更改，请重新勾选技改实施范围！”
-	 */
-	$("input[name='switch_mode']").live("change",function(e){
-		$("input[name='new_tecn_flag']").removeAttr("checked");
-		var tbs=$(".tech_factory").find("table");
-		$.each(tbs,function(i,tb){
-			var tr_body=$(tb).find("tr").eq(1);
-			$(tr_body).html("<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>");
-		})
-	alert("切换方式已更改，请重新勾选技改实施范围！")
-	});
-	/**
-	 * 变更切换节点，将所有工厂技改明细清空，提示“切换节点已更改，请重新勾选技改实施范围！”
-	 */
-	$("#switch_node").live("change",function(e){
-		$("input[name='new_tecn_flag']").removeAttr("checked");
-		var tbs=$(".tech_factory").find("table");
-		$.each(tbs,function(i,tb){
-			var tr_body=$(tb).find("tr").eq(1);
-			$(tr_body).html("<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>");
-		})
-	alert("切换节点已更改，请重新勾选技改实施范围！")
 	});
 	
 	$("#btnEditConfirm").live("click",function(){
@@ -210,7 +147,12 @@ function ajaxQuery(targetPage){
 				$("<td />").html(data.factory||"").appendTo(tr);
 				$("<td />").html(data.switch_node||"").appendTo(tr);
 				$("<td />").html(data.tech_list||"").appendTo(tr);
-				$("<td />").html("<i name='edit' class=\"fa fa-pencil\" title=\"分配\" style=\"cursor: pointer;text-align: center;\" onclick='ajaxEdit(" + data.id + ")'></i>").appendTo(tr);
+				if(data.assess_date.trim().length==0&&data.assign_date.trim().length>0){
+					$("<td />").html("<i name='edit' class=\"fa fa-pencil\" title=\"分配\" style=\"cursor: pointer;text-align: center;\" onclick='ajaxEdit(" + data.id + ")'></i>").appendTo(tr);
+				}else{
+					$("<td />").html("").appendTo(tr);
+				}
+				
 				$("#techTaskList tbody").append(tr);
 				$(tr).data("task_id",data.id);
 			});
@@ -238,10 +180,7 @@ function addTechDetail(order_desc,tech_detail_list,follow_detail){
 			return false;
 		}
 	})
-	var order_disabled="";
-	if(is_follow){
-		order_disabled="disabled";
-	}
+	var order_disabled="disabled";
 	
 	order_desc=order_desc||"";
 	//factory=factory||"";
@@ -257,7 +196,6 @@ function addTechDetail(order_desc,tech_detail_list,follow_detail){
 	$("#new_accordion").find("div").removeClass("active");
 	
 	var tabli="<li class='active'><a href='#new_task"+taskNum+"' data-toggle='tab' style='font-size: 14px; color: #333;display:inline-block'><span>订单"+taskNum+"</span>"
-	+"&nbsp;&nbsp;"+(order_disabled==""?"<i class='fa fa-remove' style='cursor: pointer;color: rgb(218, 208, 208);display:inline-block' onclick='javascript:{if (confirm(\"确认删除？\"))removeTechDetail(this)}'></i>":"")
 	+"</a></li>";
 	
 	$("#new_tab li:eq("+index+")").before(tabli);
@@ -269,12 +207,12 @@ function addTechDetail(order_desc,tech_detail_list,follow_detail){
 	
 	$(tabContent).appendTo($("#new_accordion"));
 	addTechFactoryDetail(taskNum,tech_detail_list,follow_detail);
-	getFuzzyOrder("#order_"+taskNum);
+	//getFuzzyOrder("#order_"+taskNum);
 }
 
 /**
  * 
- * @param p
+ * @param 
  */
 function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 	var factory_disable_obj={};
@@ -283,11 +221,7 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 		var factory=follow.split("||")[0];
 		var follow_num=Number(follow.split("||")[1]);
 		//alert(follow_num);
-		factory_disable_obj[factory]="";
-		if(follow_num>0){
-			factory_disable_obj[factory]="disabled";
-			return false;
-		}
+		factory_disable_obj[factory]="disabled";
 	})
 	
 	
@@ -297,7 +231,8 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 		var tech_detail_arr=tech_detail_list.split(";");
 		var content=$("<div id=\"tech_factory_"+taskNum+"\" class=\"tech_factory\"/>");
 		$.each(tech_detail_arr,function(i,tech_detail){
-			var factory=tech_detail.split("||")[0];
+			var factory=tech_detail.split("||")[0].split("_")[1];
+			var factory_id=tech_detail.split("||")[0].split("_")[0];
 			var tech_info=tech_detail.split("||")[1];
 			var tech_obj=new Array();
 			$.each(tech_info.split(","),function(i,data){
@@ -309,12 +244,12 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 			if(tech_info.trim().length>0){
 				checked="checked";
 			}
-			var facotory_div=$("<div><span>"+factory+"</span></div>");
+			var facotory_div=$("<div><span factory_id='"+factory_id+"'>"+factory+"</span></div>");
 			var ckbox=$("<input style=\"height:30px\" name=\"new_tecn_flag\""+
 					" class=\"input-medium\" type=\"checkbox\""+checked+" "+factory_disable_obj[factory]+">");
 			var tech_table=$("<table class=\"table table-bordered table-striped\" style=\"margin-bottom: 0px;\"></table>");
-			var tr_head=$("<tr><td>自制件</td><td>部件</td><td>焊装</td><td>玻璃钢</td><td>涂装</td><td>底盘</td><td>总装</td><td>检测线</td></tr>");
-			var tr_body=$("<tr height='31px'><td>"+(tech_obj['自制件']||'')+"</td><td>"+(tech_obj['部件']||'')+"</td><td>"+
+			var tr_head=$("<tr height='31px'><td>自制件</td><td>部件</td><td>焊装</td><td>玻璃钢</td><td>涂装</td><td>底盘</td><td>总装</td><td>检测线</td></tr>");
+			var tr_body=$("<tr height='31px'><td contenteditable=\"true\">"+(tech_obj['自制件']||'0')+"</td><td contenteditable=\"true\">"+(tech_obj['部件']||'0')+"</td><td>"+
 					(tech_obj['焊装']||'')+"</td><td>"+(tech_obj['玻璃钢']||'')+"</td><td>"+(tech_obj['涂装']||'')+"</td><td>"+
 					(tech_obj['底盘']||'')+"</td><td>"+(tech_obj['总装']||'')+"</td><td>"+(tech_obj['检测线']||'')+"</td></tr>");
 			$(tech_table).append(tr_head).append(tr_body);						
@@ -329,42 +264,6 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 	}	
 }
 
-/*
- * 删除技改任务
- */
-function removeTechDetail(p){
-	var task_div_id=$(p).parent().attr("href");
-	
-	var task_pre="new_task";
-	// alert(task_div_id);
-	var allTabLi = $(p).parent().parent().siblings();	
-	$(p).parent().parent().remove();// 删除该tabLi
-	$(task_div_id).remove();// 删除对应tab content
-	var allTabDiv = $("#new_accordion").find(".tab-pane");
-	// 技改任务tab栏重新排序
-	var actived=false;
-	allTabLi.each(function(index,li){
-		if(index>=0){
-			var span = $(li).children('a');
-			// alert($(span).attr("href"));
-			$(span).attr('href',"#"+task_pre+(index+1));
-			$(span).find("span").html("订单"+(index+1));
-			if($(li).hasClass("active")){actived=true}
-		}
-	});
-	// 技改任务DIV id重排
-	allTabDiv.each(function(index,div){
-		if(index>0){
-			var pre_id = $(div).attr('id');
-			$("#"+pre_id).attr("id",""+task_pre+(index+1));
-		}
-	});
-	if(!actived){
-		$(allTabLi[0]).addClass("active");
-		$(allTabDiv[0]).addClass("active");
-	}
-	
-}
 
 //根据技改任务ID查询技改实施范围信息
 function getTechList(task_id){
@@ -385,108 +284,6 @@ function getTechList(task_id){
 		return tech_list;
 }
 
-//输入订单编号，查询工厂订单列表
-function getFactoryOrderList(order_no){
-	var conditions="{'order_no':'"+order_no+"'}";
-	var order_list=[];
-	$.ajax({
-		url:"techTask!getOrderList.action",
-		dataType:"json",
-		type:"post",
-		async:false,
-		data:{
-			"conditions":conditions
-			},
-		success:function(response){
-			order_list=response.dataList;
-			}
-		});
-		return order_list;
-}
-
-function getFuzzyOrder(elmentId){
-	var orderList=new Array();
-	$(elmentId).typeahead({
-		source : function(input,process){
-			var data={
-					"conditionMap.orderNo":input
-			};		
-			return $.ajax({
-				url:"common!getOrderFuzzySelect.action",
-				dataType : "json",
-				type : "get",
-				data : data,
-				success: function (data) { 
-					orderList = data;
-					var results = new Array();
-					$.each(data, function(index, value) {
-						results.push(value.orderNo);
-					})
-					
-					return process(results);
-				}
-			});
-		},
-		items : 30,
-		highlighter : function(item) {
-			var order_name = "";
-			var bus_type = "";
-			var order_qty = "";
-			$.each( orderList, function(index, value) {
-				//alert(value.orderNo);
-				if (value.orderNo == item) {
-					order_name = value.name;
-					bus_type = value.busType;
-					order_qty = value.orderQty + "台";
-				}
-			})
-			return item + "  " + order_name + " " + bus_type + order_qty;
-		},
-		matcher : function(item) {
-			return true;
-		},
-		updater : function(item) {
-			var order_name = "";
-			var bus_type = "";
-			var order_qty = "";
-			$.each(orderList, function(index, value) {
-				if (value.orderNo == item) {
-					order_name = value.name;
-					bus_type = value.busType;
-					order_qty = value.orderQty + "台";
-				}
-			})
-			//alert($(elmentId).closest(".order_desc").html());
-			$(elmentId).parent("div").find(".order_desc").html(item + "  " + order_name + " " + bus_type + order_qty);
-			var order_list=getFactoryOrderList(item);
-			var taskNum=$(".tab-pane.active").attr("id").replace("new_task","");
-			$("#tech_factory_"+taskNum).remove();
-			
-			//alert(taskNum);
-			$.each(order_list,function(i,order_detail){
-				var order_desc=order_detail.order_desc;
-				var tech_detail_list=order_detail.tech_detail_list;
-				addTechFactoryDetail(taskNum,tech_detail_list);
-			});
-			var order_inputs=$(".assess_order_no");
-			var return_order=item;
-			var tech_factoryId="";
-			$.each(order_inputs,function(i,order_input){
-				if($(order_input).val()==item&&elmentId!=("#"+$(order_input).attr("id"))){
-					//$(elmentId).val("");
-					alert("该订单技改范围已经存在，不能重复维护！");
-					return_order=null;
-					tech_factoryId="#tech_factory_"+elmentId.replace("#order_","");
-					$(tech_factoryId).remove();
-					$(elmentId).parent("div").find(".order_desc").html("");
-					return null;
-				}
-			})
-			
-			return return_order;
-		}
-	});
-}
 
 function getTechBusNum(order_no,factory,tech_date,switch_mode,switch_node,node_list){
 	var conditions={};
@@ -520,19 +317,21 @@ function asessTechTask(){
 	var switch_node=$("#switch_node").val()||"";
 	var node_list="";
 	var node_index=switch_node_arr.indexOf(switch_node);
+
 	if(switch_mode=='节点前切换'){
 		node_list=switch_node_arr.substring(0,node_index-1)
 	}
-	if(switch_mode=='节点间切换'){				
+	if(switch_mode=='节点后切换'){				
 		node_list=switch_node_arr.substring(node_index,switch_node_arr.length)
 	}
 	var conditions=new Array();
 
 	$.each(factory_cboxs,function(i,cbox){
 		var factory=$(cbox).parent("div").find("span").html();
+		var factory_id=$(cbox).parent("div").find("span").attr("factory_id");
 		var order_no=$(cbox).parent("div").parent("div").parent("div").find(".assess_order_no").val();
 		//alert($(cbox).attr("checked"));
-		if($(cbox).attr("checked")=="checked"&& !$(cbox).attr("disabled")){
+		if($(cbox).attr("checked")=="checked"){
 			var tech_detail_list=[];
 			var tb=$(cbox).parent("div").parent("div").find("table");
 			var tr_body=$(tb).find("tr").eq(1);
@@ -550,6 +349,7 @@ function asessTechTask(){
 			var obj={};
 			obj.tech_task_id=tech_task_id;
 			obj.factory_list=factory;
+			obj.factory_id=factory_id
 			obj.order_no=order_no;
 			obj.switch_mode=switch_mode;
 			obj.switch_node=switch_node;
@@ -559,8 +359,9 @@ function asessTechTask(){
 			conditions.push(obj);
 		}
 	});
+	//alert(JSON.stringify(conditions));
 	$.ajax({
-		url:"techTask!asessTechTask.action",
+		url:"techTask!assignTechTask.action",
 		dataType:"json",
 		type:"post",
 		async:false,

@@ -224,7 +224,7 @@ public class TechTaskAction extends BaseAction<Object> {
 			if("节点前切换".equals(conditionMap.get("switch_mode"))){
 				data_list=techTaskDao.queryTechBusNum_Pre(conditionMap);
 			}
-			if("节点间切换".equals(conditionMap.get("switch_mode"))){
+			if("节点后切换".equals(conditionMap.get("switch_mode"))){
 				data_list=techTaskDao.queryTechBusNum_After(conditionMap);
 			}
 		}
@@ -272,7 +272,7 @@ public class TechTaskAction extends BaseAction<Object> {
 				if("节点前切换".equals(switch_mode)){
 					followList=techTaskDao.queryTechBusList_Pre(conditionMap);
 				}
-				if("节点间切换".equals(switch_mode)){
+				if("节点后切换".equals(switch_mode)){
 					followList=techTaskDao.queryTechBusList_After(conditionMap);
 				}
 				//往技改跟进表中（BMS_TECH_TASK_FOLLOW）插入查询到的技改车辆信息
@@ -314,6 +314,10 @@ public class TechTaskAction extends BaseAction<Object> {
 	// ############# by yk start #############//	
 	public String techTaskMaterialCheck(){
 		return "techTaskMaterialCheck";
+	}
+	
+	public String techTaskMaterialCheckPage(){
+		return "techTaskMaterialCheckPage";
 	}
 	
 	public String getTaskInfo() throws UnsupportedEncodingException{
@@ -754,8 +758,6 @@ public class TechTaskAction extends BaseAction<Object> {
 		}
 		return null;
 	}
-
-
 	
 	private String saveFileMethod(File f){
 		String filepath="";
@@ -803,9 +805,115 @@ public class TechTaskAction extends BaseAction<Object> {
 	public String taskMaintainPage() {
 		return "taskMaintainPage";
 	}
+	
+	/**
+	 * 技改工时评估界面
+	 * 
+	 * @return
+	 */
+	public String workHourEstimatePage() {
+		return "workHourEstimatePage";
+	}
+	
+	/**
+	 * 获得技改工时评估列表
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public String getWorkHourEstimateList() throws UnsupportedEncodingException {
+		/*
+		 * SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		 * String curTime = df.format(new Date()); int userid=getUser().getId();
+		 */
+		// logger.info("---->HrAction::getWorkTimePriceList " + curTime + " " +
+		// userid);
+
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+
+		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		conditionMap.put("factory", request.getParameter("factory"));
+		conditionMap.put("order_no", request.getParameter("order_no"));
+		conditionMap.put("task_content", request.getParameter("task_content"));
+		conditionMap.put("tech_order_no", request.getParameter("tech_order_no"));
+		conditionMap.put("tech_date_start", request.getParameter("tech_date_start"));
+		conditionMap.put("tech_date_end", request.getParameter("tech_date_end"));
+		conditionMap.put("status", request.getParameter("status"));
+		if (pager != null) {
+			conditionMap.put("offset", (pager.getCurPage() - 1) * pager.getPageSize());
+			conditionMap.put("pageSize", pager.getPageSize());
+		}
+
+		List list = techTaskDao.queryTechWorkHourEstimateList(conditionMap);
+		int totalCount = techTaskDao.queryTechWorkHourEstimateListTotalCount(conditionMap);
+
+		Map<String, String> page_map = new HashMap<String, String>();
+		if (pager != null) {
+			pager.setTotalCount(totalCount);
+			page_map.put("totalCount", String.valueOf(pager.getTotalCount()));
+			page_map.put("curPage", String.valueOf(pager.getCurPage()));
+			page_map.put("pageSize", String.valueOf(pager.getPageSize()));
+		}
+		JSONObject json = Util.dataListToJson(true, "查询成功", list, page_map);
+
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(json);
+		return null;
+	}
+	
+	/**
+	 * 技改工时评估-修改
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public String editTechWorkHourEstimate() throws UnsupportedEncodingException {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String curTime = df.format(new Date());
+		int userid = getUser().getId();
+		// logger.info("---->HrAction::addRewards " + curTime + " " + userid);
+
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+
+		List<Map<String, Object>> editList = new ArrayList<Map<String, Object>>();
+		Map<String, Object> infomap = new HashMap<String, Object>();
+		infomap.put("time_list", request.getParameter("time_list"));
+		infomap.put("single_time_total", request.getParameter("single_time_total"));
+		infomap.put("assesor_id", userid);
+		if("1".equals(request.getParameter("flg"))){
+			infomap.put("assess_date", "");
+		}else{
+			infomap.put("assess_date", curTime);
+		}
+		
+		infomap.put("id", request.getParameter("id"));
+		infomap.put("tech_task_id", request.getParameter("tech_task_id"));
+		editList.add(infomap);
+
+		techTaskDao.updateTechWorkHourEstimate(editList);
+		
+		JSONObject json = Util.dataListToJson(true, "success", null, null);
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(json);
+		return null;
+	}
 
 	// ############# by wx end #############//	
-	
-	
-
 }

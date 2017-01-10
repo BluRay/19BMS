@@ -33,6 +33,9 @@ $(document).ready(function () {
 		$("#new_tab").html("<li><i id=\"add_tech_detail\" class=\"fa fa-plus\" style=\"cursor: pointer; padding-top: 12px; color: blue;\"></i></li>");
 		var is_follow=false;
 		var tech_list=getTechList(task_id);
+		if(tech_list.length==0){
+			addTechDetail();
+		}
 		$.each(tech_list,function(i,tech_detail){
 			var order_desc=tech_detail.order_desc;
 			var tech_detail_list=tech_detail.tech_detail_list;
@@ -46,13 +49,14 @@ $(document).ready(function () {
 				}
 			})
 		});		
+		
 		var mode_index=0;
 		if(switch_mode=='节点前切换'){
 			mode_index=1;
 			$("#div_switch_node").css("display","");
 			$("#switch_node").val(switch_node);
 		}
-		if(switch_mode=='节点间切换'){
+		if(switch_mode=='节点后切换'){
 			mode_index=2;
 			$("#div_switch_node").css("display","");
 			$("#switch_node").val(switch_node);
@@ -109,7 +113,7 @@ $(document).ready(function () {
 			if(switch_mode=='节点前切换'){
 				node_list=switch_node_arr.substring(0,node_index-1)
 			}
-			if(switch_mode=='节点间切换'){				
+			if(switch_mode=='节点后切换'){				
 				node_list=switch_node_arr.substring(node_index,switch_node_arr.length)
 			}
 			//alert(order_no);
@@ -150,7 +154,7 @@ $(document).ready(function () {
 	});
 	
 	$("#btnEditConfirm").live("click",function(){
-		asessTechTask();
+		assignTechTask();
 	});
 	
 })
@@ -212,6 +216,8 @@ function ajaxQuery(targetPage){
 				$("<td />").html(data.tech_list||"").appendTo(tr);
 				if(data.assess_date.trim().length==0){
 					$("<td />").html("<i name='edit' class=\"fa fa-pencil\" title=\"分配\" style=\"cursor: pointer;text-align: center;\" onclick='ajaxEdit(" + data.id + ")'></i>").appendTo(tr);
+				}else{
+					$("<td />").html("").appendTo(tr);
 				}
 				
 				$("#techTaskList tbody").append(tr);
@@ -233,7 +239,8 @@ function addTechDetail(order_desc,tech_detail_list,follow_detail){
 	follow_detail=follow_detail||"";
 	var is_follow=false;
 	$.each(follow_detail.split(";"),function(i,follow){
-		var factory=follow.split("||")[0];
+		var factory_id=follow.split("||")[0].split("_")[0];
+		var factory=follow.split("||")[0].split("_")[1];
 		var follow_num=follow.split("||")[1];
 		//alert(follow_num);
 		if(follow.split("||")[1]>0){
@@ -283,7 +290,8 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 	var factory_disable_obj={};
 	follow_detail=follow_detail||"";
 	$.each(follow_detail.split(";"),function(i,follow){
-		var factory=follow.split("||")[0];
+		var factory_id=follow.split("||")[0].split("_")[0];
+		var factory=follow.split("||")[0].split("_")[1];
 		var follow_num=Number(follow.split("||")[1]);
 		//alert(follow_num);
 		factory_disable_obj[factory]="";
@@ -300,7 +308,8 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 		var tech_detail_arr=tech_detail_list.split(";");
 		var content=$("<div id=\"tech_factory_"+taskNum+"\" class=\"tech_factory\"/>");
 		$.each(tech_detail_arr,function(i,tech_detail){
-			var factory=tech_detail.split("||")[0];
+			var factory_id=tech_detail.split("||")[0].split("_")[0];
+			var factory=tech_detail.split("||")[0].split("_")[1];
 			var tech_info=tech_detail.split("||")[1];
 			var tech_obj=new Array();
 			$.each(tech_info.split(","),function(i,data){
@@ -312,7 +321,7 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 			if(tech_info.trim().length>0){
 				checked="checked";
 			}
-			var facotory_div=$("<div><span>"+factory+"</span></div>");
+			var facotory_div=$("<div><span factory_id='"+factory_id+"'>"+factory+"</span></div>");
 			var ckbox=$("<input style=\"height:30px\" name=\"new_tecn_flag\""+
 					" class=\"input-medium\" type=\"checkbox\""+checked+" "+factory_disable_obj[factory]+">");
 			var tech_table=$("<table class=\"table table-bordered table-striped\" style=\"margin-bottom: 0px;\"></table>");
@@ -515,7 +524,7 @@ function getTechBusNum(order_no,factory,tech_date,switch_mode,switch_node,node_l
 		return data_list;
 }
 
-function asessTechTask(){
+function assignTechTask(){
 	var factory_cboxs=$("input[name='new_tecn_flag']");
 	var tech_task_id=$("#assessModal").data("tech_task_id");
 	var switch_mode=$("input[name='switch_mode']:checked").val();
@@ -526,13 +535,14 @@ function asessTechTask(){
 	if(switch_mode=='节点前切换'){
 		node_list=switch_node_arr.substring(0,node_index-1)
 	}
-	if(switch_mode=='节点间切换'){				
+	if(switch_mode=='节点后切换'){				
 		node_list=switch_node_arr.substring(node_index,switch_node_arr.length)
 	}
 	var conditions=new Array();
 
 	$.each(factory_cboxs,function(i,cbox){
 		var factory=$(cbox).parent("div").find("span").html();
+		var factory_id=$(cbox).parent("div").find("span").attr("factory_id");
 		var order_no=$(cbox).parent("div").parent("div").parent("div").find(".assess_order_no").val();
 		//alert($(cbox).attr("checked"));
 		if($(cbox).attr("checked")=="checked"&& !$(cbox).attr("disabled")){
@@ -553,6 +563,7 @@ function asessTechTask(){
 			var obj={};
 			obj.tech_task_id=tech_task_id;
 			obj.factory_list=factory;
+			obj.factory_id=factory_id;
 			obj.order_no=order_no;
 			obj.switch_mode=switch_mode;
 			obj.switch_node=switch_node;

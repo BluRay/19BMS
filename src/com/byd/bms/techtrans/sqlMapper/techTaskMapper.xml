@@ -5,9 +5,10 @@
 	
 	<select id="queryTechTaskList" parameterType="Map" resultType="Map">
 	<![CDATA[
-		SELECT t.*,concat(d.order_no,'<br />',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
-		d.factory,d.tech_list,d.time_list,d.single_time_total,d.time_total
+		SELECT t.*,k.key_name tech_type,concat(d.order_no,'<br />',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
+		d.factory_id,d.factory,d.tech_list,d.time_list,d.single_time_total,d.time_total
 		FROM BMS_TECH_TASK t
+		LEFT JOIN BMS_BASE_KEY k on t.tech_type=k.id and k.key_code='ECN_TYPE'
 		LEFT JOIN BMS_TECH_TASK_DETAIL d ON t.id=d.tech_task_id
 		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
 		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
@@ -96,8 +97,8 @@
 	<select id="queryTechList" parameterType="Map" resultType="Map">
 		<![CDATA[		
 		SELECT concat(d.order_no,'<br>',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
-		group_concat(d.factory,'||',d.tech_list separator ';') tech_detail_list,
-		group_concat(d.factory,'||',(select count(f.bus_number) from BMS_TECH_TASK_FOLLOW f where f.confirmor_date is not null and f.confirmor_date !='' and f.factory=d.factory and f.order_no=d.order_no)  separator ';') follow_detail
+		group_concat(d.factory_id,'_',d.factory,'||',d.tech_list separator ';') tech_detail_list,
+		group_concat(d.factory_id,'_',d.factory,'||',(select count(f.bus_number) from BMS_TECH_TASK_FOLLOW f where f.confirmor_date is not null and f.confirmor_date !='' and f.factory=d.factory and f.order_no=d.order_no)  separator ';') follow_detail
 		FROM BMS_TECH_TASK_DETAIL d 
 		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
 		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
@@ -108,7 +109,7 @@
 	
 	<select id="queryFactoryOrderList" parameterType="Map" resultType="Map">
 		SELECT concat(o.order_no,' ',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
-		group_concat(f.factory_name,'||','' separator ';') tech_detail_list
+		group_concat(f.id,'_',f.factory_name,'||','' separator ';') tech_detail_list
 		FROM BMS_ORDER o
 		LEFT JOIN BMS_FACTORY_ORDER fo ON o.id=fo.order_id
 		LEFT JOIN BMS_BASE_BUS_TYPE bt ON bt.id=o.bus_type_id
@@ -623,12 +624,12 @@
 		values
 		<foreach collection="list" item="item" index="index" separator="," >  
         (#{item.tech_task_id},#{item.bus_number},#{item.order_no},#{item.factory},#{item.workshop})  
-    </foreach> 
+    	</foreach> 
 	</insert>
 	
 	<insert id="insertTechTaskDetail" useGeneratedKeys="true" parameterType="Map">
-		insert into BMS_TECH_TASK_DETAIL (tech_task_id,order_no,factory,tech_list)
-		values (#{tech_task_id},#{order_no},#{factory_list},#{tech_list})  
+		insert into BMS_TECH_TASK_DETAIL (tech_task_id,order_no,factory,factory_id,tech_list)
+		values (#{tech_task_id},#{order_no},#{factory_list},#{factory_id},#{tech_list})  
 
 	</insert>
 	
@@ -678,7 +679,10 @@
 <!--  ###################  by yk  start  ###############  -->
 	
 	<select id="queryTaskBaseInfo" parameterType="Map" resultType="Map">
-		SELECT * FROM BMS_TECH_TASK t WHERE t.id = #{taskid}
+		SELECT T.*,K1.key_name AS ECN_CHANGE_TYPE,K2.key_name AS ECN_TYPE FROM BMS_TECH_TASK T 
+		LEFT JOIN BMS_BASE_KEY K1 ON T.tech_order_type = K1.id 
+		LEFT JOIN BMS_BASE_KEY K2 ON T.tech_type = K2.id 
+		WHERE T.id = #{taskid}
 	</select>
 	
 	<select id="queryTaskMaterielInfo" parameterType="Map" resultType="Map">
@@ -720,13 +724,13 @@
 			and t.tech_date&lt;=#{tech_date_end} 
 		</if>
 		<if test="status=='已创建'">
-			and t.edit_date !=''
+			and t.edit_date !='' and t.assign_date ='' and t.assess_date ='' and t.finish_date ='' 
 		</if>
 		<if test="status=='已分配'">
-			and t.assign_date !=''
+			and t.assign_date !='' and t.assess_date ='' and t.finish_date ='' 
 		</if>
 		<if test="status=='已评估'">
-			and t.assess_date !=''
+			and t.assess_date !='' and t.finish_date ='' 
 		</if>
 		<if test="status=='已完成'">
 			and t.finish_date !=''
@@ -762,13 +766,13 @@
 			and t.tech_date&lt;=#{tech_date_end} 
 		</if>
 		<if test="status=='已创建'">
-			and t.edit_date !=''
+			and t.edit_date !='' and t.assign_date ='' and t.assess_date ='' and t.finish_date ='' 
 		</if>
 		<if test="status=='已分配'">
-			and t.assign_date !=''
+			and t.assign_date !='' and t.assess_date ='' and t.finish_date ='' 
 		</if>
 		<if test="status=='已评估'">
-			and t.assess_date !=''
+			and t.assess_date !='' and t.finish_date ='' 
 		</if>
 		<if test="status=='已完成'">
 			and t.finish_date !=''
@@ -845,6 +849,110 @@
 		]]>
 	</insert>
 	
+	<!--技改工时评估-查询 -->
+	<select id="queryTechWorkHourEstimateList" parameterType="Map" resultType="Map">
+		SELECT
+			d.*,
+			t.task_content,
+			t.tech_order_type,
+			t.tech_order_no,
+			t.tech_date,
+			t.edit_date,
+			t.assign_date,
+			t.assess_date,
+			t.finish_date
+		FROM
+			BMS_TECH_TASK_DETAIL AS d
+		LEFT JOIN BMS_TECH_TASK AS t ON t.id = d.tech_task_id
+		WHERE 1=1
+		<if test="factory !=null and factory !=''">
+			and d.factory = #{factory}
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			and d.order_no = #{order_no}
+		</if>
+		<if test="task_content !=null and task_content !=''">
+			and t.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and t.edit_date !='' and t.assign_date ='' and t.assess_date ='' and t.finish_date ='' 
+		</if>
+		<if test="status=='已分配'">
+			and t.assign_date !='' and t.assess_date ='' and t.finish_date ='' 
+		</if>
+		<if test="status=='已评估'">
+			and t.assess_date !='' and t.finish_date ='' 
+		</if>
+		<if test="status=='已完成'">
+			and t.finish_date !=''
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	
+	<!--技改工时评估-查询totalcount -->
+	<select id="queryTechWorkHourEstimateListTotalCount" parameterType="Map" resultType="int">
+		SELECT count(d.id)
+		FROM
+			BMS_TECH_TASK_DETAIL AS d
+		LEFT JOIN BMS_TECH_TASK AS t ON t.id = d.tech_task_id
+		WHERE 1=1
+		<if test="factory !=null and factory !=''">
+			and d.factory = #{factory}
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			and d.order_no = #{order_no}
+		</if>
+		<if test="task_content !=null and task_content !=''">
+			and t.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and t.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and t.edit_date !='' and t.assign_date ='' and t.assess_date ='' and t.finish_date ='' 
+		</if>
+		<if test="status=='已分配'">
+			and t.assign_date !='' and t.assess_date ='' and t.finish_date ='' 
+		</if>
+		<if test="status=='已评估'">
+			and t.assess_date !='' and t.finish_date ='' 
+		</if>
+		<if test="status=='已完成'">
+			and t.finish_date !=''
+		</if>
+	</select>
+	
+	<!-- 技改工时评估-修改 -->
+	<update id="updateTechWorkHourEstimate" parameterType="List">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_TECH_TASK_DETAIL
+			SET time_list = #{item.time_list}
+			,single_time_total = #{item.single_time_total}
+			WHERE id = #{item.id};
+			UPDATE BMS_TECH_TASK
+			SET assesor_id = #{item.assesor_id}
+			,assess_date = #{item.assess_date}
+			WHERE id = #{item.tech_task_id}
+		</foreach>
+	</update>
 <!--  ###################  by wx  end  ###############  -->
 	
 </mapper>

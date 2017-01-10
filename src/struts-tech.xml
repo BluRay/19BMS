@@ -17,10 +17,12 @@
 			<!-- by yk start -->
 			<result name="techTaskInfoPage">/jsp/techtrans/techTaskInfoPage.jsp</result>
 			<result name="techTaskMaterialCheck">/jsp/techtrans/techTaskMaterialCheck.jsp</result>
+			<result name="techTaskMaterialCheckPage">/jsp/techtrans/techTaskMaterialCheckPage.jsp</result>
 			<!-- by yk end -->
 			
 			<!-- by wx start -->
 			<result name="taskMaintainPage">/jsp/techtrans/techTaskMaintain.jsp</result>
+			<result name="workHourEstimatePage">/jsp/techtrans/techWorkHourEstimate.jsp</result>
 			<!-- by wx end -->	
 		</action>
 		
