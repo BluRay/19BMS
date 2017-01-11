@@ -92,6 +92,36 @@ public interface ITechTaskDao {
 	 * @param cdmap
 	 */
 	public void updateTechTaskInfo(Map<String, Object> cdmap);
+	/**
+	 * 技改工时分配明细查询
+	 * @param conditionMap
+	 * @return
+	 */
+	public List workshoptimeinfo(Map<String, Object> conditionMap);
+	/**
+	 * 技改任务跟进车辆信息查询
+	 * @param map
+	 * @return
+	 */
+	public List queryTaskBusNumber(Map<String, Object> map);
+	/**
+	 * 员工技改工时明细查询
+	 * @param conditionMap
+	 * @return
+	 */
+	public List<Map<String, String>> queryStaffWorkHours(Map<String, Object> conditionMap);
+	/**
+	 * 员工技改工时保存
+	 * @param swh_list
+	 * @return
+	 */
+	public int saveWorkHourInfo(List<Map<String, Object>> swh_list);
+	/**
+	 * 员工技改工时修改
+	 * @param swh_list
+	 * @return
+	 */
+	public int batchUpdateWorkHour(List<Map<String, Object>> swh_list);
 	//by xjw end
 	 
 	
@@ -100,6 +130,9 @@ public interface ITechTaskDao {
 	public List<Map<String,String>> queryTaskMaterielInfo(Map<String, Object> conditionMap);
 	public List<Map<String,String>> queryTaskOrderInfo(Map<String, Object> conditionMap);
 	public List<Map<String,String>> queryTaskOrderFinishInfo(Map<String, Object> conditionMap);
+	public int checkTaskMaterial(Map<String, Object> conditionMap);
+	public int queryTaskMaterialCheckCount(Map<String, Object> conditionMap);
+	public int checkTask(Map<String, Object> conditionMap);
 	//by yk end
 	
 	

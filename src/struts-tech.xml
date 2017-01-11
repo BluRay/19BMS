@@ -9,6 +9,7 @@
 			<!-- by xjw start -->
 			<result name="assignPage">/jsp/techtrans/taskAssignPage.jsp</result>
 			<result name="assignPrePage">/jsp/techtrans/taskAssignPrePage.jsp</result>
+			<result name="worktimeMaitain">/jsp/techtrans/techWorktimeMaitain.jsp</result>
 			<result type="json">
 				<param name="root">result</param>
 			</result>

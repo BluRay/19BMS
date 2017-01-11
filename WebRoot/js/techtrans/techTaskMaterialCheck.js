@@ -53,7 +53,7 @@ function ajaxQuery(targetPage) {
 				$("<td />").html(value.repeat_change).appendTo(tr);
 				$("<td />").html(getKeys("ECN_TYPE",value.tech_type)).appendTo(tr);
 
-				$("<td />").html(value.finish_date==""?"<a href='' onclick=''>确认</a>":"").appendTo(tr);
+				$("<td />").html(value.finish_date==""?"<a onclick='window.open(\"/19bms/techTask!techTaskMaterialCheckPage.action?taskid=1\")' onclick=''>确认</a>":"").appendTo(tr);
 				$("#tableTaskFollow tbody").append(tr);
 
 				$(tr).data("id", value.id);

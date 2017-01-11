@@ -25,11 +25,13 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.xwork.StringUtils;
 import org.apache.struts2.ServletActionContext;
 
 import com.byd.bms.techtrans.dao.ITechTaskDao;
 import com.byd.bms.util.Util;
 import com.byd.bms.util.action.BaseAction;
+import com.byd.bms.util.entity.BmsBaseUser;
 import com.byd.bms.util.entity.Pager;
 import com.byd.bms.util.poi.ExcelModel;
 import com.byd.bms.util.poi.ExcelTool;
@@ -129,6 +131,15 @@ public class TechTaskAction extends BaseAction<Object> {
 	}
 	
 	// ############# by xjw start ##############//
+	private String whflag;
+	
+	public String getWhflag() {
+		return whflag;
+	}
+
+	public void setWhflag(String whflag) {
+		this.whflag = whflag;
+	}
 
 	/**
 	 * 技改任务分配界面
@@ -307,7 +318,220 @@ public class TechTaskAction extends BaseAction<Object> {
 	public String taskAssignPrePage(){
 		return "assignPrePage";
 	}
+	/**
+	 * 技改工时维护界面
+	 * @return
+	 */
+	public String worktimeMaintain(){
+		return "worktimeMaitain";
+	}
+	/**
+	 * 根据工厂id,任务id 查询车间的工时配置信息
+	 */
+	@SuppressWarnings("rawtypes")
+	public String workshoptimeinfo() throws UnsupportedEncodingException {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		if (request.getParameter("factoryId") != null)
+			conditionMap.put( "factoryId", new String(request.getParameter("factoryId")));
+		if (request.getParameter("taskid") != null)
+			conditionMap.put("taskid", new String(request.getParameter("taskid")));
+
+		List datalist = new ArrayList();
+		datalist = techTaskDao.workshoptimeinfo(conditionMap);
+		Map<String, String> page_map = new HashMap<String, String>();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+		JSONObject json = Util.dataListToJson(true, "查询成功", datalist, page_map);
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(json);
+		return null;
+	}
+	/**
+	 * 查询技改跟进车辆信息
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public String getTaskBusNumber() throws UnsupportedEncodingException {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		// 获取参数
+		String order_no = request.getParameter("order_no");
+		map.put("order_no", order_no);
+		int tech_task_id = Integer.parseInt(request.getParameter("tech_task_id"));
+		map.put("tech_task_id", tech_task_id);
+		String factory=request.getParameter("factory");
+		map.put("factory", factory);
+		String workshop=request.getParameter("workshop");
+		map.put("workshop", workshop);
+		String bus_num_start = request.getParameter("bus_num_start");
+		if (bus_num_start != null && bus_num_start.trim() != "") {
+			bus_num_start = StringUtils.leftPad(bus_num_start, 4, "0");
+			map.put("bus_num_start", bus_num_start);
+		}
+		String bus_num_end = request.getParameter("bus_num_end");
+		if (bus_num_end != null && bus_num_end.trim() != "") {
+			bus_num_end = StringUtils.leftPad(bus_num_end, 4, "0");
+			map.put("bus_num_end", bus_num_end);
+		}
+		if (request.getParameter("task_detail_status") != null
+				&& request.getParameter("task_detail_status").trim() != "") {
+			map.put("task_detail_status",
+					request.getParameter("task_detail_status"));
+		}
+
+		List datalist = new ArrayList();
+		datalist = techTaskDao.queryTaskBusNumber(map);
+
+		JSONObject json = Util.dataListToJson(true, "查询成功", datalist, null);
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(json);
+		return null;
+	}
+	/**
+	 * 员工工时查询
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public String getStaffWorkHours() throws UnsupportedEncodingException {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+		JSONObject jo = JSONObject.fromObject(conditions);
+		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		for (Iterator it = jo.keys(); it.hasNext();) {
+			String key = (String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		/*
+		 * Map<String,Object> map = new HashMap<String,Object>();
+		 * map.put("ecnTaskId", request.getParameter("ecnTaskId"));
+		 * map.put("staffNum", request.getParameter("staffNum"));
+		 * map.put("workDate", request.getParameter("workDate"));
+		 */
+
+		JSONObject json = Util.dataListToJson(true, "查询成功",
+				techTaskDao.queryStaffWorkHours(conditionMap));
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(json);
+		return null;
+	}
 	
+	/**
+	 * 工时维护--保存工时信息
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public String saveWorkHourInfo() throws UnsupportedEncodingException {
+		BmsBaseUser user = getUser();
+		String createTime = Util.format(new Date(), "yyyy-MM-dd HH:mm:ss");
+		JSONArray jsonArray = JSONArray.fromObject(conditions);
+		List<Map<String, Object>> swh_list = new ArrayList<Map<String, Object>>();
+		for (int i = 0; i < jsonArray.size(); i++) {
+			JSONObject object = (JSONObject) jsonArray.get(i);
+			object.put("editorId", user.getId());
+			object.put("editDate", createTime);
+			Map<String, Object> map = (Map<String, Object>) object;
+			swh_list.add(map);
+		}
+		int i = techTaskDao.saveWorkHourInfo(swh_list);
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+		JSONObject json = null;
+		if (i > 0) {
+			json = Util.dataListToJson(true, "保存成功", null);
+		} else {
+			json = Util.dataListToJson(false, "保存失败", null);
+		}
+
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(json);
+		return null;
+	}
+	/**
+	 * 工时修改
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public String updateWorkHourInfo() throws UnsupportedEncodingException {
+		BmsBaseUser user = getUser();
+		String createTime = Util.format(new Date(), "yyyy-MM-dd HH:mm:ss");
+		JSONArray jsonArray = JSONArray.fromObject(conditions);
+		List<Map<String, Object>> swh_list = new ArrayList<Map<String, Object>>();
+		for (int i = 0; i < jsonArray.size(); i++) {
+			JSONObject object = (JSONObject) jsonArray.get(i);
+			if ("verify".equals(whflag)) {
+				object.put("approverId", user.getId());
+				object.put("approveDate", createTime);
+				object.put("status", "1");
+				object.put("actionType", "verify");
+			} else if ("reject".equals(whflag)) {
+				object.put("approverId", user.getId());
+				object.put("approveDate", createTime);
+				object.put("status", "2");
+				object.put("actionType", "reject");
+			} else {
+				object.put("editorId", user.getId());
+				object.put("editDate", createTime);
+			}
+
+			Map<String, Object> map = (Map<String, Object>) object;
+			swh_list.add(map);
+		}
+
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out = null;
+		JSONObject json = null;
+		try{
+			int i = techTaskDao.batchUpdateWorkHour(swh_list);
+			json = Util.dataListToJson(true, "保存成功", null);
+		}catch(Exception e){
+			json = Util.dataListToJson(false, "保存失败", null);
+		}
+
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.print(json);
+		return null;
+	}
 	// ############# by xjw end #############//	
 	
 	
@@ -347,6 +571,39 @@ public class TechTaskAction extends BaseAction<Object> {
 		List<Map<String,String>> dataOrderFinishInfo = techTaskDao.queryTaskOrderFinishInfo(conditionMap);
 		result=new HashMap<String,Object>();		
 		result.put("dataOrderFinishInfo", dataOrderFinishInfo);
+		return SUCCESS;
+	}
+	
+	public String checkTaskMaterial() throws UnsupportedEncodingException{
+		HttpServletRequest request = ServletActionContext.getRequest();
+		request.setCharacterEncoding("UTF-8");
+		String taskid = request.getParameter("taskid");
+		String check_id = request.getParameter("check_id");
+		String curTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()); 
+		int userid=getUser().getId();
+		String[] check = check_id.split(",");
+		
+		//更新物料确认信息
+		for (int i = 0; i < check.length; i++){
+			Map<String,Object> conditionMap=new HashMap<String,Object>();
+			conditionMap.put("id", check[i]);
+			conditionMap.put("userid", userid);
+			conditionMap.put("curTime", curTime);
+			techTaskDao.checkTaskMaterial(conditionMap);
+		}		
+		//判断当前技改的物料信息是否全部确认
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		conditionMap.put("taskid", taskid);
+		int checkCount = techTaskDao.queryTaskMaterialCheckCount(conditionMap);
+		if (checkCount == 0){
+			Map<String,Object> conditionMap2=new HashMap<String,Object>();
+			conditionMap2.put("id", taskid);
+			conditionMap2.put("userid", userid);
+			conditionMap2.put("curTime", curTime);
+			techTaskDao.checkTask(conditionMap2);
+		}
+		result=new HashMap<String,Object>();	
+		result.put("result", true);
 		return SUCCESS;
 	}
 	

@@ -5,9 +5,30 @@ var dataOrderInfo = [];
 $(document).ready(function(){
 	var ecnTaskId = GetQueryString('taskid');
 	getBaseInfo(ecnTaskId);
+	
+	$("#btnCheck").click(function() {
+		if($("#check_id").val() === ''){
+			alert("请选择需要确认的物料！");
+			return false;
+		}
+		$.ajax({
+	        url: "techTask!checkTaskMaterial.action",
+	        dataType: "json",
+	        type: "get",
+	        data: {
+	        	"taskid":ecnTaskId,
+	        	"check_id":$("#check_id").val()
+	        },
+	        success: function(response) {
+	        	alert("确认成功！");
+	        	getBaseInfo(ecnTaskId);
+	        }
+		});
+	});
 })
 
 function getBaseInfo(ecnTaskId){
+	$("#MaterielInfoTable tbody").html('');
 	$.ajax({
         url: "techTask!getTaskInfo.action",
         dataType: "json",
@@ -45,6 +66,11 @@ function getBaseInfo(ecnTaskId){
         	});
         	$.each(response.dataMaterielInfo,function (index,value) {
         		var tr = $("<tr id= '"+value.ID+"'/>");
+        		if(value.MATERIAL_CHECKER_ID!='0'){
+        			$("<td />").html('<input type="checkbox" disabled="disabled" id="check_'+value.ID+'" onclick="mat_check('+value.ID+')">').appendTo(tr);
+        		}else{
+        			$("<td />").html('<input type="checkbox" id="check_'+value.ID+'" onclick="mat_check('+value.ID+')">').appendTo(tr);
+        		}       		
         		$("<td />").html(value.SAP_NO).appendTo(tr);
         		$("<td />").html(value.MATERIAL_DESC).appendTo(tr);
         		$("<td />").html(value.MATERIAL_TYPE).appendTo(tr);
@@ -59,8 +85,8 @@ function getBaseInfo(ecnTaskId){
         		$("<td />").html(value.PROCESS).appendTo(tr);
         		$("<td />").html(value.ASSEMB_SITE).appendTo(tr);
         		$("<td />").html(value.REMARK).appendTo(tr);
-        		$("<td />").html("-").appendTo(tr);
-        		$("<td />").html("-").appendTo(tr);
+        		$("<td />").html(value.MATERIAL_CHECKER_ID).appendTo(tr);
+        		$("<td />").html(value.MATERIAL_CHECK_DATE).appendTo(tr);
         		
         		$("#MaterielInfoTable tbody").append(tr);	
         	});
@@ -94,6 +120,15 @@ function getBaseInfo(ecnTaskId){
         	});
         }
 	});
+}
+
+
+function mat_check(mat_id){
+	if ($('#check_'+mat_id).attr('checked')) {
+		$("#check_id").val($("#check_id").val() + mat_id + ",")
+	}else{
+		$("#check_id").val($("#check_id").val().replace(mat_id + ",",''))
+	}
 }
 
 function showOrderInfo(index){

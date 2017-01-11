@@ -40,34 +40,7 @@
 				<legend style="margin: 0 auto;">技改物料确认</legend>
 				<div role="tabpanel" >
 					<!-- Tab panes -->
-					<div class="tab-content" style="height:500px;overflow:auto">
-						
-						<div role="tabpanel" class="tab-pane " id="workhour_MaterielInfo">
-						<table id="MaterielInfoTable" class="table table-bordered table-striped" style="text-align: center;margin-left:17px; font-size: 12px;width:96%;max-width:96%">
-							<thead>
-								<tr>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">SAP料号</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">物料描述</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">物料类型</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">材料/规格</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">单位</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">供应商<br>代码</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">单车损耗<br>（%）</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">层级用量</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">单重</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">单车用量<br>含损耗</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">使用车间</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">工序</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">装备位置</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">备注</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">确认人</th>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">确认时间</th>
-								</tr>
-							</thead>
-							<tbody>
-							</tbody>
-						</table>
-						</div>
+					<div class="tab-content" style="height:98%;overflow:auto">
 						
 						<div role="tabpanel" class="tab-pane active" id="workhour_Range">
 							<div class="control-group">
@@ -114,7 +87,34 @@
 								</tbody>
 							</table>
 							
-							</div>
+							<table id="MaterielInfoTable" class="table table-bordered table-striped" style="text-align: center;margin-left:17px; font-size: 12px;width:96%;max-width:96%">
+							<thead>
+								<tr>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">确认</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">SAP料号</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">物料描述</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">物料类型</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">材料/规格</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">单位</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">供应商<br>代码</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">单车损耗<br>（%）</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">层级用量</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">单重</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">单车用量<br>含损耗</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">使用车间</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">工序</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">装备位置</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">备注</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">确认人</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">确认时间</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+						<center><input type="button" class="btn btn-primary" id="btnCheck" value="确认" style="margin-left: 2px;"></input></center>	
+						<input id="check_id"  type="text" style="display: none;width:410px;height:18px"></input>
+						</div>
 						</div>
 						
 					</div>

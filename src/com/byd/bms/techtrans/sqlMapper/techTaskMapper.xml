@@ -5,14 +5,31 @@
 	
 	<select id="queryTechTaskList" parameterType="Map" resultType="Map">
 	<![CDATA[
-		SELECT t.*,k.key_name tech_type,concat(d.order_no,'<br />',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
+		SELECT t.*,k.key_name tech_type,k1.key_name tech_order_type,o.id order_id,o.order_no,
+		concat(d.order_no,'<br />',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
+		(SELECT group_concat(tmp.workshop,':',tmp.follow_num separator ',') follow_list
+		FROM(
+		SELECT  tf.tech_task_id, tf.factory,tf.workshop,count(tf.bus_number) follow_num
+		FROM BMS_TECH_TASK_FOLLOW tf 
+		WHERE  tf.confirmor_id>0
+		group by tf.tech_task_id,tf.factory,tf.workshop
+		UNION ALL
+		SELECT tfp.tech_task_id, tfp.factory,tfp.workshop,sum(tfp.follow_num) follow_num 
+		FROM BMS_TECH_TASK_FOLLOW_PRE tfp WHERE tfp.confirmor_id>0 group by tfp.tech_task_id,tfp.factory,tfp.workshop) tmp WHERE tmp.tech_task_id=t.id and tmp.factory=d.factory ) follow_list,
+		(SELECT group_concat(tmp.workshop,':',tmp.ready_hour_total separator ',') ready_hour_list
+		FROM(
+		SELECT h.ecn_task_id tech_task_id,h.factory,h.workshop,ifnull(sum(h.work_hour),0)ready_hour_total
+		FROM BMS_HR_STAFF_HOURS h
+		WHERE h.hour_type='3' and h.status !='2'
+		group by h.ecn_task_id,h.factory,h.workshop) tmp  WHERE tmp.tech_task_id=t.id and tmp.factory=d.factory ) ready_hour_list,
 		d.factory_id,d.factory,d.tech_list,d.time_list,d.single_time_total,d.time_total
 		FROM BMS_TECH_TASK t
 		LEFT JOIN BMS_BASE_KEY k on t.tech_type=k.id and k.key_code='ECN_TYPE'
+		LEFT JOIN BMS_BASE_KEY k1 on t.tech_order_type=k1.id and k1.key_code='ECN_CHANGE_TYPE'
 		LEFT JOIN BMS_TECH_TASK_DETAIL d ON t.id=d.tech_task_id
 		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
 		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
-		WHERE 1=1
+		WHERE 1=1 
 		]]>
 		<if test="task_content !=null and task_content !=''">
 			and t.task_content like (concat('%',#{task_content},'%'))
@@ -27,7 +44,7 @@
 			and d.factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
-			and find_in_set(d.tech_list,#{workshop})>0
+			and instr(d.tech_list,#{workshop})>0
 		</if>
 		<if test="tech_date_start !=null and tech_date_start !=''">
 			and t.tech_date>=#{tech_date_start} 
@@ -36,13 +53,13 @@
 			and t.tech_date&lt;=#{tech_date_end} 
 		</if>
 		<if test="status=='已创建'">
-			and t.edit_date !=''
+			and t.edit_date !='' and t.assign_date==''
 		</if>
 		<if test="status=='已分配'">
-			and t.assign_date !=''
+			and t.assign_date !='' and t.assess_date==''
 		</if>
 		<if test="status=='已评估'">
-			and t.assess_date !=''
+			and t.assess_date !='' and t.finish_date==''
 		</if>
 		<if test="status=='已完成'">
 			and t.finish_date !=''
@@ -72,7 +89,7 @@
 			and d.factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
-			and find_in_set(d.tech_list,#{workshop})>0
+			and instr(d.tech_list,#{workshop})>0
 		</if>
 		<if test="tech_date_start !=null and tech_date_start !=''">
 			and t.tech_date>=#{tech_date_start} 
@@ -81,13 +98,13 @@
 			and t.tech_date&lt;=#{tech_date_end} 
 		</if>
 		<if test="status=='已创建'">
-			and t.edit_date !=''
+			and t.edit_date !='' and t.assign_date==''
 		</if>
 		<if test="status=='已分配'">
-			and t.assign_date !=''
+			and t.assign_date !='' and t.assess_date==''
 		</if>
 		<if test="status=='已评估'">
-			and t.assess_date !=''
+			and t.assess_date !='' and t.finish_date==''
 		</if>
 		<if test="status=='已完成'">
 			and t.finish_date !=''
@@ -672,6 +689,122 @@
 		where id=#{tech_task_id}
 	</update>
 	
+	<select id="workshoptimeinfo" parameterType="Map" resultType="Map">
+		select time_list from BMS_TECH_TASK_DETAIL 
+		where tech_task_id=#{tech_task_id} and order_no=#{order_no} and factory=#{factory}
+	</select>
+	
+	<select id="queryTaskBusNumber" parameterType="Map" resultType="Map">
+		SELECT b.bus_number,b.latest_process_id,p.process_name,f.factory_name,u.username confirmor,d.confirmor_date,d.workshop 
+		FROM BMS_TECH_TASK_FOLLOW d 
+		LEFT JOIN BMS_PLAN_BUS b ON d.bus_number = b.bus_number 
+		LEFT JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id 
+		LEFT JOIN BMS_BASE_PROCESS p ON b.latest_process_id = p.id 
+		LEFT JOIN BMS_ORDER o ON d.order_no = o.order_no 
+		LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id 
+		LEFT JOIN BMS_BASE_USER u ON d.confirmor_id = u.id 
+		WHERE 1=1
+		<if test="tech_task_id !=null and tech_task_id !=''">
+			and d.tech_task_id=#{tech_task_id}
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			and d.order_no=#{order_no}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and d.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and d.workshop=#{workshop}
+		</if>
+		order by d.confirmor_date,b.bus_number
+	</select>
+	<select id="queryStaffWorkHours" parameterType="Map" resultType="Map">
+		select h.id,h.work_hour,o.name work_org,s.staff_number,s.name
+		staff_name,s.plant_org,s.workshop_org,s.workgroup_org,s.team_org,s.job,h.work_date,
+		case h.status when '0' then '已维护' when '1' then '已审批' when '2' then
+		'已驳回' else '已锁定' end as status,u.username
+		editor,h.edit_date,u1.username approver,h.approve_date,u.email
+		from
+		BMS_HR_STAFF_HOURS h
+		left join BMS_BASE_ORG o on h.org_id=o.id
+		left join
+		BMS_HR_STAFF s on h.staff_id=s.id
+		left join BMS_BASE_USER u on
+		u.id=h.editor_id
+		left join BMS_BASE_USER u1 on u1.id=h.approver_id
+		where h.hour_type='3'
+		<if test="orgId !=null and orgId !=''">
+			and h.org_id=#{orgId}
+		</if>
+		<if test="staffNum !=null and staffNum !=''">
+			and find_in_set(s.staff_number,#{staffNum})>0
+		</if>
+		<if test="workDate !=null and workDate !=''">
+			and h.work_date=#{workDate}
+		</if>
+		<if test="workMonth!=null and workMonth !=''">
+			and h.work_date like concat(#{workMonth},'%')
+		</if>
+		<if test="ecnTaskId !=null and ecnTaskId !=''">
+			and h.ecn_task_id=#{ecnTaskId}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+		</if>
+		order by h.status
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	
+	<insert id="saveWorkHourInfo" parameterType="list">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			insert into BMS_HR_STAFF_HOURS
+			(org_id,hour_type,ecn_task_id,work_date,staff_id,work_hour,editor_id,edit_date,skill_parameter,factory,dept,workshop,workgroup,team)
+			values
+			(#{detail.subgroupId},'3',#{detail.ecnTaskId},#{detail.workDate},#{detail.staff_id},#{detail.workHour},#{detail.editorId},#{detail.editDate},
+			#{detail.skillParameter},#{detail.factory},#{detail.dept},#{detail.workshop},#{detail.workgroup},#{detail.team})
+		</foreach>
+	</insert>
+	
+		<update id="batchUpdateWorkHour" parameterType="List">
+		<foreach collection="list" item="detail" index="index"
+			separator=";">
+			update BMS_HR_STAFF_HOURS
+			<trim prefix="SET" suffixOverrides=",">
+				<if test="detail.status!=null">
+					status=#{detail.status},
+				</if>
+				<if test="detail.workHour !=null">
+					work_hour=#{detail.workHour},
+				</if>
+				<if test="detail.editorId !=null">
+					editor_id=#{detail.editorId},
+				</if>
+				<if test="detail.editDate !=null">
+					edit_date=#{detail.editDate}
+				</if>
+				<if test="detail.approverId !=null">
+					approver_id=#{detail.approverId},
+				</if>
+				<if test="detail.approveDate !=null">
+					approve_date=#{detail.approveDate}
+				</if>
+			</trim>
+			where id=#{detail.id}
+			<if test="detail.actionType!=null">
+				and status !='3'
+			</if>
+		</foreach>
+	</update>
 <!--  ###################  by xjw  end  ###############  -->
 	
 	
@@ -699,6 +832,22 @@
 		WHERE t.tech_task_id = #{taskid} AND t.order_no = #{order_no} GROUP BY workshop
 		) S
 	</select>
+	
+	<update id="checkTaskMaterial" parameterType="Map">
+		<![CDATA[
+			UPDATE BMS_TECH_MATERIAL SET material_checker_id = #{userid}, material_check_date = #{curTime}
+			WHERE id = #{id}
+		]]>
+	</update>
+	<select id="queryTaskMaterialCheckCount" parameterType="Map" resultType="int">
+		SELECT COUNT(T.id) AS CHECK_COUNT FROM BMS_TECH_MATERIAL T WHERE T.tech_task_id = #{taskid} AND T.material_checker_id = '0'
+	</select>
+	<update id="checkTask" parameterType="Map">
+		<![CDATA[
+			UPDATE BMS_TECH_TASK SET material_checker_id = #{userid}, material_check_date = #{curTime}
+			WHERE id = #{id}
+		]]>
+	</update>
 	
 <!--  ###################  by yk  end  ###############  -->
 	

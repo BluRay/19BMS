@@ -188,7 +188,7 @@ function ajaxQuery(targetPage){
 	conditions.task_content=$("#tech_task_content").val();
 	conditions.tech_order_no=$("#tech_order_no").val();
 	conditions.order_no=$("#order_no").val();
-	conditions.factory=$("#factory :selected").text();
+	conditions.factory=$("#search_factory :selected").text();
 	conditions.tech_date_start=$("#startDate").val();
 	conditions.tech_date_end=$("#endDate").val();
 	conditions.status=$("#status").val();
