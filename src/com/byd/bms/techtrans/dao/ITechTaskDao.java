@@ -122,6 +122,11 @@ public interface ITechTaskDao {
 	 * @return
 	 */
 	public int batchUpdateWorkHour(List<Map<String, Object>> swh_list);
+	/**
+	 * 计算技改工资
+	 * @param conditionMap
+	 */
+	public void caculateEcnSalary(Map<String, Object> conditionMap);
 	//by xjw end
 	 
 	
@@ -133,6 +138,7 @@ public interface ITechTaskDao {
 	public int checkTaskMaterial(Map<String, Object> conditionMap);
 	public int queryTaskMaterialCheckCount(Map<String, Object> conditionMap);
 	public int checkTask(Map<String, Object> conditionMap);
+	public List<Map<String, String>> queryAssignList(String taskid);
 	//by yk end
 	
 	

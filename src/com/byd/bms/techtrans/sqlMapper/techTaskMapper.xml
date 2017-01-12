@@ -5,7 +5,10 @@
 	
 	<select id="queryTechTaskList" parameterType="Map" resultType="Map">
 	<![CDATA[
-		SELECT t.*,k.key_name tech_type,k1.key_name tech_order_type,o.id order_id,o.order_no,
+		SELECT t.id,t.task_content,t.tech_order_no,t.major_change,t.custom_change,t.custom_change_no,
+		t.repeat_change,t.tech_point_num,t.tech_order_file,t.custom_change_file,t.tech_date,t.duty_unit,
+		t.switch_mode,t.switch_node,t.editor_id,t.edit_date,t.assigner_id,t.assign_date,t.assesor_id,t.assess_date,
+		k.key_name tech_type,k1.key_name tech_order_type,o.id order_id,o.order_no,
 		concat(d.order_no,'<br />',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
 		(SELECT group_concat(tmp.workshop,':',tmp.follow_num separator ',') follow_list
 		FROM(
@@ -53,13 +56,13 @@
 			and t.tech_date&lt;=#{tech_date_end} 
 		</if>
 		<if test="status=='已创建'">
-			and t.edit_date !='' and t.assign_date==''
+			and t.edit_date !='' and t.assign_date=''
 		</if>
 		<if test="status=='已分配'">
-			and t.assign_date !='' and t.assess_date==''
+			and t.assign_date !='' and t.assess_date=''
 		</if>
 		<if test="status=='已评估'">
-			and t.assess_date !='' and t.finish_date==''
+			and t.assess_date !='' and t.finish_date=''
 		</if>
 		<if test="status=='已完成'">
 			and t.finish_date !=''
@@ -98,13 +101,13 @@
 			and t.tech_date&lt;=#{tech_date_end} 
 		</if>
 		<if test="status=='已创建'">
-			and t.edit_date !='' and t.assign_date==''
+			and t.edit_date !='' and t.assign_date=''
 		</if>
 		<if test="status=='已分配'">
-			and t.assign_date !='' and t.assess_date==''
+			and t.assign_date !='' and t.assess_date=''
 		</if>
 		<if test="status=='已评估'">
-			and t.assess_date !='' and t.finish_date==''
+			and t.assess_date !='' and t.finish_date=''
 		</if>
 		<if test="status=='已完成'">
 			and t.finish_date !=''
@@ -775,7 +778,7 @@
 		</foreach>
 	</insert>
 	
-		<update id="batchUpdateWorkHour" parameterType="List">
+	<update id="batchUpdateWorkHour" parameterType="List">
 		<foreach collection="list" item="detail" index="index"
 			separator=";">
 			update BMS_HR_STAFF_HOURS
@@ -798,6 +801,9 @@
 				<if test="detail.approveDate !=null">
 					approve_date=#{detail.approveDate}
 				</if>
+				<if test="detail.techSinglePrice !=null">
+					tech_single_price=#{detail.techSinglePrice}
+				</if>
 			</trim>
 			where id=#{detail.id}
 			<if test="detail.actionType!=null">
@@ -805,6 +811,10 @@
 			</if>
 		</foreach>
 	</update>
+	
+	<select id="caculateEcnSalary" parameterType="Map" resultType="String"> 
+		call P_CACULATE_ECN_SALLARY(#{factory},#{workshop},'','',#{workMonth});
+	</select>
 <!--  ###################  by xjw  end  ###############  -->
 	
 	
@@ -848,6 +858,17 @@
 			WHERE id = #{id}
 		]]>
 	</update>
+	<select id="queryAssignList" parameterType="String" resultType="Map">
+		select sum(h.work_hour) total_hour,o.name
+		work_org,s.staff_number,s.name
+		staff_name,s.plant_org,s.workshop_org,s.workgroup_org,s.team_org,s.job,s.skill_parameter
+		from BMS_HR_STAFF_HOURS h
+		left join BMS_BASE_ORG o on h.org_id=o.id
+		left join BMS_HR_STAFF s on h.staff_id=s.id
+		where h.hour_type='3' and
+		h.ecn_task_id=#{taskid}
+		group by s.staff_number
+	</select>
 	
 <!--  ###################  by yk  end  ###############  -->
 	

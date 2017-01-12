@@ -8,6 +8,7 @@ $(document)
 					initPage();
 					$("#dstcopy").live("click",function(){
 						//$(".distribution :eq(0)").focus();
+						//alert($(".distribution :eq(0)").val());
 						$(".distribution :eq(0)").css("display","none");
 						$("#copy_paste").val($(".distribution :eq(0)").val()).css("display","").css("background-color","rgb(191, 237, 245)").select();
 						$(".distribution").css("background-color","rgb(191, 237, 245)");
@@ -342,7 +343,7 @@ $(document)
 											busNumber=$("#c_bus_number").val();
 											order_id=$("#order_number").attr("order_id");
 										}
-										if(workshop=='自制件'/*||workshop=='部件'||workshop=='车架'||workshop=='五大片'*/){											
+										if(isCustomer=='1'/*||workshop=='部件'||workshop=='车架'||workshop=='五大片'*/){											
 											var area=busNumber.split("_");
 											if(area.length<=1){
 												alert("输入格式不正确，自编号格式为：车型-订单_起始号-结束号！");
@@ -576,12 +577,12 @@ function addWorkHourItem(staffId, cardNo, staffName, staffPost, workHour,
 						+ workHour + " >").appendTo(tr);
 	}
 	
-	if(index>0){
+	/*if(index>0){
 		$("<td />")
 		.html(
 				"<input class='input-small distribution' id='dist_"+staffId+"' style='text-align:center;margin-bottom: 0px;' type='text' value="
 						+distribution+  " >").appendTo(tr);
-	}else
+	}else*/
 	$("<td />")
 	.html(
 			"<input class='input-small distribution' id='dist_"+staffId+"' style='text-align:center;margin-bottom: 0px;' type='text' value="

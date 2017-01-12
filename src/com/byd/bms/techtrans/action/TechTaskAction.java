@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.xwork.StringUtils;
 import org.apache.struts2.ServletActionContext;
 
+import com.byd.bms.techtrans.dao.IEcnTaskDao;
 import com.byd.bms.techtrans.dao.ITechTaskDao;
 import com.byd.bms.util.Util;
 import com.byd.bms.util.action.BaseAction;
@@ -532,6 +533,27 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
+	/**
+	 * 技改工时审核页面
+	 * @return
+	 */
+	public String worktimeVerify(){
+		return "worktimeVerify";
+	} 
+	/**
+	 * 计算技改工资
+	 * @return
+	 */
+	public String caculateSalary(){
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		techTaskDao.caculateEcnSalary(conditionMap);
+		return null;
+	}
 	// ############# by xjw end #############//	
 	
 	
@@ -554,10 +576,15 @@ public class TechTaskAction extends BaseAction<Object> {
 		List<Map<String,String>> dataMaterielInfo = techTaskDao.queryTaskMaterielInfo(conditionMap);
 		List<Map<String,String>> dataOrderInfo = techTaskDao.queryTaskOrderInfo(conditionMap);
 		
+		Map<String, Object> m = new HashMap<String, Object>();
+		m.put("ecnTaskId", taskid);
+		
 		result=new HashMap<String,Object>();		
 		result.put("dataBaseInfo", dataBaseInfo);
 		result.put("dataMaterielInfo", dataMaterielInfo);
 		result.put("dataOrderInfo", dataOrderInfo);
+		result.put("whList", techTaskDao.queryStaffWorkHours(m));
+		result.put("assignList", techTaskDao.queryAssignList(taskid));
 		return SUCCESS;
 	}
 	public String getTaskOrderFinishInfo() throws UnsupportedEncodingException{
