@@ -2,6 +2,8 @@ var factory="";
 var workshop="";
 var team="";
 var workgroup_price=0;
+var last_order_id=0;
+
 $(document)
 		.ready(
 				function() {
@@ -50,8 +52,65 @@ $(document)
 						},
 						items : 30,
 						matcher : function(item) {
-							// alert(this.query);
+							if(this.query==item){
+								//alert(this.query);
+								$.each(busNumberlist, function(index, value) {
+									if (value.bus_number == item) {
+										selectId = value.order_id;
+										$("#bus_number").attr("order_id", selectId);
+									if(team.trim().length==0){
+										alert("请选择小班组！");
+										return false;
+									}	
+										
+									var conditions = "{"
+										+ "busNumber:'"+ value.bus_number
+										+"',workshop:'"+workshop+"',team:'"
+										+ team+"'}";	
+									var sfwlist = ajaxGetStaffWorkHours(conditions);
+									//alert(sfwlist[0].id);
+									if (sfwlist.length > 0) {
+										alert("该车号已维护工时！");
+										$("#bus_number").val("");
+										$("#bus_number").attr("order_id","");
+										$("#tb_workhour").html("");
+										return false;
+										
+									}
+									if(last_order_id==""){
+										last_order_id=selectId;
+										var list=ajaxGetStaffList();
+										$("#tb_workhour").html("");
+										workgroup_price=ajaxGetWorkgroupPrice();
+										$.each(list, function(index, staff) {
+												//workgroup_price+=parseFloat(staff.distribution);
+												// alert(staff.id);
+										addWorkHourItem(staff.id, staff.staff_number, staff.name,
+														staff.job, "", staff.team_org, staff.workgroup_org,
+														staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
+										});
+									}else if(last_order_id!=selectId){
+										if(last_order_id!=""|confirm("是否重新抓取数据？")){
+											var list=ajaxGetStaffList();
+											$("#tb_workhour").html("");
+											workgroup_price=ajaxGetWorkgroupPrice();
+											$.each(list, function(index, staff) {
+													//workgroup_price+=parseFloat(staff.distribution);
+													// alert(staff.id);
+											addWorkHourItem(staff.id, staff.staff_number, staff.name,
+															staff.job, "", staff.team_org, staff.workgroup_org,
+															staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
+											});
+										}
+										last_order_id=selectId;
+									}		
+									
+								}
+								})
+								
+							}
 							return true;
+							
 						},
 						updater : function(item) {
 							$.each(busNumberlist, function(index, value) {
@@ -77,20 +136,36 @@ $(document)
 									return false;
 									
 								}
-										
-								var list=ajaxGetStaffList();
-								$("#tb_workhour").html("");
-								workgroup_price=ajaxGetWorkgroupPrice();
-								$.each(list, function(index, staff) {
-										//workgroup_price+=parseFloat(staff.distribution);
-										// alert(staff.id);
-								addWorkHourItem(staff.id, staff.staff_number, staff.name,
-												staff.job, "", staff.team_org, staff.workgroup_org,
-												staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
-								});
+								if(last_order_id==""){
+									last_order_id=selectId;
+									var list=ajaxGetStaffList();
+									$("#tb_workhour").html("");
+									workgroup_price=ajaxGetWorkgroupPrice();
+									$.each(list, function(index, staff) {
+											//workgroup_price+=parseFloat(staff.distribution);
+											// alert(staff.id);
+									addWorkHourItem(staff.id, staff.staff_number, staff.name,
+													staff.job, "", staff.team_org, staff.workgroup_org,
+													staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
+									});
+								}else if(last_order_id!=selectId){
+									last_order_id=selectId;
+									if(confirm("是否重新抓取数据？")){
+										var list=ajaxGetStaffList();
+										$("#tb_workhour").html("");
+										workgroup_price=ajaxGetWorkgroupPrice();
+										$.each(list, function(index, staff) {
+												//workgroup_price+=parseFloat(staff.distribution);
+												// alert(staff.id);
+										addWorkHourItem(staff.id, staff.staff_number, staff.name,
+														staff.job, "", staff.team_org, staff.workgroup_org,
+														staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
+										});
+									}
+									
+								}
 							}
 							})
-
 							return item;
 						}
 					});
@@ -98,6 +173,7 @@ $(document)
 					
 					$("#order_number").live("input",function(){
 						$("#order_number").attr("order_id","");
+						$("#tb_workhour").html("");
 					});
 					/**
 					 * 订单编号模糊查询
@@ -151,6 +227,21 @@ $(document)
 							return item + "  " + order_name + " " + bus_type + order_qty;
 						},
 						matcher : function(item) {
+							$.each(orderList, function(index, value) {
+								if (value.orderNo == item) {
+									selectId = value.id;
+								}
+							})
+							$("#order_number").attr("order_id", selectId);
+							var list=ajaxGetStaffList();
+							workgroup_price=ajaxGetWorkgroupPrice();
+							$.each(list, function(index, staff) {
+								//workgroup_price+=parseFloat(staff.distribution);
+								// alert(staff.id);
+							addWorkHourItem(staff.id, staff.staff_number, staff.name,
+										staff.job, "", staff.team_org, staff.workgroup_org,
+										staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
+							});
 							return true;
 						},
 						updater : function(item) {
@@ -162,8 +253,7 @@ $(document)
 							//alert(selectId);
 							$("#order_number").attr("order_id", selectId);
 							var list=ajaxGetStaffList();
-							$("#tb_workhour").html("");
-							workgroup_price=ajaxGetWorkgroupPrice();;
+							workgroup_price=ajaxGetWorkgroupPrice();
 							$.each(list, function(index, staff) {
 								//workgroup_price+=parseFloat(staff.distribution);
 								// alert(staff.id);
@@ -343,7 +433,7 @@ $(document)
 											busNumber=$("#c_bus_number").val();
 											order_id=$("#order_number").attr("order_id");
 										}
-										if(isCustomer=='1'/*||workshop=='部件'||workshop=='车架'||workshop=='五大片'*/){											
+										if(isCustomer=='1'&&workshop=='自制件'/*||workshop=='部件'||workshop=='车架'||workshop=='五大片'*/){											
 											var area=busNumber.split("_");
 											if(area.length<=1){
 												alert("输入格式不正确，自编号格式为：车型-订单_起始号-结束号！");
@@ -366,6 +456,11 @@ $(document)
 										if(workgroup_price==0){
 											saveFlag = false;
 											alert("该班组未维护班组承包单价！");
+											return false;
+										}
+										if(order_id==undefined||order_id=="undefined"||order_id==""){
+											saveFlag = false;
+											alert("请选择正确的车号！");
 											return false;
 										}
 										

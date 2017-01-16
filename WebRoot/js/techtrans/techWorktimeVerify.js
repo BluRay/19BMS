@@ -13,336 +13,119 @@ $(document).ready(function () {
 	// 复选框全选、反选
 	$("#checkall").click(function() {
 		if ($(this).attr("checked") == "checked") {
-			check_All_unAll("#workhour_tb", true);
+			check_All_unAll("#work_hour_tb", true);
 		} else
-			check_All_unAll("#workhour_tb", false);
+			check_All_unAll("#work_hour_tb", false);
 	});
-	//Enter键移动输入光标
-	$(".work_hour").live("keydown",function(event){
-		if (event.keyCode == "13") {								
-			$(this).parent().parent().next().find("input").focus();
-		}
-	})
 	
-	$(".fa-pencil").live("click",
-			function(e) {
-				var tr = $(e.target).closest("tr");
-				var tds = $(tr).children("td");
-				var type = $(e.target).attr("data-original-title");
-				var tech_order_no = $(tr).data("tech_order_no");
-				var task = $(tr).data("task");
-				var tech_date=$(tr).data("tech_date");
-				edit_list=[];
-				ready_hour=0;
-				var factory=$(tr).data("factory");
-	    		var workshop=$(tr).data("workshop");
-				var conditions="{ecnTaskId:'"+$(tr).data("tech_task_id")+"',factory:'"+factory+"',workshop:'"+workshop+"'}";
-				var swhlist=ajaxGetStaffWorkHours(conditions);
-				generateWorkhourTb(swhlist,true);
-				$(".read_hours").html("已分配工时："+ready_hour);
-				if (type == "工时维护") {									
-					$("#tb_workhour").html("");
-					$("#orderNo").html(tech_order_no);
-					$("#task").html(task);
-					getWorkshopSelect_Auth("#workshop", workshop,factory, "noall");
-					$("#workshop").attr("disabled",true);
-					getChildOrgSelect("#group", $("#workshop").val(), "","empty");
-					$("#mtaModal").data("ecnTaskId",$(tr).data("tech_task_id"));
-					$("#mtaModal").data("totalHour",$(tr).data("totalHour"));
-					$("#mtaModal").data("tech_date",tech_date);
-					$("#mtaModal").modal("show");
-				}
-				if (type == "工时修改") {
-					$("#edit_orderNo").html(tech_order_no);
-					$("#edit_task").html(task);
-					$("#editModal").data("ecnTaskId",$(tr).data("tech_task_id"));
-					$("#editModal").data("totalHour",$(tr).data("totalHour"));
-					$("#editModal").data("factory",$(tr).data("factory"));
-					$("#editModal").data("workshop",$(tr).data("workshop"));
-					$("#editModal").modal("show");
-				}
+	$(".fa-pencil").live("click",function(e) {
+		var d = new Date();
+		var eYear = d.getFullYear();
+		var eMon = d.getMonth() + 1;
+		var workMonth=eYear+"-"+(eMon<10?"0"+eMon:eMon);
+		$("#edit_workDate").val(workMonth);
+		
+		var tr = $(e.target).closest("tr");
+		var tds = $(tr).children("td");
+		var type = $(e.target).attr("data-original-title");
+		var tech_order_no = $(tr).data("tech_order_no");
+		var task = $(tr).data("task");
+		var totalQty=$(tr).data("tech_num");
+		var singleHour=$(tr).data("single_hour");
+
+		edit_list = [];
+		ready_hour = 0;
+		var factory=$(tr).data("factory");
+		var workshop=$(tr).data("workshop");
+		//var conditions = "{ecnTaskId:'" + $(tr).data("ecnTaskId") + "'}";
+		var conditions="{ecnTaskId:'"+$(tr).data("tech_task_id")+"',workMonth:'"+workMonth+"',factory:'"+factory+"',workshop:'"+workshop+"'}";
+		swhlist = ajaxGetStaffWorkHours(conditions);
+		generateWorkhourTb(swhlist,true);
+		$("#checkall").attr("checked",false);
+		$("#edit_orderNo").html(tech_order_no);
+		$("#edit_task").html(task);
+		$("#edit_ecnNumber").html(totalQty);
+		$("#edit_singleHour").html(singleHour);
+		$("#edit_singlePrice").find("input").val("")
+		$("#editModal").data("factory",$(tr).data("factory"));
+		$("#editModal").data("workshop",$(tr).data("workshop"))
+		$("#editModal").data("tech_task_id", $(tr).data("tech_task_id"));
+		$("#editModal").data("totalHour", $(tr).data("totalHour"));
+		$("#editModal").modal("show");
 			});
 	
-	// 新增额外工时
-	$(".addWorkhour").live("click", function() {
-		if($("#mta_wdate").val().trim()==""){
-			alert("请选择操作日期！");
-		}else{
-			addWorkHourItem();
-		}
-		
-	});
-	// 工时删除
-	$(".close").live("click", function(e) {
-		$(e.target).closest("tr").remove();
-	});
-	$("#btnSwhQuery").live("click",function(){
-		var staffNum=$("#edit_cardNumber").val();
-		var workDate=$("#edit_workDate").val();
-		var ecnTaskId=$("#editModal").data("ecnTaskId");
+	$("#btnSwhQuery").click(function(){
 		var factory=$("#editModal").data("factory");
 		var workshop=$("#editModal").data("workshop");
-		var conditions="{staffNum:'"+staffNum+"',workDate:'"+workDate+"',ecnTaskId:'"+ecnTaskId
-		+"',factory:'"+factory+"',workshop:'"+workshop+"'}";
-		var swhlist=ajaxGetStaffWorkHours(conditions);
-		generateWorkhourTb(swhlist);
+		//var conditions = "{ecnTaskId:'" + $(tr).data("ecnTaskId") + "'}";
+		var conditions="{ecnTaskId:'"+$("#editModal").data("tech_task_id")+"',workMonth:'"+$("#edit_workDate").val()+
+		"',factory:'"+factory+"',workshop:'"+workshop+"',staffNum='"+$("#edit_cardNumber").val()+"'}";
+		swhlist = ajaxGetStaffWorkHours(conditions);
+		generateWorkhourTb(swhlist,true);
 	});
-	// 保存工时信息
-	$("#btnMtaSave")
-			.click(
-					function() {
-						var inputlist = $("#table_workhour input[class='input-small card_num']");
-						 //alert(inputlist.length);
-						var saveFlag=true;
-						var stafflist = [];
-						var factory=$("#factory option:selected").text();
-						var dept="生产部";
-						var workshop=$("#workshop option:selected").text();
-						var workgroup=$("#group option:selected").text()=="请选择"?"":$("#group option:selected").text();
-						var team=$("#subgroup option:selected").text()=="请选择"?"":$("#subgroup option:selected").text();
-						
-						var subgroupId=$("#subgroup").val()==''?'0':$("#subgroup").val();
-						var groupId=$("#group").val()==''?'0':$("#group").val();
-						var workshopId=$("#workshop").val()==''?'0':$("#workshop").val();
-						var workDate=$("#mta_wdate").val();						
-						if(workshopId=='0'){
-							alert("请选择车间！");
-						}else if(workDate==null||workDate.trim().length==0){
-							alert("请输入操作日期！");
-						}else{
-							if(checkSalarySubmit(factory,workshop,workDate.substring(0,7))=='true'){
-								alert("车间工资已提交/结算，不允许再维护工时信息！");
-								return false;
-							}
-							var staffNumlist="";
-							$.each(inputlist,
-									function(index, input) {
-										var tr = $(input).closest(
-												"tr");
-										var staffId=$(input).attr("staffId");											
-										var workHour=$(tr).find(".work_hour").val();
-										var skillParameter=$(tr).data("skill_parameter");
-										if(staffId !=undefined &&staffId.trim().length>0){
-											var staff = {};
-											staff.orderId = $(tr).data(
-													"id");
-											staff.ecnTaskId = $("#mtaModal").data("ecnTaskId");
-											staff.workDate=workDate;
-											staff.staff_id=staffId;
-											if(workshopId!='0'){
-												staff.subgroupId=workshopId
-											}
-											if(groupId!='0'){
-												staff.subgroupId=groupId
-											}
-											if(subgroupId!='0'){
-												staff.subgroupId=subgroupId
-											}
-											staff.factory=factory;
-											staff.dept=dept;
-											staff.workshop=workshop;
-											staff.workgroup=workgroup;
-											staff.team=team;
-											staff.workHour=workHour;
-											staff.skillParameter=skillParameter;
-											if(!isContain(staff,stafflist)){
-												stafflist.push(staff);
-											}else{
-												saveFlag=false;
-												alert("不能重复维护工时！");
-												return false;
-											}			
-										}
-										if(workHour==''||workHour.trim().length==0){
-											saveFlag=false;
-											alert("技改工时不能为空！");
-											return false;
-										}
-										var staffNum=$(input).val();
-										if(staffNum.trim().length==0){
-											alert("工号不能为空！");
-											saveFlag=false;
-											return false;
-										}
-										var staffNum = $(input).val();	
-										staffNumlist+=staffNum+","																														
-									});
-							var conditions="{staffNum:'"+staffNumlist+"',workDate:'"+
-							$("#mta_wdate").val()+"',ecnTaskId:"+$("#mtaModal").data("ecnTaskId")+"}";
-							var sfwlist=ajaxGetStaffWorkHours(conditions);
-							if(sfwlist.length>0){														
-									//$(tr).remove();
-									saveFlag=false;
-									alert("不能重复维护工时！");
-									return false;
-								}
-							if(saveFlag&&stafflist.length>0){
-								$('#btnMtaSave').attr("disabled",true);
-								ajaxSave(JSON.stringify(stafflist));
-						
-							}
-							
-						}
-						
-		
-					});
-	// 为工号输入框添加change事件
-	$(".card_num")
-			.live(
-					"change",
-					function(e) {
-						var cardNumInput = $(e.target);
-						var tr = $(cardNumInput).closest("tr");
-						$(tr).find(".staff_name").html("");
-						$(tr).find(".staff_post").html("");
-						$(tr).find(".staff_subgroup").html("");
-						$(tr).find(".staff_group").html("");
-						$(tr).find(".staff_workshop").html("");
-						$(tr).find(".staff_factory").html("");
-						var staff = getStaffInfo($(cardNumInput)
-								.val());
-						if (staff == undefined || staff == null) {
-							alert("请输入有效员工号！");
-							$(cardNumInput).val("");
-						} else {
-							$(cardNumInput).attr("staffId",staff.id);
-							$(tr).find(".staff_name").html(
-									staff.name);
-							$(tr).find(".staff_post").html(
-									staff.job);
-							$(tr).find(".staff_subgroup").html(
-									staff.team_org);
-							$(tr).find(".staff_group").html(
-									staff.workgroup_org);
-							$(tr).find(".staff_workshop").html(
-									staff.workshop_org);
-							$(tr).find(".staff_factory").html(
-									staff.plant_org);
-							$(tr).data("skill_parameter",staff.skill_parameter)
-						}
-					});
-	// 工时输入验证
-	$(".work_hour")
-			.live(
-					"input",
-					function(e) {
-						var total_hour=0;
-						var hour = $(e.target).val();
-						var tr=$(e.target).closest("tr");
-						var limit_total_hour = parseFloat($(
-								"#mtaModal").data("totalHour"));
-						var hour_inputs=$("#tb_workhour").find(".work_hour");
-						// alert(parseFloat(hour));
-						$.each(hour_inputs,function(index,hinput){
-							var single_hour=isNaN(parseFloat($(hinput).val()))?0:parseFloat($(hinput).val());
-							total_hour += single_hour;
-						});
-						
-						//alert(ready_hour);
-						var staffNum=$(tr).find(".card_num").val();
-						 if (!re_f.test(hour)&&hour!="") {
-							$(this).val("");
-							alert("技改工时只能是数字,且只能以半小时为单位，例如：1.0,1.5,2.0！");							
-						}
-						
-						
-					});
-	// 选定小班组查询人员列表
-	$("#subgroup").live("change",
-			function() {
-				var factory = $("#factory").find(
-						"option:selected").text();
-				var workshop = $("#workshop").find(
-						"option:selected").text();
-				var workgroup = $("#group").find(
-						"option:selected").text();
-				var subgroup = $(this).find("option:selected")
-						.text();
-				/*if($("#tb_workhour").html().length==0){*/
-					$.ajax({
-						type : "get",// 使用get方法访问后台
-						dataType : "json",// 返回json格式的数据
-						async : false,
-						url : "common!getStaffInfo.action",
-						data : {
-							"factory" : factory,
-							"workshop" : workshop,
-							"workgroup" : workgroup,
-							"subgroup" : subgroup
-						},
-						success : function(response) {
-							var list = response;
-							$("#tb_workhour").html("");
-							$.each(list, function(index, staff) {
-								//alert(staff.id);								
-								addWorkHourItem(staff.id,staff.staff_number,
-										staff.name, staff.job, "",
-										staff.team_org,
-										staff.workgroup_org,
-										staff.workshop_org,
-										staff.plant_org,staff.skill_parameter)
-							});
-						}
-					})
-				/*}*/
-				
-			});
 
-	// 工厂切换事件
-	$("#factory").change(
-			function() {
-				var selectFactory = $("#factory :selected").text();
-				/*getWorkshopSelect_Org("#workshop", null,
-						selectFactory, "empty");*/
-				getWorkshopSelect_Auth("#workshop", null,
-						selectFactory, "noall");
-				$("#group").html(
-						"<option value=''>请选择</option>");
-				$("#subgroup").html(
-						"<option value=''>请选择</option>");
-			});
-	// 车间切换事件
-	$("#workshop").change(
-			function() {
-				var workshop = $("#workshop").val();
-				getChildOrgSelect("#group", workshop, "",
-						"empty");
-				$("#subgroup").html(
-						"<option value=''>请选择</option>");
-			});
-	// 班组切换事件
-	$("#group").change(function() {
-		var group = $("#group").val();
-		getChildOrgSelect("#subgroup", group, "", "empty");
+	// 批准
+	$("#btnVerify").click(function() {
+		var workDate=$("#edit_workDate").val();
+		var tech_single_price=$("#edit_singlePrice").find("input").val();
+		if(!const_float_validate.test(tech_single_price)){
+			alert("请输入有效工时单价！");
+			return false;
+		}
+		var conditions={};
+		conditions.factory=$("#editModal").data("factory");
+		conditions.workshop=$("#editModal").data("workshop");
+		conditions.workMonth=workDate;
+		edit_list=getSelectList();
+		var orderStaus="verify";
+		var trs=$("#workhour_list").children("tr");
+		$.each(trs,function(index,tr){
+			var cbx=$(tr).find("td").find("input").attr("type");
+			//alert(cbx)
+			if(cbx!=undefined){
+				var obj=edit_list[index];
+				//alert(obj.staff_number)
+				edit_list[index].techSinglePrice=tech_single_price;
+				var c_checkbox=$(tr).find('input[type=checkbox]');
+				var status=$(tr).data("status");
+				var ischecked=$(c_checkbox).is(":checked");
+				if(status=='已驳回'&&!ischecked){
+					orderStaus="reject";
+				}	
+			}
+			
+		});
+		if(edit_list.length>0)
+		ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"verify",$("#editModal").data("tech_task_id"),orderStaus);
+		$("#editModal").modal("hide");
 	});
-	//工时修改页面工时change事件，有效修改数据保存到edit_list
-	$(".edit_work_hour").live("input",function(e){
-		var pre_submit_val=isNaN(parseFloat($(e.target).attr("old_value")))?0:parseFloat($(e.target).attr("old_value"));
-		var submit_val=parseFloat($(e.target).val());
-		var limit_total_hour = parseFloat($("#editModal").data("totalHour"));
-		if (!re_f.test($(e.target).val())&&$(e.target).val()!="") {
-			$(e.target).val(pre_submit_val);
-			alert("技改工时只能是数字,且只能以半小时为单位，例如：1.0,1.5,2.0！");							
+	// 驳回
+	$("#btnReject").click(function() {
+		
+		$("#reasonModal").modal("show");		
+	});
+	//输入驳回原因确认后驳回
+	$("#btnMtaSave").click(function() {
+		var workDate=$("#edit_workDate").val();
+		var conditions={};
+		conditions.factory=$("#editModal").data("factory");
+		conditions.workshop=$("#editModal").data("workshop");
+		conditions.workMonth=workDate;
+		edit_list=getSelectList();
+		if(!edit_list){
+			return false;
+		}
+		var rejectReason=$("#reject_reason").val();
+		if(rejectReason){
+			if(edit_list.length>0){
+				ajaxUpdate(JSON.stringify(edit_list),JSON.stringify(conditions),"reject",$("#editModal").data("tech_task_id"),"reject",rejectReason);
+				$("#editModal").modal("hide");
+			}			
 		}else{
-			var edit_obj={};
-			edit_obj.id=$(e.target).closest("tr").data("id");
-			edit_obj.workHour=submit_val;
-			edit_list.push(edit_obj);
+			alert("请输入驳回原因！");
 		}
 		
 	});
-	
-	//保存工时修改
-	$("#btnEditSave").click(function(){		
-		if(edit_list.length>0){
-			ajaxUpdate(JSON.stringify(edit_list));
-		}else{
-			alert("无数据更改！");
-			$("#editModal").modal("hide");
-		}
-		
-	});
-	
 
 	
 	function initPage(){
@@ -552,8 +335,8 @@ function ajaxQuery(targetPage){
     					}else{
     						$("<td />").html("未完成").appendTo(tr);
     					}  					
-    					$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\" title='工时维护' style=\"cursor: pointer;text-align: center;\" ></i>").appendTo(tr);
-        	  			$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='工时修改'style=\"cursor: pointer;text-align: center;\" ></i>").appendTo(tr);
+    					//$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\" title='工时维护' style=\"cursor: pointer;text-align: center;\" ></i>").appendTo(tr);
+        	  			$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='工时审核'style=\"cursor: pointer;text-align: center;\" ></i>").appendTo(tr);
         	  			$("#tableTaskFollow tbody").append(tr);
         	  			$(tr).data("totalHour",assign_num*assign_time);
                 		$(tr).data("tech_order_no",value.tech_order_no);
@@ -561,7 +344,8 @@ function ajaxQuery(targetPage){
                 		$(tr).data("tech_task_id",value.task_detail_id);
                 		$(tr).data("factory",value.factory);
                 		$(tr).data("workshop",workshop);
-                		$(tr).data("tech_date",value.tech_date);
+                		$(tr).data("tech_num",assign_num);
+                		$(tr).data("single_hour",assign_time);
     				}/*else{
     					var tr_c=$("<tr >")
     					$("<td />").html(workshop).appendTo(tr_c);   					
@@ -760,42 +544,7 @@ function ajaxGetStaffWorkHours(conditions) {
 	});
 	return swhlist;
 }
-/*
- * caculate: true 计算已分配工时合计
- */
-function generateWorkhourTb(swhlist,caculate){
-	caculate=caculate||false;
-	var ready=0;
-	$("#workhour_list").html("");
-	$.each(swhlist,function(index,swh){
-		var tr = $("<tr style='padding:5px'/>");
-		var workhour=swh.work_hour==undefined?"":swh.work_hour;
-		if(swh.status=='已驳回'){
-			$("<td />").html("<input type='checkbox' >").appendTo(tr);
-		}else{
-			$("<td />").html("").appendTo(tr);
-		}
-		$("<td />").html(swh.staff_number).appendTo(tr);
-		$("<td />").html(swh.staff_name).appendTo(tr);
-		$("<td />").html(swh.job).appendTo(tr);
-		var disabled = (swh.status!='已驳回') ? 'disabled' : "";
-		$("<td />").html("<input class='input-small edit_work_hour'"+disabled+" style='text-align:center;margin-bottom: 0px;' type='text' value='"+workhour+"' old_value='"+workhour+"'>").appendTo(tr);
-		$("<td />").html(swh.team_org).appendTo(tr);
-		$("<td />").html(swh.workgroup_org).appendTo(tr);
-		$("<td />").html(swh.workshop_org).appendTo(tr);
-		$("<td />").html(swh.plant_org).appendTo(tr);
-		$("<td />").html(swh.status).appendTo(tr);
-		$("<td />").html(swh.work_date).appendTo(tr);
-		$("#workhour_list").append(tr);
-		$(tr).data("id",swh.id);
-		if(caculate){
-			var h=isNaN(parseFloat(swh.work_hour))?0:parseFloat(swh.work_hour);
-			ready+=h;
-		}
-		
-	});
-	ready_hour=ready.toFixed(2);
-}
+
 function ajaxSave(conditions) {
 	$(".divLoading").addClass("fade in").show();
 	$("#btnMtaSave").attr("disabled",true);
@@ -821,17 +570,42 @@ function ajaxSave(conditions) {
 	});
 }
 
-function ajaxUpdate(conditions){
+function ajaxUpdate(datalist,conditions,whflag,ecnTaskId,taskStaus,rejectReason) {
 	var targetPage = $("#cur").attr("page") || 1;
 	$.ajax({
 		url : "techTask!updateWorkHourInfo.action",
 		dataType : "json",
-		type : "get",
+		async:false,
+		type : "post",
 		data : {
-			"conditions" : conditions
+			"conditions" : datalist,
+			"whflag":whflag
 		},
 		success : function(response) {
 			if (response.success) {
+				if(whflag=='reject'){
+					var emaillist=[];
+					var dlist=JSON.parse(datalist);
+					$.each(dlist,function(i,swh){
+						var obj={};
+						obj['工号']=swh.staff_number;
+						obj['姓名']=swh.staff_name;
+						obj['岗位']=swh.job;
+						obj['额外工时']=swh.work_hour;
+						obj['小班组']=swh.team_org;
+						obj['班组']=swh.workgroup_org;
+						obj['车间']=swh.workshop_org;
+						obj['工厂']=swh.plant_org;
+						obj['操作日期']=swh.work_date;
+						emaillist.push(obj);
+					})
+					var tbhead='工号,姓名,岗位,额外工时,小班组,班组,车间,工厂,操作日期';
+					//alert(JSON.stringify(emaillist))
+					sendEmail(dlist[0].email,'',"技改单"+$("#edit_orderNo").html()+$("#editModal").data("factory")+$("#editModal").data("workshop")+'车间技改工时信息驳回',tbhead,JSON.stringify(emaillist),rejectReason)
+					$("#reasonModal").modal("hide");
+				}	
+				
+				ajaxCaculateSalary(conditions);
 				alert(response.message);
 				ajaxQuery(targetPage);
 			} else {
@@ -841,41 +615,84 @@ function ajaxUpdate(conditions){
 		}
 	});
 }
+//批准、驳回时重新计算技改工资
+function ajaxCaculateSalary(conditions) {
+	$.ajax({
+		url : "techTask!caculateSalary.action",
+		dataType : "json",
+		type : "post",
+		data : {
+			"conditions" : conditions
+		},
+		success : function(response) {
+			if (response.success) {
+				
+			} else {
+				alert(response.message);
+			}
 
-function addWorkHourItem(staffId,cardNo, staffName, staffPost, workHour, subgroup,
-		group, workshop, factory,skillParameter) {
-	cardNo = cardNo || "";
-	cardNoDisabled = "";
-	if (cardNo.trim().length > 0) {
-		cardNoDisabled = "disabled";
-	}
-	workHour = workHour || "";
+		}
+	});
+}
+/*
+ * caculate: true 计算已分配工时合计
+ */
+function generateWorkhourTb(swhlist,caculate) {
+	caculate=caculate||false;
+	$("#workhour_list").html("");
+	$.each(swhlist, function(index, swh) {
+		var tr = $("<tr style='padding:5px'/>");
+		if (swh.status=="已锁定") {
+			$("<td />").html(swh.status).appendTo(tr);
+		} else {
+			$("<td />").html("<input type='checkbox' >").appendTo(tr);
+		}
+		$("<td />").html(swh.staff_number).appendTo(tr);
+		$("<td />").html(swh.staff_name).appendTo(tr);
+		$("<td />").html(swh.job).appendTo(tr);
+		$("<td />").html(swh.work_hour).appendTo(tr);
+		$("<td />").html(swh.team_org).appendTo(tr);
+		$("<td />").html(swh.workgroup_org).appendTo(tr);
+		$("<td />").html(swh.workshop_org).appendTo(tr);
+		$("<td />").html(swh.plant_org).appendTo(tr);
+		$("<td />").html(swh.work_date).appendTo(tr);
+		$("<td />").html(swh.status).appendTo(tr);
+		$("#workhour_list").append(tr);
+		$(tr).data("id", swh.id);
+		$(tr).data("swhindex", index);
+		$(tr).data("status", swh.status);
+		if(caculate){
+			ready_hour += parseFloat(swh.work_hour);
+		}
+		
+	});
 	var tr = $("<tr style='padding:5px'/>");
-	$("<td />")
-			.html(
-					"<button type=\"button\" class=\"close\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button>")
-			.appendTo(tr);
-	$("<td />")
-			.html(
-					"<input class='input-small card_num' style='text-align:center;margin-bottom: 0px;' type='text' value='"
-							+ cardNo + "' staffId='"+staffId+"' " + cardNoDisabled + ">").appendTo(tr);
-	$("<td class='staff_name' />").html(staffName).appendTo(tr);
-	$("<td class='staff_post' />").html(staffPost).appendTo(tr);
-	$("<td />")
-			.html(
-					"<input class='input-small work_hour' style='text-align:center;margin-bottom: 0px;' type='text' value="
-							+ workHour + " >").appendTo(tr);
-	$("<td class='staff_subgroup' />").html(subgroup).appendTo(tr);
-	$("<td class='staff_group' />").html(group).appendTo(tr);
-	$("<td class='staff_workshop' />").html(workshop).appendTo(tr);
-	$("<td class='staff_factory' />").html(factory).appendTo(tr);
-	$(tr).data("skill_parameter",skillParameter)
-	$("#tb_workhour").append(tr);
+	$("<td />").html("").appendTo(tr);
+	$("<td />").html("").appendTo(tr);
+	$("<td />").html("").appendTo(tr);
+	$("<td />").html("").appendTo(tr);
+	$("<td />").html("").appendTo(tr);
+	$("<td />").html("").appendTo(tr);
+	$("<td />").html("").appendTo(tr);
+	$("<td />").html("").appendTo(tr);
+	$("<td />").html("").appendTo(tr);
+	$("<td />").html("合计工时：").appendTo(tr);
+	$("<td />").html(ready_hour.toFixed(2)).appendTo(tr);
+	
+	$("#workhour_list").append(tr);
 }
 
-function minWorkDate(){
-	var min_date=$("#mtaModal").data("tech_date");
-	var time = Date.parse(min_date); 
-	//alert(time);
-	return new Date(time);
+function getSelectList(){
+	var boxList=$("#workhour_list :checked");
+	var swhList=[];
+	$.each(boxList,function(index,box){
+		var obj={};
+		var tr=$(box).closest("tr");
+		//var swhid=$(tr).data("id");
+		//obj.id=swhid;
+		var swhindex=$(tr).data("swhindex");
+		obj=swhlist[swhindex];
+		swhList.push(obj);
+	});
+	return swhList;
 }

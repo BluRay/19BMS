@@ -583,14 +583,6 @@ public class TechTaskAction extends BaseAction<Object> {
 	public String techTaskMaterialCheckPage() {
 		return "techTaskMaterialCheckPage";
 	}
-	
-	/**
-	 * 分类型变更汇总
-	 * @return
-	 */
-	public String techTaskCollect(){
-		return "techTaskCollect";
-	}
 
 	public String getTaskInfo() throws UnsupportedEncodingException {
 		HttpServletRequest request = ServletActionContext.getRequest();

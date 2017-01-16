@@ -158,12 +158,23 @@ public interface ITechTaskDao {
 	public int deleteChangedMaterialList(Map<String,Object> conditionMap);
 	public List<Map<String,Object>> queryChangedMaterialList(Map<String,Object> conditionMap);	
 	/**
-	 * 技改工时评估查询
+	 * 技改工时评估
 	 */
 	public List<Map<String,Object>> queryTechWorkHourEstimateList(Map<String,Object> conditionMap);
 	public int queryTechWorkHourEstimateListTotalCount(Map<String,Object> conditionMap);
 	//public List<Map<String,Object>> querySingleTechWorkHourEstimate(Map<String,Object> conditionMap);
 	public int updateTechWorkHourEstimate(List<Map<String, Object>> conditionList);
+	
+	/**
+	 * 技改跟进
+	 */
+	public List<Map<String,Object>> queryTechFollowingUpList(Map<String,Object> conditionMap);
+	public int queryTechFollowingUpListTotalCount(Map<String,Object> conditionMap);
+	
+	public List<Map<String,Object>> queryFollowingUpDetailList(Map<String,Object> conditionMap);
+	public List<Map<String,Object>> queryFollowingUpDetailList1(Map<String,Object> conditionMap);
+	public int updateFollowingUp(List<Map<String, Object>> conditionList);
+	public int addFollowingUp1(Map<String, Object> conditionMap);
 	//by wx end
 
 }

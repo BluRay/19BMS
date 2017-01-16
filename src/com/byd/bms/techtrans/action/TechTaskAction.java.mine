@@ -85,7 +85,7 @@ public class TechTaskAction extends BaseAction<Object> {
 	public void setNew_custom_change_file(File new_custom_change_file) {
 		this.new_custom_change_file = new_custom_change_file;
 	}
-
+	
 	public File getFile() {
 		return file;
 	}
@@ -130,10 +130,10 @@ public class TechTaskAction extends BaseAction<Object> {
 	public void setConditions(String conditions) {
 		this.conditions = conditions;
 	}
-
+	
 	// ############# by xjw start ##############//
 	private String whflag;
-
+	
 	public String getWhflag() {
 		return whflag;
 	}
@@ -153,193 +153,179 @@ public class TechTaskAction extends BaseAction<Object> {
 
 	/**
 	 * 技改任务列表查询
-	 * 
 	 * @return
 	 */
-	public String getTaskList() {
-		result = new HashMap<String, Object>();
-		JSONObject jo = JSONObject.fromObject(conditions);
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		for (Iterator it = jo.keys(); it.hasNext();) {
-			String key = (String) it.next();
+	public String getTaskList(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
 			conditionMap.put(key, jo.get(key));
 		}
-		int totalCount = techTaskDao.queryTechTaskListCount(conditionMap);
-
-		if (pager != null) {
-			conditionMap.put("offset", (pager.getCurPage() - 1) * pager.getPageSize());
+		int totalCount=techTaskDao.queryTechTaskListCount(conditionMap);
+		
+		if (pager != null){
+			conditionMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());
 			conditionMap.put("pageSize", pager.getPageSize());
 		}
-		List<Map<String, Object>> data_list = techTaskDao.queryTechTaskList(conditionMap);
-		if (pager != null) {
-			pager.setTotalCount(totalCount);
+		List<Map<String,Object>> data_list=techTaskDao.queryTechTaskList(conditionMap);		
+		if (pager != null){
+			pager.setTotalCount(totalCount);			
 		}
 		result.put("pager", pager);
 		result.put("dataList", data_list);
 		return SUCCESS;
 	}
-
+	
 	/**
 	 * 查询技改实施范围信息列表
-	 * 
 	 * @return
 	 */
-	public String getTechList() {
-		result = new HashMap<String, Object>();
-		JSONObject jo = JSONObject.fromObject(conditions);
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		for (Iterator it = jo.keys(); it.hasNext();) {
-			String key = (String) it.next();
+	public String getTechList(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
 			conditionMap.put(key, jo.get(key));
 		}
-		List<Map<String, Object>> data_list = techTaskDao.queryTechList(conditionMap);
+		List<Map<String,Object>> data_list=techTaskDao.queryTechList(conditionMap);
 		result.put("dataList", data_list);
 		return SUCCESS;
 	}
-
 	/**
 	 * 输入订单编号，查询工厂订单列表
-	 * 
 	 * @return
 	 */
-	public String getOrderList() {
-		result = new HashMap<String, Object>();
-		JSONObject jo = JSONObject.fromObject(conditions);
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		for (Iterator it = jo.keys(); it.hasNext();) {
-			String key = (String) it.next();
+	public String getOrderList(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
 			conditionMap.put(key, jo.get(key));
 		}
-		List<Map<String, Object>> data_list = techTaskDao.queryFactoryOrderList(conditionMap);
+		List<Map<String,Object>> data_list=techTaskDao.queryFactoryOrderList(conditionMap);
 		result.put("dataList", data_list);
 		return SUCCESS;
 	}
-
 	/**
 	 * 勾选工厂后查询该工厂各车间技改车辆数
-	 * 
-	 * @param conditions
-	 *            :{'order_no':xx,'factory_list':xx,'tech_date':xx,
-	 *            'switch_mode':xx,'switch_node':xx,'node_list':xx}
+	 * @param conditions:{'order_no':xx,'factory_list':xx,'tech_date':xx,
+	 * 'switch_mode':xx,'switch_node':xx,'node_list':xx}
 	 * @return
 	 */
-	public String getTechBusNum() {
-		result = new HashMap<String, Object>();
-		JSONObject jo = JSONObject.fromObject(conditions);
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		for (Iterator it = jo.keys(); it.hasNext();) {
-			String key = (String) it.next();
+	public String getTechBusNum(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
 			conditionMap.put(key, jo.get(key));
 		}
-		List<String> node_list = new ArrayList<String>();
-		String nodes = (String) conditionMap.get("node_list");
-		node_list = Arrays.asList(nodes.split(","));
+		List<String> node_list=new ArrayList<String>();
+		String nodes=(String) conditionMap.get("node_list");
+		node_list=Arrays.asList(nodes.split(","));
 		conditionMap.put("node_list", node_list);
-		List<Map<String, Object>> data_list = null;
-		if (conditionMap.containsKey("switch_mode")) {
-			if ("全部切换".equals(conditionMap.get("switch_mode"))) {
-				data_list = techTaskDao.queryTechBusNum_All(conditionMap);
+		List<Map<String,Object>> data_list=null;
+		if(conditionMap.containsKey("switch_mode")){
+			if("全部切换".equals(conditionMap.get("switch_mode"))){
+				data_list=techTaskDao.queryTechBusNum_All(conditionMap);
 			}
-			if ("节点前切换".equals(conditionMap.get("switch_mode"))) {
-				data_list = techTaskDao.queryTechBusNum_Pre(conditionMap);
+			if("节点前切换".equals(conditionMap.get("switch_mode"))){
+				data_list=techTaskDao.queryTechBusNum_Pre(conditionMap);
 			}
-			if ("节点后切换".equals(conditionMap.get("switch_mode"))) {
-				data_list = techTaskDao.queryTechBusNum_After(conditionMap);
+			if("节点后切换".equals(conditionMap.get("switch_mode"))){
+				data_list=techTaskDao.queryTechBusNum_After(conditionMap);
 			}
 		}
-		result.put("dataList", data_list);
+		result.put("dataList", data_list);		
 		return SUCCESS;
 	}
-
 	/**
-	 * 技改任务确认分配，先根据技改任务id、订单、工厂删除原有记录（表BMS_TECH_TASK_DETAIL、BMS_TECH_TASK_FOLLOW
-	 * ）
-	 * 
+	 * 技改任务确认分配，先根据技改任务id、订单、工厂删除原有记录（表BMS_TECH_TASK_DETAIL、BMS_TECH_TASK_FOLLOW）
 	 * @return
 	 */
-	public String assignTechTask() {
-		result = new HashMap<String, Object>();
-		// JSONObject jo=JSONObject.fromObject(conditions);
-		JSONArray jsa = JSONArray.fromObject(conditions);
-		Map<String, Object> cdmap = new HashMap<String, Object>();
-		try {
-			for (Object o : jsa) {
-				JSONObject jo = (JSONObject) o;
-				Map<String, Object> conditionMap = new HashMap<String, Object>();
-				for (Iterator it = jo.keys(); it.hasNext();) {
-					String key = (String) it.next();
+	public String assignTechTask(){
+		result=new HashMap<String,Object>();
+		//JSONObject jo=JSONObject.fromObject(conditions);
+		JSONArray jsa=JSONArray.fromObject(conditions);
+		Map<String,Object> cdmap=new HashMap<String,Object>();
+		try{
+			for(Object o:jsa){
+				JSONObject jo=(JSONObject)o;
+				Map<String,Object> conditionMap=new HashMap<String,Object>();
+				for(Iterator it=jo.keys();it.hasNext();){
+					String key=(String) it.next();
 					conditionMap.put(key, jo.get(key));
 				}
-				String switch_mode = (String) conditionMap.get("switch_mode");
-				String switch_node = (String) conditionMap.get("switch_node");
-				int tech_task_id = (int) conditionMap.get("tech_task_id");
+				String switch_mode=(String) conditionMap.get("switch_mode");
+				String switch_node=(String) conditionMap.get("switch_node");
+				int tech_task_id=(int) conditionMap.get("tech_task_id");
 				cdmap.put("switch_mode", switch_mode);
 				cdmap.put("switch_node", switch_node);
 				cdmap.put("tech_task_id", tech_task_id);
-
-				List<String> node_list = new ArrayList<String>();
-				String nodes = (String) conditionMap.get("node_list");
-				node_list = Arrays.asList(nodes.split(","));
+				
+				List<String> node_list=new ArrayList<String>();
+				String nodes=(String) conditionMap.get("node_list");
+				node_list=Arrays.asList(nodes.split(","));
 				conditionMap.put("node_list", node_list);
-				List<Map<String, Object>> followList = new ArrayList<Map<String, Object>>();
-
-				// 删除技改跟进表中（BMS_TECH_TASK_FOLLOW）未跟进工厂的技改车辆
-				int i = techTaskDao.deleteTechFollowBus(conditionMap);
-				// 删除技改明细中（BMS_TECH_TASK_DETAIL）技改明细
+				List<Map<String,Object>> followList=new ArrayList<Map<String,Object>>();
+				
+				//删除技改跟进表中（BMS_TECH_TASK_FOLLOW）未跟进工厂的技改车辆
+				int i=techTaskDao.deleteTechFollowBus(conditionMap);
+				//删除技改明细中（BMS_TECH_TASK_DETAIL）技改明细
 				techTaskDao.deleteTechTaskDetail(conditionMap);
-				// 查询需要技改的车辆信息
-				if ("全部切换".equals(switch_mode)) {
-					followList = techTaskDao.queryTechBusList_All(conditionMap);
+				//查询需要技改的车辆信息
+				if("全部切换".equals(switch_mode)){
+					followList=techTaskDao.queryTechBusList_All(conditionMap);
 				}
-				if ("节点前切换".equals(switch_mode)) {
-					followList = techTaskDao.queryTechBusList_Pre(conditionMap);
+				if("节点前切换".equals(switch_mode)){
+					followList=techTaskDao.queryTechBusList_Pre(conditionMap);
 				}
-				if ("节点后切换".equals(switch_mode)) {
-					followList = techTaskDao.queryTechBusList_After(conditionMap);
+				if("节点后切换".equals(switch_mode)){
+					followList=techTaskDao.queryTechBusList_After(conditionMap);
 				}
-				// 往技改跟进表中（BMS_TECH_TASK_FOLLOW）插入查询到的技改车辆信息
-				if (followList.size() > 0) {
-					i = techTaskDao.insertTechFollowBus(followList);
+				//往技改跟进表中（BMS_TECH_TASK_FOLLOW）插入查询到的技改车辆信息
+				if(followList.size()>0){
+					i=techTaskDao.insertTechFollowBus(followList);
 				}
-				// 插入技改明细
-				techTaskDao.insertTechTaskDetail(conditionMap);
-			}
-			int editor_id = getUser().getId();
+				//插入技改明细
+				techTaskDao.insertTechTaskDetail(conditionMap);										
+			}	
+			int editor_id=getUser().getId();
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String curTime = df.format(new Date());
 			cdmap.put("editor_id", editor_id);
 			cdmap.put("edit_date", curTime);
-			// 修改技改任务相关内容
+			//修改技改任务相关内容
 			techTaskDao.updateTechTaskInfo(cdmap);
-
+			
 			result.put("message", "分配成功！");
 			result.put("success", true);
-		} catch (Exception e) {
+		}catch(Exception e){
 			result.put("message", "分配失败！");
 			result.put("success", false);
 		}
-
+	
 		return SUCCESS;
 	}
-
+	
 	/**
-	 * 技改分配前段页面
-	 * 
+	 *  技改分配前段页面
 	 * @return
 	 */
-	public String taskAssignPrePage() {
+	public String taskAssignPrePage(){
 		return "assignPrePage";
 	}
-
 	/**
 	 * 技改工时维护界面
-	 * 
 	 * @return
 	 */
-	public String worktimeMaintain() {
+	public String worktimeMaintain(){
 		return "worktimeMaitain";
 	}
-
 	/**
 	 * 根据工厂id,任务id 查询车间的工时配置信息
 	 */
@@ -349,7 +335,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		request.setCharacterEncoding("UTF-8");
 		Map<String, Object> conditionMap = new HashMap<String, Object>();
 		if (request.getParameter("factoryId") != null)
-			conditionMap.put("factoryId", new String(request.getParameter("factoryId")));
+			conditionMap.put( "factoryId", new String(request.getParameter("factoryId")));
 		if (request.getParameter("taskid") != null)
 			conditionMap.put("taskid", new String(request.getParameter("taskid")));
 
@@ -368,7 +354,6 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
 	/**
 	 * 查询技改跟进车辆信息
 	 * 
@@ -388,9 +373,9 @@ public class TechTaskAction extends BaseAction<Object> {
 		map.put("order_no", order_no);
 		int tech_task_id = Integer.parseInt(request.getParameter("tech_task_id"));
 		map.put("tech_task_id", tech_task_id);
-		String factory = request.getParameter("factory");
+		String factory=request.getParameter("factory");
 		map.put("factory", factory);
-		String workshop = request.getParameter("workshop");
+		String workshop=request.getParameter("workshop");
 		map.put("workshop", workshop);
 		String bus_num_start = request.getParameter("bus_num_start");
 		if (bus_num_start != null && bus_num_start.trim() != "") {
@@ -402,8 +387,10 @@ public class TechTaskAction extends BaseAction<Object> {
 			bus_num_end = StringUtils.leftPad(bus_num_end, 5, "0");
 			map.put("bus_num_end", bus_num_end);
 		}
-		if (request.getParameter("task_detail_status") != null && request.getParameter("task_detail_status").trim() != "") {
-			map.put("task_detail_status", request.getParameter("task_detail_status"));
+		if (request.getParameter("task_detail_status") != null
+				&& request.getParameter("task_detail_status").trim() != "") {
+			map.put("task_detail_status",
+					request.getParameter("task_detail_status"));
 		}
 
 		List datalist = new ArrayList();
@@ -418,7 +405,6 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
 	/**
 	 * 员工工时查询
 	 * 
@@ -444,7 +430,8 @@ public class TechTaskAction extends BaseAction<Object> {
 		 * map.put("workDate", request.getParameter("workDate"));
 		 */
 
-		JSONObject json = Util.dataListToJson(true, "查询成功", techTaskDao.queryStaffWorkHours(conditionMap));
+		JSONObject json = Util.dataListToJson(true, "查询成功",
+				techTaskDao.queryStaffWorkHours(conditionMap));
 		try {
 			out = response.getWriter();
 		} catch (IOException e) {
@@ -453,7 +440,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
+	
 	/**
 	 * 工时维护--保存工时信息
 	 * 
@@ -493,7 +480,6 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
 	/**
 	 * 工时修改
 	 * 
@@ -507,7 +493,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		List<Map<String, Object>> swh_list = new ArrayList<Map<String, Object>>();
 		for (int i = 0; i < jsonArray.size(); i++) {
 			JSONObject object = (JSONObject) jsonArray.get(i);
-
+			
 			if ("verify".equals(whflag)) {
 				object.put("approverId", user.getId());
 				object.put("approveDate", createTime);
@@ -532,10 +518,10 @@ public class TechTaskAction extends BaseAction<Object> {
 		response.setContentType("text/html;charset=utf-8");
 		PrintWriter out = null;
 		JSONObject json = null;
-		try {
+		try{
 			int i = techTaskDao.batchUpdateWorkHour(swh_list);
 			json = Util.dataListToJson(true, "保存成功", null);
-		} catch (Exception e) {
+		}catch(Exception e){
 			json = Util.dataListToJson(false, "保存失败", null);
 		}
 
@@ -547,40 +533,36 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
 	/**
 	 * 技改工时审核页面
-	 * 
 	 * @return
 	 */
-	public String worktimeVerify() {
+	public String worktimeVerify(){
 		return "worktimeVerify";
-	}
-
+	} 
 	/**
 	 * 计算技改工资
-	 * 
 	 * @return
 	 */
-	public String caculateSalary() {
-		JSONObject jo = JSONObject.fromObject(conditions);
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		for (Iterator it = jo.keys(); it.hasNext();) {
-			String key = (String) it.next();
+	public String caculateSalary(){
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
 			conditionMap.put(key, jo.get(key));
 		}
 		techTaskDao.caculateEcnSalary(conditionMap);
 		return null;
 	}
-
-	// ############# by xjw end #############//
-
-	// ############# by yk start #############//
-	public String techTaskMaterialCheck() {
+	// ############# by xjw end #############//	
+	
+	
+	// ############# by yk start #############//	
+	public String techTaskMaterialCheck(){
 		return "techTaskMaterialCheck";
 	}
-
-	public String techTaskMaterialCheckPage() {
+	
+	public String techTaskMaterialCheckPage(){
 		return "techTaskMaterialCheckPage";
 	}
 	
@@ -591,21 +573,21 @@ public class TechTaskAction extends BaseAction<Object> {
 	public String techTaskCollect(){
 		return "techTaskCollect";
 	}
-
-	public String getTaskInfo() throws UnsupportedEncodingException {
+	
+	public String getTaskInfo() throws UnsupportedEncodingException{
 		HttpServletRequest request = ServletActionContext.getRequest();
 		request.setCharacterEncoding("UTF-8");
 		String taskid = request.getParameter("taskid");
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
 		conditionMap.put("taskid", taskid);
-		List<Map<String, String>> dataBaseInfo = techTaskDao.queryTaskBaseInfo(conditionMap);
-		List<Map<String, String>> dataMaterielInfo = techTaskDao.queryTaskMaterielInfo(conditionMap);
-		List<Map<String, String>> dataOrderInfo = techTaskDao.queryTaskOrderInfo(conditionMap);
-
+		List<Map<String,String>> dataBaseInfo = techTaskDao.queryTaskBaseInfo(conditionMap);
+		List<Map<String,String>> dataMaterielInfo = techTaskDao.queryTaskMaterielInfo(conditionMap);
+		List<Map<String,String>> dataOrderInfo = techTaskDao.queryTaskOrderInfo(conditionMap);
+		
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("ecnTaskId", taskid);
-
-		result = new HashMap<String, Object>();
+		
+		result=new HashMap<String,Object>();		
 		result.put("dataBaseInfo", dataBaseInfo);
 		result.put("dataMaterielInfo", dataMaterielInfo);
 		result.put("dataOrderInfo", dataOrderInfo);
@@ -613,58 +595,58 @@ public class TechTaskAction extends BaseAction<Object> {
 		result.put("assignList", techTaskDao.queryAssignList(taskid));
 		return SUCCESS;
 	}
-
-	public String getTaskOrderFinishInfo() throws UnsupportedEncodingException {
+	public String getTaskOrderFinishInfo() throws UnsupportedEncodingException{
 		HttpServletRequest request = ServletActionContext.getRequest();
 		request.setCharacterEncoding("UTF-8");
 		String taskid = request.getParameter("taskid");
 		String order_no = request.getParameter("order_no");
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
 		conditionMap.put("taskid", taskid);
 		conditionMap.put("order_no", order_no);
-		List<Map<String, String>> dataOrderFinishInfo = techTaskDao.queryTaskOrderFinishInfo(conditionMap);
-		result = new HashMap<String, Object>();
+		List<Map<String,String>> dataOrderFinishInfo = techTaskDao.queryTaskOrderFinishInfo(conditionMap);
+		result=new HashMap<String,Object>();		
 		result.put("dataOrderFinishInfo", dataOrderFinishInfo);
 		return SUCCESS;
 	}
-
-	public String checkTaskMaterial() throws UnsupportedEncodingException {
+	
+	public String checkTaskMaterial() throws UnsupportedEncodingException{
 		HttpServletRequest request = ServletActionContext.getRequest();
 		request.setCharacterEncoding("UTF-8");
 		String taskid = request.getParameter("taskid");
 		String check_id = request.getParameter("check_id");
-		String curTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-		int userid = getUser().getId();
+		String curTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()); 
+		int userid=getUser().getId();
 		String[] check = check_id.split(",");
-
-		// 更新物料确认信息
-		for (int i = 0; i < check.length; i++) {
-			Map<String, Object> conditionMap = new HashMap<String, Object>();
+		
+		//更新物料确认信息
+		for (int i = 0; i < check.length; i++){
+			Map<String,Object> conditionMap=new HashMap<String,Object>();
 			conditionMap.put("id", check[i]);
 			conditionMap.put("userid", userid);
 			conditionMap.put("curTime", curTime);
 			techTaskDao.checkTaskMaterial(conditionMap);
-		}
-		// 判断当前技改的物料信息是否全部确认
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		}		
+		//判断当前技改的物料信息是否全部确认
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
 		conditionMap.put("taskid", taskid);
 		int checkCount = techTaskDao.queryTaskMaterialCheckCount(conditionMap);
-		if (checkCount == 0) {
-			Map<String, Object> conditionMap2 = new HashMap<String, Object>();
+		if (checkCount == 0){
+			Map<String,Object> conditionMap2=new HashMap<String,Object>();
 			conditionMap2.put("id", taskid);
 			conditionMap2.put("userid", userid);
 			conditionMap2.put("curTime", curTime);
 			techTaskDao.checkTask(conditionMap2);
 		}
-		result = new HashMap<String, Object>();
+		result=new HashMap<String,Object>();	
 		result.put("result", true);
 		return SUCCESS;
 	}
-
-	// ############# by yk end #############//
-
-	// ############# by wx start #############//
-
+	
+	// ############# by yk end #############//	
+	
+	
+	// ############# by wx start #############//	
+	
 	/**
 	 * 技改任务查询明细界面
 	 * 
@@ -726,7 +708,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
+	
 	/**
 	 * 获得单条技改任务维护
 	 * 
@@ -752,7 +734,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		conditionMap.put("id", request.getParameter("id"));
 
 		List list = techTaskDao.querySingleTechTaskMaintain(conditionMap);
-
+		
 		JSONObject json = Util.dataListToJson(true, "查询成功", list, null);
 
 		try {
@@ -763,7 +745,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
+	
 	/**
 	 * 技改任务维护-修改
 	 * 
@@ -795,10 +777,10 @@ public class TechTaskAction extends BaseAction<Object> {
 		infomap.put("repeat_change", request.getParameter("edit_repeat_change") == null ? "N" : "Y");
 		infomap.put("custom_change", request.getParameter("edit_custom_change") == null ? "N" : "Y");
 		infomap.put("custom_change_no", request.getParameter("edit_custom_change_no"));
-
-		infomap.put("tech_order_file", saveFileMethod(edit_tech_order_file));
-		infomap.put("custom_change_file", saveFileMethod(edit_custom_change_file));
-
+		
+		infomap.put("tech_order_file",saveFileMethod(edit_tech_order_file));
+		infomap.put("custom_change_file",saveFileMethod(edit_custom_change_file));
+		
 		infomap.put("editor_id", userid);
 		infomap.put("edit_date", curTime);
 		infomap.put("id", request.getParameter("tech_task_id"));
@@ -807,8 +789,8 @@ public class TechTaskAction extends BaseAction<Object> {
 		String selectedrows = request.getParameter("selectedrows");
 
 		techTaskDao.updateTechTaskMaintain(editList);
-
-		// 删除原来的变更物料清单
+		
+		//删除原来的变更物料清单
 		Map<String, Object> deletemap = new HashMap<String, Object>();
 		deletemap.put("tech_task_id", request.getParameter("tech_task_id"));
 		techTaskDao.deleteChangedMaterialList(deletemap);
@@ -816,30 +798,30 @@ public class TechTaskAction extends BaseAction<Object> {
 		List<Map<String, Object>> changeMaterialList = new ArrayList<Map<String, Object>>();
 		JSONArray jsonArray = JSONArray.fromObject(selectedrows);
 		JSONObject obj = null;
-		for (int i = 0; i < jsonArray.size(); i++) {
-			Map<String, Object> changeMaterialMap = new HashMap<String, Object>();
-			obj = jsonArray.getJSONObject(i);
-			// asns.add(obj.getString("asnNo"));
-			changeMaterialMap.put("tech_task_id", request.getParameter("tech_task_id"));
-			changeMaterialMap.put("sap_no", obj.getString("sap_no"));
-			changeMaterialMap.put("material_desc", obj.getString("material_desc"));
-			changeMaterialMap.put("material_type", obj.getString("material_type"));
-			changeMaterialMap.put("material_spec", obj.getString("material_spec"));
-			changeMaterialMap.put("unit", obj.getString("unit"));
-			changeMaterialMap.put("supplier_code", obj.getString("supplier_code"));
-			changeMaterialMap.put("single_loss", obj.getString("single_loss"));
-			changeMaterialMap.put("level_usage", obj.getString("level_usage"));
-			changeMaterialMap.put("single_weight", obj.getString("single_weight"));
-			changeMaterialMap.put("single_usage", obj.getString("single_usage"));
-			changeMaterialMap.put("workshop", obj.getString("workshop"));
-			changeMaterialMap.put("process", obj.getString("process"));
-			changeMaterialMap.put("assemb_site", obj.getString("assemb_site"));
-			changeMaterialMap.put("remark", obj.getString("remark"));
-			changeMaterialList.add(changeMaterialMap);
-		}
-		if (changeMaterialList.size() > 0) {
-			techTaskDao.addChangedMaterialList(changeMaterialList);
-		}
+        for (int i = 0; i < jsonArray.size(); i++) {
+        	Map<String, Object> changeMaterialMap = new HashMap<String, Object>();
+            obj = jsonArray.getJSONObject(i);
+            //asns.add(obj.getString("asnNo"));
+            changeMaterialMap.put("tech_task_id", request.getParameter("tech_task_id"));
+            changeMaterialMap.put("sap_no", obj.getString("sap_no"));
+            changeMaterialMap.put("material_desc", obj.getString("material_desc"));
+            changeMaterialMap.put("material_type", obj.getString("material_type"));
+            changeMaterialMap.put("material_spec", obj.getString("material_spec"));
+            changeMaterialMap.put("unit", obj.getString("unit"));
+            changeMaterialMap.put("supplier_code", obj.getString("supplier_code"));
+            changeMaterialMap.put("single_loss", obj.getString("single_loss"));
+            changeMaterialMap.put("level_usage", obj.getString("level_usage"));
+            changeMaterialMap.put("single_weight", obj.getString("single_weight"));
+            changeMaterialMap.put("single_usage", obj.getString("single_usage"));
+            changeMaterialMap.put("workshop", obj.getString("workshop"));
+            changeMaterialMap.put("process", obj.getString("process"));
+            changeMaterialMap.put("assemb_site", obj.getString("assemb_site"));
+            changeMaterialMap.put("remark", obj.getString("remark"));
+            changeMaterialList.add(changeMaterialMap);
+        }
+        if(changeMaterialList.size()>0){
+        	techTaskDao.addChangedMaterialList(changeMaterialList);
+        }
 
 		JSONObject json = Util.dataListToJson(true, "success", null, null);
 		try {
@@ -869,8 +851,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		response.setContentType("text/html;charset=utf-8");
 		PrintWriter out = null;
 
-		// List<Map<String, Object>> addList = new ArrayList<Map<String,
-		// Object>>();
+		//List<Map<String, Object>> addList = new ArrayList<Map<String, Object>>();
 		Map<String, Object> infomap = new HashMap<String, Object>();
 		infomap.put("task_content", request.getParameter("new_task_content"));
 		infomap.put("tech_order_no", request.getParameter("new_tech_order_no"));
@@ -883,48 +864,48 @@ public class TechTaskAction extends BaseAction<Object> {
 		infomap.put("repeat_change", request.getParameter("new_repeat_change") == null ? "N" : "Y");
 		infomap.put("custom_change", request.getParameter("new_custom_change") == null ? "N" : "Y");
 		infomap.put("custom_change_no", request.getParameter("new_custom_change_no"));
-
-		infomap.put("tech_order_file", saveFileMethod(new_tech_order_file));
-		infomap.put("custom_change_file", saveFileMethod(new_custom_change_file));
-
+		
+		infomap.put("tech_order_file",saveFileMethod(new_tech_order_file));
+		infomap.put("custom_change_file",saveFileMethod(new_custom_change_file));
+		
 		infomap.put("editor_id", userid);
 		infomap.put("edit_date", curTime);
 		infomap.put("id", -1);
-		// addList.add(infomap);
+		//addList.add(infomap);
 
 		String selectedrows = request.getParameter("selectedrows");
 
 		techTaskDao.addTechTaskMaintain(infomap);
-
+		
 		int tech_task_id = Integer.parseInt(infomap.get("id").toString());
 
 		List<Map<String, Object>> changeMaterialList = new ArrayList<Map<String, Object>>();
 		JSONArray jsonArray = JSONArray.fromObject(selectedrows);
 		JSONObject obj = null;
-		for (int i = 0; i < jsonArray.size(); i++) {
-			Map<String, Object> changeMaterialMap = new HashMap<String, Object>();
-			obj = jsonArray.getJSONObject(i);
-			// asns.add(obj.getString("asnNo"));
-			changeMaterialMap.put("tech_task_id", tech_task_id);
-			changeMaterialMap.put("sap_no", obj.getString("sap_no"));
-			changeMaterialMap.put("material_desc", obj.getString("material_desc"));
-			changeMaterialMap.put("material_type", obj.getString("material_type"));
-			changeMaterialMap.put("material_spec", obj.getString("material_spec"));
-			changeMaterialMap.put("unit", obj.getString("unit"));
-			changeMaterialMap.put("supplier_code", obj.getString("supplier_code"));
-			changeMaterialMap.put("single_loss", obj.getString("single_loss"));
-			changeMaterialMap.put("level_usage", obj.getString("level_usage"));
-			changeMaterialMap.put("single_weight", obj.getString("single_weight"));
-			changeMaterialMap.put("single_usage", obj.getString("single_usage"));
-			changeMaterialMap.put("workshop", obj.getString("workshop"));
-			changeMaterialMap.put("process", obj.getString("process"));
-			changeMaterialMap.put("assemb_site", obj.getString("assemb_site"));
-			changeMaterialMap.put("remark", obj.getString("remark"));
-			changeMaterialList.add(changeMaterialMap);
-		}
-		if (changeMaterialList.size() > 0) {
-			techTaskDao.addChangedMaterialList(changeMaterialList);
-		}
+        for (int i = 0; i < jsonArray.size(); i++) {
+        	Map<String, Object> changeMaterialMap = new HashMap<String, Object>();
+            obj = jsonArray.getJSONObject(i);
+            //asns.add(obj.getString("asnNo"));
+            changeMaterialMap.put("tech_task_id", tech_task_id);
+            changeMaterialMap.put("sap_no", obj.getString("sap_no"));
+            changeMaterialMap.put("material_desc", obj.getString("material_desc"));
+            changeMaterialMap.put("material_type", obj.getString("material_type"));
+            changeMaterialMap.put("material_spec", obj.getString("material_spec"));
+            changeMaterialMap.put("unit", obj.getString("unit"));
+            changeMaterialMap.put("supplier_code", obj.getString("supplier_code"));
+            changeMaterialMap.put("single_loss", obj.getString("single_loss"));
+            changeMaterialMap.put("level_usage", obj.getString("level_usage"));
+            changeMaterialMap.put("single_weight", obj.getString("single_weight"));
+            changeMaterialMap.put("single_usage", obj.getString("single_usage"));
+            changeMaterialMap.put("workshop", obj.getString("workshop"));
+            changeMaterialMap.put("process", obj.getString("process"));
+            changeMaterialMap.put("assemb_site", obj.getString("assemb_site"));
+            changeMaterialMap.put("remark", obj.getString("remark"));
+            changeMaterialList.add(changeMaterialMap);
+        }
+        if(changeMaterialList.size()>0){
+        	techTaskDao.addChangedMaterialList(changeMaterialList);
+        }
 
 		JSONObject json = Util.dataListToJson(true, "success", null, null);
 		try {
@@ -935,7 +916,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
+	
 	/**
 	 * 变更物料清单查询
 	 * 
@@ -948,12 +929,12 @@ public class TechTaskAction extends BaseAction<Object> {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		response.setContentType("text/html;charset=utf-8");
 		PrintWriter out = null;
-
+		
 		Map<String, Object> conditionMap = new HashMap<String, Object>();
 		conditionMap.put("tech_task_id", request.getParameter("tech_task_id"));
-
+		
 		List list = techTaskDao.queryChangedMaterialList(conditionMap);
-
+		
 		JSONObject json = Util.dataListToJson(true, "查询成功", list, null);
 
 		try {
@@ -1069,10 +1050,10 @@ public class TechTaskAction extends BaseAction<Object> {
 		}
 		return null;
 	}
-
-	private String saveFileMethod(File f) {
-		String filepath = "";
-
+	
+	private String saveFileMethod(File f){
+		String filepath="";
+		
 		if (f != null) {
 			try {
 				// 把上传的文件放到指定的路径下
@@ -1087,23 +1068,27 @@ public class TechTaskAction extends BaseAction<Object> {
 
 				File saveFile = new File(savedir, String.valueOf(System.currentTimeMillis()) + ".pdf");
 				fileLength += f.length();
-				/**
-				 * if(fileLength>1024 * 1024 * 20){ JSONObject json =
-				 * Util.dataListToJson(false,"新增失败，单个上传文件大小不能大于10M！",null); try
-				 * { out = response.getWriter(); } catch (IOException e) {
-				 * e.printStackTrace(); } out.print(json); }
-				 **/
+				/**if(fileLength>1024 * 1024 * 20){
+					JSONObject json = Util.dataListToJson(false,"新增失败，单个上传文件大小不能大于10M！",null);
+					try {
+						out = response.getWriter();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					out.print(json);
+		    	}**/
 				FileUtils.copyFile(f, saveFile);
-				filepath = "/19bms/file/upload/techTask/" + saveFile.getName();
+				filepath = "/19bms/file/upload/techTask/"+saveFile.getName();
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-
+		
 		return filepath;
 	}
-
+	
+	
 	/**
 	 * 技改任务维护界面
 	 * 
@@ -1112,7 +1097,7 @@ public class TechTaskAction extends BaseAction<Object> {
 	public String taskMaintainPage() {
 		return "taskMaintainPage";
 	}
-
+	
 	/**
 	 * 技改工时评估界面
 	 * 
@@ -1121,16 +1106,7 @@ public class TechTaskAction extends BaseAction<Object> {
 	public String workHourEstimatePage() {
 		return "workHourEstimatePage";
 	}
-
-	/**
-	 * 技改跟进页面
-	 * 
-	 * @return
-	 */
-	public String followingUpPage() {
-		return "followingUpPage";
-	}
-
+	
 	/**
 	 * 获得技改工时评估列表
 	 * 
@@ -1185,7 +1161,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		out.print(json);
 		return null;
 	}
-
+	
 	/**
 	 * 技改工时评估-修改
 	 * 
@@ -1209,18 +1185,18 @@ public class TechTaskAction extends BaseAction<Object> {
 		infomap.put("time_list", request.getParameter("time_list"));
 		infomap.put("single_time_total", request.getParameter("single_time_total"));
 		infomap.put("assesor_id", userid);
-		if ("1".equals(request.getParameter("flg"))) {
+		if("1".equals(request.getParameter("flg"))){
 			infomap.put("assess_date", "");
-		} else {
+		}else{
 			infomap.put("assess_date", curTime);
 		}
-
+		
 		infomap.put("id", request.getParameter("id"));
 		infomap.put("tech_task_id", request.getParameter("tech_task_id"));
 		editList.add(infomap);
 
 		techTaskDao.updateTechWorkHourEstimate(editList);
-
+		
 		JSONObject json = Util.dataListToJson(true, "success", null, null);
 		try {
 			out = response.getWriter();
@@ -1231,244 +1207,5 @@ public class TechTaskAction extends BaseAction<Object> {
 		return null;
 	}
 
-	/**
-	 * 获得技改跟进列表
-	 * 
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String getFollowingUpList() throws UnsupportedEncodingException {
-		/*
-		 * SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		 * String curTime = df.format(new Date()); int userid=getUser().getId();
-		 */
-		// logger.info("---->HrAction::getWorkTimePriceList " + curTime + " " +
-		// userid);
-
-		HttpServletRequest request = ServletActionContext.getRequest();
-		request.setCharacterEncoding("UTF-8");
-		HttpServletResponse response = ServletActionContext.getResponse();
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter out = null;
-
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		conditionMap.put("factory", request.getParameter("factory"));
-		conditionMap.put("workshop", request.getParameter("workshop"));
-		conditionMap.put("order_no", request.getParameter("order_no"));
-		conditionMap.put("task_content", request.getParameter("task_content"));
-		conditionMap.put("tech_order_no", request.getParameter("tech_order_no"));
-		conditionMap.put("tech_date_start", request.getParameter("tech_date_start"));
-		conditionMap.put("tech_date_end", request.getParameter("tech_date_end"));
-		conditionMap.put("status", request.getParameter("status"));
-		if (pager != null) {
-			conditionMap.put("offset", (pager.getCurPage() - 1) * pager.getPageSize());
-			conditionMap.put("pageSize", pager.getPageSize());
-		}
-
-		List list = techTaskDao.queryTechFollowingUpList(conditionMap);
-		int totalCount = techTaskDao.queryTechFollowingUpListTotalCount(conditionMap);
-
-		Map<String, String> page_map = new HashMap<String, String>();
-		if (pager != null) {
-			pager.setTotalCount(totalCount);
-			page_map.put("totalCount", String.valueOf(pager.getTotalCount()));
-			page_map.put("curPage", String.valueOf(pager.getCurPage()));
-			page_map.put("pageSize", String.valueOf(pager.getPageSize()));
-		}
-		JSONObject json = Util.dataListToJson(true, "查询成功", list, page_map);
-
-		try {
-			out = response.getWriter();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		out.print(json);
-		return null;
-	}
-
-	/**
-	 * 获得技改跟进明细列表
-	 * 
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String getFollowingUpDetailList() throws UnsupportedEncodingException {
-		/*
-		 * SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		 * String curTime = df.format(new Date()); int userid=getUser().getId();
-		 */
-		// logger.info("---->HrAction::getWorkTimePriceList " + curTime + " " +
-		// userid);
-
-		HttpServletRequest request = ServletActionContext.getRequest();
-		request.setCharacterEncoding("UTF-8");
-		HttpServletResponse response = ServletActionContext.getResponse();
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter out = null;
-
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		conditionMap.put("factory", request.getParameter("factory"));
-		conditionMap.put("workshop", request.getParameter("workshop"));
-		conditionMap.put("order_no", request.getParameter("order_no"));
-		conditionMap.put("tech_task_id", request.getParameter("tech_task_id"));
-		if ("view".equals(request.getParameter("view"))) {
-			conditionMap.put("view", request.getParameter("view"));
-		}
-		conditionMap.put("bus_num_start", request.getParameter("bus_num_start"));
-		conditionMap.put("bus_num_end", request.getParameter("bus_num_end"));
-		/*
-		 * if (pager != null) { conditionMap.put("offset", (pager.getCurPage() -
-		 * 1) * pager.getPageSize()); conditionMap.put("pageSize",
-		 * pager.getPageSize()); }
-		 */
-
-		List list = techTaskDao.queryFollowingUpDetailList(conditionMap);
-		// int totalCount =
-		// techTaskDao.queryTechFollowingUpListTotalCount(conditionMap);
-
-		/*
-		 * Map<String, String> page_map = new HashMap<String, String>(); if
-		 * (pager != null) { pager.setTotalCount(totalCount);
-		 * page_map.put("totalCount", String.valueOf(pager.getTotalCount()));
-		 * page_map.put("curPage", String.valueOf(pager.getCurPage()));
-		 * page_map.put("pageSize", String.valueOf(pager.getPageSize())); }
-		 */
-		JSONObject json = Util.dataListToJson(true, "查询成功", list, null);
-
-		try {
-			out = response.getWriter();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		out.print(json);
-		return null;
-	}
-
-	/**
-	 * 获得技改跟进明细列表1
-	 * 
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String getFollowingUpDetailList1() throws UnsupportedEncodingException {
-		/*
-		 * SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		 * String curTime = df.format(new Date()); int userid=getUser().getId();
-		 */
-		// logger.info("---->HrAction::getWorkTimePriceList " + curTime + " " +
-		// userid);
-
-		HttpServletRequest request = ServletActionContext.getRequest();
-		request.setCharacterEncoding("UTF-8");
-		HttpServletResponse response = ServletActionContext.getResponse();
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter out = null;
-
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		conditionMap.put("factory", request.getParameter("factory"));
-		conditionMap.put("workshop", request.getParameter("workshop"));
-		conditionMap.put("order_no", request.getParameter("order_no"));
-		conditionMap.put("tech_task_id", request.getParameter("tech_task_id"));
-
-		List list = techTaskDao.queryFollowingUpDetailList1(conditionMap);
-		JSONObject json = Util.dataListToJson(true, "查询成功", list, null);
-
-		try {
-			out = response.getWriter();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		out.print(json);
-		return null;
-	}
-
-	/**
-	 * 技改跟进-修改
-	 * 
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	public String editFollowingUp() throws UnsupportedEncodingException {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String curTime = df.format(new Date());
-		int userid = getUser().getId();
-		// logger.info("---->HrAction::addRewards " + curTime + " " + userid);
-
-		HttpServletRequest request = ServletActionContext.getRequest();
-		request.setCharacterEncoding("UTF-8");
-		HttpServletResponse response = ServletActionContext.getResponse();
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter out = null;
-
-		JSONArray jsonArray = JSONArray.fromObject(request.getParameter("ids"));
-
-		List<Map<String, Object>> editList = new ArrayList<Map<String, Object>>();
-		for (int i = 0; i < jsonArray.size(); i++) {
-			Map<String, Object> infomap = new HashMap<String, Object>();
-
-			infomap.put("id", jsonArray.getString(i).toString());
-			infomap.put("confirmor_id", userid);
-			infomap.put("confirmor_date", curTime);
-			editList.add(infomap);
-		}
-		techTaskDao.updateFollowingUp(editList);
-
-		JSONObject json = Util.dataListToJson(true, "success", null, null);
-		try {
-			out = response.getWriter();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		out.print(json);
-		return null;
-	}
-
-	/**
-	 * 技改跟进-修改1
-	 * 
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	public String editFollowingUp1() throws UnsupportedEncodingException {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String curTime = df.format(new Date());
-		int userid = getUser().getId();
-		// logger.info("---->HrAction::addRewards " + curTime + " " + userid);
-
-		HttpServletRequest request = ServletActionContext.getRequest();
-		request.setCharacterEncoding("UTF-8");
-		HttpServletResponse response = ServletActionContext.getResponse();
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter out = null;
-
-		//List<Map<String, Object>> editList = new ArrayList<Map<String, Object>>();
-
-		Map<String, Object> infomap = new HashMap<String, Object>();
-
-		infomap.put("tech_task_id", request.getParameter("tech_task_id"));
-		infomap.put("factory", request.getParameter("factory"));
-		infomap.put("workshop", request.getParameter("workshop"));
-		infomap.put("follow_num", request.getParameter("follow_num"));
-		infomap.put("confirmor_id", userid);
-		infomap.put("confirmor_date", curTime);
-		infomap.put("order_no", request.getParameter("order_no"));
-		infomap.put("task_detail_id", request.getParameter("task_detail_id"));
-		//editList.add(infomap);
-
-		techTaskDao.addFollowingUp1(infomap);
-
-		JSONObject json = Util.dataListToJson(true, "success", null, null);
-		try {
-			out = response.getWriter();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		out.print(json);
-		return null;
-	}
-
-	// ############# by wx end #############//
+	// ############# by wx end #############//	
 }

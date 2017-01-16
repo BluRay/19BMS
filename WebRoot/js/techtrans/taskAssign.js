@@ -214,7 +214,7 @@ function ajaxQuery(targetPage){
 				$("<td />").html(data.factory||"").appendTo(tr);
 				$("<td />").html(data.switch_node||"").appendTo(tr);
 				$("<td />").html(data.tech_list||"").appendTo(tr);
-				if(data.assess_date.trim().length==0){
+				if(data.assign_date.trim().length==0){
 					$("<td />").html("<i name='edit' class=\"fa fa-pencil\" title=\"分配\" style=\"cursor: pointer;text-align: center;\" onclick='ajaxEdit(" + data.id + ")'></i>").appendTo(tr);
 				}else{
 					$("<td />").html("").appendTo(tr);

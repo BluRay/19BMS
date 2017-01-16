@@ -139,6 +139,7 @@
 		from BMS_PLAN_BUS b
 		where b.bus_number LIKE CONCAT('%',#{bus_input},'%')
 		order by b.bus_number desc
+		limit 50
 	</select>
 
 	<select id="getPartsSelect" parameterType="String" resultType="Map">

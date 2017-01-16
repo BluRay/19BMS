@@ -121,7 +121,7 @@ function ajaxQuery(targetPage){
 	conditions.task_content=$("#tech_task_content").val();
 	conditions.tech_order_no=$("#tech_order_no").val();
 	conditions.order_no=$("#order_no").val();
-	conditions.factory=$("#factory :selected").text();
+	conditions.factory=$("#search_factory :selected").text();
 	conditions.tech_date_start=$("#startDate").val();
 	conditions.tech_date_end=$("#endDate").val();
 	conditions.status=$("#status").val();
@@ -218,7 +218,7 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 	var factory_disable_obj={};
 	follow_detail=follow_detail||"";
 	$.each(follow_detail.split(";"),function(i,follow){
-		var factory=follow.split("||")[0];
+		var factory=follow.split("||")[0].split("_")[1];
 		var follow_num=Number(follow.split("||")[1]);
 		//alert(follow_num);
 		factory_disable_obj[factory]="disabled";

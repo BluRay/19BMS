@@ -4,36 +4,62 @@
 <!--  ###################  by xjw  start  ###############  -->
 	
 	<select id="queryTechTaskList" parameterType="Map" resultType="Map">
-	<![CDATA[
-		SELECT t.id,t.task_content,t.tech_order_no,t.major_change,t.custom_change,t.custom_change_no,
-		t.repeat_change,t.tech_point_num,t.tech_order_file,t.custom_change_file,t.tech_date,t.duty_unit,
+		SELECT t.id,d.id task_detail_id,t.task_content,t.tech_order_no,t.major_change,t.custom_change,t.custom_change_no,
+		t.repeat_change,t.tech_point_num,t.tech_order_file,t.custom_change_file,t.tech_date,t.duty_unit duty_unit_id,k2.key_name duty_unit,
 		t.switch_mode,t.switch_node,t.editor_id,t.edit_date,t.assigner_id,t.assign_date,t.assesor_id,t.assess_date,
 		k.key_name tech_type,k1.key_name tech_order_type,o.id order_id,o.order_no,
-		concat(d.order_no,'<br />',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
+		concat(d.order_no,'&lt;br&gt;',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,
 		(SELECT group_concat(tmp.workshop,':',tmp.follow_num separator ',') follow_list
 		FROM(
-		SELECT  tf.tech_task_id, tf.factory,tf.workshop,count(tf.bus_number) follow_num
+		SELECT  tf.tech_task_id,tf.order_no,tf.factory,tf.workshop,count(tf.bus_number) follow_num
 		FROM BMS_TECH_TASK_FOLLOW tf 
-		WHERE  tf.confirmor_id>0
-		group by tf.tech_task_id,tf.factory,tf.workshop
+		WHERE  tf.confirmor_id>0	
+		<if test="order_no !=null and order_no !=''">
+			and tf.order_no=#{order_no}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and tf.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and tf.workshop=#{workshop}
+		</if>	
+		group by tf.tech_task_id,tf.order_no,tf.factory,tf.workshop
 		UNION ALL
-		SELECT tfp.tech_task_id, tfp.factory,tfp.workshop,sum(tfp.follow_num) follow_num 
-		FROM BMS_TECH_TASK_FOLLOW_PRE tfp WHERE tfp.confirmor_id>0 group by tfp.tech_task_id,tfp.factory,tfp.workshop) tmp WHERE tmp.tech_task_id=t.id and tmp.factory=d.factory ) follow_list,
+		SELECT tfp.tech_task_id,tfp.order_no,tfp.factory,tfp.workshop,sum(tfp.follow_num) follow_num 
+		FROM BMS_TECH_TASK_FOLLOW_PRE tfp WHERE tfp.confirmor_id>0 
+		<if test="order_no !=null and order_no !=''">
+			and tfp.order_no=#{order_no}
+		</if>
+		<if test="factory !=null and factory !=''">
+			and tfp.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and tfp.workshop=#{workshop}
+		</if>
+		group by tfp.tech_task_id,tfp.order_no,tfp.factory,tfp.workshop) tmp 
+		WHERE tmp.tech_task_id=t.id and tmp.factory=d.factory and tmp.order_no=d.order_no) follow_list,
 		(SELECT group_concat(tmp.workshop,':',tmp.ready_hour_total separator ',') ready_hour_list
 		FROM(
 		SELECT h.ecn_task_id tech_task_id,h.factory,h.workshop,ifnull(sum(h.work_hour),0)ready_hour_total
 		FROM BMS_HR_STAFF_HOURS h
 		WHERE h.hour_type='3' and h.status !='2'
-		group by h.ecn_task_id,h.factory,h.workshop) tmp  WHERE tmp.tech_task_id=t.id and tmp.factory=d.factory ) ready_hour_list,
+		<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+		</if>
+		group by h.ecn_task_id,h.factory,h.workshop) tmp  WHERE tmp.tech_task_id=d.id and tmp.factory=d.factory ) ready_hour_list,
 		d.factory_id,d.factory,d.tech_list,d.time_list,d.single_time_total,d.time_total
 		FROM BMS_TECH_TASK t
 		LEFT JOIN BMS_BASE_KEY k on t.tech_type=k.id and k.key_code='ECN_TYPE'
 		LEFT JOIN BMS_BASE_KEY k1 on t.tech_order_type=k1.id and k1.key_code='ECN_CHANGE_TYPE'
+		LEFT JOIN BMS_BASE_KEY k2 on t.duty_unit=k2.id and k2.key_code='ECN_DUTY_UNIT'
 		LEFT JOIN BMS_TECH_TASK_DETAIL d ON t.id=d.tech_task_id
 		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
 		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
 		WHERE 1=1 
-		]]>
+
 		<if test="task_content !=null and task_content !=''">
 			and t.task_content like (concat('%',#{task_content},'%'))
 		</if>
@@ -67,6 +93,31 @@
 		<if test="status=='已完成'">
 			and t.finish_date !=''
 		</if>
+		<if test="status=='未维护'">
+			and  not exists (SELECT distinct h.ecn_task_id tech_task_id
+			FROM BMS_HR_STAFF_HOURS h
+			WHERE h.hour_type='3' and h.factory=#{factory} and workshop=#{workshop} 
+			and h.work_hour>0 and d.id=h.ecn_task_id) 
+		</if>
+		<if test="status=='未审批'">
+			and exists (SELECT distinct h.ecn_task_id tech_task_id
+			FROM BMS_HR_STAFF_HOURS h
+			WHERE h.hour_type='3' and h.status='0' and h.factory=#{factory} and workshop=#{workshop} 
+			and h.work_hour>0 and d.id=h.ecn_task_id) 
+		</if>
+		<if test="status=='已审批'">
+			and exists (SELECT distinct h.ecn_task_id tech_task_id
+			FROM BMS_HR_STAFF_HOURS h
+			WHERE h.hour_type='3' and h.status='1' and h.factory=#{factory} and workshop=#{workshop} 
+			and h.work_hour>0 and d.id=h.ecn_task_id) 
+		</if>
+		<if test="status=='已驳回'">
+			and exists (SELECT distinct h.ecn_task_id tech_task_id
+			FROM BMS_HR_STAFF_HOURS h
+			WHERE h.hour_type='3' and h.status='2' and h.factory=#{factory} and workshop=#{workshop} 
+			and h.work_hour>0 and d.id=h.ecn_task_id) 
+		</if>
+		
 		order by t.tech_date desc
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize} 
@@ -111,6 +162,30 @@
 		</if>
 		<if test="status=='已完成'">
 			and t.finish_date !=''
+		</if>
+		<if test="status=='未维护'">
+			and  not exists (SELECT distinct h.ecn_task_id tech_task_id
+			FROM BMS_HR_STAFF_HOURS h
+			WHERE h.hour_type='3' and h.factory=#{factory} and workshop=#{workshop} 
+			and h.work_hour>0 and d.id=h.ecn_task_id) 
+		</if>
+		<if test="status=='未审批'">
+			and exists (SELECT distinct h.ecn_task_id tech_task_id
+			FROM BMS_HR_STAFF_HOURS h
+			WHERE h.hour_type='3' and h.status='0' and h.factory=#{factory} and workshop=#{workshop} 
+			and h.work_hour>0 and d.id=h.ecn_task_id) 
+		</if>
+		<if test="status=='已审批'">
+			and exists (SELECT distinct h.ecn_task_id tech_task_id
+			FROM BMS_HR_STAFF_HOURS h
+			WHERE h.hour_type='3' and h.status='1' and h.factory=#{factory} and workshop=#{workshop} 
+			and h.work_hour>0 and d.id=h.ecn_task_id) 
+		</if>
+		<if test="status=='已驳回'">
+			and exists (SELECT distinct h.ecn_task_id tech_task_id
+			FROM BMS_HR_STAFF_HOURS h
+			WHERE h.hour_type='3' and h.status='2' and h.factory=#{factory} and workshop=#{workshop} 
+			and h.work_hour>0 and d.id=h.ecn_task_id) 
 		</if>
 	</select>
 	
@@ -719,6 +794,12 @@
 		<if test="workshop !=null and workshop !=''">
 			and d.workshop=#{workshop}
 		</if>
+		<if test="bus_num_start!=null and  bus_num_start!=''">
+			<![CDATA[ and d.bus_number >= CONCAT(t.bus_type_code,"-",o.order_code,"-",o.productive_year,"-",#{bus_num_start}) ]]>
+		</if>
+		<if test="bus_num_end!=null and  bus_num_end!=''">
+			<![CDATA[ and d.bus_number <= CONCAT(t.bus_type_code,"-",o.order_code,"-",o.productive_year,"-",#{bus_num_end})]]>
+		</if>
 		order by d.confirmor_date,b.bus_number
 	</select>
 	<select id="queryStaffWorkHours" parameterType="Map" resultType="Map">
@@ -793,16 +874,16 @@
 					editor_id=#{detail.editorId},
 				</if>
 				<if test="detail.editDate !=null">
-					edit_date=#{detail.editDate}
+					edit_date=#{detail.editDate},
 				</if>
 				<if test="detail.approverId !=null">
 					approver_id=#{detail.approverId},
 				</if>
 				<if test="detail.approveDate !=null">
-					approve_date=#{detail.approveDate}
+					approve_date=#{detail.approveDate},
 				</if>
 				<if test="detail.techSinglePrice !=null">
-					tech_single_price=#{detail.techSinglePrice}
+					tech_single_price=#{detail.techSinglePrice},
 				</if>
 			</trim>
 			where id=#{detail.id}
@@ -1123,6 +1204,255 @@
 			WHERE id = #{item.tech_task_id}
 		</foreach>
 	</update>
+	
+	<!--技改跟进-查询 -->
+	<select id="queryTechFollowingUpList" parameterType="Map" resultType="Map">
+		SELECT * FROM
+(
+SELECT
+t.task_content,
+t.tech_order_type,
+t.tech_order_no,
+t.tech_date,
+t.switch_mode,
+t.switch_node,
+f.tech_task_id,
+f.workshop,
+f.factory,
+f.order_no,
+substring_index(substring_index(d.tech_list,CONCAT(f.workshop,':'),-1),',',1) AS total,
+sum(f.follow_num) AS complete,
+t.edit_date,
+t.assign_date,
+t.assess_date,
+t.finish_date
+FROM
+BMS_TECH_TASK_FOLLOW_PRE AS f
+LEFT JOIN BMS_TECH_TASK AS t ON f.tech_task_id = t.id
+LEFT JOIN BMS_TECH_TASK_DETAIL AS d ON d.tech_task_id = f.tech_task_id AND d.order_no = f.order_no AND d.factory = f.factory
+GROUP BY t.id,f.order_no,f.factory,f.workshop
+
+UNION
+
+SELECT
+t.task_content,
+t.tech_order_type,
+t.tech_order_no,
+t.tech_date,
+t.switch_mode,
+t.switch_node,
+f.tech_task_id,
+f.workshop,
+f.factory,
+f.order_no,
+Count(f.id) AS total,
+Count(IF(ISNULL(f.confirmor_id),NULL,1)) AS complete,
+t.edit_date,
+t.assign_date,
+t.assess_date,
+t.finish_date
+FROM
+BMS_TECH_TASK_FOLLOW AS f
+LEFT JOIN BMS_TECH_TASK AS t ON f.tech_task_id = t.id
+GROUP BY t.id,f.order_no,f.factory,f.workshop
+) AS tmp 
+where 1=1
+		<if test="factory !=null and factory !=''">
+			and tmp.factory = #{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and tmp.workshop = #{workshop}
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			and tmp.order_no = #{order_no}
+		</if>
+		<if test="task_content !=null and task_content !=''">
+			and tmp.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and tmp.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and tmp.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and tmp.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and tmp.edit_date !='' and tmp.assign_date ='' and tmp.assess_date ='' and tmp.finish_date ='' 
+		</if>
+		<if test="status=='已分配'">
+			and tmp.assign_date !='' and tmp.assess_date ='' and tmp.finish_date ='' 
+		</if>
+		<if test="status=='已评估'">
+			and tmp.assess_date !='' and tmp.finish_date ='' 
+		</if>
+		<if test="status=='已完成'">
+			and tmp.finish_date !=''
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize} 
+		</if>
+	</select>
+	
+	<!--技改跟进-查询totalcount -->
+	<select id="queryTechFollowingUpListTotalCount" parameterType="Map" resultType="int">
+		SELECT count(*) FROM
+(
+SELECT
+t.task_content,
+t.tech_order_type,
+t.tech_order_no,
+t.tech_date,
+t.switch_mode,
+t.switch_node,
+f.tech_task_id,
+f.workshop,
+f.factory,
+f.order_no,
+substring_index(substring_index(d.tech_list,CONCAT(f.workshop,':'),-1),',',1) AS total,
+sum(f.follow_num) AS complete,
+t.edit_date,
+t.assign_date,
+t.assess_date,
+t.finish_date
+FROM
+BMS_TECH_TASK_FOLLOW_PRE AS f
+LEFT JOIN BMS_TECH_TASK AS t ON f.tech_task_id = t.id
+LEFT JOIN BMS_TECH_TASK_DETAIL AS d ON d.tech_task_id = f.tech_task_id AND d.order_no = f.order_no AND d.factory = f.factory
+GROUP BY t.id,f.order_no,f.factory,f.workshop
+
+UNION
+
+SELECT
+t.task_content,
+t.tech_order_type,
+t.tech_order_no,
+t.tech_date,
+t.switch_mode,
+t.switch_node,
+f.tech_task_id,
+f.workshop,
+f.factory,
+f.order_no,
+Count(f.id) AS total,
+Count(IF(ISNULL(f.confirmor_id),NULL,1)) AS complete,
+t.edit_date,
+t.assign_date,
+t.assess_date,
+t.finish_date
+FROM
+BMS_TECH_TASK_FOLLOW AS f
+LEFT JOIN BMS_TECH_TASK AS t ON f.tech_task_id = t.id
+GROUP BY t.id,f.order_no,f.factory,f.workshop
+) AS tmp 
+where 1=1
+		<if test="factory !=null and factory !=''">
+			and tmp.factory = #{factory}
+		</if>
+		<if test="workshop !=null and workshop !=''">
+			and tmp.workshop = #{workshop}
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			and tmp.order_no = #{order_no}
+		</if>
+		<if test="task_content !=null and task_content !=''">
+			and tmp.task_content like (concat('%',#{task_content},'%'))
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			and tmp.tech_order_no like (concat('%',#{tech_order_no},'%'))
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			and tmp.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			and tmp.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="status=='已创建'">
+			and tmp.edit_date !='' and tmp.assign_date ='' and tmp.assess_date ='' and tmp.finish_date ='' 
+		</if>
+		<if test="status=='已分配'">
+			and tmp.assign_date !='' and tmp.assess_date ='' and tmp.finish_date ='' 
+		</if>
+		<if test="status=='已评估'">
+			and tmp.assess_date !='' and tmp.finish_date ='' 
+		</if>
+		<if test="status=='已完成'">
+			and tmp.finish_date !=''
+		</if>
+	</select>
+	
+	<!--技改跟进明细列表 -->
+	<select id="queryFollowingUpDetailList" parameterType="Map" resultType="Map">
+		SELECT
+f.id,
+f.bus_number,
+f.factory,
+p.process_name,
+u.username AS confirmor,
+f.confirmor_date
+FROM
+BMS_TECH_TASK_FOLLOW AS f
+LEFT JOIN BMS_PLAN_BUS AS b ON b.bus_number = f.bus_number
+LEFT JOIN BMS_BASE_PROCESS AS p ON p.id = b.latest_process_id
+LEFT JOIN BMS_BASE_USER AS u ON u.id = f.confirmor_id
+
+		WHERE 1=1
+		and f.tech_task_id = #{tech_task_id}
+		and f.order_no = #{order_no}
+		and f.factory = #{factory}
+		and f.workshop = #{workshop}
+		<if test="view !=null and view !=''">
+		and f.confirmor_id > 0
+		</if>
+		<if test="bus_num_start !=null and bus_num_start !=''">
+		and substring_index(f.bus_number,'-',-1) >= #{bus_num_start}
+		</if>
+		<if test="bus_num_end !=null and bus_num_end !=''">
+		and substring_index(f.bus_number,'-',-1) &lt;= #{bus_num_end}
+		</if>
+	</select>
+	
+	<select id="queryFollowingUpDetailList1" parameterType="Map" resultType="Map">
+		SELECT
+f.id,
+f.follow_num,
+u.username AS confirmor,
+f.confirmor_date
+FROM
+BMS_TECH_TASK_FOLLOW_PRE AS f
+LEFT JOIN BMS_BASE_USER AS u ON u.id = f.confirmor_id
+
+		WHERE 1=1
+		and f.tech_task_id = #{tech_task_id}
+		and f.order_no = #{order_no}
+		and f.factory = #{factory}
+		and f.workshop = #{workshop}
+		order by f.confirmor_date
+	</select>
+	
+	<!-- 技改跟进-修改 -->
+	<update id="updateFollowingUp" parameterType="List">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_TECH_TASK_FOLLOW
+			SET confirmor_id = #{item.confirmor_id},confirmor_date = #{item.confirmor_date}
+			WHERE id = #{item.id}
+		</foreach>
+	</update>
+	
+	<!-- 技改跟进-修改1 -->
+	<insert id="addFollowingUp1" useGeneratedKeys="true" parameterType="map">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT
+			LAST_INSERT_ID() as id
+		</selectKey>
+		<![CDATA[
+			INSERT INTO
+			BMS_TECH_TASK_FOLLOW_PRE(tech_task_id,factory,workshop,follow_num,confirmor_id,confirmor_date,order_no,task_detail_id)
+			VALUES(#{tech_task_id},#{factory},#{workshop},#{follow_num},#{confirmor_id},#{confirmor_date},#{order_no},#{task_detail_id})
+		]]>
+	</insert>
 <!--  ###################  by wx  end  ###############  -->
 	
 </mapper>

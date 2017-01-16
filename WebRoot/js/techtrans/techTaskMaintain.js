@@ -3,9 +3,13 @@ var timeConfigCount = 0;
 var ready_hour = 0;
 var edit_list = [];
 var re_f = /^[0-9]+[0-9]*\.?[0|5]?$/;// 浮点数正则表达式
+// add by wuxiao
+var ECN_TYPE = [];
+var ECN_CHANGE_TYPE = [];
+var ECN_DUTY_UNIT = [];
 $(document).ready(function() {
 	initPage();
-	
+
 	// 复选框全选、反选
 	$("#checkall").click(function() {
 		if ($(this).attr("checked") == "checked") {
@@ -19,16 +23,19 @@ $(document).ready(function() {
 			$(this).parent().parent().next().find("input").focus();
 		}
 	});
-	
+
 	// 删除
 	$(".close").live("click", function(e) {
 		$(e.target).closest("tr").remove();
 	});
 
 	function initPage() {
+		generatekeys("ECN_TYPE", ECN_TYPE);
+		generatekeys("ECN_CHANGE_TYPE", ECN_CHANGE_TYPE);
+		generatekeys("ECN_DUTY_UNIT", ECN_DUTY_UNIT);
 		ajaxQuery(1);
 	}
-	
+
 	// 技改信息查询
 	$("#btnQuery").click(function() {
 		ajaxQuery();
@@ -57,7 +64,7 @@ $(document).ready(function() {
 		ajaxEdit();
 		return false;
 	});
-	//end
+	// end
 });
 
 /**
@@ -87,18 +94,18 @@ function ajaxQuery(targetPage) {
 			$.each(response.data, function(index, value) {
 				var tr = $("<tr />");
 				$("<td />").html(value.task_content).appendTo(tr);
-				$("<td />").html(getKeys("ECN_CHANGE_TYPE",value.tech_order_type)).appendTo(tr);
+				$("<td />").html(getKeys(ECN_CHANGE_TYPE, value.tech_order_type)).appendTo(tr);
 				$("<td />").html(value.tech_order_no).appendTo(tr);
-				$("<td />").html("<a href='#' onclick='window.open(\""+value.tech_order_file+"\")'>"+(value.tech_order_file==""?"":"查看")+"</a>").appendTo(tr);
+				$("<td />").html("<a href='#' onclick='window.open(\"" + value.tech_order_file + "\")'>" + (value.tech_order_file == "" ? "" : "查看") + "</a>").appendTo(tr);
 				$("<td />").html(value.tech_date).appendTo(tr);
-				$("<td />").html(getKeys("ECN_DUTY_UNIT",value.duty_unit)).appendTo(tr);
+				$("<td />").html(getKeys(ECN_DUTY_UNIT, value.duty_unit)).appendTo(tr);
 				$("<td />").html(value.major_change).appendTo(tr);
 				$("<td />").html(value.custom_change).appendTo(tr);
-				$("<td />").html("<a href='#' onclick='window.open(\""+value.custom_change_file+"\")'>"+(value.custom_change_file==""?"":"查看")+"</a>").appendTo(tr);
+				$("<td />").html("<a href='#' onclick='window.open(\"" + value.custom_change_file + "\")'>" + (value.custom_change_file == "" ? "" : "查看") + "</a>").appendTo(tr);
 				$("<td />").html(value.repeat_change).appendTo(tr);
-				$("<td />").html(getKeys("ECN_TYPE",value.tech_type)).appendTo(tr);
+				$("<td />").html(getKeys(ECN_TYPE, value.tech_type)).appendTo(tr);
 
-				$("<td />").html(value.finish_date==""?"<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" onclick='showEditModal("+value.id+")' ></i>":"").appendTo(tr);
+				$("<td />").html(value.finish_date == "" ? "<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" onclick='showEditModal(" + value.id + ")' ></i>" : "").appendTo(tr);
 				$("#tableTaskFollow tbody").append(tr);
 
 				$(tr).data("id", value.id);
@@ -145,14 +152,16 @@ function ajaxQueryChangedMaterialList(tech_task_id) {
 				$("<td id=\"assemb_site\" contentEditable=\"true\"/>").html(value.assemb_site).appendTo(tr);
 				$("<td id=\"remark\" contentEditable=\"true\"/>").html(value.remark).appendTo(tr);
 
-				//$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" ></i>").appendTo(tr);
+				// $("<td />").html("<i name='edit' class=\"fa fa-pencil\"
+				// rel=\"tooltip\" title='修改'style=\"cursor: pointer;text-align:
+				// center;\" ></i>").appendTo(tr);
 				$("#table2 tbody").append(tr);
 			});
 		}
 	});
 }
 
-function showEditModal(id){
+function showEditModal(id) {
 	$('#editForm').resetForm();
 	getKeysSelect("ECN_TYPE", "", "#edit_tech_type");
 	getKeysSelect("ECN_CHANGE_TYPE", "", "#edit_tech_order_type");
@@ -160,10 +169,10 @@ function showEditModal(id){
 	$("#table2 tbody").html("");
 	$("#edit_tech_order_file").next("a").remove();
 	$("#edit_custom_change_file").next("a").remove();
-	
+
 	ajaxSingleQuery(id);
 	ajaxQueryChangedMaterialList(id);
-	
+
 	$("#tech_task_id").val(id);
 	$("#editModal").modal("show");
 }
@@ -184,19 +193,21 @@ function ajaxSingleQuery(id) {
 				$("#edit_task_content").val(value.task_content);
 				$("#edit_tech_order_type").val(value.tech_order_type);
 				$("#edit_tech_order_no").val(value.tech_order_no);
-				
-				//$("#edit_tech_order_file").val("<a href='"+value.tech_order_file+"'>"+(value.tech_order_file==""?"":"查看")+"</a>").appendTo(tr);
-				$("#edit_tech_order_file").after("<a href='#' onclick='window.open(\""+value.tech_order_file+"\")'>"+(value.tech_order_file==""?"":"查看")+"</a>");
+
+				// $("#edit_tech_order_file").val("<a
+				// href='"+value.tech_order_file+"'>"+(value.tech_order_file==""?"":"查看")+"</a>").appendTo(tr);
+				$("#edit_tech_order_file").after("<a href='#' onclick='window.open(\"" + value.tech_order_file + "\")'>" + (value.tech_order_file == "" ? "" : "查看") + "</a>");
 				$("#edit_tech_date").val(value.tech_date);
 				$("#edit_duty_unit").val(value.duty_unit);
-				value.major_change=="Y"?$("#edit_major_change").attr('checked',true):$("#edit_major_change").removeAttr('checked');
-				value.custom_change=="Y"?$("#edit_custom_change").attr('checked',true):$("#edit_custom_change").removeAttr('checked');
-				value.repeat_change=="Y"?$("#edit_repeat_change").attr('checked',true):$("#edit_repeat_change").removeAttr('checked');
-				
-				//$("#edit_custom_change_file").val("<a href='"+value.custom_change_file+"'>"+(value.custom_change_file==""?"":"查看")+"</a>").appendTo(tr);
-				$("#edit_custom_change_file").after("<a href='#' onclick='window.open(\""+value.custom_change_file+"\")'>"+(value.custom_change_file==""?"":"查看")+"</a>");
+				value.major_change == "Y" ? $("#edit_major_change").attr('checked', true) : $("#edit_major_change").removeAttr('checked');
+				value.custom_change == "Y" ? $("#edit_custom_change").attr('checked', true) : $("#edit_custom_change").removeAttr('checked');
+				value.repeat_change == "Y" ? $("#edit_repeat_change").attr('checked', true) : $("#edit_repeat_change").removeAttr('checked');
+
+				// $("#edit_custom_change_file").val("<a
+				// href='"+value.custom_change_file+"'>"+(value.custom_change_file==""?"":"查看")+"</a>").appendTo(tr);
+				$("#edit_custom_change_file").after("<a href='#' onclick='window.open(\"" + value.custom_change_file + "\")'>" + (value.custom_change_file == "" ? "" : "查看") + "</a>");
 				$("#edit_tech_type").val(value.tech_type);
-				
+
 				$("#edit_tech_point_num").val(value.tech_point_num);
 				$("#edit_custom_change_no").val(value.custom_change_no);
 			});
@@ -204,13 +215,13 @@ function ajaxSingleQuery(id) {
 	});
 }
 
-//add by wuxiao start
+// add by wuxiao start
 function ajaxAdd() {
 	if ($("#new_task_content").val().trim() == "") {
 		alert("技改任务 值不能为空！");
 		$("#new_task_content").focus();
 		return false;
-	} 
+	}
 	if ($("#new_tech_order_no").val().trim() == "") {
 		alert("技改单号 值不能为空！");
 		$("#new_tech_order_no").focus();
@@ -252,12 +263,12 @@ function ajaxAdd() {
 		dataType : "json",
 		type : "post",
 		data : {
-			"selectedrows": JSON.stringify(trs)
+			"selectedrows" : JSON.stringify(trs)
 		},
 		success : function(response) {
 			if (response.success) {
-				//$(".divLoading").hide();
-				//$("#btnMtaSave").attr("disabled", false);
+				// $(".divLoading").hide();
+				// $("#btnMtaSave").attr("disabled", false);
 				$("#newModal").modal("hide");
 				alert(response.message);
 				ajaxQuery();
@@ -273,7 +284,7 @@ function ajaxEdit() {
 		alert("技改任务 值不能为空！");
 		$("#edit_task_content").focus();
 		return false;
-	} 
+	}
 	if ($("#edit_tech_order_no").val().trim() == "") {
 		alert("技改单号 值不能为空！");
 		$("#edit_tech_order_no").focus();
@@ -304,23 +315,22 @@ function ajaxEdit() {
 		$("#edit_duty_unit").focus();
 		return false;
 	}
-	/*if ($("#edit_tech_order_file").val().trim() == "") {
-		alert("技改单附件 值不能为空！");
-		$("#edit_tech_order_file").focus();
-		return false;
-	}*/
+	/*
+	 * if ($("#edit_tech_order_file").val().trim() == "") { alert("技改单附件
+	 * 值不能为空！"); $("#edit_tech_order_file").focus(); return false; }
+	 */
 	var trs = getSelectRowDatas("table2");
 	$('#editForm').ajaxSubmit({
 		url : "techTask!editTechTaskMaintain.action",
 		dataType : "json",
 		type : "post",
 		data : {
-			"selectedrows": JSON.stringify(trs)
+			"selectedrows" : JSON.stringify(trs)
 		},
 		success : function(response) {
 			if (response.success) {
-				//$(".divLoading").hide();
-				//$("#btnMtaSave").attr("disabled", false);
+				// $(".divLoading").hide();
+				// $("#btnMtaSave").attr("disabled", false);
 				$("#editModal").modal("hide");
 				alert(response.message);
 				ajaxQuery();
@@ -353,7 +363,7 @@ function LimitAttach(form, file) {
 		// form.submit();
 		// $('#btn_upload').val("上传中...");
 		// $('#btn_upload').attr('disabled', "true");
-		//$(".divLoading").addClass("fade in").show();
+		// $(".divLoading").addClass("fade in").show();
 		$('#uploadForm').ajaxSubmit({
 			dataType : "json",
 			type : 'post', // 提交方式 get/post
@@ -366,7 +376,7 @@ function LimitAttach(form, file) {
 				// alert('提交成功！');
 
 				$("#table1 tbody").html("");
-				//alert(response);
+				// alert(response);
 				if (response.success) {
 					$.each(response.data, function(index, value) {
 						var tr = $("<tr />");
@@ -386,15 +396,17 @@ function LimitAttach(form, file) {
 						$("<td id=\"assemb_site\" contentEditable=\"true\"/>").html(value.assemb_site).appendTo(tr);
 						$("<td id=\"remark\" contentEditable=\"true\"/>").html(value.remark).appendTo(tr);
 
-						//$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" ></i>").appendTo(tr);
+						// $("<td />").html("<i name='edit' class=\"fa
+						// fa-pencil\" rel=\"tooltip\" title='修改'style=\"cursor:
+						// pointer;text-align: center;\" ></i>").appendTo(tr);
 						$("#table1 tbody").append(tr);
 
-						//$(tr).data("id", value.id);
+						// $(tr).data("id", value.id);
 
 					});
 
 					$('#uploadForm').resetForm(); // 提交后重置表单
-					//$(".divLoading").hide();
+					// $(".divLoading").hide();
 				}
 			}
 		});
@@ -425,7 +437,7 @@ function LimitAttach2(form, file) {
 		// form.submit();
 		// $('#btn_upload').val("上传中...");
 		// $('#btn_upload').attr('disabled', "true");
-		//$(".divLoading").addClass("fade in").show();
+		// $(".divLoading").addClass("fade in").show();
 		$('#uploadForm2').ajaxSubmit({
 			dataType : "json",
 			type : 'post', // 提交方式 get/post
@@ -438,7 +450,7 @@ function LimitAttach2(form, file) {
 				// alert('提交成功！');
 
 				$("#table2 tbody").html("");
-				//alert(response);
+				// alert(response);
 				if (response.success) {
 					$.each(response.data, function(index, value) {
 						var tr = $("<tr />");
@@ -458,15 +470,17 @@ function LimitAttach2(form, file) {
 						$("<td id=\"assemb_site\" contentEditable=\"true\"/>").html(value.assemb_site).appendTo(tr);
 						$("<td id=\"remark\" contentEditable=\"true\"/>").html(value.remark).appendTo(tr);
 
-						//$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" ></i>").appendTo(tr);
+						// $("<td />").html("<i name='edit' class=\"fa
+						// fa-pencil\" rel=\"tooltip\" title='修改'style=\"cursor:
+						// pointer;text-align: center;\" ></i>").appendTo(tr);
 						$("#table2 tbody").append(tr);
 
-						//$(tr).data("id", value.id);
+						// $(tr).data("id", value.id);
 
 					});
 
 					$('#uploadForm2').resetForm(); // 提交后重置表单
-					//$(".divLoading").hide();
+					// $(".divLoading").hide();
 				}
 			}
 		});
@@ -477,7 +491,7 @@ function LimitAttach2(form, file) {
 	}
 }
 
-//格局化日期：yyyy-MM-dd
+// 格局化日期：yyyy-MM-dd
 function formatDate(date) {
 	var myyear = date.getFullYear();
 	var mymonth = date.getMonth() + 1;
@@ -493,56 +507,67 @@ function formatDate(date) {
 }
 
 function getSelectRowDatas(tableID) {
-    var trs = $("#" + tableID).find("tr");
-    var propertyValue;
-    var selectData = new Array();
-    for (var i = 1; i < trs.length; i++) { //第二行开始为数据
-        var obj = new Object();
-        var objTr = trs[i];
-        var tdArray = objTr.childNodes;
-        
-        if(tdArray[0].innerHTML == "" && tdArray[0].children.length == 0){
-          continue;
-        }
-        
-        for (var j = 0; j < tdArray.length; j++) {
-            var propertyName = tdArray[j].id;
-            propertyValue = tdArray[j].innerHTML;
-            var childTag = tdArray[j].children;
-            if (childTag.length > 0) {
-                var inputType = childTag[0].tagName;
-                var inputName = childTag[0].type;
-                if (inputName == "checkbox") {
-                    if (childTag[0].checked == false) { //判断为没有选中的数据行直接跳出不做处理
-                        break;
-                    }
-                    continue;
-                }
-                if ((inputType == "INPUT" && inputName == "hidden") || (inputType == "INPUT" && inputName == "text") || inputType == "SELECT") {
-                    propertyValue = childTag[0].value;
-                }else if(inputType==="A"){
-                    propertyValue = childTag[0].innerHTML;
-                }
-            }
-            obj[propertyName] = propertyValue;
-        }
-        if (!isEmptyObject(obj)) {
-            selectData.push(obj);
-        }
+	var trs = $("#" + tableID).find("tr");
+	var propertyValue;
+	var selectData = new Array();
+	for (var i = 1; i < trs.length; i++) { // 第二行开始为数据
+		var obj = new Object();
+		var objTr = trs[i];
+		var tdArray = objTr.childNodes;
 
-    }
-    return selectData;
+		if (tdArray[0].innerHTML == "" && tdArray[0].children.length == 0) {
+			continue;
+		}
+
+		for (var j = 0; j < tdArray.length; j++) {
+			var propertyName = tdArray[j].id;
+			propertyValue = tdArray[j].innerHTML;
+			var childTag = tdArray[j].children;
+			if (childTag.length > 0) {
+				var inputType = childTag[0].tagName;
+				var inputName = childTag[0].type;
+				if (inputName == "checkbox") {
+					if (childTag[0].checked == false) { // 判断为没有选中的数据行直接跳出不做处理
+						break;
+					}
+					continue;
+				}
+				if ((inputType == "INPUT" && inputName == "hidden") || (inputType == "INPUT" && inputName == "text") || inputType == "SELECT") {
+					propertyValue = childTag[0].value;
+				} else if (inputType === "A") {
+					propertyValue = childTag[0].innerHTML;
+				}
+			}
+			obj[propertyName] = propertyValue;
+		}
+		if (!isEmptyObject(obj)) {
+			selectData.push(obj);
+		}
+
+	}
+	return selectData;
 }
 
-function isEmptyObject(obj){
-    for(var n in obj){
-        return false;
-    }
-    return true;
+function isEmptyObject(obj) {
+	for ( var n in obj) {
+		return false;
+	}
+	return true;
 }
 
-function getKeys(keyCode,input) {
-	var returnValue="";
+function getKeys(keys, input) {
+	var returnValue = "";
+
+	$.each(keys, function(index, value) {
+		if (input == value.id) {
+			returnValue = value.key_name;
+		}
+	});
+
+	return returnValue;
+}
+
+function generatekeys(keyCode, list) {
 	$.ajax({
 		url : "common!getKeysSelect.action",
 		dataType : "json",
@@ -555,11 +580,15 @@ function getKeys(keyCode,input) {
 		},
 		success : function(response) {
 			$.each(response.data, function(index, value) {
-				if (input == value.id) {
-					returnValue = value.key_name
-				}
+				/*
+				 * if (input == value.id) { returnValue = value.key_name }
+				 */
+				var obj = {
+					"id" : value.id,
+					"key_name" : value.key_name
+				};
+				list.push(obj);
 			});
 		}
 	});
-	return returnValue;
 }

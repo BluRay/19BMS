@@ -11,6 +11,7 @@
 			<result name="assignPrePage">/jsp/techtrans/taskAssignPrePage.jsp</result>
 			<result name="worktimeMaitain">/jsp/techtrans/techWorktimeMaitain.jsp</result>
 			<result name="worktimeVerify">/jsp/techtrans/techWorktimeVerify.jsp</result>
+			<result name="taskSearch">/jsp/techtrans/techTaskSearch.jsp</result>
 			<result type="json">
 				<param name="root">result</param>
 			</result>
@@ -20,11 +21,13 @@
 			<result name="techTaskInfoPage">/jsp/techtrans/techTaskInfoPage.jsp</result>
 			<result name="techTaskMaterialCheck">/jsp/techtrans/techTaskMaterialCheck.jsp</result>
 			<result name="techTaskMaterialCheckPage">/jsp/techtrans/techTaskMaterialCheckPage.jsp</result>
+			<result name="techTaskCollect">/jsp/techtrans/techTaskCollect.jsp</result>
 			<!-- by yk end -->
 			
 			<!-- by wx start -->
 			<result name="taskMaintainPage">/jsp/techtrans/techTaskMaintain.jsp</result>
 			<result name="workHourEstimatePage">/jsp/techtrans/techWorkHourEstimate.jsp</result>
+			<result name="followingUpPage">/jsp/techtrans/techFollowingUp.jsp</result>
 			<!-- by wx end -->	
 		</action>
 		
