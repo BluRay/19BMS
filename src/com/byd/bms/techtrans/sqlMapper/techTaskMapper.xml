@@ -1210,58 +1210,37 @@
 		SELECT * FROM
 (
 SELECT
+d.id as task_detail_id,
 t.task_content,
 t.tech_order_type,
 t.tech_order_no,
 t.tech_date,
 t.switch_mode,
 t.switch_node,
-f.tech_task_id,
-f.workshop,
-f.factory,
-f.order_no,
-substring_index(substring_index(d.tech_list,CONCAT(f.workshop,':'),-1),',',1) AS total,
-sum(f.follow_num) AS complete,
+d.tech_task_id,
+d.factory,
+d.order_no,
+substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) as ws,
+substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',-1) AS total,
+IF(substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '自制件' or substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '部件',IFNULL(sum(f.follow_num),0),count(IF(ISNULL(f1.confirmor_id),NULL,1)) ) as complete,
 t.edit_date,
 t.assign_date,
 t.assess_date,
 t.finish_date
 FROM
-BMS_TECH_TASK_FOLLOW_PRE AS f
-LEFT JOIN BMS_TECH_TASK AS t ON f.tech_task_id = t.id
-LEFT JOIN BMS_TECH_TASK_DETAIL AS d ON d.tech_task_id = f.tech_task_id AND d.order_no = f.order_no AND d.factory = f.factory
-GROUP BY t.id,f.order_no,f.factory,f.workshop
-
-UNION
-
-SELECT
-t.task_content,
-t.tech_order_type,
-t.tech_order_no,
-t.tech_date,
-t.switch_mode,
-t.switch_node,
-f.tech_task_id,
-f.workshop,
-f.factory,
-f.order_no,
-Count(f.id) AS total,
-Count(IF(ISNULL(f.confirmor_id),NULL,1)) AS complete,
-t.edit_date,
-t.assign_date,
-t.assess_date,
-t.finish_date
-FROM
-BMS_TECH_TASK_FOLLOW AS f
-LEFT JOIN BMS_TECH_TASK AS t ON f.tech_task_id = t.id
-GROUP BY t.id,f.order_no,f.factory,f.workshop
+BMS_TECH_TASK_DETAIL AS d
+join mysql.help_topic b ON b.help_topic_id &lt;  (LENGTH(d.tech_list) - LENGTH(REPLACE(d.tech_list, ',', '')) + 1)
+LEFT JOIN BMS_TECH_TASK AS t ON d.tech_task_id = t.id
+LEFT JOIN BMS_TECH_TASK_FOLLOW_PRE f ON d.id = f.task_detail_id and substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = f.workshop
+LEFT JOIN BMS_TECH_TASK_FOLLOW f1 ON d.id = f1.task_detail_id and substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = f1.workshop
+GROUP BY d.tech_task_id,d.order_no,d.factory,ws
 ) AS tmp 
 where 1=1
 		<if test="factory !=null and factory !=''">
 			and tmp.factory = #{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
-			and tmp.workshop = #{workshop}
+			and tmp.ws = #{workshop}
 		</if>
 		<if test="order_no !=null and order_no !=''">
 			and tmp.order_no = #{order_no}
@@ -1300,58 +1279,37 @@ where 1=1
 		SELECT count(*) FROM
 (
 SELECT
+d.id as task_detail_id,
 t.task_content,
 t.tech_order_type,
 t.tech_order_no,
 t.tech_date,
 t.switch_mode,
 t.switch_node,
-f.tech_task_id,
-f.workshop,
-f.factory,
-f.order_no,
-substring_index(substring_index(d.tech_list,CONCAT(f.workshop,':'),-1),',',1) AS total,
-sum(f.follow_num) AS complete,
+d.tech_task_id,
+d.factory,
+d.order_no,
+substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) as ws,
+substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',-1) AS total,
+IF(substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '自制件' or substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '部件',IFNULL(sum(f.follow_num),0),count(IF(ISNULL(f1.confirmor_id),NULL,1)) ) as complete,
 t.edit_date,
 t.assign_date,
 t.assess_date,
 t.finish_date
 FROM
-BMS_TECH_TASK_FOLLOW_PRE AS f
-LEFT JOIN BMS_TECH_TASK AS t ON f.tech_task_id = t.id
-LEFT JOIN BMS_TECH_TASK_DETAIL AS d ON d.tech_task_id = f.tech_task_id AND d.order_no = f.order_no AND d.factory = f.factory
-GROUP BY t.id,f.order_no,f.factory,f.workshop
-
-UNION
-
-SELECT
-t.task_content,
-t.tech_order_type,
-t.tech_order_no,
-t.tech_date,
-t.switch_mode,
-t.switch_node,
-f.tech_task_id,
-f.workshop,
-f.factory,
-f.order_no,
-Count(f.id) AS total,
-Count(IF(ISNULL(f.confirmor_id),NULL,1)) AS complete,
-t.edit_date,
-t.assign_date,
-t.assess_date,
-t.finish_date
-FROM
-BMS_TECH_TASK_FOLLOW AS f
-LEFT JOIN BMS_TECH_TASK AS t ON f.tech_task_id = t.id
-GROUP BY t.id,f.order_no,f.factory,f.workshop
+BMS_TECH_TASK_DETAIL AS d
+join mysql.help_topic b ON b.help_topic_id &lt;  (LENGTH(d.tech_list) - LENGTH(REPLACE(d.tech_list, ',', '')) + 1)
+LEFT JOIN BMS_TECH_TASK AS t ON d.tech_task_id = t.id
+LEFT JOIN BMS_TECH_TASK_FOLLOW_PRE f ON d.id = f.task_detail_id and substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = f.workshop
+LEFT JOIN BMS_TECH_TASK_FOLLOW f1 ON d.id = f1.task_detail_id and substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = f1.workshop
+GROUP BY d.tech_task_id,d.order_no,d.factory,ws
 ) AS tmp 
 where 1=1
 		<if test="factory !=null and factory !=''">
 			and tmp.factory = #{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
-			and tmp.workshop = #{workshop}
+			and tmp.ws = #{workshop}
 		</if>
 		<if test="order_no !=null and order_no !=''">
 			and tmp.order_no = #{order_no}

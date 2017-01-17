@@ -301,6 +301,7 @@
     	<input type="hidden" id="select_workshop1" />
     	<input type="hidden" id="select_order_no1" />
     	<input type="hidden" id="total_num1" />
+    	<input type="hidden" id="task_detail_id1" />
     </div>    
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
