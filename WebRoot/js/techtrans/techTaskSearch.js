@@ -32,8 +32,9 @@ $(document).ready(function(){
 	
 	//----------START bootstrap initTable ----------
 	function initTable() {
+		//alert(getHeight());
 	    $table.bootstrapTable({
-	        height: getHeight(),
+	        height: '480',
 	        url:data_url,
 	        striped:true,
 	        paginationVAlign:'bottom',
@@ -42,7 +43,7 @@ $(document).ready(function(){
 	        fixedNumber: 0,					//冻结列数
 	        queryParams:function(params) {
 	        	var workshopAll="";
-	        	$("#workshop option").each(function(){
+	        	$("#search_workshop option").each(function(){
 	        		workshopAll+=$(this).text()+",";
 	        	});
 	        	var workshop=$("#search_workshop :selected").text()=="全部"?workshopAll:$("#search_workshop :selected").text();
@@ -51,7 +52,7 @@ $(document).ready(function(){
 	        	conditions.tech_order_no=$("#tech_order_no").val();
 	        	conditions.order_no=$("#order_no").val();
 	        	conditions.factory=$("#search_factory :selected").text();
-	        	conditions.workshop=workshopAll;
+	        	conditions.workshop_list=workshop;
 	        	conditions.tech_date_start=$("#startDate").val();
 	        	conditions.tech_date_end=$("#endDate").val();
 	        	conditions.status=$("#taskstatus").val();
@@ -62,25 +63,25 @@ $(document).ready(function(){
 	        columns: [
 	        [
 	            {
-	            	field: 'TASK_CONTENT',title: '技改任务',align: 'center',width:'100px',valign: 'middle',align: 'center',
+	            	field: 'task_content',title: '技改任务',align: 'center',width:'250',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 		        	return {css: {"padding-left": "3px", "padding-right": "2px","font-size":"12px"}};
 		        	}
 	            },{
-	            	field: 'TECH_ORDER_TYPE',title: '变更单<br/>类型',width:'40px',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'tech_order_type',title: '变更单<br/>类型',align: 'center',width:'60',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'TECH_ORDER_NO',title: '技改单号',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'tech_order_no',title: '技改单号',align: 'center',width:'180',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'TECH_ORDER_FILE',title: '变更单<br/>附件',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'tech_order_file',title: '变更单<br/>附件',align: 'center',width:'60',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -89,28 +90,28 @@ $(document).ready(function(){
 		                    	return "<a href=\""+value+"\" target='_blank'>"+"查看"+"</a>";
 		                    }
 	            },{
-	            	field: 'TECH_DATE',title: '技改单日期',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'tech_date',title: '技改单日期',align: 'center',width:'80',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'DUTY_UNIT',title: '责任单位',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'duty_unit',title: '责任单位',align: 'center',width:'100',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'MAJOR_CHANGE',title: '重大<br/>变更',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'major_change',title: '重大<br/>变更',align: 'center',width:'50',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'CUSTOM_CHANGE',title: '顾客<br/>变更',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'custom_change',title: '顾客<br/>变更',align: 'center',width:'50',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter
 	            },{
-	            	field: 'CUSTOM_CHANGE_FILE',title: '顾客变更<br/>单附件',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'custom_change_file',title: '顾客变更<br/>单附件',width:'70',align: 'center',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -119,136 +120,91 @@ $(document).ready(function(){
 	                    	return "<a href=\""+value+"\" target='_blank'>"+"查看"+"</a>";
 	                    }	
 	            },{
-	            	field: 'REPEAT_CHANGE',title: '重复<br/>变更',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'repeat_change',title: '重复<br/>变更',align: 'center',width:'50',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'TECH_TYPE',title: '技改类型',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'tech_type',title: '技改类型',align: 'center',width:'100',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'SWITCH_MODE',title: '切换方式',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'switch_mode',title: '切换方式',align: 'center',width:'80',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'SWITCH_NODE',title: '切换节点',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'switch_node',title: '切换<br/>节点',align: 'center',width:'60',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'ORDER_DESC',title: '订单',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'order_desc',title: '订单',align: 'center',width:'150',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	},
 	    	      
 	            },{
-	            	field: 'ECNWH_TOTAL',title: '技改<br/>工厂',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'factory',title: '技改<br/>工厂',align: 'center',width:'80',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'ECN_PAY_TOTAL',title: '车间',align: 'center',valign: 'middle',align: 'center',
+	            	field: 'workshop',title: '车间',align: 'center',width:'60',valign: 'middle',align: 'center',
+	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+	                cellStyle:function cellStyle(value, row, index, field) {
+	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
+	    	        	}
+	            },{
+	            	field: 'tech_time',title: '分配<br/>工时',align: 'center',width:'50',valign: 'middle',align: 'center',
+	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+	                cellStyle:function cellStyle(value, row, index, field) {
+	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
+	    	        	}
+	            },{
+	            	field: 'tech_num',title: '技改<br/>台数',align: 'center',width:'50',valign: 'middle',align: 'center',
+	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+	                cellStyle:function cellStyle(value, row, index, field) {
+	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
+	    	        	}
+	            },{
+	            	field: 'follow_num',title: '已完成',align: 'center',width:'60',valign: 'middle',align: 'center',
+	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+	                cellStyle:function cellStyle(value, row, index, field) {
+	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
+	    	        	}
+	            },{
+	            	field: 'ready_hour',title: '已录入<br/>工时',align: 'center',width:'60',valign: 'middle',align: 'center',
+	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+	                cellStyle:function cellStyle(value, row, index, field) {
+	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
+	    	        	}
+	            },{            	
+	            	field: '',title: '车号<br/>信息',align: 'center',width:'60',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	},
-	    	        formatter:function(value,row,index){
-	                    	return "<a href=\"hrReport!ecnReport.action?staff="+row.staff_number+"&factory="+$("#factory :selected").text()+
-	        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+	    	        	formatter:function(value,row,index){
+	                    	return "<i name=\"edit\" class=\"fa fa-search\" style=\"cursor: pointer;text-align: center;\" onclick=\"getTaskAllSelectedBusNum('"
+	                    	+row.order_no+"','"+row.factory+"','"+row.id+"',null,null,'"+row.workshop+"')\">";
 	                    }
 	            },{
-	            	field: 'TMPWH_TOTAL',title: '额外<br/>工时',align: 'center',valign: 'middle',align: 'center',
-	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
-	                cellStyle:function cellStyle(value, row, index, field) {
-	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
-	    	        	}
-	            },{
-	            	field: 'TMP_PAY_TOTAL',title: '额外<br/>工资',align: 'center',valign: 'middle',align: 'center',
-	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
-	                cellStyle:function cellStyle(value, row, index, field) {
-	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
-	    	        	},
-	    	        formatter:function(value,row,index){
-	        	        	return "<a href=\"hrReport!tmpReport.action?staff="+row.staff_number+"&factory="+$("#factory").val()+
-	        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
-	        	        }
-	            },{
-	            	field: 'WWH_TOTAL',title: '等待<br/>工时',align: 'center',valign: 'middle',align: 'center',
-	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
-	                cellStyle:function cellStyle(value, row, index, field) {
-	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
-	    	        	}
-	            },{
-	            	field: 'WAIT_PAY_TOTAL',title: '等待<br/>工资',align: 'center',valign: 'middle',align: 'center',
-	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
-	                cellStyle:function cellStyle(value, row, index, field) {
-	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
-	    	        	}
-	            },{
-	            	//var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
-	            	field: 'id',title: '计件<br/>工资',align: 'center',valign: 'middle',align: 'center',
-	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
-	                cellStyle:function cellStyle(value, row, index, field) {
-	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
-	    	        	},
-		        	formatter:function(value, row, index){
-	                	var piece_pay_total=row.piece_pay_total==undefined?0:parseFloat(row.piece_pay_total);
-	                	var ecn_pay_total=row.ecn_pay_total==undefined?0:parseFloat(row.ecn_pay_total);
-	                	var tmp_pay_total=row.tmp_pay_total==undefined?0:parseFloat(row.tmp_pay_total);
-	                	var wait_pay_total=row.wait_pay_total==undefined?0:parseFloat(row.wait_pay_total);
-	                	var deduct_pay_total=row.deduct_pay_total==undefined?0:parseFloat(row.deduct_pay_total);               	
-	                	var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
-	                	return (parseFloat(piece_salary)).toFixed(2);
-	                }
-	            },{
-	            	field: 'DEDUCT_PAY_TOTAL',title: '考核<br/>扣款',align: 'center',valign: 'middle',align: 'center',
+	            	field: '',title: '成本是否<br/>可转移',align: 'center',width:'70',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	},
 	                formatter:function(value,row,index){
-	                    	return "<a href=\"hr!rewardsCollect.action?staff="+row.staff_number+"&factory="+$("#factory :selected").text()+
-	        	        	"&month="+$("#month_start").val()+"\" target='_blank'>"+value.toFixed(2)+"</a>";
+	                    	return row.tech_order_type=='ECN'?'否':'是';
 	                    }
-	            },{
-	            	field: 'id',title: '实发计<br/>件工资',align: 'center',valign: 'middle',align: 'center',
-	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
-	                cellStyle:function cellStyle(value, row, index, field) {
-	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
-	    	        	},
-	                formatter:function(value, row, index){
-	                	var piece_pay_total=row.piece_pay_total==undefined?0:parseFloat(row.piece_pay_total);
-	                	var ecn_pay_total=row.ecn_pay_total==undefined?0:parseFloat(row.ecn_pay_total);
-	                	var tmp_pay_total=row.tmp_pay_total==undefined?0:parseFloat(row.tmp_pay_total);
-	                	var wait_pay_total=row.wait_pay_total==undefined?0:parseFloat(row.wait_pay_total);
-	                	var deduct_pay_total=row.deduct_pay_total==undefined?0:parseFloat(row.deduct_pay_total);               	
-	                	var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
-	                	return (parseFloat(piece_salary)+parseFloat(deduct_pay_total)).toFixed(2);
-	                }
-	            },{
-	            	field: 'id',title: '&nbsp;&nbsp;平均&nbsp;&nbsp;<br/>&nbsp;&nbsp;工资&nbsp;&nbsp;',align: 'center',valign: 'middle',align: 'center',
-	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
-	                cellStyle:function cellStyle(value, row, index, field) {
-	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
-	    	        	},
-	                formatter:function(value, row, index){
-	                	var piece_pay_total=row.piece_pay_total==undefined?0:parseFloat(row.piece_pay_total);
-	                	var ecn_pay_total=row.ecn_pay_total==undefined?0:parseFloat(row.ecn_pay_total);
-	                	var tmp_pay_total=row.tmp_pay_total==undefined?0:parseFloat(row.tmp_pay_total);
-	                	var wait_pay_total=row.wait_pay_total==undefined?0:parseFloat(row.wait_pay_total);
-	                	var deduct_pay_total=row.deduct_pay_total==undefined?0:parseFloat(row.deduct_pay_total);               	
-	                	var piece_salary=parseFloat(piece_pay_total)+parseFloat(ecn_pay_total)+parseFloat(tmp_pay_total)+parseFloat(wait_pay_total);				
-	                	return ((parseFloat(piece_salary)+parseFloat(deduct_pay_total))/row.ATTENDANCE_DAYS).toFixed(2);
-	                }
 	            }
 	        ]
 	    ]
@@ -262,7 +218,71 @@ $(document).ready(function(){
 			$("#btnSave").attr("disabled","disabled");
 	    });
 	    $(window).resize(function () {
-	        $table.bootstrapTable('resetView', {height: getHeight()});
+	        $table.bootstrapTable('resetView', {height: '480',});
 	    });
 	}
 	//----------END bootstrap initTable ----------
+	
+	/**
+	 * 查看技改任务所有已分配车号信息
+	 * @param order_id
+	 * @param factoryid
+	 * @param taskid
+	 * @param switch_mode
+	 * @param bus_num_start
+	 * @param bus_num_end
+	 */
+	function getTaskAllSelectedBusNum(order_no,factory,taskid,bus_num_start,bus_num_end,workshop){
+		$("#selectBusNumber_orderId_view").val(order_no);
+		$("#selectBusNumber_factoryId_view").val(factory);
+		$("#selectBusNumber_workshop_view").val(workshop);
+		$("#selectBusNumber_taskId_view").val(taskid);
+		var bus_num_start = $("#bus_num_start_view").val()||'';
+		var bus_num_end = $("#bus_num_end_view").val()||'';
+		
+		ajaxShowBusNumber(order_no,taskid,bus_num_start,bus_num_end,factory,workshop);
+	}
+	/**
+	 * 根据订单查询车号信息
+	 * @param order_id
+	 * @param ecn_task_id
+	 * @param bus_num_s
+	 * @param bus_num_e
+	 */
+	function ajaxShowBusNumber(order_no,tech_task_id,bus_num_s,bus_num_e,factory,workshop){
+		$.ajax({
+			url: "techTask!getTaskBusNumber.action",
+			dataType: "json",
+			type: "get",
+			data: {
+					"order_no" : order_no,
+					"factory":factory,
+					"tech_task_id" : tech_task_id,
+					"bus_num_start" : bus_num_s||'',
+					"bus_num_end" : bus_num_e||'',
+					"workshop":workshop,
+					"bus_status":"all"
+			},
+			async: false,
+			error: function () {alert(response.message);},
+			success: function (response) {
+				if(response.success){
+					$("#selectBusNumber_table_view tbody").html("");
+		    		$.each(response.data,function (index,value) {
+		    			var tr = $("<tr />");
+		    			$("<td style=\"text-align:center;\" />").html(index+1).appendTo(tr);
+		    			$("<td style=\"text-align:center;\" />").html(value.bus_number).appendTo(tr);
+		    			$("<td style=\"text-align:center;\" />").html(value.factory_name).appendTo(tr);
+		    			$("<td style=\"text-align:center;\" />").html(value.process_name).appendTo(tr);
+		       			$("<td style=\"text-align:center;\" />").html(value.confirmor).appendTo(tr);
+		    			$("<td style=\"text-align:center;\" />").html(value.confirmor_date).appendTo(tr);
+		    			$("#selectBusNumber_table_view tbody").append(tr);
+		    			
+		    		});
+					$("#selectBusNumberModal_view").modal("show");
+				} else {
+					alert(response.message);
+				}
+			}
+		})
+	}

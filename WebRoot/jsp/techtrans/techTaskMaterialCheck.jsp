@@ -25,7 +25,7 @@
 </head>
 <body >
 	<%@ include file="../common/head.jsp"%>
-	<%@ include file="../common/general_order_left.jsp"%>
+	<%@ include file="../common/general_techtask_left.jsp"%>
 	<div class="content-wrapper ">
 	<div id="bodymain" class="offhead">
 		<div id="bodyright" class="offset2">

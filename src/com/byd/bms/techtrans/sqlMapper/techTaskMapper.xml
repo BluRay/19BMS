@@ -75,6 +75,13 @@
 		<if test="workshop !=null and workshop !=''">
 			and instr(d.tech_list,#{workshop})>0
 		</if>
+		<if test="workshop_list !=null and workshop_list !=''">
+			and
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="or" close=")">
+			instr(d.tech_list,#{item})>0
+			</foreach>
+		</if>
 		<if test="tech_date_start !=null and tech_date_start !=''">
 			and t.tech_date>=#{tech_date_start} 
 		</if>
@@ -96,25 +103,77 @@
 		<if test="status=='未维护'">
 			and  not exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
-			WHERE h.hour_type='3' and h.factory=#{factory} and workshop=#{workshop} 
+			WHERE h.hour_type='3' 
+			<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+			</if>
+			<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+			</if>
+			<if test="workshop_list !=null and workshop_list !=''">
+			and h.workshop in
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="," close=")">
+			#{item}
+			</foreach>
+			</if>  
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
 		</if>
 		<if test="status=='未审批'">
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
-			WHERE h.hour_type='3' and h.status='0' and h.factory=#{factory} and workshop=#{workshop} 
+			WHERE h.hour_type='3' and h.status='0' 
+			<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+			</if>
+			<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+			</if>
+			<if test="workshop_list !=null and workshop_list !=''">
+			and h.workshop in
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="," close=")">
+			#{item}
+			</foreach>
+			</if>  
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
 		</if>
 		<if test="status=='已审批'">
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
-			WHERE h.hour_type='3' and h.status='1' and h.factory=#{factory} and workshop=#{workshop} 
+			WHERE h.hour_type='3' and h.status='1' 
+			<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+			</if>
+			<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+			</if>
+			<if test="workshop_list !=null and workshop_list !=''">
+			and h.workshop in
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="," close=")">
+			#{item}
+			</foreach>
+			</if>  
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
 		</if>
 		<if test="status=='已驳回'">
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
-			WHERE h.hour_type='3' and h.status='2' and h.factory=#{factory} and workshop=#{workshop} 
+			WHERE h.hour_type='3' and h.status='2' 
+			<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+			</if>
+			<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+			</if>
+			<if test="workshop_list !=null and workshop_list !=''">
+			and h.workshop in
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="," close=")">
+			#{item}
+			</foreach>
+			</if>  
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
 		</if>
 		
@@ -145,6 +204,13 @@
 		<if test="workshop !=null and workshop !=''">
 			and instr(d.tech_list,#{workshop})>0
 		</if>
+		<if test="workshop_list !=null and workshop_list !=''">
+			and
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="or" close=")">
+			instr(d.tech_list,#{item})>0
+			</foreach>
+		</if>
 		<if test="tech_date_start !=null and tech_date_start !=''">
 			and t.tech_date>=#{tech_date_start} 
 		</if>
@@ -166,25 +232,77 @@
 		<if test="status=='未维护'">
 			and  not exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
-			WHERE h.hour_type='3' and h.factory=#{factory} and workshop=#{workshop} 
+			WHERE h.hour_type='3' 
+			<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+			</if>
+			<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+			</if>
+			<if test="workshop_list !=null and workshop_list !=''">
+			and h.workshop in
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="," close=")">
+			#{item}
+			</foreach>
+			</if>  
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
 		</if>
 		<if test="status=='未审批'">
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
-			WHERE h.hour_type='3' and h.status='0' and h.factory=#{factory} and workshop=#{workshop} 
+			WHERE h.hour_type='3' and h.status='0' 
+			<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+			</if>
+			<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+			</if>
+			<if test="workshop_list !=null and workshop_list !=''">
+			and h.workshop in
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="," close=")">
+			#{item}
+			</foreach>
+			</if> 
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
 		</if>
 		<if test="status=='已审批'">
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
-			WHERE h.hour_type='3' and h.status='1' and h.factory=#{factory} and workshop=#{workshop} 
+			WHERE h.hour_type='3' and h.status='1' 
+			<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+			</if>
+			<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+			</if>
+			<if test="workshop_list !=null and workshop_list !=''">
+			and h.workshop in
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="," close=")">
+			#{item}
+			</foreach>
+			</if>  
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
 		</if>
 		<if test="status=='已驳回'">
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
-			WHERE h.hour_type='3' and h.status='2' and h.factory=#{factory} and workshop=#{workshop} 
+			WHERE h.hour_type='3' and h.status='2' 
+			<if test="factory !=null and factory !=''">
+			and h.factory=#{factory}
+			</if>
+			<if test="workshop !=null and workshop !=''">
+			and h.workshop=#{workshop}
+			</if>
+			<if test="workshop_list !=null and workshop_list !=''">
+			and h.workshop in
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="," close=")">
+			#{item}
+			</foreach>
+			</if>  
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
 		</if>
 	</select>

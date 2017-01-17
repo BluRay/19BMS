@@ -22,53 +22,58 @@ opacity:0
 			</a>
 		</li>
 		<li id="techtransConfig">
-			<a href="#" class="js-sub-menu-toggle">
+			<a href="techTask!taskAssignPage.action" class="js-sub-menu-toggle">
 				<i class="fa fa-share-alt fw"></i><span class="text">技改任务分配</span>
 			</a>
 		</li>
 		<li id="techtransConfig">
-			<a href="#" class="js-sub-menu-toggle">
+			<a href="techTask!assignPrePage.action" class="js-sub-menu-toggle">
 				<i class="fa fa-share-alt fw"></i><span class="text">技改任务分配-前段</span>
 			</a>
 		</li>
 		<li id="techtransTime">
-			<a href="ecnDocumentTask!taskTimeMaintain.action" class="js-sub-menu-toggle">
-				<i class="fa fa-share-alt fw"></i><span class="text">技改车间工时分配</span>
+			<a href="techTask!techTaskMaterialCheck" class="js-sub-menu-toggle">
+				<i class="fa fa-share-alt fw"></i><span class="text">技改物料确认</span>
 			</a>
 		</li>
 		<li id="techtransFollow">
-			<a href="ecnDocumentTask!taskFollowUpMaintain.action" class="js-sub-menu-toggle">
-				<i class="fa fa-check-square-o fw"></i><span class="text">技改跟进</span>
+			<a href="techTask!workHourEstimatePage" class="js-sub-menu-toggle">
+				<i class="fa fa-check-square-o fw"></i><span class="text">工时评估</span>
 			</a>
 		</li>
 		<li id="techtransWorkTime">
-			<a href="ecnDocumentTask!worktimeMaintain.action" class="js-sub-menu-toggle">
-				<i class="fa fa-calculator fw"></i><span class="text">技改工时维护</span>
+			<a href="techTask!followingUpPage" class="js-sub-menu-toggle">
+				<i class="fa fa-calculator fw"></i><span class="text">技改跟进</span>
 			</a>
 		</li>
 		<li id="techtransWorkTime">
-			<a href="ecnDocumentTask!worktimeVerify.action" class="js-sub-menu-toggle">
-				<i class="fa fa-user fw"></i><span class="text">技改工时审核</span>
+			<a href="techTask!worktimeMaitain" class="js-sub-menu-toggle">
+				<i class="fa fa-user fw"></i><span class="text">技改工时维护</span>
 			</a>
 		</li>
 		<li id="techtransSerach">
-			<a href="ecnDocumentTask!showEcnInformationList.action" class="js-sub-menu-toggle">
-				<i class="fa fa-search fw"></i><span class="text">技改查询</span>
+			<a href="techTask!worktimeVerify" class="js-sub-menu-toggle">
+				<i class="fa fa-search fw"></i><span class="text">技改工时审核</span>
 			</a>
 		</li>
-<!-- 		<li id="techtransSerach">
-			<a href="swrNotice!showTechTransList.action" class="js-sub-menu-toggle">
-				<i class="fa fa-search fw"></i><span class="text">技改工时查询</span>
-			</a>
-		</li> -->
 		<li id="SWRMaintain">
-			<a href="swrNotice!maintain.action" class="js-sub-menu-toggle">
-				<i class="fa fa-file-text-o fa-fw"></i><span class="text">SWR通知单</span>
+			<a href="techTask!taskSearch" class="js-sub-menu-toggle">
+				<i class="fa fa-file-text-o fa-fw"></i><span class="text">技改查询</span>
 			</a>
 		</li>
 		<li id="techtransReport">
-			<a href="ecnReport!ecnIndex.action">
-				<i class="fa fa-line-chart fa-fw"></i><span class="text">技改报表</span>
+			<a href="">
+				<i class="fa fa-line-chart fa-fw"></i><span class="text">技改成本</span>
+			</a>
+		</li>
+		<li id="techtransReport">
+			<a href="">
+				<i class="fa fa-line-chart fa-fw"></i><span class="text">技改情况汇总</span>
+			</a>
+		</li>
+		<li id="techtransReport">
+			<a href="">
+				<i class="fa fa-line-chart fa-fw"></i><span class="text">分类型变更汇总</span>
 			</a>
 		</li>
 	</ul>

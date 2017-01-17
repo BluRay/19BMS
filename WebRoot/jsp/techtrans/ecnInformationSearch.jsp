@@ -63,7 +63,7 @@
 </head>
 <body >
 	<%@ include file="/jsp/common/head.jsp"%>
-	<%@ include file="../common/general_techtrans_left.jsp"%>
+	<%@ include file="../common/general_techtask_left.jsp"%>
 	<!-- Tab panes -->
 	<div class="content-wrapper ">
 	<div id="bodymain" class="offhead">

@@ -20,8 +20,8 @@
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 <link type="text/css" rel="stylesheet" href="js/datePicker/skin/WdatePicker.css">
 <script type="text/javascript" src="js/techtrans/techTaskSearch.js?timestamp=<%=_systime%>"></script>
-<link rel="stylesheet" href="css/bootstrap.3.2.css">
 <link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/bootstrap.3.2.css">
 <link rel="stylesheet" href="css/bootstrap-table.css">
 <link rel="stylesheet" href="css/bootstrap-table-fixed-columns.css">
 <link rel="stylesheet" href="css/bootstrap-editable.css">
@@ -30,10 +30,15 @@
     position: absolute;
 	margin-top: -10px;
 	right: 16px;
-	top: 165px;
+	top: 145px;
 }
 .btn-default {
 	height:30px;
+}
+
+.table > thead > tr > th {
+    vertical-align: bottom;
+    border-bottom: 1px solid #ddd;
 }
 </style>
 </head>
@@ -44,7 +49,7 @@
 	<div class="content-wrapper " >
 	<div id="bodymain" class="offhead">
 	<div id="bodyright" class="offset2">
-	<legend >技改查询</legend>
+	<legend style="margin: -5px auto;font-size:17px;line-height:2.3">技改查询</legend>
 	<div id="taskFollow" style="margin-top: -5px;margin-bottom:-15px">
 		<div class="control-group" style="padding-top:10px;padding-bottom:2px">
 				<table style="font-size: 13px;">
@@ -74,15 +79,16 @@
 						</td>
 						<td style="text-align: right" width="60px">状态：</td>
 						<td width="100px">
-						<select  class="input-medium carType" id="taskstatus" style="width:80px" >
-							<option value="未维护" selected>未维护</option>
-							<option value="未审批">未审批</option>
-							<option value="已审批">已审批</option>
-							<option value="已驳回">已驳回</option>
+						<select  class="input-medium carType" id="taskstatus" style="width:80px;height: 30px;margin-bottom: 10px;" >
+							<option value="全部">全部</option>
+							<option value="已创建">已创建</option>
+							<option value="已分配">已分配</option>
+							<option value="已评估">已评估</option>
+							<option value="已完成">已完成</option>
 						</select>
 						</td>
 						<td>
-						<input type="button" class="btn btn-primary" id="btnQuery" value="查询" style="margin-left: 2px;margin-top: -10px;"></input>
+						<input type="button" class="btn btn-primary" id="btnQuery" value="查询" style="margin-left: 2px;margin-top: -10px;height: 30px;"></input>
 						</td>
 					</tr>
 				</table>
@@ -90,7 +96,7 @@
 			
 		<div class="container" style="height:200px;padding-left:0px;padding-right:0px;padding-top:-20px">
 		<div id="toolbar"></div>
-		<table style="font-weight:normal;font-size:12px" id="table" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
+		<table style="font-weight:normal;font-size:12px;table-layout:fixed" id="table" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
 	           data-show-toggle="false" data-show-columns="true" data-show-export="true" data-detail-view="false"
 	           data-detail-formatter="detailFormatter" data-minimum-count-columns="2" data-show-pagination-switch="true"
 	           data-pagination="true" data-id-field="id" data-page-list="[50, 100, 200, 500, ALL]"
