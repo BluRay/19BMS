@@ -44,6 +44,8 @@ $(document).ready(function () {
 					$("#tb_workhour").html("");
 					$("#orderNo").html(tech_order_no);
 					$("#task").html(task);
+					getAuthorityFactorySelect("#factory", factory, "noall");
+					$("#factory").attr("disabled",true);
 					getWorkshopSelect_Auth("#workshop", workshop,factory, "noall");
 					$("#workshop").attr("disabled",true);
 					getChildOrgSelect("#group", $("#workshop").val(), "","empty");
@@ -346,7 +348,7 @@ $(document).ready(function () {
 
 	
 	function initPage(){
-		getAuthorityFactorySelect("#factory", "", "noall");
+		
 		//getWorkshopSelect_Key("#search_workshop", "");		
 		var selectFactory = $("#factory :selected").text();
 		//getWorkshopSelect_Org("#workshop", null, selectFactory, "empty");

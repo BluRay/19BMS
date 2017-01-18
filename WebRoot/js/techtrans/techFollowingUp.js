@@ -128,7 +128,7 @@ function ajaxQuery(targetPage) {
 					if (value.ws == "自制件" || value.ws == "部件") {
 						$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" onclick='showSelectBusNumberModal1(\"" + value.factory + "\",\"" + value.ws + "\",\"" + value.order_no + "\"," + value.tech_task_id + "," + value.total + "," + value.task_detail_id + ");' ></i>").appendTo(tr);
 					} else {
-						$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" onclick='showSelectBusNumberModal(\"" + value.factory + "\",\"" + value.ws + "\",\"" + value.order_no + "\"," + value.tech_task_id + ");' ></i>").appendTo(tr);
+						$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" onclick='showSelectBusNumberModal(\"" + value.factory + "\",\"" + value.ws + "\",\"" + value.order_no + "\"," + value.tech_task_id + "," + value.task_detail_id + ");' ></i>").appendTo(tr);
 					}
 				}
 				if (parseInt(value.complete) <= 0) {
@@ -276,7 +276,7 @@ function ajaxQueryDetail1(tbody, factory, workshop, order_no, tech_task_id) {
 	});
 }
 
-function showSelectBusNumberModal(factory, workshop, order_no, tech_task_id) {
+function showSelectBusNumberModal(factory, workshop, order_no, tech_task_id, task_detail_id) {
 	$('#select_tech_task_id').val(tech_task_id);
 	$('#select_factory').val(factory);
 	$('#select_workshop').val(workshop);
@@ -284,6 +284,7 @@ function showSelectBusNumberModal(factory, workshop, order_no, tech_task_id) {
 	$('#bus_num_start').val("");
 	$('#bus_num_end').val("");
 	$(".checkall").removeAttr("checked");
+	$('#task_detail_id').val(task_detail_id);
 	ajaxQueryDetail($("#selectBusNumber_table_tbody"), factory, workshop, order_no, tech_task_id, null);
 
 	$("#selectBusNumberModal").modal("show");
@@ -342,7 +343,10 @@ function ajaxEdit() {
 		dataType : "json",
 		type : "post",
 		data : {
-			"ids" : JSON.stringify(ids)
+			"ids" : JSON.stringify(ids),
+			"task_detail_id" : $('#task_detail_id').val(),
+			"workshop" : $('#select_workshop').val(),
+			"update_status" : $('.cbox').length == ids.length ? 1 : 0
 		},
 		success : function(response) {
 			if (response.success) {
@@ -385,7 +389,8 @@ function ajaxEdit1() {
 			"order_no" : $('#select_order_no1').val(),
 			"tech_task_id" : $('#select_tech_task_id1').val(),
 			"follow_num" : $('#follow_num').val(),
-			"task_detail_id" : $('#task_detail_id1').val()
+			"task_detail_id" : $('#task_detail_id1').val(),
+			"update_status" : complete_num + follow_num == total_num ? 1 : 0
 		},
 		success : function(response) {
 			if (response.success) {

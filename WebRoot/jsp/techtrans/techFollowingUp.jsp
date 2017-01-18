@@ -77,7 +77,7 @@
 </head>
 <body>
 	<%@ include file="/jsp/common/head.jsp"%>
-	<%@ include file="../common/general_techtrans_left.jsp"%>
+	<%@ include file="../common/general_techtask_left.jsp"%>
 	<!-- Tab panes -->
 	<div class="content-wrapper " unselectable="on" onselectstart="return false;" style="-moz-user-select: -moz-none;">
 		<div id="bodymain" class="offhead">
@@ -109,9 +109,7 @@
 									<td><input name="tech_date_start" id="tech_date_start" class="Wdate" style="height: 30px; background-color: white; width: 120px" onfocus="javascript:WdatePicker()" type="text"> 至 <input name="tech_date_end" id="tech_date_end" class="Wdate" onfocus="javascript:WdatePicker()" style="height: 30px; background-color: white; width: 120px" type="text"></td>
 									<td><select class="input-medium carType" id="status" style="width: 80px">
 											<option value="">全部</option>
-											<option value="已创建">已创建</option>
-											<option value="已分配">已分配</option>
-											<option value="已评估">已评估</option>
+											<option value="未完成">未完成</option>
 											<option value="已完成">已完成</option>
 									</select> <input type="button" class="btn btn-primary" id="btnQuery" value="查询" style="margin-left: 2px;"></input> 
 									</td>
@@ -135,7 +133,7 @@
 								<th>工厂</th>
 								<th>车间</th>
 								<th>技改台数</th>
-								<th>已完成</th>
+								<th>完成台数</th>
 <!-- 								<th>未完成</th> -->
 								<th>技改跟进</th>
 								<th>已跟进清单</th>
@@ -234,6 +232,7 @@
     	<input type="hidden" id="select_factory" /> 
     	<input type="hidden" id="select_workshop" />
     	<input type="hidden" id="select_order_no" />
+    	<input type="hidden" id="task_detail_id" />
     </div>    
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>

@@ -139,6 +139,10 @@ public interface ITechTaskDao {
 	public int queryTaskMaterialCheckCount(Map<String, Object> conditionMap);
 	public int checkTask(Map<String, Object> conditionMap);
 	public List<Map<String, String>> queryAssignList(String taskid);
+	public List<Map<String, String>> queryTechTaskReport(Map<String, Object> conditionMap);
+	public int queryTechTaskReportCount(Map<String, Object> conditionMap);
+	public List<Map<String, String>> queryTechTaskReport2(Map<String, Object> conditionMap);
+	public int queryTechTaskReportCount2(Map<String, Object> conditionMap);
 	//by yk end
 	
 	
@@ -175,6 +179,7 @@ public interface ITechTaskDao {
 	public List<Map<String,Object>> queryFollowingUpDetailList1(Map<String,Object> conditionMap);
 	public int updateFollowingUp(List<Map<String, Object>> conditionList);
 	public int addFollowingUp1(Map<String, Object> conditionMap);
+	public int updateWorkshopStatus2(List<Map<String, Object>> conditionList);
 	//by wx end
 
 }

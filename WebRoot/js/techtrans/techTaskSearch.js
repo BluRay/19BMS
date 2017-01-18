@@ -6,7 +6,7 @@ $(document).ready(function(){
 	// 工厂切换事件
 	$("#search_factory").change(function() {
 		var selectFactory = $("#search_factory :selected").text();
-		getWorkshopSelect_Auth("#search_workshop", null, selectFactory, "noall");
+		getWorkshopSelect_Auth("#search_workshop", null, selectFactory, "");
 	});
 	
 	$("#btnQuery").click(function () {
@@ -55,7 +55,7 @@ $(document).ready(function(){
 	        	conditions.workshop_list=workshop;
 	        	conditions.tech_date_start=$("#startDate").val();
 	        	conditions.tech_date_end=$("#endDate").val();
-	        	conditions.status=$("#taskstatus").val();
+	        	conditions.workshop_status=$("#taskstatus").val();
 	        	
 	        	params["conditions"] = JSON.stringify(conditions); 
 	        	return params;
@@ -87,8 +87,10 @@ $(document).ready(function(){
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	},
 	    	        formatter:function(value,row,index){
-		                    	return "<a href=\""+value+"\" target='_blank'>"+"查看"+"</a>";
-		                    }
+	    	        	if(value!=''&&value!=null){
+    	        			return "<a href=\""+value+"\" target='_blank'>"+"查看"+"</a>";
+    	        			}	
+		                }
 	            },{
 	            	field: 'tech_date',title: '技改单日期',align: 'center',width:'80',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
@@ -117,7 +119,9 @@ $(document).ready(function(){
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	},
 	    	        formatter:function(value,row,index){
-	                    	return "<a href=\""+value+"\" target='_blank'>"+"查看"+"</a>";
+	    	        		if(value!=''&&value!=null){
+	    	        			return "<a href=\""+value+"\" target='_blank'>"+"查看"+"</a>";
+	    	        		}	                    	
 	                    }	
 	            },{
 	            	field: 'repeat_change',title: '重复<br/>变更',align: 'center',width:'50',valign: 'middle',align: 'center',
@@ -175,7 +179,7 @@ $(document).ready(function(){
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 	    	        	}
 	            },{
-	            	field: 'follow_num',title: '已完成',align: 'center',width:'60',valign: 'middle',align: 'center',
+	            	field: 'follow_num',title: '完成<br/>台数',align: 'center',width:'60',valign: 'middle',align: 'center',
 	                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 	                cellStyle:function cellStyle(value, row, index, field) {
 	    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};

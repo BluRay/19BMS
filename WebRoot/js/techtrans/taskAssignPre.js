@@ -106,7 +106,7 @@ function initPage(){
 	$("#startDate").val(s1);
 	$("#endDate").val(s);
 	
-	getAuthorityFactorySelect("#search_factory", "", "noall");
+	getFactorySelect("#search_factory", "", "");
 	getOrderNoSelect("#order_no","#orderId");
 	
 	
@@ -333,7 +333,7 @@ function asessTechTask(){
 		//alert($(cbox).attr("checked"));
 		if($(cbox).attr("checked")=="checked"){
 			var tech_detail_list=[];
-			var tb=$(cbox).parent("div").parent("div").find("table");
+			var tb=$(cbox).parent("div").next("table");
 			var tr_body=$(tb).find("tr").eq(1);
 			var tr_head=$(tb).find("tr").eq(0);
 			$.each(tr_body.children("td"),function(i,td){

@@ -14,6 +14,7 @@ $(document).ready(function () {
 		$("#div_switch_node").css("display","none");
 		var tr=$(e.target).closest("tr");
 		var task_id=$(tr).data("task_id");
+		var task_detail_id=$(tr).data("task_detail_id");
 		var tds=$(e.target).parent("td").siblings();
 		var task_content=$(tds[0]).html();
 		var tech_order_no=$(tds[1]).html();
@@ -69,6 +70,7 @@ $(document).ready(function () {
 		$("#v_tech_order_no").html(tech_order_no);
 		$("#assessModal").data("tech_date",tech_date);
 		$("#assessModal").data("tech_task_id",task_id);
+		$("#assessModal").data("task_detail_id",task_detail_id);
 		$("#assessModal").modal("show");
 	});
 	//点击+号新增技改范围
@@ -173,7 +175,7 @@ function initPage(){
 	$("#startDate").val(s1);
 	$("#endDate").val(s);
 	
-	getAuthorityFactorySelect("#search_factory", "", "noall");
+	getFactorySelect("#search_factory", "", "");
 	getOrderNoSelect("#order_no","#orderId");
 	
 	
@@ -214,7 +216,7 @@ function ajaxQuery(targetPage){
 				$("<td />").html(data.factory||"").appendTo(tr);
 				$("<td />").html(data.switch_node||"").appendTo(tr);
 				$("<td />").html(data.tech_list||"").appendTo(tr);
-				if(data.assign_date.trim().length==0){
+				if(data.assess_date==undefined||data.assess_date==null||data.assess_date.trim().length==0){
 					$("<td />").html("<i name='edit' class=\"fa fa-pencil\" title=\"分配\" style=\"cursor: pointer;text-align: center;\" onclick='ajaxEdit(" + data.id + ")'></i>").appendTo(tr);
 				}else{
 					$("<td />").html("").appendTo(tr);
@@ -222,6 +224,7 @@ function ajaxQuery(targetPage){
 				
 				$("#techTaskList tbody").append(tr);
 				$(tr).data("task_id",data.id);
+				$(tr).data("task_detail_id",data.task_detail_id);
 			});
 			
 			$("#total").html(response.pager.totalCount);
@@ -527,6 +530,7 @@ function getTechBusNum(order_no,factory,tech_date,switch_mode,switch_node,node_l
 function assignTechTask(){
 	var factory_cboxs=$("input[name='new_tecn_flag']");
 	var tech_task_id=$("#assessModal").data("tech_task_id");
+	var task_detail_id=$("#assessModal").data("task_detail_id");
 	var switch_mode=$("input[name='switch_mode']:checked").val();
 	var tech_date=$("#assessModal").data("tech_date");
 	var switch_node=$("#switch_node").val()||"";
@@ -547,7 +551,7 @@ function assignTechTask(){
 		//alert($(cbox).attr("checked"));
 		if($(cbox).attr("checked")=="checked"&& !$(cbox).attr("disabled")){
 			var tech_detail_list=[];
-			var tb=$(cbox).parent("div").parent("div").find("table");
+			var tb=$(cbox).parent("div").next("table");
 			var tr_body=$(tb).find("tr").eq(1);
 			var tr_head=$(tb).find("tr").eq(0);
 			$.each(tr_body.children("td"),function(i,td){

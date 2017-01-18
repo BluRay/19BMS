@@ -65,9 +65,11 @@ $(document).ready(function () {
 		if(cur_key_name.indexOf("下线")>=0&&$('#exec_workshop :selected').text()=='底盘'){
 			//alert(cur_key_name);
 			$.each(parts_list,function(i,parts){
-				if(parts.parts_num==undefined||parts.parts_num.trim().length==0){
-					enterflag=false;
-					return false;
+				if(parts.id !==0){
+					if(parts.parts_num==undefined||parts.parts_num.trim().length==0){
+						enterflag=false;
+						return false;
+					}
 				}
 			});
 		}
@@ -211,30 +213,32 @@ $(document).ready(function () {
             	$("#partsListTable tbody").html("");
             	parts_list=response.data;
             	$.each(response.data,function(index,parts){
-            		if(parts.process_name==$("#exec_processname").val()&&parts.parts){
-            			var tr=$("<tr />");
-            			if(parts.parts==''||parts.parts==null){
-            				$(tr).css('display','none');
-            			}
-            			
-                		$("<td align=\"left\" height=36px style=\"padding-left:5px\">"+parts.parts+"</td>").appendTo(tr);
-                		if(parts.parts_num){
-                			$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' style=\"border:0px;width:90%;font-size:14px\" disabled value='"+parts.parts_num+"' /></td>").appendTo(tr);
-                		}else
-                		$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' placeholder=\"请扫描零部件编号\" style=\"border:0px;width:90%;font-size:14px\" /></td>").appendTo(tr);
-                		if(parts.batch){
-                			$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='batch' style=\"border:0px;width:90%;font-size:14px\" disabled value='"+parts.batch+"' /></td>").appendTo(tr);
-                		}else
-                		$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='batch' placeholder=\"请填写零部件批次\" style=\"border:0px;width:90%;font-size:14px\" /></td>").appendTo(tr);
-                		if(parts.parts_num||parts.batch){
-                			$("<td align=\"left\" style=\"width:36px;padding-left:10px\"><i class=\"fa fa-2x fa-check-circle-o\" style=\"color:green\" aria-hidden=\"true\"></i></td>").appendTo(tr);
-                		}else{
-                			$("<td align=\"left\" style=\"width:36px;padding-left:10px\"></td>").appendTo(tr);
-                		}
-                		$("#partsListTable tbody").append(tr);
-                		$(tr).data("parts_index",index);
-            		}  		
-            		
+            		if(parts.id !== 0){
+            			if(parts.process_name==$("#exec_processname").val()&&parts.parts){
+	            			var tr=$("<tr />");
+	            			if(parts.parts==''||parts.parts==null){
+	            				$(tr).css('display','none');
+	            			}
+	            			
+	                		$("<td align=\"left\" height=36px style=\"padding-left:5px\">"+parts.parts+"</td>").appendTo(tr);
+	                		if(parts.parts_num){
+	                			$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' style=\"border:0px;width:90%;font-size:14px\" disabled value='"+parts.parts_num+"' /></td>").appendTo(tr);
+	                		}else
+	                		$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' placeholder=\"请扫描零部件编号\" style=\"border:0px;width:90%;font-size:14px\" /></td>").appendTo(tr);
+	                		if(parts.batch){
+	                			$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='batch' style=\"border:0px;width:90%;font-size:14px\" disabled value='"+parts.batch+"' /></td>").appendTo(tr);
+	                		}else
+	                		$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='batch' placeholder=\"请填写零部件批次\" style=\"border:0px;width:90%;font-size:14px\" /></td>").appendTo(tr);
+	                		if(parts.parts_num||parts.batch){
+	                			$("<td align=\"left\" style=\"width:36px;padding-left:10px\"><i class=\"fa fa-2x fa-check-circle-o\" style=\"color:green\" aria-hidden=\"true\"></i></td>").appendTo(tr);
+	                		}else{
+	                			$("<td align=\"left\" style=\"width:36px;padding-left:10px\"></td>").appendTo(tr);
+	                		}
+	                		$("#partsListTable tbody").append(tr);
+	                		$(tr).data("parts_index",index);
+	            		}  	
+            		}
+
             	});
             }
 		}) 

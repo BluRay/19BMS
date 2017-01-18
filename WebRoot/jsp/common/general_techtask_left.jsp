@@ -17,7 +17,7 @@ opacity:0
 			</a>
 		</li>
 		<li id="techtransMaintain">
-			<a href="#" class="js-sub-menu-toggle">
+			<a href="techTask!taskMaintainPage.action" class="js-sub-menu-toggle">
 				<i class="fa fa-edit fa-fw"></i><span class="text">技改任务维护</span>
 			</a>
 		</li>
@@ -27,7 +27,7 @@ opacity:0
 			</a>
 		</li>
 		<li id="techtransConfig">
-			<a href="techTask!assignPrePage.action" class="js-sub-menu-toggle">
+			<a href="techTask!taskAssignPrePage.action" class="js-sub-menu-toggle">
 				<i class="fa fa-share-alt fw"></i><span class="text">技改任务分配-前段</span>
 			</a>
 		</li>
@@ -37,27 +37,27 @@ opacity:0
 			</a>
 		</li>
 		<li id="techtransFollow">
-			<a href="techTask!workHourEstimatePage" class="js-sub-menu-toggle">
+			<a href="techTask!workHourEstimatePage.action" class="js-sub-menu-toggle">
 				<i class="fa fa-check-square-o fw"></i><span class="text">工时评估</span>
 			</a>
 		</li>
 		<li id="techtransWorkTime">
-			<a href="techTask!followingUpPage" class="js-sub-menu-toggle">
+			<a href="techTask!followingUpPage.action" class="js-sub-menu-toggle">
 				<i class="fa fa-calculator fw"></i><span class="text">技改跟进</span>
 			</a>
 		</li>
 		<li id="techtransWorkTime">
-			<a href="techTask!worktimeMaitain" class="js-sub-menu-toggle">
+			<a href="techTask!worktimeMaintain.action" class="js-sub-menu-toggle">
 				<i class="fa fa-user fw"></i><span class="text">技改工时维护</span>
 			</a>
 		</li>
 		<li id="techtransSerach">
-			<a href="techTask!worktimeVerify" class="js-sub-menu-toggle">
+			<a href="techTask!worktimeVerify.action" class="js-sub-menu-toggle">
 				<i class="fa fa-search fw"></i><span class="text">技改工时审核</span>
 			</a>
 		</li>
 		<li id="SWRMaintain">
-			<a href="techTask!taskSearch" class="js-sub-menu-toggle">
+			<a href="techTask!taskSearch.action" class="js-sub-menu-toggle">
 				<i class="fa fa-file-text-o fa-fw"></i><span class="text">技改查询</span>
 			</a>
 		</li>

@@ -44,7 +44,7 @@
 </head>
 <body >
 	<%@ include file="/jsp/common/head.jsp"%>
-	<%@ include file="../common/general_techtrans_left.jsp"%>
+	<%@ include file="../common/general_techtask_left.jsp"%>
 	<!-- Tab panes -->
 	<div class="content-wrapper " >
 	<div id="bodymain" class="offhead">
@@ -80,10 +80,8 @@
 						<td style="text-align: right" width="60px">状态：</td>
 						<td width="100px">
 						<select  class="input-medium carType" id="taskstatus" style="width:80px;height: 30px;margin-bottom: 10px;" >
-							<option value="全部">全部</option>
-							<option value="已创建">已创建</option>
-							<option value="已分配">已分配</option>
-							<option value="已评估">已评估</option>
+							<option value="">全部</option>
+							<option value="未完成">未完成</option>
 							<option value="已完成">已完成</option>
 						</select>
 						</td>

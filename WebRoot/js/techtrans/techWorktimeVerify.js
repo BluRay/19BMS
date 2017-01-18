@@ -51,6 +51,8 @@ $(document).ready(function () {
 		$("#editModal").data("workshop",$(tr).data("workshop"))
 		$("#editModal").data("tech_task_id", $(tr).data("tech_task_id"));
 		$("#editModal").data("totalHour", $(tr).data("totalHour"));
+		$("#editModal").data("tech_id", $(tr).data("tech_id"));
+		
 		$("#editModal").modal("show");
 			});
 	
@@ -82,13 +84,14 @@ $(document).ready(function () {
 		$.each(trs,function(index,tr){
 			var cbx=$(tr).find("td").find("input").attr("type");
 			//alert(cbx)
-			if(cbx!=undefined){
-				var obj=edit_list[index];
-				//alert(obj.staff_number)
-				edit_list[index].techSinglePrice=tech_single_price;
+			if(cbx!=undefined){			
 				var c_checkbox=$(tr).find('input[type=checkbox]');
 				var status=$(tr).data("status");
 				var ischecked=$(c_checkbox).is(":checked");
+				if(ischecked){
+					edit_list[index].techSinglePrice=tech_single_price;
+				}
+				//var obj=edit_list[index];			
 				if(status=='已驳回'&&!ischecked){
 					orderStaus="reject";
 				}	
@@ -342,6 +345,7 @@ function ajaxQuery(targetPage){
                 		$(tr).data("tech_order_no",value.tech_order_no);
                 		$(tr).data("task",value.task_content);
                 		$(tr).data("tech_task_id",value.task_detail_id);
+                		$(tr).data("tech_id",value.id);
                 		$(tr).data("factory",value.factory);
                 		$(tr).data("workshop",workshop);
                 		$(tr).data("tech_num",assign_num);
@@ -692,6 +696,7 @@ function getSelectList(){
 		//obj.id=swhid;
 		var swhindex=$(tr).data("swhindex");
 		obj=swhlist[swhindex];
+		obj.tech_task_id=$("#editModal").data("tech_id");
 		swhList.push(obj);
 	});
 	return swhList;

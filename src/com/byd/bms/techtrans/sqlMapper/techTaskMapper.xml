@@ -17,7 +17,7 @@
 		<if test="order_no !=null and order_no !=''">
 			and tf.order_no=#{order_no}
 		</if>
-		<if test="factory !=null and factory !=''">
+		<if test="factory !=null and factory !='全部'">
 			and tf.factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
@@ -30,7 +30,7 @@
 		<if test="order_no !=null and order_no !=''">
 			and tfp.order_no=#{order_no}
 		</if>
-		<if test="factory !=null and factory !=''">
+		<if test="factory !=null and factory !='全部'">
 			and tfp.factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
@@ -43,7 +43,7 @@
 		SELECT h.ecn_task_id tech_task_id,h.factory,h.workshop,ifnull(sum(h.work_hour),0)ready_hour_total
 		FROM BMS_HR_STAFF_HOURS h
 		WHERE h.hour_type='3' and h.status !='2'
-		<if test="factory !=null and factory !=''">
+		<if test="factory !=null and factory !='全部'">
 			and h.factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
@@ -69,7 +69,7 @@
 		<if test="order_no !=null and order_no !=''">
 			and d.order_no=#{order_no}
 		</if>
-		<if test="factory !=null and factory !=''">
+		<if test="factory !=null and factory !='全部'">
 			and d.factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
@@ -104,7 +104,7 @@
 			and  not exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
 			WHERE h.hour_type='3' 
-			<if test="factory !=null and factory !=''">
+			<if test="factory !=null and factory !='全部'">
 			and h.factory=#{factory}
 			</if>
 			<if test="workshop !=null and workshop !=''">
@@ -123,7 +123,7 @@
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
 			WHERE h.hour_type='3' and h.status='0' 
-			<if test="factory !=null and factory !=''">
+			<if test="factory !=null and factory !='全部'">
 			and h.factory=#{factory}
 			</if>
 			<if test="workshop !=null and workshop !=''">
@@ -142,7 +142,7 @@
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
 			WHERE h.hour_type='3' and h.status='1' 
-			<if test="factory !=null and factory !=''">
+			<if test="factory !=null and factory !='全部'">
 			and h.factory=#{factory}
 			</if>
 			<if test="workshop !=null and workshop !=''">
@@ -161,7 +161,7 @@
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
 			WHERE h.hour_type='3' and h.status='2' 
-			<if test="factory !=null and factory !=''">
+			<if test="factory !=null and factory !='全部'">
 			and h.factory=#{factory}
 			</if>
 			<if test="workshop !=null and workshop !=''">
@@ -175,6 +175,24 @@
 			</foreach>
 			</if>  
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
+		</if>
+		<if test="workshop_status=='已完成'">
+			<if test="workshop_list !=null and workshop_list !=''">
+			and
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="or" close=")">
+			instr(d.status_list,#{item})>0
+			</foreach>
+			</if>
+		</if>
+		<if test="workshop_status=='未完成'">
+			<if test="workshop_list !=null and workshop_list !=''">
+			and
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="or" close=")">
+			instr(d.status_list,#{item})=0
+			</foreach>
+			</if>
 		</if>
 		
 		order by t.tech_date desc
@@ -198,7 +216,7 @@
 		<if test="order_no !=null and order_no !=''">
 			and d.order_no=#{order_no}
 		</if>
-		<if test="factory !=null and factory !=''">
+		<if test="factory !=null and factory !='全部'">
 			and d.factory=#{factory}
 		</if>
 		<if test="workshop !=null and workshop !=''">
@@ -233,7 +251,7 @@
 			and  not exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
 			WHERE h.hour_type='3' 
-			<if test="factory !=null and factory !=''">
+			<if test="factory !=null and factory !='全部'">
 			and h.factory=#{factory}
 			</if>
 			<if test="workshop !=null and workshop !=''">
@@ -252,7 +270,7 @@
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
 			WHERE h.hour_type='3' and h.status='0' 
-			<if test="factory !=null and factory !=''">
+			<if test="factory !=null and factory !='全部'">
 			and h.factory=#{factory}
 			</if>
 			<if test="workshop !=null and workshop !=''">
@@ -271,7 +289,7 @@
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
 			WHERE h.hour_type='3' and h.status='1' 
-			<if test="factory !=null and factory !=''">
+			<if test="factory !=null and factory !='全部'">
 			and h.factory=#{factory}
 			</if>
 			<if test="workshop !=null and workshop !=''">
@@ -290,7 +308,7 @@
 			and exists (SELECT distinct h.ecn_task_id tech_task_id
 			FROM BMS_HR_STAFF_HOURS h
 			WHERE h.hour_type='3' and h.status='2' 
-			<if test="factory !=null and factory !=''">
+			<if test="factory !=null and factory !='全部'">
 			and h.factory=#{factory}
 			</if>
 			<if test="workshop !=null and workshop !=''">
@@ -304,6 +322,24 @@
 			</foreach>
 			</if>  
 			and h.work_hour>0 and d.id=h.ecn_task_id) 
+		</if>
+		<if test="workshop_status=='已完成'">
+			<if test="workshop_list !=null and workshop_list !=''">
+			and
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="or" close=")">
+			instr(d.status_list,#{item})>0
+			</foreach>
+			</if>
+		</if>
+		<if test="workshop_status=='未完成'">
+			<if test="workshop_list !=null and workshop_list !=''">
+			and
+			<foreach item="item" index="index" collection="workshop_list"
+			open="(" separator="or" close=")">
+			instr(d.status_list,#{item})=0
+			</foreach>
+			</if>
 		</if>
 	</select>
 	
@@ -833,10 +869,10 @@
         SELECT  
         LAST_INSERT_ID()  
     	</selectKey>
-		insert into BMS_TECH_TASK_FOLLOW (tech_task_id,bus_number,order_no,factory,workshop)
+		insert into BMS_TECH_TASK_FOLLOW (tech_task_id,bus_number,order_no,factory,workshop,task_detail_id)
 		values
 		<foreach collection="list" item="item" index="index" separator="," >  
-        (#{item.tech_task_id},#{item.bus_number},#{item.order_no},#{item.factory},#{item.workshop})  
+        (#{item.tech_task_id},#{item.bus_number},#{item.order_no},#{item.factory},#{item.workshop},#{item.task_detail_id})  
     	</foreach> 
 	</insert>
 	
@@ -848,22 +884,24 @@
 	
 	<update id="deleteTechFollowBus" parameterType="Map">
 		delete from BMS_TECH_TASK_FOLLOW where tech_task_id=#{tech_task_id}
-		<if test="order_no !=null and order_no !=''">
+		and (confirmor_id is null or confirmor_id=0) 
+		<!-- <if test="order_no !=null and order_no !=''">
 			and order_no=#{order_no}
 		</if>
 		<if test="factory_list !=null and factory_list !=''">
 			and find_in_set(factory,#{factory_list})>0
-		</if>
+		</if> -->
 	</update>
 	
 	<update id="deleteTechTaskDetail" parameterType="list">
 		delete from BMS_TECH_TASK_DETAIL where tech_task_id=#{tech_task_id}
-		<if test="order_no !=null and order_no !=''">
+		and (time_list is null or time_list='') 
+		<!-- <if test="order_no !=null and order_no !=''">
 			and order_no=#{order_no}
-		</if>
-		<if test="factory_list !=null and factory_list !=''">
+		</if> -->
+		<!-- <if test="factory_list !=null and factory_list !=''">
 			and find_in_set(factory,#{factory_list})>0
-		</if>
+		</if> -->
 	</update>
 	
 	<update id="updateTechTaskInfo" parameterType="Map">
@@ -880,6 +918,9 @@
 			</if>
 			<if test="edit_date !=null">
 				assign_date=#{edit_date},
+			</if>
+			<if test="tech_single_price !=null">
+				tech_single_price=#{tech_single_price},
 			</if>
 		</trim>
 		where id=#{tech_task_id}
@@ -1067,6 +1108,78 @@
 		where h.hour_type='3' and
 		h.ecn_task_id=#{taskid}
 		group by s.staff_number
+	</select>
+	
+	<select id="queryTechTaskReport" parameterType="Map" resultType="Map">
+		SELECT D.FACTORY,T.TECH_DATE,D.ORDER_NO,T.TECH_ORDER_NO,K1.KEY_NAME AS DUTY_UNIT,T.TASK_CONTENT,T.TECH_ORDER_NO,D.TECH_LIST,D.TIME_LIST,
+		T.TECH_SINGLE_PRICE
+		FROM BMS_TECH_TASK_DETAIL D
+		LEFT JOIN BMS_TECH_TASK T ON D.tech_task_id = T.id
+		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id  WHERE 1=1 
+		<if test="task_content !=null and task_content !=''">
+			AND T.TASK_CONTENT LIKE CONCAT(#{task_content},'%')
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			AND T.TECH_ORDER_NO LIKE CONCAT(#{tech_order_no},'%')
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			AND T.ORDER_NO LIKE CONCAT(#{order_no},'%')
+		</if>
+		<if test="factory !=null and factory !=''">
+			AND D.FACTORY_ID = #{factory}
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			AND T.TECH_DATE >= #{tech_date_start}
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			AND T.TECH_DATE &lt;= #{tech_date_end}
+		</if>
+		<if test="sort!=null">
+			ORDER BY ${sort} ${order}
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
+	</select>
+	<select id="queryTechTaskReportCount" parameterType="Map" resultType="int">
+		SELECT COUNT(D.ID)
+		FROM BMS_TECH_TASK_DETAIL D
+		LEFT JOIN BMS_TECH_TASK T ON D.tech_task_id = T.id
+		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id WHERE 1=1 
+		<if test="task_content !=null and task_content !=''">
+			AND T.TASK_CONTENT LIKE CONCAT(#{task_content},'%')
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			AND T.TECH_ORDER_NO LIKE CONCAT(#{tech_order_no},'%')
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			AND T.ORDER_NO LIKE CONCAT(#{order_no},'%')
+		</if>
+		<if test="factory !=null and factory !=''">
+			AND D.FACTORY_ID = #{factory}
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			AND T.TECH_DATE >= #{tech_date_start}
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			AND T.TECH_DATE &lt;= #{tech_date_end}
+		</if>
+	</select>
+	
+	<select id="queryTechTaskReport2" parameterType="Map" resultType="Map">
+		SELECT D.FACTORY,T.TECH_DATE,D.ORDER_NO,T.TECH_ORDER_NO,K1.KEY_NAME,T.TASK_CONTENT,M.ID,M.SAP_NO,M.MATERIAL_DESC,
+		M.MATERIAL_TYPE,M.MATERIAL_SPEC,M.UNIT,M.SUPPLIER_CODE,
+		M.SINGLE_LOSS,M.LEVEL_USAGE,M.SINGLE_WEIGHT,M.SINGLE_USAGE,M.WORKSHOP,M.PROCESS,
+		M.ASSEMB_SITE FROM BMS_TECH_MATERIAL M
+		LEFT JOIN BMS_TECH_TASK_DETAIL D ON M.tech_task_id = D.tech_task_id
+		LEFT JOIN BMS_TECH_TASK T ON M.tech_task_id = T.id
+		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id 
+	</select>
+	<select id="queryTechTaskReportCount2" parameterType="Map" resultType="int">
+		SELECT COUNT(M.ID) FROM BMS_TECH_MATERIAL M
+		LEFT JOIN BMS_TECH_TASK_DETAIL D ON M.tech_task_id = D.tech_task_id
+		LEFT JOIN BMS_TECH_TASK T ON M.tech_task_id = T.id
+		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id 
 	</select>
 	
 <!--  ###################  by yk  end  ###############  -->
@@ -1329,6 +1442,7 @@
 (
 SELECT
 d.id as task_detail_id,
+d.status_list,
 t.task_content,
 t.tech_order_type,
 t.tech_order_no,
@@ -1340,11 +1454,7 @@ d.factory,
 d.order_no,
 substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) as ws,
 substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',-1) AS total,
-IF(substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '自制件' or substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '部件',IFNULL(sum(f.follow_num),0),count(IF(ISNULL(f1.confirmor_id),NULL,1)) ) as complete,
-t.edit_date,
-t.assign_date,
-t.assess_date,
-t.finish_date
+IF(substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '自制件' or substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '部件',IFNULL(sum(f.follow_num),0),count(f1.confirmor_id) ) as complete
 FROM
 BMS_TECH_TASK_DETAIL AS d
 join mysql.help_topic b ON b.help_topic_id &lt;  (LENGTH(d.tech_list) - LENGTH(REPLACE(d.tech_list, ',', '')) + 1)
@@ -1375,17 +1485,15 @@ where 1=1
 		<if test="tech_date_end !=null and tech_date_end !=''">
 			and tmp.tech_date&lt;=#{tech_date_end} 
 		</if>
-		<if test="status=='已创建'">
-			and tmp.edit_date !='' and tmp.assign_date ='' and tmp.assess_date ='' and tmp.finish_date ='' 
-		</if>
-		<if test="status=='已分配'">
-			and tmp.assign_date !='' and tmp.assess_date ='' and tmp.finish_date ='' 
-		</if>
-		<if test="status=='已评估'">
-			and tmp.assess_date !='' and tmp.finish_date ='' 
-		</if>
 		<if test="status=='已完成'">
-			and tmp.finish_date !=''
+			<if test="workshop !=null and workshop !=''">
+				and instr(tmp.status_list,#{workshop})>0
+			</if>
+		</if>
+		<if test="status=='未完成'">
+			<if test="workshop !=null and workshop !=''">
+				and instr(tmp.status_list,#{workshop})&lt;0
+			</if>
 		</if>
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize} 
@@ -1398,6 +1506,7 @@ where 1=1
 (
 SELECT
 d.id as task_detail_id,
+d.status_list,
 t.task_content,
 t.tech_order_type,
 t.tech_order_no,
@@ -1409,11 +1518,7 @@ d.factory,
 d.order_no,
 substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) as ws,
 substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',-1) AS total,
-IF(substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '自制件' or substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '部件',IFNULL(sum(f.follow_num),0),count(IF(ISNULL(f1.confirmor_id),NULL,1)) ) as complete,
-t.edit_date,
-t.assign_date,
-t.assess_date,
-t.finish_date
+IF(substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '自制件' or substring_index(substring_index(substring_index(d.tech_list,',', b.help_topic_id + 1), ',', -1),':',1) = '部件',IFNULL(sum(f.follow_num),0),count(f1.confirmor_id) ) as complete
 FROM
 BMS_TECH_TASK_DETAIL AS d
 join mysql.help_topic b ON b.help_topic_id &lt;  (LENGTH(d.tech_list) - LENGTH(REPLACE(d.tech_list, ',', '')) + 1)
@@ -1444,17 +1549,15 @@ where 1=1
 		<if test="tech_date_end !=null and tech_date_end !=''">
 			and tmp.tech_date&lt;=#{tech_date_end} 
 		</if>
-		<if test="status=='已创建'">
-			and tmp.edit_date !='' and tmp.assign_date ='' and tmp.assess_date ='' and tmp.finish_date ='' 
-		</if>
-		<if test="status=='已分配'">
-			and tmp.assign_date !='' and tmp.assess_date ='' and tmp.finish_date ='' 
-		</if>
-		<if test="status=='已评估'">
-			and tmp.assess_date !='' and tmp.finish_date ='' 
-		</if>
 		<if test="status=='已完成'">
-			and tmp.finish_date !=''
+			<if test="workshop !=null and workshop !=''">
+				and instr(tmp.status_list,#{workshop})>0
+			</if>
+		</if>
+		<if test="status=='未完成'">
+			<if test="workshop !=null and workshop !=''">
+				and instr(tmp.status_list,#{workshop})&lt;0
+			</if>
 		</if>
 	</select>
 	
@@ -1512,7 +1615,7 @@ LEFT JOIN BMS_BASE_USER AS u ON u.id = f.confirmor_id
 		<foreach collection="list" index="index" item="item"
 			separator=";">
 			UPDATE BMS_TECH_TASK_FOLLOW
-			SET confirmor_id = #{item.confirmor_id},confirmor_date = #{item.confirmor_date}
+			SET confirmor_id = #{item.confirmor_id},confirmor_date = #{item.confirmor_date},task_detail_id = #{item.task_detail_id}
 			WHERE id = #{item.id}
 		</foreach>
 	</update>
@@ -1529,6 +1632,16 @@ LEFT JOIN BMS_BASE_USER AS u ON u.id = f.confirmor_id
 			VALUES(#{tech_task_id},#{factory},#{workshop},#{follow_num},#{confirmor_id},#{confirmor_date},#{order_no},#{task_detail_id})
 		]]>
 	</insert>
+	
+	<!-- 技改跟进-修改2 -->
+	<update id="updateWorkshopStatus2" parameterType="List">
+		<foreach collection="list" index="index" item="item"
+			separator=";">
+			UPDATE BMS_TECH_TASK_DETAIL
+			SET status_list = IF(status_list='' or status_list is null,#{item.workshop},CONCAT(status_list,CONCAT(',',#{item.workshop})))
+			WHERE id = #{item.task_detail_id}
+		</foreach>
+	</update>
 <!--  ###################  by wx  end  ###############  -->
 	
 </mapper>
