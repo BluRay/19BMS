@@ -68,22 +68,12 @@
         </div>
 		<div class="container" style="height:200px;padding-left:0px;padding-right:0px;padding-top:0px">
 		<div id="toolbar"></div>
-		<div id="tab_1">
 		<table style="font-weight:normal" id="table" table-layout="fixed" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
 	           data-show-toggle="false" data-show-columns="true" data-show-export="true" data-detail-view="false"
 	           data-detail-formatter="detailFormatter" data-minimum-count-columns="2" data-show-pagination-switch="true"
 	           data-pagination="true" data-id-field="id" data-page-list="[50, 100, 200, 500, ALL]"
 	           data-show-footer="false" data-side-pagination="server" data-response-handler="responseHandler">
 	    </table>
-	    </div>
-	    <div id="tab_2">
-	    <table style="font-weight:normal" id="table2" table-layout="fixed" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
-	           data-show-toggle="false" data-show-columns="true" data-show-export="true" data-detail-view="false"
-	           data-detail-formatter="detailFormatter" data-minimum-count-columns="2" data-show-pagination-switch="true"
-	           data-pagination="true" data-id-field="id" data-page-list="[50, 100, 200, 500, ALL]"
-	           data-show-footer="false" data-side-pagination="server" data-response-handler="responseHandler">
-	    </table>
-	    </div>
 		</div>
 
 		<div class="modal fade" id="reasonModal" tabindex="-1" role="dialog" unselectable="on" onselectstart="return false;" 
@@ -107,7 +97,7 @@
 		</div>
 </div>
 <script>
-var $table = $('#table'),$table2 = $('#table2'),$remove = $('#remove'),selections = [];
+var $table = $('#table'),$remove = $('#remove'),selections = [];
 </script>
 </body>
 </html>

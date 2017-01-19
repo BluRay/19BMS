@@ -66,7 +66,7 @@
 	<%@ include file="/jsp/common/head.jsp"%>
 	<%@ include file="../common/general_techtask_left.jsp"%>
 	<!-- Tab panes -->
-	<div class="content-wrapper " unselectable="on" onselectstart="return false;" >
+	<div class="content-wrapper " >
 	<div id="bodymain" class="offhead">
 	<div id="bodyright" class="offset2">
 	<legend >技改工时维护</legend>

@@ -22,13 +22,8 @@ opacity:0
 			</a>
 		</li>
 		<li id="techtransConfig">
-			<a href="techTask!taskAssignPage.action" class="js-sub-menu-toggle">
+			<a href="ecnDocumentTask!maintain.action" class="js-sub-menu-toggle">
 				<i class="fa fa-share-alt fw"></i><span class="text">技改任务分配</span>
-			</a>
-		</li>
-		<li id="techtransConfig">
-			<a href="techTask!taskAssignPrePage.action" class="js-sub-menu-toggle">
-				<i class="fa fa-share-alt fw"></i><span class="text">技改任务分配-前段</span>
 			</a>
 		</li>
 		<li id="techtransTime">

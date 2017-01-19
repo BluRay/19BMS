@@ -12,6 +12,7 @@
 			<result name="worktimeMaitain">/jsp/techtrans/techWorktimeMaitain.jsp</result>
 			<result name="worktimeVerify">/jsp/techtrans/techWorktimeVerify.jsp</result>
 			<result name="taskSearch">/jsp/techtrans/techTaskSearch.jsp</result>
+			<result name="changeTypeReport">/jsp/techtrans/techChangeTypeReport.jsp</result>
 			<result type="json">
 				<param name="root">result</param>
 			</result>
