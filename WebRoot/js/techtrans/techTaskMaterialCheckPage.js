@@ -197,3 +197,11 @@ function GetQueryString(name) {
 	if (r != null) return unescape(r[2]);
 	return null;
 }
+function selectAll() {
+	if ($("#selectAll").attr("checked")) {
+		$(":checkbox").attr("checked", true);
+		$(":disabled").attr("checked", false);
+	} else {
+		$(":checkbox").attr("checked", false);
+	}
+}

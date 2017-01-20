@@ -9,8 +9,8 @@
 <meta http-equiv="expires" content="0" />
 <title>技改查询</title>
 <!-- Le styles -->
-<link href="css/bootstrap.css" rel="stylesheet" type="text/css">
-<link href="css/common.css" rel="stylesheet">	
+<!-- <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+<link href="css/common.css" rel="stylesheet">	 -->
 <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
 <script type="text/javascript" src="js/bootstrap-table.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -48,7 +48,7 @@
 	<!-- Tab panes -->
 	<div class="content-wrapper " >
 	<div id="bodymain" class="offhead">
-	<div id="bodyright" class="offset2">
+	<div id="bodyright" class="offset2" style="margin-left:20px">
 	<legend style="margin: -5px auto;font-size:17px;line-height:2.3">技改查询</legend>
 	<div id="taskFollow" style="margin-top: -5px;margin-bottom:-15px">
 		<div class="control-group" style="padding-top:10px;padding-bottom:2px">
@@ -98,7 +98,7 @@
 	           data-show-toggle="false" data-show-columns="true" data-show-export="true" data-detail-view="false"
 	           data-detail-formatter="detailFormatter" data-minimum-count-columns="2" data-show-pagination-switch="true"
 	           data-pagination="true" data-id-field="id" data-page-list="[50, 100, 200, 500, ALL]"
-	           data-show-footer="false" data-side-pagination="server" data-response-handler="responseHandler">
+	           data-show-footer="false" data-side-pagination="client" data-response-handler="responseHandler">
 	    </table>
 		</div>	
 		 </div>  

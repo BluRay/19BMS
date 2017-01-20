@@ -1,5 +1,4 @@
 var data_url = "techTask!searchTaskList.action?";
-
 $(document).ready(function(){
 	$(".container").width(getWidth());
 	initPage();
@@ -33,10 +32,15 @@ $(document).ready(function(){
 	//----------START bootstrap initTable ----------
 	function initTable() {
 		//alert(getHeight());
+		
 	    $table.bootstrapTable({
-	        height: '480',
+	        height: '470',
 	        url:data_url,
 	        striped:true,
+	        sidePagination : "client",
+	        responseHandler: function(res){
+	             return res.rows;
+	        },
 	        paginationVAlign:'bottom',
 	        searchOnEnterKey:true,
 	        fixedColumns: false,			//冻结列
@@ -222,7 +226,7 @@ $(document).ready(function(){
 			$("#btnSave").attr("disabled","disabled");
 	    });
 	    $(window).resize(function () {
-	        $table.bootstrapTable('resetView', {height: '480',});
+	        $table.bootstrapTable('resetView', {height: '470',});
 	    });
 	}
 	//----------END bootstrap initTable ----------

@@ -168,13 +168,121 @@ function initTable() {
 		columns = [
 			          [
 			            {
-			            	field: 'FACTORY',title: '工厂',width:'80',align: 'center',valign: 'middle',align: 'center',
+			            	field: 'FACTORY',title: '工厂',width:'60',align: 'center',valign: 'middle',align: 'center',
 			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 			                cellStyle:function cellStyle(value, row, index, field) {
 				        	return {css: {"padding-left": "3px", "padding-right": "2px","font-size":"13px"}};
 				        	}
 			            },{
-			            	field: 'TECH_DATE',title: '技改单日期',width:'100',align: 'center',valign: 'middle',align: 'center',
+			            	field: 'TECH_DATE',title: '技改单日期',width:'90',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'ORDER_NO',title: '车型订单',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'TECH_ORDER_NO',title: '技改单号',width:'150',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'DUTY_UNIT',title: '责任单位',width:'100',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'TASK_CONTENT',title: '技改任务',width:'200',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'SAP_NO',title: 'SAP料号',width:'120',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'MATERIAL_DESC',title: '物料描述',width:'150',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'MATERIAL_TYPE',title: '物料类型',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'MATERIAL_SPEC',title: '物料规格',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'UNIT',title: '单位',width:'60',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'SUPPLIER_CODE',title: '供应商代码',width:'140',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'SINGLE_LOSS',title: '单车损耗',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'LEVEL_USAGE',title: '层级用量',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'SINGLE_WEIGHT',title: '单重',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'SINGLE_USAGE',title: '单车用量',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'WORKSHOP',title: '使用车间',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'PROCESS',title: '工序',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'ASSEMB_SITE',title: '装配位置',width:'80',align: 'center',valign: 'middle',align: 'center',
+			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
+			                cellStyle:function cellStyle(value, row, index, field) {
+			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
+			    	        	}
+			            },{
+			            	field: 'BUS_COUNT',title: '技改台数',width:'80',align: 'center',valign: 'middle',align: 'center',
 			                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 			                cellStyle:function cellStyle(value, row, index, field) {
 			    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"13px"}};
@@ -189,8 +297,8 @@ function initTable() {
         striped:true,
         paginationVAlign:'bottom',
         searchOnEnterKey:true,
-        fixedColumns: false,			//冻结列
-        fixedNumber: 0,					//冻结列数
+        fixedColumns: true,			//冻结列
+        fixedNumber: 4,					//冻结列数
         queryParams:function(params) {        	
         	params["task_content"] = $("#task_content").val();
         	params["tech_order_no"] = $("#tech_order_no").val();

@@ -1,4 +1,4 @@
-var data_url="";
+var data_url="techTask!getChangeTypeReportData.action";
 $(document).ready(function(){
 	initPage();
 	
@@ -15,7 +15,7 @@ $(document).ready(function(){
 });
 
 function initPage(){
-	getAuthorityFactorySelect("#factory", "", "noall");
+	getAuthorityFactorySelect("#factory", "", "");
 	getOrderNoSelect("#order_number","#orderId");
 	//ajaxQuery();
 }
@@ -42,13 +42,13 @@ function initTable() {
 			        	return {css: {"padding-left": "3px", "padding-right": "2px","font-size":"12px"}};
 			        	}
 		            },{
-		            	field: 'tech_order_no',title: '技改单号',align: 'center',width:'180',valign: 'middle',align: 'center',
+		            	field: 'tech_order_no',title: '技改单号',align: 'center',width:'150',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'tech_date',title: '技改单日期',align: 'center',width:'80',valign: 'middle',align: 'center',
+		            	field: 'tech_date',title: '技改单日期',align: 'center',width:'100',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -61,31 +61,31 @@ function initTable() {
 		    	        	},
 		    	      
 		            },{
-		            	field: 'factory',title: '技改<br/>工厂',align: 'center',width:'80',valign: 'middle',align: 'center',
+		            	field: 'factory',title: '技改<br/>工厂',align: 'center',width:'100',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'tech_time',title: '分配<br/>工时',align: 'center',width:'50',valign: 'middle',align: 'center',
+		            	field: 'time_list',title: '分配<br/>工时',align: 'center',width:'250',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'tech_num',title: '技改<br/>台数',align: 'center',width:'50',valign: 'middle',align: 'center',
+		            	field: 'tech_list',title: '技改<br/>台数',align: 'center',width:'250',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'total_time',title: '工厂总<br/>计改工时',align: 'center',width:'60',valign: 'middle',align: 'center',
+		            	field: 'total_time',title: '工厂总<br/>计改工时',align: 'center',width:'80',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'custom_change_no',title: '顾客变更<br/>单号',align: 'center',width:'60',valign: 'middle',align: 'center',
+		            	field: 'custom_change_no',title: '顾客变更<br/>单号',align: 'center',width:'80',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -122,13 +122,13 @@ function initTable() {
 		    	        	},
 		    	      
 		            },{
-		            	field: 'total_time',title: '订单总<br/>计改工时',align: 'center',width:'60',valign: 'middle',align: 'center',
+		            	field: 'total_time',title: '订单总<br/>计改工时',align: 'center',width:'70',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'custom_change_no',title: '顾客变更<br/>单号',align: 'center',width:'60',valign: 'middle',align: 'center',
+		            	field: 'custom_change_no',title: '顾客变更<br/>单号',align: 'center',width:'70',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -145,8 +145,12 @@ function initTable() {
         striped:true,
         paginationVAlign:'bottom',
         searchOnEnterKey:true,
-        fixedColumns: true,			//冻结列
-        fixedNumber: 3,					//冻结列数
+        fixedColumns: false,			//冻结列
+        fixedNumber: 0,				//冻结列数
+        sidePagination : "client",
+        responseHandler: function(res){
+             return res.rows;
+        },
         queryParams:function(params) {
         	
         	var conditions={};
@@ -155,7 +159,7 @@ function initTable() {
         	conditions.factory=$("#factory :selected").text();
         	conditions.tech_date_start=$("#startDate").val();
         	conditions.tech_date_end=$("#endDate").val();
-     	
+        	conditions.group_by_flg=report_demt;
         	params["conditions"] = JSON.stringify(conditions); 
         	return params;
         },
@@ -163,7 +167,7 @@ function initTable() {
     });
 
     $(window).resize(function () {
-        $table.bootstrapTable('resetView', {height: '450',});
+        $table.bootstrapTable('resetView', {height: '450'});
     });
 }
 //----------END bootstrap initTable ----------

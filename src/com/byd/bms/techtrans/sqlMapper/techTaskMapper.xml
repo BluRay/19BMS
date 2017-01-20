@@ -1055,6 +1055,44 @@
 	<select id="caculateEcnSalary" parameterType="Map" resultType="String"> 
 		call P_CACULATE_ECN_SALLARY(#{factory},#{workshop},'','',#{workMonth});
 	</select>
+	
+	<select id="queryChangeTypeReport" parameterType="Map" resultType="Map">
+		SELECT t.task_content,t.tech_order_no,t.tech_date,concat(d.order_no,'&lt;br&gt;',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,d.factory,
+		group_concat(d.tech_list  separator ',') as tech_list,group_concat(d.time_list  separator ',') as time_list,t.custom_change_no,
+		sum(case d.time_total when '' then 0 else time_total end ) as time_total
+		FROM BMS_TECH_TASK_DETAIL d
+		LEFT JOIN BMS_TECH_TASK t ON d.tech_task_id=t.id
+		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
+		LEFT JOIN BMS_BASE_BUS_TYPE bt on bt.id=o.bus_type_id
+		WHERE 1=1
+		<if test="change_type=='顾客变更'">
+			AND custom_change='Y'
+		</if>
+		<if test="change_type=='重大变更'">
+			AND major_change='Y'
+		</if>
+		<if test="change_type=='重复变更'">
+			AND repeat_change='Y'
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			AND d.order_no=#{order_no}
+		</if>
+		<if test="factory !=null and factory !='全部'">
+			AND d.factory=#{factory}
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			AND t.tech_date>=#{tech_date_start} 
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			AND t.tech_date&lt;=#{tech_date_end} 
+		</if>
+		<if test="group_by_flg =='工厂维度'">
+			GROUP BY d.tech_task_id,d.factory,d.order_no
+		</if>
+		<if test="group_by_flg =='订单维度'">
+			GROUP BY d.tech_task_id,d.order_no
+		</if>
+	</select>
 <!--  ###################  by xjw  end  ###############  -->
 	
 	
@@ -1115,7 +1153,7 @@
 		T.TECH_SINGLE_PRICE
 		FROM BMS_TECH_TASK_DETAIL D
 		LEFT JOIN BMS_TECH_TASK T ON D.tech_task_id = T.id
-		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id  WHERE 1=1 
+		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id WHERE 1=1 
 		<if test="task_content !=null and task_content !=''">
 			AND T.TASK_CONTENT LIKE CONCAT(#{task_content},'%')
 		</if>
@@ -1167,19 +1205,63 @@
 	</select>
 	
 	<select id="queryTechTaskReport2" parameterType="Map" resultType="Map">
-		SELECT D.FACTORY,T.TECH_DATE,D.ORDER_NO,T.TECH_ORDER_NO,K1.KEY_NAME,T.TASK_CONTENT,M.ID,M.SAP_NO,M.MATERIAL_DESC,
+		SELECT D.FACTORY,T.TECH_DATE,D.ORDER_NO,T.TECH_ORDER_NO,K1.KEY_NAME AS DUTY_UNIT,T.TASK_CONTENT,M.ID,M.SAP_NO,M.MATERIAL_DESC,
 		M.MATERIAL_TYPE,M.MATERIAL_SPEC,M.UNIT,M.SUPPLIER_CODE,
 		M.SINGLE_LOSS,M.LEVEL_USAGE,M.SINGLE_WEIGHT,M.SINGLE_USAGE,M.WORKSHOP,M.PROCESS,
-		M.ASSEMB_SITE FROM BMS_TECH_MATERIAL M
+		M.ASSEMB_SITE,
+		(SELECT COUNT(DISTINCT F.bus_number) AS BUS_COUNT FROM BMS_TECH_TASK_FOLLOW F WHERE F.TECH_TASK_ID = M.TECH_TASK_ID AND F.factory = D.FACTORY) AS BUS_COUNT
+		FROM BMS_TECH_MATERIAL M
 		LEFT JOIN BMS_TECH_TASK_DETAIL D ON M.tech_task_id = D.tech_task_id
 		LEFT JOIN BMS_TECH_TASK T ON M.tech_task_id = T.id
-		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id 
+		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id WHERE 1=1 
+		<if test="task_content !=null and task_content !=''">
+			AND T.TASK_CONTENT LIKE CONCAT(#{task_content},'%')
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			AND T.TECH_ORDER_NO LIKE CONCAT(#{tech_order_no},'%')
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			AND T.ORDER_NO LIKE CONCAT(#{order_no},'%')
+		</if>
+		<if test="factory !=null and factory !=''">
+			AND D.FACTORY_ID = #{factory}
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			AND T.TECH_DATE >= #{tech_date_start}
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			AND T.TECH_DATE &lt;= #{tech_date_end}
+		</if>
+		<if test="sort!=null">
+			ORDER BY ${sort} ${order}
+		</if>
+		<if test="offset!=null">
+			LIMIT #{offset} ,#{pageSize}
+		</if>
 	</select>
 	<select id="queryTechTaskReportCount2" parameterType="Map" resultType="int">
 		SELECT COUNT(M.ID) FROM BMS_TECH_MATERIAL M
 		LEFT JOIN BMS_TECH_TASK_DETAIL D ON M.tech_task_id = D.tech_task_id
 		LEFT JOIN BMS_TECH_TASK T ON M.tech_task_id = T.id
-		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id 
+		LEFT JOIN BMS_BASE_KEY K1 ON T.duty_unit = K1.id WHERE 1=1 
+		<if test="task_content !=null and task_content !=''">
+			AND T.TASK_CONTENT LIKE CONCAT(#{task_content},'%')
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			AND T.TECH_ORDER_NO LIKE CONCAT(#{tech_order_no},'%')
+		</if>
+		<if test="order_no !=null and order_no !=''">
+			AND T.ORDER_NO LIKE CONCAT(#{order_no},'%')
+		</if>
+		<if test="factory !=null and factory !=''">
+			AND D.FACTORY_ID = #{factory}
+		</if>
+		<if test="tech_date_start !=null and tech_date_start !=''">
+			AND T.TECH_DATE >= #{tech_date_start}
+		</if>
+		<if test="tech_date_end !=null and tech_date_end !=''">
+			AND T.TECH_DATE &lt;= #{tech_date_end}
+		</if>
 	</select>
 	
 <!--  ###################  by yk  end  ###############  -->
@@ -1428,6 +1510,7 @@
 			UPDATE BMS_TECH_TASK_DETAIL
 			SET time_list = #{item.time_list}
 			,single_time_total = #{item.single_time_total}
+			,time_total = #{item.time_total}
 			WHERE id = #{item.id};
 			UPDATE BMS_TECH_TASK
 			SET assesor_id = #{item.assesor_id}

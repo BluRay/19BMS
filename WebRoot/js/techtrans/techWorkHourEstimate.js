@@ -87,7 +87,7 @@ function ajaxQuery(targetPage) {
 				if(value.finish_date!="" || (value.edit_date !='' && value.assign_date =='' && value.assess_date =='' && value.finish_date =='') ){
 					$("<td />").html("").appendTo(tr);
 				}else{
-					$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" onclick='showConfigModal("+value.id+","+value.tech_task_id+",\""+value.factory+"\",\""+value.time_list+"\")' ></i>").appendTo(tr);
+					$("<td />").html("<i name='edit' class=\"fa fa-pencil\" rel=\"tooltip\"  title='修改'style=\"cursor: pointer;text-align: center;\" onclick='showConfigModal("+value.id+","+value.tech_task_id+",\""+value.factory+"\",\""+value.time_list+"\",\""+value.tech_list+"\")' ></i>").appendTo(tr);
 				}
 				$("#tableTaskFollow tbody").append(tr);
 
@@ -103,7 +103,7 @@ function ajaxQuery(targetPage) {
 	});
 }
 
-function showConfigModal(id,tech_task_id,factory,time_list){
+function showConfigModal(id,tech_task_id,factory,time_list,tech_list){
 	re1 = new RegExp(":","g"); //定义正则表达式//第一个参数是要替换掉的内容，第二个参数"g"表示替换全部（global）。
 	re2 = new RegExp(",","g");
 	var jsonobj;
@@ -151,6 +151,7 @@ function showConfigModal(id,tech_task_id,factory,time_list){
 	});
 	
 	$("#tech_task_id").val(tech_task_id);
+	$("#tech_list").val(tech_list);
 	$("#id").val(id);
 	
 	$("#configModal").modal("show");
@@ -168,6 +169,15 @@ function ajaxConfig() {
 			time_list += workshop + ":" + workhour + ",";
 		}
 	});
+	
+	var total_hour = 0;
+	var tech_list = $('#tech_list').val();
+	var jsonobj;
+	if(tech_list && tech_list!=''){
+		str = "{\""+tech_list.replace(re1,"\":").replace(re2,",\"")+"}";
+		jsonobj = JSON.parse(str);
+	}
+	
 	if(time_list==""){
 		//回滚
 		$.ajax({
@@ -179,6 +189,7 @@ function ajaxConfig() {
 				"single_time_total": "",
 				"id": $("#id").val(),
 				"tech_task_id": $("#tech_task_id").val(),
+				"total_hour" : "",
 				"flg": 1
 			},
 			success : function(response) {
@@ -196,6 +207,21 @@ function ajaxConfig() {
 	}else{
 		//修改
 		time_list = time_list.substring(0,time_list.length-1);
+		var jsonobj1;
+		if(time_list && time_list!=''){
+			str = "{\""+time_list.replace(re1,"\":").replace(re2,",\"")+"}";
+			jsonobj1 = JSON.parse(str);
+		}
+		if(jsonobj){
+			for (key in jsonobj) {
+				for (key1 in jsonobj1) {
+					if(key==key1){
+						total_hour += parseFloat(jsonobj1[key1]) * parseFloat(jsonobj[key]);
+						//break;
+					}
+				}
+			}
+		}
 		$.ajax({
 			url : "techTask!editTechWorkHourEstimate.action",
 			dataType : "json",
@@ -205,6 +231,7 @@ function ajaxConfig() {
 				"single_time_total": $("#config_totalhour").html(),
 				"id": $("#id").val(),
 				"tech_task_id": $("#tech_task_id").val(),
+				"total_hour" : total_hour,
 				"flg": 0
 			},
 			success : function(response) {

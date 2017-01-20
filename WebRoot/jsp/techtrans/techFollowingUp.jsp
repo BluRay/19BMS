@@ -84,7 +84,7 @@
 			<div id="bodyright" class="offset2">
 				<legend>技改跟进</legend>
 				<div id="taskFollow">
-					<form id="form" class="well form-search">
+					<form id="form" class="form-search">
 						<table>
 							<thead>
 								<tr>

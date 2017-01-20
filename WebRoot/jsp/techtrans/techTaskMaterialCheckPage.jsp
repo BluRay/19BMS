@@ -45,10 +45,10 @@
 						<div role="tabpanel" class="tab-pane active" id="workhour_Range">
 							<div class="control-group">
 							<label class="control-label" style="padding-top:5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;技改任务：</b>
-								<input id="task_content" type="text" style="width:410px;height:18px"></input>
+								<input id="task_content" disabled="disabled" type="text" style="width:410px;height:18px"></input>
 							</label>
 							<label class="control-label" style="padding-top:5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;技改单号：</b>
-								<input id="tech_order_no" type="text" style="width:410px;height:18px"></input>
+								<input id="tech_order_no" disabled="disabled" type="text" style="width:410px;height:18px"></input>
 							</label>
 							<label class="control-label" for=""><b>&nbsp;&nbsp;&nbsp;&nbsp;切换方式：</b>
 								<input style="vertical-align:middle;margin-top:-2px;" name="switch_type" id="type1" type="radio">全部切换&nbsp;&nbsp;
@@ -56,7 +56,7 @@
 								<input style="vertical-align:middle;margin-top:-2px;" name="switch_type" id="type3" type="radio">节点后切换&nbsp;&nbsp;
 							</label>
 							<label class="control-label" for=""><b>&nbsp;&nbsp;&nbsp;&nbsp;切换节点：</b>
-								<input id="switch_node" type="text" style="width:150px;height:18px"></input>
+								<input id="switch_node" disabled="disabled" type="text" style="width:150px;height:18px"></input>
 							</label>
 							<label class="control-label" for=""><b>&nbsp;&nbsp;&nbsp;&nbsp;实施范围：</b>
 								<ul class="nav nav-tabs" id="new_tab" role="tablist" style="height: 38px;margin-left:17px;">
@@ -90,7 +90,7 @@
 							<table id="MaterielInfoTable" class="table table-bordered table-striped" style="text-align: center;margin-left:17px; font-size: 12px;width:96%;max-width:96%">
 							<thead>
 								<tr>
-								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">确认</th>
+								<th style="padding-left:1px;padding-right:1px;vertical-align:middle"><input type="checkbox" onclick="selectAll()" id="selectAll"></th>
 								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">SAP料号</th>
 								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">物料描述</th>
 								<th style="padding-left:1px;padding-right:1px;vertical-align:middle">物料类型</th>

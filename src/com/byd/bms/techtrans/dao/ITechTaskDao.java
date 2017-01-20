@@ -127,6 +127,12 @@ public interface ITechTaskDao {
 	 * @param conditionMap
 	 */
 	public void caculateEcnSalary(Map<String, Object> conditionMap);
+	/**
+	 * 变更类别汇总数据查询
+	 * @param conditionMap
+	 * @return
+	 */
+	public List<Map<String, Object>> queryChangeTypeReport(Map<String, Object> conditionMap);
 	//by xjw end
 	 
 	

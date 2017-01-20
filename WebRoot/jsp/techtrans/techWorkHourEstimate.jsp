@@ -84,7 +84,7 @@
 			<div id="bodyright" class="offset2">
 				<legend>技改工时评估</legend>
 				<div id="taskFollow">
-					<form id="form" class="well form-search">
+					<form id="form" class="form-search">
 						<table>
 							<thead>
 								<tr>
@@ -178,6 +178,7 @@
         </table>
         <input type="text" style="display:none;" id="id" name="id"></input>
         <input type="text" style="display:none;" id="tech_task_id" name="tech_task_id"></input>
+        <input type="text" style="display:none;" id="tech_list" name="tech_list"></input>
     </form>
     </div>
     <div class="modal-footer">

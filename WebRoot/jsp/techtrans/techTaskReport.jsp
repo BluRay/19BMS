@@ -68,7 +68,7 @@
         </div>
 		<div class="container" style="height:200px;padding-left:0px;padding-right:0px;padding-top:0px">
 		<div id="toolbar"></div>
-		<table style="font-weight:normal" id="table" table-layout="fixed" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
+		<table style="font-weight:normal;table-layout:fixed" id="table"  data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
 	           data-show-toggle="false" data-show-columns="true" data-show-export="true" data-detail-view="false"
 	           data-detail-formatter="detailFormatter" data-minimum-count-columns="2" data-show-pagination-switch="true"
 	           data-pagination="true" data-id-field="id" data-page-list="[50, 100, 200, 500, ALL]"

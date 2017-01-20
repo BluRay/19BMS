@@ -32,7 +32,7 @@ opacity:0
 			</a>
 		</li>
 		<li id="techtransTime">
-			<a href="techTask!techTaskMaterialCheck" class="js-sub-menu-toggle">
+			<a href="techTask!techTaskMaterialCheck.action" class="js-sub-menu-toggle">
 				<i class="fa fa-share-alt fw"></i><span class="text">技改物料确认</span>
 			</a>
 		</li>
@@ -72,7 +72,7 @@ opacity:0
 			</a>
 		</li>
 		<li id="techtransReport">
-			<a href="">
+			<a href="techTask!changeTypeReport.action">
 				<i class="fa fa-line-chart fa-fw"></i><span class="text">分类型变更汇总</span>
 			</a>
 		</li>

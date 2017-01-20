@@ -595,12 +595,12 @@ public class TechTaskAction extends BaseAction<Object> {
 		List<String> workshopList=Arrays.asList(workshops.split(","));
 		conditionMap.put("workshop_list", workshopList);
 		
-		int totalCount=techTaskDao.queryTechTaskListCount(conditionMap);
+		//int totalCount=techTaskDao.queryTechTaskListCount(conditionMap);
 		
-		if (pager != null){
+		/*if (pager != null){
 			conditionMap.put("offset", (pager.getCurPage()-1)*pager.getPageSize());
 			conditionMap.put("pageSize", pager.getPageSize());
-		}
+		}*/
 		List<Map<String,Object>> data_list=techTaskDao.queryTechTaskList(conditionMap);	
 		List<Map<String,Object>> rows=new ArrayList<Map<String,Object>>();
 		
@@ -662,12 +662,12 @@ public class TechTaskAction extends BaseAction<Object> {
 			
 		}			
 		
-		if (pager != null){
+		/*if (pager != null){
 			pager.setTotalCount(totalCount);			
-		}
+		}*/
 		result.put("pager", pager);
 		result.put("dataList", data_list);
-		result.put("total", totalCount);
+		//result.put("total", totalCount);
 		result.put("rows", rows);
 		return SUCCESS;
 	}
@@ -678,7 +678,24 @@ public class TechTaskAction extends BaseAction<Object> {
 	public String changeTypeReport(){
 			return "changeTypeReport";
 	}
+	/**
+	 * 分类型变更汇总报表数据获取
+	 * @return
+	 */
+	public String getChangeTypeReportData(){
+		result=new HashMap<String,Object>();
+		JSONObject jo=JSONObject.fromObject(conditions);
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
+		for(Iterator it=jo.keys();it.hasNext();){
+			String key=(String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		List<Map<String,Object>> rows=new ArrayList<Map<String,Object>>();
+		rows=techTaskDao.queryChangeTypeReport(conditionMap);
 		
+		result.put("rows", rows);
+		return SUCCESS;
+	}
 	// ############# by xjw end #############//	
 
 	// ############# by yk start #############//
@@ -1360,6 +1377,7 @@ public class TechTaskAction extends BaseAction<Object> {
 		Map<String, Object> infomap = new HashMap<String, Object>();
 		infomap.put("time_list", request.getParameter("time_list"));
 		infomap.put("single_time_total", request.getParameter("single_time_total"));
+		infomap.put("time_total", request.getParameter("total_hour"));
 		infomap.put("assesor_id", userid);
 		if ("1".equals(request.getParameter("flg"))) {
 			infomap.put("assess_date", "");
