@@ -119,7 +119,7 @@
        	</h5>
     </div>
     <div class="modal-body">
-    	<table id="selectBusNumber_table_view" style="table-layout:fixed;font-size:12px" class="table table-bordered table-striped">
+    	<table id="selectBusNumber_table_view" style="table-layout:fixed;font-size:12px;border-collapse: collapse;" class="table table-bordered table-striped">
 			<thead>
                 <tr>
                 	<th style="text-align:center;" width="60px">序号</th>
@@ -141,7 +141,7 @@
     	<input type="hidden" id="selectBusNumber_switch_mode_view" />
     </div>    
     <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+        <button class="btn" style="border: 1px solid #cccccc;" data-dismiss="modal" aria-hidden="true">关闭</button>
         <!-- <button class="btn btn-success" id="btnTest">TEST</button> -->
     </div>
 </div>

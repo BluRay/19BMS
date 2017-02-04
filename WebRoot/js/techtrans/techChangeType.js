@@ -61,19 +61,19 @@ function initTable() {
 		    	        	},
 		    	      
 		            },{
-		            	field: 'factory',title: '技改<br/>工厂',align: 'center',width:'100',valign: 'middle',align: 'center',
+		            	field: 'factory',title: '技改工厂',align: 'center',width:'100',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'time_list',title: '分配<br/>工时',align: 'center',width:'250',valign: 'middle',align: 'center',
+		            	field: 'time_list',title: '分配工时',align: 'center',width:'250',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'tech_list',title: '技改<br/>台数',align: 'center',width:'250',valign: 'middle',align: 'center',
+		            	field: 'tech_list',title: '技改台数',align: 'center',width:'250',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -85,7 +85,7 @@ function initTable() {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'custom_change_no',title: '顾客变更<br/>单号',align: 'center',width:'80',valign: 'middle',align: 'center',
+		            	field: 'custom_change_no',title: '顾客变更<br/>单号',align: 'center',width:'90',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -109,7 +109,7 @@ function initTable() {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'tech_date',title: '技改单日期',align: 'center',width:'80',valign: 'middle',align: 'center',
+		            	field: 'tech_date',title: '技改单日期',align: 'center',width:'90',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -122,13 +122,13 @@ function initTable() {
 		    	        	},
 		    	      
 		            },{
-		            	field: 'total_time',title: '订单总<br/>计改工时',align: 'center',width:'70',valign: 'middle',align: 'center',
+		            	field: 'total_time',title: '订单总<br/>计改工时',align: 'center',width:'90',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'custom_change_no',title: '顾客变更<br/>单号',align: 'center',width:'70',valign: 'middle',align: 'center',
+		            	field: 'custom_change_no',title: '顾客变更<br/>单号',align: 'center',width:'90',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -140,7 +140,7 @@ function initTable() {
 	
 	//alert(getHeight());
     $table.bootstrapTable({
-        height: '450',
+        height: '470',
         url:data_url,
         striped:true,
         paginationVAlign:'bottom',
@@ -167,7 +167,7 @@ function initTable() {
     });
 
     $(window).resize(function () {
-        $table.bootstrapTable('resetView', {height: '450'});
+        $table.bootstrapTable('resetView', {height: '470'});
     });
 }
 //----------END bootstrap initTable ----------

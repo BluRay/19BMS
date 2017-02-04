@@ -8,8 +8,8 @@
 <meta http-equiv="expires" content="0" />
 <title>分类型变更汇总</title>
 <!-- Le styles -->
-<link href="css/bootstrap.css" rel="stylesheet" type="text/css">
-<link href="css/common.css" rel="stylesheet">
+<!-- <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+<link href="css/common.css" rel="stylesheet"> -->
 <script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="js/bootstrap-table.js"></script>
 <script type="text/javascript" src="js/tableExport.js"></script>
@@ -44,6 +44,9 @@
     vertical-align: bottom;
     border-bottom: 1px solid #ddd;
 }
+a {
+    cursor: pointer;
+}
 </style>
 </head>
 <body >
@@ -52,7 +55,7 @@
 	<!-- Tab panes -->
 	<div class="content-wrapper ">
 	<div id="bodymain" class="offhead">
-	<div id="bodyright" class="offset2">
+	<div id="bodyright" class="offset2" style="margin-left:20px">
 		<legend >分类型变更汇总</legend>
 		<div class="control-group">
 					<table >
