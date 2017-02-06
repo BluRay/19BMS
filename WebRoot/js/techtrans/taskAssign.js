@@ -170,7 +170,7 @@ function initPage(){
 	var h = d.getHours(); 
 	var m = d.getMinutes(); 
 	var se = d.getSeconds(); 
-	s1=(vYear-1)+"-"+(12)+"-"+"01";	
+	s1=(vYear-1)+"-"+(vMon<10 ? "0" + vMon : vMon)+"-"+"01";	
 	s=vYear+"-"+(vMon<10 ? "0" + vMon : vMon)+"-"+(vDay<10 ? "0"+ vDay : vDay);
 	$("#startDate").val(s1);
 	$("#endDate").val(s);
