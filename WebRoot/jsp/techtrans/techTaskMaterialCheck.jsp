@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
 <meta http-equiv="expires" content="0" />
-<title>BMS - 订单维护</title>
+<title>BMS - 技改物料确认</title>
 <!-- Le styles -->
 <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
 <link href="css/common.css" rel="stylesheet">
@@ -31,7 +31,7 @@
 		<div id="bodyright" class="offset2">
 			<!-- Main -->
 			<div>
-				<legend style="margin: 0 auto;">订单维护</legend>
+				<legend style="margin: 0 auto;">技改物料确认</legend>
 				<div style="margin: 0 auto;">
 				<div class="control-group" style="padding-top:10px;padding-bottom:2px">
 				<table>

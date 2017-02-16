@@ -453,7 +453,7 @@ a:hover {
 									href="testRecordIn!qualityIndex.action" class="overlink">品质</a></td>
 								<td style="width: 9%; height: 50px"><a href="afterSale!queryAfterSaleProblems.action"
 									class="overlink">售后</a></td>
-								<td style="width: 9%; height: 50px"><a href="#"
+								<td style="width: 9%; height: 50px"><a href="http://10.23.20.5:8082/wms_web/views/login.jsp?bms_username=<%=session.getAttribute("card_number")%>"
 									class="overlink">仓储</a></td>
 								<td style="width: 9%; height: 50px"><a href="selfcost!index.action"
 									class="overlink">成本</a></td>

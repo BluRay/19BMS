@@ -37,6 +37,7 @@ public class LoginAction extends BaseAction<BmsBaseUser>{
 				if(MD5Util.validPassword(password, user.getPassword())){
 					session.setAttribute("user_name", user.getUsername());
 					session.setAttribute("display_name", user.getDisplay_name());
+					session.setAttribute("card_number", user.getCard_number());
 					session.setAttribute("user_id", user.getId());
 					session.setAttribute("factory", user.getFactory());
 					session.setAttribute("bmsuser", user);

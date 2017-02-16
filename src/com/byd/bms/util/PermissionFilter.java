@@ -154,6 +154,7 @@ public class PermissionFilter implements Filter {
 							if(ipOK){
 								logger.info("ipOK:"+ipOK);
 								session.setAttribute("user_name", user.getUsername());
+								session.setAttribute("card_number", user.getCard_number());
 								session.setAttribute("display_name", user.getDisplay_name());
 								session.setAttribute("user_id", user.getId());
 								session.setAttribute("factory", user.getFactory());
