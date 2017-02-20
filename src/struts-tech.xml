@@ -22,7 +22,7 @@
 			<result name="techTaskInfoPage">/jsp/techtrans/techTaskInfoPage.jsp</result>
 			<result name="techTaskMaterialCheck">/jsp/techtrans/techTaskMaterialCheck.jsp</result>
 			<result name="techTaskMaterialCheckPage">/jsp/techtrans/techTaskMaterialCheckPage.jsp</result>
-			<result name="techTaskCollect">/jsp/techtrans/techTaskCollect.jsp</result>
+			<result name="techTaskCollect">/jsp/techtrans/techTaskCollect.jsp</result><!-- 技改情况汇总 -->
 			<result name="techTaskReport">/jsp/techtrans/techTaskReport.jsp</result>
 			<!-- by yk end -->
 			

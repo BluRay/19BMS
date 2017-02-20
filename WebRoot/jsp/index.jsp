@@ -35,7 +35,6 @@
 			$(this).css("font-size", "22px");
 		});
 		getAuthorityFactorySelect("#factorySelect", "", "noall");
-
 		ajaxQueryOrder();
 		$("#factorySelect").live("change",function(){
 			ajaxQueryOrder();
@@ -235,7 +234,6 @@ a:hover {
 	color: black;
 	text-decoration: none
 }
-
 .overlink {
 	color: black
 }
