@@ -85,7 +85,7 @@ function getBaseInfo(ecnTaskId){
         		$("<td />").html(value.PROCESS).appendTo(tr);
         		$("<td />").html(value.ASSEMB_SITE).appendTo(tr);
         		$("<td />").html(value.REMARK).appendTo(tr);
-        		$("<td />").html(value.MATERIAL_CHECKER_ID).appendTo(tr);
+        		$("<td />").html((value.MATERIAL_CHECKER_ID===0)?'未确认':value.MATERIAL_CHECKER_ID).appendTo(tr);
         		$("<td />").html(value.MATERIAL_CHECK_DATE).appendTo(tr);
         		
         		$("#MaterielInfoTable tbody").append(tr);	
