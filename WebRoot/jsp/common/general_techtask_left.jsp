@@ -62,12 +62,12 @@ opacity:0
 			</a>
 		</li>
 		<li id="techtransReport">
-			<a href="">
+			<a href="techTask!techTaskReport.action">
 				<i class="fa fa-line-chart fa-fw"></i><span class="text">技改成本</span>
 			</a>
 		</li>
 		<li id="techtransReport">
-			<a href="">
+			<a href="techTask!techTaskCollect.action">
 				<i class="fa fa-line-chart fa-fw"></i><span class="text">技改情况汇总</span>
 			</a>
 		</li>

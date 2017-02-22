@@ -44,8 +44,10 @@ $(document).ready(function() {
 	// add by wuxiao start
 	$("#btnAdd").click(function() {
 		// alert(1);
+		var new_tech_order_no = $('#new_tech_order_no').val();
 		$('#addForm').resetForm();
-		$('#new_task_content').val(formatDate(new Date()));
+		$('#new_tech_order_no').val(new_tech_order_no);
+		$('#new_tech_date').val(formatDate(new Date()));
 		$('#new_tech_point_num').val(1);
 		getKeysSelect("ECN_TYPE", "", "#new_tech_type");
 		getKeysSelect("ECN_CHANGE_TYPE", "", "#new_tech_order_type");
