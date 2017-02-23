@@ -52,7 +52,7 @@ $(document).ready(function(){
 	        	});
 	        	var workshop=$("#search_workshop :selected").text()=="全部"?workshopAll:$("#search_workshop :selected").text();
 	        	var conditions={};
-	        	conditions.task_content=$("#tech_task_content").val();
+	        	conditions.task_content=$("#task_content").val();
 	        	conditions.tech_order_no=$("#tech_order_no").val();
 	        	conditions.order_no=$("#order_no").val();
 	        	conditions.factory=$("#search_factory :selected").text();

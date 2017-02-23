@@ -1299,6 +1299,7 @@
 		<if test="status=='已完成'">
 			and t.finish_date !=''
 		</if>
+		order by t.id desc 
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize} 
 		</if>

@@ -181,7 +181,7 @@
 						<div class="controls">
 							<input checked name="switch_mode" value="全部切换" type="radio"><span>全部切换&nbsp;&nbsp;</span>
 							<input name="switch_mode" value="节点前切换" type="radio"><span>节点前切换&nbsp;&nbsp;</span>
-							<input name="switch_mode" value="节点间切换" type="radio"><span>节点间切换&nbsp;&nbsp;</span>
+							<input name="switch_mode" value="节点后切换" type="radio"><span>节点后切换&nbsp;&nbsp;</span>
 						</div>
 					</div>
 					<div id="div_switch_node" class="control-group" style="display:none">
