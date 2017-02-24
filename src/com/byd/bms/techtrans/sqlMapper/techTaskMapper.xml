@@ -50,7 +50,7 @@
 			and h.workshop=#{workshop}
 		</if>
 		group by h.ecn_task_id,h.factory,h.workshop) tmp  WHERE tmp.tech_task_id=d.id and tmp.factory=d.factory ) ready_hour_list,
-		d.factory_id,d.factory,d.tech_list,d.time_list,d.single_time_total,d.time_total
+		d.factory_id,d.factory,d.tech_list,d.time_list,d.single_time_total,d.time_total,d.prod_factory_id,d.prod_factory
 		FROM BMS_TECH_TASK t
 		LEFT JOIN BMS_BASE_KEY k on t.tech_type=k.id and k.key_code='ECN_TYPE'
 		LEFT JOIN BMS_BASE_KEY k1 on t.tech_order_type=k1.id and k1.key_code='ECN_CHANGE_TYPE'
@@ -877,8 +877,8 @@
 	</insert>
 	
 	<insert id="insertTechTaskDetail" useGeneratedKeys="true" parameterType="Map">
-		insert into BMS_TECH_TASK_DETAIL (tech_task_id,order_no,factory,factory_id,tech_list)
-		values (#{tech_task_id},#{order_no},#{factory_list},#{factory_id},#{tech_list})  
+		insert into BMS_TECH_TASK_DETAIL (tech_task_id,order_no,factory,factory_id,prod_factory,prod_factory_id,tech_list)
+		values (#{tech_task_id},#{order_no},#{tech_factory},#{tech_factory_id},#{factory_list},#{factory_id},#{tech_list})  
 
 	</insert>
 	

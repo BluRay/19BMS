@@ -21,6 +21,8 @@ $(document).ready(function () {
 		var switch_mode=$(tds[3]).html();
 		var switch_node=$(tds[6]).html();
 		var tech_date=$(tds[2]).html();
+		var prod_factory_id=$(tr).data("prod_factory_id");
+		var prod_factory=$(tr).data("prod_factory");
 		//var order_desc=$(tds[4]).html();
 		//var factory=$(tds[5]).html();
 		//alert(switch_mode);
@@ -41,7 +43,7 @@ $(document).ready(function () {
 			var order_desc=tech_detail.order_desc;
 			var tech_detail_list=tech_detail.tech_detail_list;
 			var follow_detail=tech_detail.follow_detail;
-			addTechDetail(order_desc,tech_detail_list,follow_detail);
+			addTechDetail(order_desc,tech_detail_list,follow_detail,prod_factory_id,prod_factory);
 			$.each(follow_detail.split(";"),function(i,follow){
 				//alert(follow.split("||")[1]);
 				if(follow.split("||")[1]>0){
@@ -225,6 +227,8 @@ function ajaxQuery(targetPage){
 				$("#techTaskList tbody").append(tr);
 				$(tr).data("task_id",data.id);
 				$(tr).data("task_detail_id",data.task_detail_id);
+				$(tr).data("prod_factory_id",data.prod_factory_id);
+				$(tr).data("prod_factory",data.prod_factory);
 			});
 			
 			$("#total").html(response.pager.totalCount);
@@ -238,7 +242,7 @@ function ajaxQuery(targetPage){
 /**
  * 新增技改范围
  */
-function addTechDetail(order_desc,tech_detail_list,follow_detail){
+function addTechDetail(order_desc,tech_detail_list,follow_detail,prod_factory_id,prod_factory){
 	follow_detail=follow_detail||"";
 	var is_follow=false;
 	$.each(follow_detail.split(";"),function(i,follow){
@@ -281,7 +285,7 @@ function addTechDetail(order_desc,tech_detail_list,follow_detail){
 	tabContent+="</div></div></div>";
 	
 	$(tabContent).appendTo($("#new_accordion"));
-	addTechFactoryDetail(taskNum,tech_detail_list,follow_detail);
+	addTechFactoryDetail(taskNum,tech_detail_list,follow_detail,prod_factory_id,prod_factory);
 	getFuzzyOrder("#order_"+taskNum);
 }
 
@@ -289,7 +293,9 @@ function addTechDetail(order_desc,tech_detail_list,follow_detail){
  * 
  * @param p
  */
-function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
+function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail,prod_factory_id,prod_factory){
+	var factory_select_options=$("#search_factory").html().replace("全部","请选择");
+	//alert(factory_select_options)	
 	var factory_disable_obj={};
 	follow_detail=follow_detail||"";
 	$.each(follow_detail.split(";"),function(i,follow){
@@ -324,20 +330,24 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail){
 			if(tech_info.trim().length>0){
 				checked="checked";
 			}
-			var facotory_div=$("<div><span factory_id='"+factory_id+"'>"+factory+"</span></div>");
+			prod_factory_id=prod_factory_id||factory_id;
+			prod_factory=prod_factory||factory;
+			var facotory_div=$("<div style='margin-top:10px'><b>生产工厂：</b><span factory_id='"+prod_factory_id+"'>"+prod_factory+"</span></div>");
 			var ckbox=$("<input style=\"height:30px\" name=\"new_tecn_flag\""+
-					" class=\"input-medium\" type=\"checkbox\""+checked+" "+factory_disable_obj[factory]+">");
+					" class=\"input-medium\" type=\"checkbox\""+checked+" "+factory_disable_obj[prod_factory]+">");
+			var tech_factory="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>技改工厂：</b><select style='width:100px;height:28px' class='tech_factory' >"+factory_select_options+"</select>";
 			var tech_table=$("<table class=\"table table-bordered table-striped\" style=\"margin-bottom: 0px;\"></table>");
 			var tr_head=$("<tr><td>自制件</td><td>部件</td><td>焊装</td><td>玻璃钢</td><td>涂装</td><td>底盘</td><td>总装</td><td>检测线</td></tr>");
 			var tr_body=$("<tr height='31px'><td>"+(tech_obj['自制件']||'')+"</td><td>"+(tech_obj['部件']||'')+"</td><td>"+
 					(tech_obj['焊装']||'')+"</td><td>"+(tech_obj['玻璃钢']||'')+"</td><td>"+(tech_obj['涂装']||'')+"</td><td>"+
 					(tech_obj['底盘']||'')+"</td><td>"+(tech_obj['总装']||'')+"</td><td>"+(tech_obj['检测线']||'')+"</td></tr>");
-			$(tech_table).append(tr_head).append(tr_body);						
+			$(tech_table).append(tr_head).append(tr_body);	
 			$(facotory_div).append(ckbox);
+			$(facotory_div).append(tech_factory);			
 			$(ckbox).data("tech_detail",tech_detail);			
 			$(content).append(facotory_div);
 			$(content).append(tech_table);
-	
+			$(facotory_div).find(".tech_factory").val(factory_id);
 		})
 		$(taskElement).append(content);
 		
@@ -547,6 +557,8 @@ function assignTechTask(){
 	$.each(factory_cboxs,function(i,cbox){
 		var factory=$(cbox).parent("div").find("span").html();
 		var factory_id=$(cbox).parent("div").find("span").attr("factory_id");
+		var tech_factory=$(cbox).parent("div").find(".tech_factory :selected").text();
+		var tech_factory_id=$(cbox).parent("div").find(".tech_factory").val();
 		var order_no=$(cbox).parent("div").parent("div").parent("div").find(".assess_order_no").val();
 		//alert($(cbox).attr("checked"));
 		if($(cbox).attr("checked")=="checked"&& !$(cbox).attr("disabled")){
@@ -574,28 +586,32 @@ function assignTechTask(){
 			obj.tech_date=tech_date;
 			obj.tech_list=tech_detail_list.toString();
 			obj.node_list=node_list;
+			obj.tech_factory_id=tech_factory_id;
+			obj.tech_factory=tech_factory;
 			conditions.push(obj);
 		}
 	});
-	$.ajax({
-		url:"techTask!assignTechTask.action",
-		dataType:"json",
-		type:"post",
-		async:false,
-		data:{
-			"conditions":JSON.stringify(conditions)
-			},
-		success:function(response){
-			if(response.success){
-				alert(response.message);
-				$("#assessModal").modal("hide");
-				ajaxQuery(1);
-			   }else{
-				   alert("系统异常，分配失败！");
-			   }
-		    }
-		});
-	
-	
+	if(conditions.length>0){
+		$.ajax({
+			url:"techTask!assignTechTask.action",
+			dataType:"json",
+			type:"post",
+			async:false,
+			data:{
+				"conditions":JSON.stringify(conditions)
+				},
+			success:function(response){
+				if(response.success){
+					alert(response.message);
+					$("#assessModal").modal("hide");
+					ajaxQuery(1);
+				   }else{
+					   alert("系统异常，分配失败！");
+				   }
+			    }
+			});
+	}else{
+		$("#assessModal").modal("hide");
+	}
 	
 }
