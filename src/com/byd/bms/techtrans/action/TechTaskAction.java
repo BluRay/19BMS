@@ -696,6 +696,13 @@ public class TechTaskAction extends BaseAction<Object> {
 		result.put("rows", rows);
 		return SUCCESS;
 	}
+	/**
+	 * 技改汇总报表页面
+	 * @return
+	 */
+	public String techCollectReport(){
+			return "techCollectReport";
+	}
 	// ############# by xjw end #############//	
 
 	// ############# by yk start #############//

@@ -1059,7 +1059,8 @@
 	<select id="queryChangeTypeReport" parameterType="Map" resultType="Map">
 		SELECT t.task_content,t.tech_order_no,t.tech_date,concat(d.order_no,'&lt;br&gt;',o.order_name,bt.bus_type_code,' ',o.order_qty,'台') order_desc,d.factory,
 		group_concat(d.tech_list  separator ',') as tech_list,group_concat(d.time_list  separator ',') as time_list,t.custom_change_no,
-		sum(case d.time_total when '' then 0 else time_total end ) as time_total
+		sum(case d.time_total when '' then 0 else time_total end ) as time_total,
+		sum(case d.single_time_total when '' then 0 else single_time_total end ) as single_time_total,t.major_change,t.custom_change,sum(t.tech_point_num) tech_point_num
 		FROM BMS_TECH_TASK_DETAIL d
 		LEFT JOIN BMS_TECH_TASK t ON d.tech_task_id=t.id
 		LEFT JOIN BMS_ORDER o ON o.order_no=d.order_no
@@ -1076,6 +1077,12 @@
 		</if>
 		<if test="order_no !=null and order_no !=''">
 			AND d.order_no=#{order_no}
+		</if>
+		<if test="tech_order_no !=null and tech_order_no !=''">
+			AND t.tech_order_no like concat('%',#{tech_order_no},'%')
+		</if>
+		<if test="task_content !=null and task_content !=''">
+			AND t.task_content like concat('%',#{task_content},'%')
 		</if>
 		<if test="factory !=null and factory !='全部'">
 			AND d.factory=#{factory}

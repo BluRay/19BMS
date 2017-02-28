@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
 <meta http-equiv="expires" content="0" />
-<title>分类型变更汇总</title>
+<title>技改情况汇总</title>
 <!-- Le styles -->
 <!-- <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
 <link href="css/common.css" rel="stylesheet"> -->
@@ -21,7 +21,7 @@
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/jquery.form.js"></script>
-<script type="text/javascript" src="js/techtrans/techChangeType.js"></script>
+<script type="text/javascript" src="js/techtrans/techCollect.js"></script>
 <script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 <link type="text/css" rel="stylesheet" href="js/datePicker/skin/WdatePicker.css">
 <link rel="stylesheet" href="css/bootstrap.3.2.css">
@@ -56,18 +56,10 @@ a {
 	<div class="content-wrapper ">
 	<div id="bodymain" class="offhead">
 	<div id="bodyright" class="offset2" style="margin-left:20px">
-		<legend >分类型变更汇总</legend>
+		<legend >技改情况汇总</legend>
 		<div class="control-group">
 					<table >
-						<tr>
-						<td width="80px" style="text-align:right">变更类别：</td>
-						<td width="80px">
-							<select id="change_type" class="input-medium" style="width:90px">
-								<option value="重大变更">重大变更</option>
-								<option value="顾客变更">顾客变更</option>
-								<option value="重复变更">重复变更</option>
-							</select>
-						</td>
+						<tr>						
 						<td width="60px" style="text-align:right">订单：</td>
 						<td width="100px">
 							<input type="text" id="order_number" class="input-medium" style="width:100px"/>
@@ -76,6 +68,14 @@ a {
 						<td width="80px">
 							<select id="factory" class="input-medium" style="width:90px">
 							</select>
+						</td>
+						<td width="90px" style="text-align:right">技改单编号：</td>
+						<td width="100px">
+							<input type="text" id="tech_order_no" class="input-medium" style="width:100px"/>
+						</td>
+						<td width="70px" style="text-align:right">任务内容：</td>
+						<td width="100px">
+							<input type="text" id=task_content class="input-medium" style="width:100px"/>
 						</td>
 						<td width="90px" style="text-align:right">技改单日期：</td>
 						<td width="220px">
@@ -98,8 +98,8 @@ a {
 		</div>
 		<div class="container" style="padding-left:0px;padding-right:0px;margin-top: -10px;">
 		<div id="toolbar"></div>
-		<table style="font-weight:normal;font-size:12px;table-layout:fixed;" id="table" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
-	           data-show-toggle="true" data-show-columns="true" data-show-export="true" data-detail-view="false"
+		<table style="font-weight:normal;font-size:12px;table-layout:fixed" id="table" data-toolbar="#toolbar" data-search="false" data-show-refresh="true"
+	           data-show-toggle="false" data-show-columns="true" data-show-export="true" data-detail-view="false"
 	           data-detail-formatter="detailFormatter" data-minimum-count-columns="2" data-show-pagination-switch="true"
 	           data-pagination="true" data-id-field="id" data-page-list="[50, 100, 200, 500, ALL]"
 	           data-show-footer="false" data-side-pagination="server" data-response-handler="responseHandler">
