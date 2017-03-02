@@ -21,8 +21,6 @@ $(document).ready(function () {
 		var switch_mode=$(tds[3]).html();
 		var switch_node=$(tds[6]).html();
 		var tech_date=$(tds[2]).html();
-		var prod_factory_id=$(tr).data("prod_factory_id");
-		var prod_factory=$(tr).data("prod_factory");
 		//var order_desc=$(tds[4]).html();
 		//var factory=$(tds[5]).html();
 		//alert(switch_mode);
@@ -43,6 +41,8 @@ $(document).ready(function () {
 			var order_desc=tech_detail.order_desc;
 			var tech_detail_list=tech_detail.tech_detail_list;
 			var follow_detail=tech_detail.follow_detail;
+			var prod_factory_id=tech_detail.prod_factory_id;
+			var prod_factory=tech_detail.prod_factory;
 			addTechDetail(order_desc,tech_detail_list,follow_detail,prod_factory_id,prod_factory);
 			$.each(follow_detail.split(";"),function(i,follow){
 				//alert(follow.split("||")[1]);
@@ -330,9 +330,9 @@ function addTechFactoryDetail(taskNum,tech_detail_list,follow_detail,prod_factor
 			if(tech_info.trim().length>0){
 				checked="checked";
 			}
-			prod_factory_id=prod_factory_id||factory_id;
-			prod_factory=prod_factory||factory;
-			var facotory_div=$("<div style='margin-top:10px'><b>生产工厂：</b><span factory_id='"+prod_factory_id+"'>"+prod_factory+"</span></div>");
+			//prod_factory_id=prod_factory_id||factory_id;
+			//prod_factory=prod_factory||factory;
+			var facotory_div=$("<div style='margin-top:10px'><b>生产工厂：</b><span factory_id='"+(prod_factory_id||factory_id)+"'>"+(prod_factory||factory)+"</span></div>");
 			var ckbox=$("<input style=\"height:30px\" name=\"new_tecn_flag\""+
 					" class=\"input-medium\" type=\"checkbox\""+checked+" "+factory_disable_obj[prod_factory]+">");
 			var tech_factory="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>技改工厂：</b><select style='width:100px;height:28px' class='tech_factory' >"+factory_select_options+"</select>";
