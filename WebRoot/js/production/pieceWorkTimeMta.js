@@ -227,21 +227,24 @@ $(document)
 							return item + "  " + order_name + " " + bus_type + order_qty;
 						},
 						matcher : function(item) {
-							$.each(orderList, function(index, value) {
-								if (value.orderNo == item) {
-									selectId = value.id;
-								}
-							})
-							$("#order_number").attr("order_id", selectId);
-							var list=ajaxGetStaffList();
-							workgroup_price=ajaxGetWorkgroupPrice();
-							$.each(list, function(index, staff) {
-								//workgroup_price+=parseFloat(staff.distribution);
-								// alert(staff.id);
-							addWorkHourItem(staff.id, staff.staff_number, staff.name,
-										staff.job, "", staff.team_org, staff.workgroup_org,
-										staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
-							});
+							if(this.query==item){
+								$.each(orderList, function(index, value) {
+									if (value.orderNo == item) {
+										selectId = value.id;
+									}
+								})
+								$("#order_number").attr("order_id", selectId);
+								var list=ajaxGetStaffList();
+								workgroup_price=ajaxGetWorkgroupPrice();
+								$.each(list, function(index, staff) {
+									//workgroup_price+=parseFloat(staff.distribution);
+									// alert(staff.id);
+								addWorkHourItem(staff.id, staff.staff_number, staff.name,
+											staff.job, "", staff.team_org, staff.workgroup_org,
+											staff.workshop_org, staff.plant_org,staff.skill_parameter,staff.distribution,index,staff.status,staff.leave_date)
+								});
+							}
+							
 							return true;
 						},
 						updater : function(item) {

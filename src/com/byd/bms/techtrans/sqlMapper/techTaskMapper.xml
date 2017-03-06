@@ -895,7 +895,11 @@
 	
 	<update id="deleteTechTaskDetail" parameterType="list">
 		delete from BMS_TECH_TASK_DETAIL where tech_task_id=#{tech_task_id}
-		and (time_list is null or time_list='') 
+		and not exists 
+		(select f.id from BMS_TECH_TASK_FOLLOW f where f.tech_task_id=#{tech_task_id} and f.confirmor_date is not null and f.confirmor_date!=''
+		union 
+		select f.id from BMS_TECH_TASK_FOLLOW_PRE f where f.tech_task_id=#{tech_task_id} and f.confirmor_date is not null and f.confirmor_date!=''
+ 		)
 		<!-- <if test="order_no !=null and order_no !=''">
 			and order_no=#{order_no}
 		</if> -->
