@@ -1,6 +1,8 @@
 var detaillist;
 var cworkshop;
 var cworkshopId;
+var busType='';
+var tplType='';
 $(document).ready(function(){
 	initPage();
 	$("#input_busType").change(function(){
@@ -212,7 +214,11 @@ $(document).ready(function(){
 		var configId=isNaN(parseInt($("#input_config").val()))?0:parseInt($("#input_config").val());
 			
 		if(busTypeId==0){
-			alert("必须选择车型！");
+			alert("请选择车型！");
+			flag=false;
+		}
+		if(tplType=='订单'&&orderId==0){
+			alert("请选择订单！");
 			flag=false;
 		}
 		if(flag){
@@ -344,14 +350,26 @@ function generateTable(workshop){
 	}
 	// 页面初始化
 	function initPage() {
+		busType=getQueryString("tplHeader.busType")||"";
+		tplType=getQueryString("tplHeader.tplType")||"";
 		getDetail();
-		getBusTypeSelect("#input_busType","");
+		getBusTypeSelect("#input_busType",busType);
 		//getOrderConfigSelect("#input_config","");
 		//getOrderSelect("#input_order","");
 		modalMove("#editModal");
 		modalMove("#newModal");
 		//getWorkshopSelect_Key("#input_workshop","");
 		$("#qc_tmpl_in").addClass("in");
+		if(tplType=='车型'){
+			$("#input_config").parent("td").hide();
+			$("#input_order").parent("td").hide();
+			$("#th_order").hide();
+			$("#th_config").hide();
+		}else{
+			$("#input_busType").attr("disabled",true);
+			getOrderSelect("#input_order",$("#input_busType").val(),"");
+			$("#input_workshop").attr("disabled",true);
+		}
 	}
 	function emptyEditModal(){
 		$("#edit_select").val("");

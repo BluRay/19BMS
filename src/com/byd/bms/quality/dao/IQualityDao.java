@@ -54,6 +54,7 @@ public interface IQualityDao {
 	public int updateTrackTplDetail(List<TrackTplDetailBean> tplDetailList);
 	public int insertTrackTplDetail(List<TrackTplDetailBean> tplDetailList);
 	public int insertTrackTplHeader(TrackTplHeaderBean tplHeader);
+	public int deleteTrackTplDetail(Map<String, Object> conditionMap);
 	//订单配置一致性模板
 	public OrderConfigTplHeaderBean getOrderConfigTplHeader(int tplHeaderId);
 	public int updateOrderConfigTplDetail(List<OrderConfigTplDetailBean> tplDetailList);

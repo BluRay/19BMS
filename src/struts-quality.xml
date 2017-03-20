@@ -12,6 +12,7 @@
 			<result name="showTestTplCopy">/jsp/quality/test_tpl_detail_copy.jsp</result>
 			<result name="showTestTplEdit">/jsp/quality/test_tpl_detail_edit.jsp</result>
 			<result name="error">/errer.jsp</result>
+			<result name="car_type">/jsp/quality/test_tpl_list_car.jsp</result>
 			<result type="json">
 				<param name="root">result</param>
 			</result>
@@ -23,6 +24,7 @@
 			<result name="showTplCopy">/jsp/quality/test_flow_tpl_detail_copy.jsp</result>
 			<result name="showTplEdit">/jsp/quality/test_flow_tpl_detail_edit.jsp</result>
 			<result name="error">/errer.jsp</result>
+			<result name="car_type">/jsp/quality/test_flow_tpl_list_car.jsp</result>
 			<result type="json">
 				<param name="root">result</param>
 			</result>
@@ -34,6 +36,7 @@
 			<result name="showTplCopy">/jsp/quality/track_tpl_detail_copy.jsp</result>
 			<result name="showTplEdit">/jsp/quality/track_tpl_detail_edit.jsp</result>
 			<result name="error">/errer.jsp</result>
+			<result name="car_type">/jsp/quality/track_tpl_list_car.jsp</result>
 			<result type="json">
 				<param name="root">result</param>
 			</result>

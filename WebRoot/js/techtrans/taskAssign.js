@@ -84,6 +84,7 @@ $(document).ready(function () {
 		//alert($(this).val());
 		if($(this).val()=='全部切换'){
 			$("#div_switch_node").hide();
+			$("#switch_node").val("");
 		}else{
 			$("#div_switch_node").show();
 		}
@@ -543,7 +544,7 @@ function assignTechTask(){
 	var task_detail_id=$("#assessModal").data("task_detail_id");
 	var switch_mode=$("input[name='switch_mode']:checked").val();
 	var tech_date=$("#assessModal").data("tech_date");
-	var switch_node=$("#switch_node").val()||"";
+	var switch_node=switch_mode=='全部切换'?"":$("#switch_node").val();
 	var node_list="";
 	var node_index=switch_node_arr.indexOf(switch_node);
 	if(switch_mode=='节点前切换'){

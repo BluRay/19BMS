@@ -63,7 +63,7 @@
 
 	<select id="getTrackTplHeaderIdByBusNo" parameterType="Map"
 		resultType="Integer">
-		select distinct detail.id from (
+		select detail.id from (
 		(select h.id,h.version,tmp.*,1 detail_index from
 		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_HEADER h
 		,(select
@@ -1963,28 +1963,20 @@
 
 	<select id="getCertificationList" parameterType="Map"
 		resultType="Map">
-		SELECT
-		b.id,b.bus_number,b.vin,b.bus_color,b.bus_seats,b.left_motor_number,b.right_motor_number,f.factory_name,
-		t.vehicle_model,t.chassis_model,t.motor_model,b.zc_production_date as
-		productive_date,b.chassis_productive_date
+		SELECT b.id,b.bus_number,b.vin,b.bus_color,b.bus_seats,concat(b.left_motor_number,'/',b.right_motor_number) motor_number,f.factory_name, 
+		t.vehicle_model,t.chassis_model,t.motor_model,b.zc_production_date as productive_date,b.dp_production_date,
+		c.tire_type,o.order_no,concat(t.passengers,'/',b.bus_seats) passengers,b.spring_num
 		FROM BMS_PLAN_BUS b
-		LEFT OUTER
-		JOIN BMS_ORDER o ON b.order_id = o.id
-		LEFT OUTER JOIN BMS_BASE_FACTORY
-		f ON b.factory_id = f.id
-		LEFT OUTER
-		JOIN BMS_BASE_BUS_TYPE t ON
-		o.bus_type_id = t.id
-		WHERE b.factory_id =
-		#{factory_id} and b.vin IS NOT
-		NULL and
-		b.left_motor_number IS NOT NULL
-		and b.right_motor_number IS NOT
-		NULL
+		LEFT JOIN BMS_ORDER o ON b.order_id = o.id
+		LEFT JOIN BMS_ORDER_CONFIG c on c.id=b.order_cofig_id
+		LEFT JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id
+		LEFT JOIN BMS_BASE_BUS_TYPE t ON o.bus_type_id = t.id
+		WHERE b.factory_id =#{factory_id} and b.vin IS NOT NULL and b.left_motor_number IS NOT NULL 
+		and b.right_motor_number IS NOT NULL
 		<if test="order_no!=''">
 			and o.order_no= #{order_no}
 		</if>
-		<if test="bus_number_size==1">
+		<if test="bus_number_size!=0">
 			and b.bus_number in
 			<foreach item="item" index="index" collection="bus_number"
 				open="(" separator="," close=")">
@@ -2007,7 +1999,7 @@
 		<if test="order_no!=''">
 			and o.order_no= #{order_no}
 		</if>
-		<if test="bus_number_size!=1">
+		<if test="bus_number_size!=0">
 			and b.bus_number in
 			<foreach item="item" index="index" collection="bus_number"
 				open="(" separator="," close=")">
@@ -3398,7 +3390,7 @@
 
 	<select id="caculateSalary" statementType="CALLABLE"
 		parameterType="Map" resultType="String">
-		call P_CACULATE_PIECE_SALLARY_V2(#{factory},#{workshop},#{workgroup},#{team},#{busNumber},#{orderId},#{startDate},#{endDate});
+		/** sql=select * from BMS_PIECE_PAY_CAL where factory=#{factory}*/call P_CACULATE_PIECE_SALLARY_V2(#{factory},#{workshop},#{workgroup},#{team},#{busNumber},#{orderId},#{startDate},#{endDate});
 	</select>
 
 	<!-- 计件工时 end -->

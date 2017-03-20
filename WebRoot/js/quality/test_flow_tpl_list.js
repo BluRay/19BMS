@@ -11,7 +11,11 @@ $(document).ready(function() {
 	})
 	$(".fa-files-o").live("click",function(e){
 		var headerId=$(e.target).parent("td").parent("tr").data("id");
-		window.open("testFlowTpl!showTplDetailCopyPage.action?tplHeader.id="+headerId,"_self");
+		var busType=$(e.target).parent("td").parent("tr").find("td").eq(0).html();
+		var workshop=$(e.target).parent("td").parent("tr").data("workshop");
+		window.open("testFlowTpl!showTplDetailCopyPage.action?tplHeader.id="+headerId+
+				"&tplHeader.busType="+busType+"&tplHeader.workshop="+workshop+
+				"&tplHeader.tplType=订单","_self");
 	});
 	$(".fa-pencil").live("click",function(e){
 		var headerId=$(e.target).parent("td").parent("tr").data("id");
@@ -67,9 +71,14 @@ function ajaxQuery(targetPage) {
 										var editTd = $("<td />")
 												.html(
 													"<i name='edit' class=\"fa fa-search\" rel=\"tooltip\" title='查看' style=\"cursor: pointer\"></i>&nbsp;&nbsp;<i name='edit' rel=\"tooltip\" title='编辑' class=\"fa fa-pencil\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;<i name='edit' rel=\"tooltip\" title='复制' class=\"fa fa-files-o\" style=\"cursor: pointer\"></i>");
+										if(value.order==null||value.order.trim().length==0){
+											editTd = $("<td />")
+											.html(
+												"<i name='edit' class=\"fa fa-search\" rel=\"tooltip\" title='查看' style=\"cursor: pointer\"></i>&nbsp;&nbsp;<i name='edit' rel=\"tooltip\" title='复制' class=\"fa fa-files-o\" style=\"cursor: pointer\"></i>");
+										}
 										editTd.appendTo(tr);
 										tr.data("id", value.id);
-										tr.data("parts", value.parts);
+										tr.data("workshop", value.workshop);
 										$("#tableResult tbody").append(tr);
 									});
 					$("#tableResult").show();

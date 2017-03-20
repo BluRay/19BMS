@@ -339,7 +339,7 @@ function getKeys(keyCode,input) {
 function getWorkshopOrg(factory) {
 	var result = [];
 	$.ajax({
-		url : "common!getWorkshopSelectOrg.action",
+		url : "common!getWorkshopSelect_Key.action",
 		dataType : "json",
 		data : {
 			"conditionMap.factory" : factory

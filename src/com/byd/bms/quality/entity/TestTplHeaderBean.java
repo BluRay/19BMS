@@ -16,6 +16,7 @@ public class TestTplHeaderBean {
 	private int editorId;
 	private String editor;
 	private String editDate;
+	private String tplType;
 	public int getId() {
 		return id;
 	}
@@ -106,5 +107,10 @@ public class TestTplHeaderBean {
 	public void setIsDraft(String isDraft) {
 		this.isDraft = isDraft;
 	}
-	
+	public String getTplType() {
+		return tplType;
+	}
+	public void setTplType(String tplType) {
+		this.tplType = tplType;
+	}
 }

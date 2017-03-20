@@ -636,7 +636,7 @@
 		from BMS_FACTORY_ORDER_DETAIL od
 		left join BMS_FACTORY_ORDER fo on fo.id=od.factory_order_id
 		left join BMS_ORDER o on fo.order_id=o.id
-		where o.productive_year = #{productive_year})
+		where o.productive_year = #{productive_year} and o.order_type='标准订单')
 	</select>
 	
 	<select id="getBusNumberByOrder" parameterType="int" resultType="Map">

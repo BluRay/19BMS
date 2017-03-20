@@ -1,5 +1,6 @@
 var detaillist;
 var cworkshop;
+var cworkshopId;
 $(document).ready(function(){
 	modalMove("#editModal");
 	$("#qc_tmpl_in").addClass("in");
@@ -82,6 +83,42 @@ $(document).ready(function(){
 			$("#processName_"+index_next).val(c_processName);
 		}		
 	});
+	//新增一行
+	$(".fa-plus").live("click",function(e){
+		var tds=$(e.target).parent("td").siblings();
+		var c_recordId=parseInt($(tds[1]).attr("recordId"));
+		var insertData={
+				parts:'',
+				partsId:'',
+				processNo:'',
+				processName:'',
+				sequence:detaillist[c_recordId].sequence+1,
+				tplRecordId:detaillist[c_recordId].tplRecordId,
+				workshop:cworkshop,
+				workshopId:cworkshopId
+		};
+		detaillist.splice(c_recordId+1,0,insertData);
+		$.each(detaillist,function(index,value){
+			if(index>c_recordId+1&&value.workshop.indexOf(cworkshop)>=0){
+				detaillist[index].sequence+=1;
+			}
+		});
+		generateTable(cworkshop);
+	})
+	//删除一行
+	$(".fa-times").live("click",function(e){
+		var tds=$(e.target).parent("td").siblings();
+		var c_recordId=parseInt($(tds[1]).attr("recordId"));
+		var c_sequence=parseInt($(tds[0]).html());
+		//alert(c_recordId);
+		$.each(detaillist,function(index,value){
+			if(value.sequence>c_sequence&&value.workshop.indexOf(cworkshop)>=0){
+				detaillist[index].sequence-=1;
+			}
+		});
+		detaillist.splice(c_recordId,1);
+		generateTable(cworkshop);
+	})
 /*	//编辑
 	$(".fa-pencil").live("click",function(e){
 		var tds=$(e.target).parent("td").siblings();
@@ -102,11 +139,11 @@ $(document).ready(function(){
 	$(".parts").live("click",function(e){
 		var c_elementId=$(this).attr("id");
 		getPartsSelect("#"+c_elementId,"",function(obj){
-			//alert(obj.id);
+			//alert(obj.name);
 			var tds=$(e.target).parent("td").siblings();
 			var c_recordId=parseInt($(tds[1]).attr("recordId"));
 			detaillist[c_recordId].partsId=parseInt(obj.id);
-			detaillist[c_recordId].parts=obj.parts;	
+			detaillist[c_recordId].parts=obj.name;	
 		});
 	});
 	//供应商输入事件绑定，更新detaillist对应数据
@@ -157,6 +194,18 @@ $(document).ready(function(){
 })
 function generateTable(workshop){
 		cworkshop=workshop;
+		if(cworkshop=="焊装"){
+			cworkshopId=25;
+		}
+		if(cworkshop=="涂装"){
+			cworkshopId=27;
+		}
+		if(cworkshop=="底盘"){
+			cworkshopId=28;
+		}
+		if(cworkshop=="总装"){
+			cworkshopId=29;
+		}
 		var tableId="";
 		if(workshop.indexOf("焊装")>=0){
 			tableId="#welding";
@@ -189,8 +238,13 @@ function generateTable(workshop){
 				.attr("partsId",value.partsId)
 				.html("<input style='border:0;width:100%;text-align:center'class='parts' value='"+value.parts+"' id='parts_"+index+"'>").appendTo(tr);
 				
-				$("<td />").html("<i name='edit' class=\"fa fa-arrow-up\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;"+
+			/*	$("<td />").html("<i name='edit' class=\"fa fa-arrow-up\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;"+
 						"<i name='edit' class=\"fa fa-arrow-down\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;")
+				.appendTo(tr);*/
+				$("<td />").html("<i name='edit' class=\"fa fa-arrow-up\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;"+
+						"<i name='edit' class=\"fa fa-arrow-down\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;"+
+						"<i name='edit' class=\"fa fa-plus\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;"+
+						"<i name='edit' class=\"fa fa-times\" style=\"cursor: pointer\"></i>")
 				.appendTo(tr);
 				tr.appendTo(tableId+" tbody");
 			}

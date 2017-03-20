@@ -101,6 +101,7 @@ public class TestTplAction extends BaseAction<Object> {
 		conditionMap.put("order", testTplHeader.getOrder());
 		conditionMap.put("config", testTplHeader.getConfig());
 		conditionMap.put("parts", testTplHeader.getParts());
+		conditionMap.put("tpl_type", testTplHeader.getTplType());
 		conditionMap.put("offset",
 				(pager.getCurPage() - 1) * pager.getPageSize());
 		conditionMap.put("pageSize", pager.getPageSize());
@@ -247,4 +248,13 @@ public class TestTplAction extends BaseAction<Object> {
 		}
 		return SUCCESS;
 	}
+	/**
+	 * 车型检验记录表模板首页
+	 * @return
+	 */
+	public String carType(){
+		
+		return "car_type";
+	}
+
 }

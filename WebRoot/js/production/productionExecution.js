@@ -62,6 +62,43 @@ $(document).ready(function () {
 		//alert("onlineflag = " + onlineflag + "\n offlineflag = " + offlineflag + 
 		//		"\n repair = " + repair + "\n ecn = " + ecn);
 		
+		
+		/**
+		 * 增加校验逻辑：总装下线校验VIN与车载终端是否绑定成功
+		 */
+		if(cur_key_name.indexOf("下线")>=0&&$('#exec_workshop :selected').text()=='总装'){
+			//alert(cur_key_name);
+			var conditions={};
+			conditions.vin=$('#vinText').data("vin");
+			conditions.flag=$('#clientFlag').val();
+			$("#gpsModal").modal("hide");
+			 $.ajax({
+				 type:"post",
+				 dataType:"json",
+				 async:false,
+				 url:"production!gpsValidate.action",
+				 data:{
+					 "conditions":JSON.stringify(conditions)
+				 },
+				 success: function(response){
+					 //alert(JSON.parse(response.data).rebackResut);
+					 var reback_data=JSON.parse(response.data);
+					 if(!reback_data.rebackResult){
+						 enterflag=false;						 
+						 alert(reback_data.rebackDesc);
+					 }
+					 
+				 },
+				 error:function(){
+					 enterflag=false;
+				 }
+			 });
+			 if(!enterflag){
+				 $("#btnSubmit").attr("disabled",false);
+				 return false;
+			 }
+		}
+		
 		if(cur_key_name.indexOf("下线")>=0&&$('#exec_workshop :selected').text()=='底盘'){
 			//alert(cur_key_name);
 			$.each(parts_list,function(i,parts){
@@ -72,6 +109,11 @@ $(document).ready(function () {
 					}
 				}
 			});
+			if(!enterflag){
+				alert(cur_key_name+"扫描前，请将零部件信息录入完整！");
+				$("#btnSubmit").attr("disabled",false);
+				 return false;
+			 }
 		}
 		
 		if(enterflag){
@@ -118,9 +160,6 @@ $(document).ready(function () {
 		            },
 		            error:function(){alertError();$("#partsListDiv").hide();}
 		        });
-		}else{
-			alert(cur_key_name+"扫描前，请将零部件信息录入完整！");
-			$("#btnSubmit").attr("disabled",false);
 		}
        
     }
@@ -145,7 +184,7 @@ $(document).ready(function () {
                     }else{
                     	
                     	var bus = response.data[0];
-                    	
+                    	$('#vinText').data("vin",bus.vin);
                     	bus_production_status=bus.production_status;
                     	orderType=bus.order_type;
                     	
@@ -213,7 +252,7 @@ $(document).ready(function () {
             	$("#partsListTable tbody").html("");
             	parts_list=response.data;
             	$.each(response.data,function(index,parts){
-            		if(parts.id !== 0){
+            		//if(parts.id !== 0){
             			if(parts.process_name==$("#exec_processname").val()&&parts.parts){
 	            			var tr=$("<tr />");
 	            			if(parts.parts==''||parts.parts==null){
@@ -237,7 +276,7 @@ $(document).ready(function () {
 	                		$("#partsListTable tbody").append(tr);
 	                		$(tr).data("parts_index",index);
 	            		}  	
-            		}
+            		//}
 
             	});
             }
@@ -299,7 +338,7 @@ $(document).ready(function () {
         //if vinText disable,stop propogation
         if($(this).attr("disabled") == "disabled")
             return false;
-        if (event.keyCode == "13"){
+        if (event.keyCode == "13"){	
             if(jQuery.trim($('#vinText').val()) != ""){
                 ajaxValidate();
                 ajaxGetPartsList();
@@ -322,9 +361,19 @@ $(document).ready(function () {
     $("#btnSubmit").click(function() {
         if(!($("#btnSubmit").hasClass("disabled"))){
             $("#btnSubmit").attr("disabled","disabled");
-            ajaxEnter();
+            if(cur_key_name.indexOf("下线")>=0&&$('#exec_workshop :selected').text()=='总装'){
+        		$("#clientVin").val($('#vinText').data("vin"));
+        		$("#gpsModal").modal("show");
+        	}else{
+        		ajaxEnter();
+        	}            
+            //$("#gpsModal").modal("hide");
         }
         return false;
+    });
+    
+    $("#clientValidate").click(function(){
+    	ajaxEnter();
     });
     
     $("#reset").click(function() {

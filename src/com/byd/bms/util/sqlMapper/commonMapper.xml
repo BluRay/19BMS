@@ -169,14 +169,14 @@
 	</select>
 	<select id="getProcessMonitorSelect" parameterType="int"
 		resultType="Map">
-		select id as ID,process_code as NAME,process_name as
-		PROCESS_NAME from BMS_BASE_PROCESS where monitory_point_flag = '1' and
+		select id,process_code as name,process_name  
+		from BMS_BASE_PROCESS where monitory_point_flag = '1' and
 		line_id=#{lineId} and delete_flag = '0'
 	</select>
 	<select id="getProcessExceptMonitorSelect" parameterType="int"
 		resultType="Map">
-		select id as ID,process_code as NAME,process_name as
-		PROCESS_NAME from BMS_BASE_PROCESS where
+		select id,process_code as name,process_name  
+		from BMS_BASE_PROCESS where
 		line_id=#{lineId} and
 		delete_flag = '0'
 	</select>
@@ -208,7 +208,7 @@
 	<select id="getWorkshopSelect_Key" parameterType="String"
 		resultType="Map">
 		select id,key_name as name from BMS_BASE_KEY where
-		key_code='WORKSHOP'
+		key_code='WORKSHOP' order by value
 	</select>
 	<select id="getEcnTypeSelect_Key" parameterType="String"
 		resultType="Map">
@@ -517,7 +517,8 @@
 		left join BMS_BASE_WORKSHOP w on w.id=h.workshop_id
 		where t.result_judge ='不合格' and substring(h.edit_date,1,10)=#{curDate}
 		and h.factory_id=#{factoryId}
-		group by h.workshop_id
+		<!--group by h.workshop_id-->
+		group by substring(h.edit_date,1,10),w.workshop_name,h.factory_id
 	</select>
 	<!-- 查询首页一次校检合格率 -->
 	<select id="queryIndexPassRateData" parameterType="Map"
@@ -531,7 +532,8 @@
 		w.id=h.workshop_id
 		where h.factory_id=#{factoryId} and
 		substring(h.edit_date,1,10) =#{curDate}
-		group by h.workshop_id
+		<!-- group by h.workshop_id  -->
+		group by h.factory_id,w.workshop_name,substring(h.edit_date,1,10)
 	</select>
 	<!-- 生产结存查询 -->
 	<select id="getProductionSearch" parameterType="Map" resultType="Map">
@@ -805,7 +807,7 @@
 			call P_QueryOrgTreeList('3','hr!attendance.action','1,2,3,4,5,6','0,1') ORDER 
 			BY s.id, s.level, s.sort_number ASC -->
 
-		call P_QueryOrgTreeList(#{userId},#{url},#{orgType},#{orgKind})
+		/**mycat:sql=select 1 from bms_hr_staff_hours where factory='长沙工厂',list_fields='id,parent_id,org_type,org_kind,level,name,name_en,org_code,sort_number,manager,responsibilities,is_customer'*/call P_QueryOrgTreeList(#{userId},#{url},#{orgType},#{orgKind});
 	</select>
 
 	<select id="getStaffNameByNumber" parameterType="String"

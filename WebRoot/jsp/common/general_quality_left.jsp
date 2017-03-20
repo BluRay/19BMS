@@ -48,14 +48,23 @@
 				class="pull-right fa fa-angle-down fa-lg "></span>
 		</a>
 			<ul id="qc_tmpl_in" class="collapse">
+				<li><a href="testTpl!carType.action"> <i
+						class="fa fa-pencil-square-o"></i><span class="text">车型检验记录表维护</span>
+				</a></li>
 				<li><a href="testTpl!index.action"> <i
-						class="fa fa-pencil-square-o"></i><span class="text">检验记录表维护</span>
+						class="fa fa-pencil-square-o"></i><span class="text">订单检验记录表维护</span>
+				</a></li>
+				<li><a href="testFlowTpl!carType.action"> <i
+						class="fa fa-pencil"></i><span class="text">车型检验流程卡维护</span>
 				</a></li>
 				<li><a href="testFlowTpl!index.action"> <i
-						class="fa fa-pencil"></i><span class="text">检验流程卡维护</span>
+						class="fa fa-pencil"></i><span class="text">订单检验流程卡维护</span>
+				</a></li>
+				<li><a href="trackTpl!carType.action"> <i
+						class="fa fa-retweet"></i><span class="text">车型产品追踪卡维护</span>
 				</a></li>
 				<li><a href="trackTpl!index.action"> <i
-						class="fa fa-retweet"></i><span class="text">产品追踪卡维护</span>
+						class="fa fa-retweet"></i><span class="text">订单产品追踪卡维护</span>
 				</a></li>
 				<li><a href="ocTpl!index.action"> <i class="fa fa-road"></i><span
 						class="text">订单配置与一致性维护</span>

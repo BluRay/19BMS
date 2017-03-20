@@ -170,6 +170,37 @@
 			    </div>
 			</div>
 			<!-- new order End -->
+			
+			<div class="modal" id="gpsModal" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;">
+			    <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			        <h3>校验</h3>
+			    </div>
+			    <div class="modal-body">
+			        <form id="  " class="form-horizontal">
+			            <div class="control-group">
+			                <label class="control-label" for="vin">*&nbsp;vin号</label>
+			                <div class="controls">
+			                    <input type="text" id="clientVin" placeholder="vin号..." class="input-medium" disabled/>
+			                </div>
+			            </div>
+			            <div class="control-group">
+			                <label class="control-label" for="left_motor_number">*&nbsp;车载版本</label>
+			                <div class="controls">
+			                    <select id="clientFlag">
+			                    	<option value='1'>1代</option>
+			                    	<option value='2'>2代</option>
+			                    </select>
+			                </div>
+			            </div>
+			        </form>
+			    </div>
+			    <div class="modal-footer">
+			        <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+			        <!-- <button class="btn btn-success" id="btnTest">TEST</button> -->
+			        <button class="btn btn-primary" id="clientValidate">确认</button>
+			    </div>
+			</div>
 			</div>
 		</div>
 	</div>

@@ -14,9 +14,9 @@
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
-<script type="text/javascript" src="js/quality/track_tpl_list.js"></script>
+<script type="text/javascript" src="js/quality/test_tpl_list_car.js"></script>
 </head>
-<body>
+<body >
 	<%@ include file="/jsp/common/head.jsp"%>
 	<%@ include file="../common/general_quality_left.jsp"%>
 	<div class="content-wrapper ">
@@ -24,16 +24,14 @@
 		
 		<div id="bodyright" class="offset2">
 			<!-- Main -->
-			<legend style="margin: 0 auto;">订单产品追踪卡模板</legend>
+			<legend style="margin: 0 auto;">车型检验记录表模板</legend>
 			<div style=" margin: 0 auto;">
 				<br />
 				<form id="form" class="well form-search">
 					<table>
 						<tr>
 							<td>车型</td>
-							<td>订单</td>
-							<td>配置</td>
-							<td>车间</td>
+							<td>零部件</td>
 							<td></td>
 						</tr>
 						<tr>
@@ -41,14 +39,7 @@
 								class="input-medium carType">
 							</select></td>
 							<td><input type="text" class="input-medium revise"
-								id="input_order" /></td>
-							<td><select name="" id="input_config"
-								class="input-medium carType">
-							</select></td>
-							<td>
-								<select name="" id="input_workshop" class="input-medium carType">
-								</select>
-							</td>
+								id="input_parts" /></td>
 							<td><input type="button" class="btn btn-primary"
 								id="btnQuery" value="查询" style="margin-left: 2px;"></input></td>							
 						</tr>
@@ -60,9 +51,7 @@
 					<thead>
 						<tr>
 							<th>车型</th>
-							<th>订单</th>
-							<th>配置</th>
-							<th>车间</th>
+							<th>零部件</th>
 							<th>版本号</th>
 							<th>备注</th>
 							<th>维护人</th>
@@ -91,6 +80,42 @@
 				</div>
 			</div>
 
+		</div>
+		<div class="modal" id="copyModal" tabindex="-1" role="dialog"
+			aria-hidden="true" style="display: none;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">×</button>
+				<h3>模板复制</h3>
+			</div>
+			<div class="modal-body">
+				<form id=" " class="form-horizontal">
+					<div class="control-group">
+						<label class="control-label" for="">*&nbsp;车型</label>
+						<div class="controls">
+							<select class="input-medium" id="new_busType" >
+							</select>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="">*&nbsp;部件</label>
+						<div class="controls">
+							<select class="input-medium" id="new_parts" >
+							</select>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="">*&nbsp;备注</label>
+						<div class="controls">
+							<textarea class="input-xlarge" id="new_memo" rows="2"></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+				<button class="btn btn-primary" id="btnAddConfirm">保存</button>
+			</div>
 		</div>
 	</div>
 </div>

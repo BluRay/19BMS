@@ -27,8 +27,8 @@
 					<table>
 						<tr>
 							<td>车型</td>
-							<td>订单</td>
-							<td>配置</td>
+							<td id='th_order'>订单</td>
+							<td id='th_config'>配置</td>
 							<td>备注</td>
 							<td></td>
 						</tr>

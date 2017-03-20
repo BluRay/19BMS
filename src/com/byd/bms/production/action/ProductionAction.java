@@ -5,8 +5,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -321,7 +329,7 @@ public class ProductionAction extends BaseAction<Object>{
 		
 		Map<String,Object> queryMap=new HashMap<String,Object>();
 		String[] busNumberList = bus_number.split("\n");
-		int bus_number_size = 1;
+		int bus_number_size = busNumberList.length;
 		if (bus_number.equals(""))bus_number_size=0;
 		logger.info("-->bus_number = " + bus_number);
 		logger.info("-->bus_number_size = " + bus_number_size);
@@ -2795,4 +2803,122 @@ public class ProductionAction extends BaseAction<Object>{
 		return SUCCESS;
 	}
 	
+	/**
+	 * added by xjw 2017/03/06 
+	 * 校验VIN与对应的车载终端是否绑定成功
+	 * @return
+	 */
+	public String gpsValidate(){
+		result=new HashMap<String, Object>();
+		JSONObject jo = JSONObject.fromObject(conditions);
+		Map<String, Object> conditionMap = new HashMap<String, Object>();	
+		for (Iterator it = jo.keys(); it.hasNext();) {
+			String key = (String) it.next();
+			conditionMap.put(key, jo.get(key));
+		}
+		String jsonstr=Util.post("http://10.9.32.67:8082/i.dbhttpservice_bms/auto/validateVin",
+		        JSONObject.fromObject(conditionMap).toString());
+		result.put("data", jsonstr);
+		
+		return SUCCESS;
+	}
+	
+	/**
+	 * added by xjw 2017/03/10
+	 * 合格证信息传输到合格证系统打印
+	 * @return
+	 */
+	public String certificatePrint(){
+		String JDriver="com.microsoft.sqlserver.jdbc.SQLServerDriver";//SQL数据库引擎
+		String connectDB="jdbc:sqlserver://10.3.12.134;DatabaseName=HGZ_DATABASE";//数据源
+		String user="TEST";
+		String password="byd123456";
+		JSONArray jsa=JSONArray.fromObject(conditions);
+		List<Map<String,Object>> buslist=JSONArray.toList(jsa,Map.class);
+		List<Map<String,Object>> updateList=new ArrayList<Map<String,Object>>();
+		List<Map<String,Object>> insertList=new ArrayList<Map<String,Object>>();
+		Connection con=null;
+		try
+		{
+			Class.forName(JDriver);//加载数据库引擎，返回给定字符串名的类
+			con=DriverManager.getConnection(connectDB,user,password);//连接数据库对象		
+			con.setAutoCommit(false);
+			System.out.println("连接数据库成功");
+			Statement stmt=con.createStatement();//创建SQL命令对象
+			
+			for(Map<String,Object> bus:buslist){
+				String sql_q="select VIN from PRINT_TABLE where VIN='"+bus.get("vin")+"'";
+				ResultSet rs=stmt.executeQuery(sql_q);
+				if(rs.next()){
+					updateList.add(bus);
+				}else{
+					insertList.add(bus);
+				}
+			}
+			
+			for(Map<String,Object>bus:updateList){
+				StringBuffer sb=new StringBuffer("update PRINT_TABLE set ");
+				sb.append("CLXH='").append(bus.get("vehicle_model")).append("',");
+				sb.append("FDJH='").append(bus.get("motor_model")).append(" ")
+				.append(bus.get("motor_number")).append("',");
+				sb.append("Leavedate='").append(bus.get("productive_date")).append("',");
+				sb.append("CLYS='").append(bus.get("bus_color")).append("',");
+				sb.append("Ltgg='").append(bus.get("tire_type")).append("',");
+				sb.append("NOTE='").append(bus.get("note")).append("',");
+				sb.append("SCD='").append(bus.get("scd_zc")).append("'");
+				sb.append(" where VIN='").append(bus.get("vin")).append("'").append(" and DATATYPE='1'");
+				stmt.addBatch(sb.toString());
+				
+				StringBuffer sb1=new StringBuffer("update PRINT_TABLE set ");
+				sb1.append("CLXH='").append(bus.get("chassis_model")).append("',");
+				sb1.append("FDJH='").append(bus.get("motor_model")).append(" ")
+				.append(bus.get("motor_number")).append("',");
+				sb1.append("Leavedate='").append(bus.get("dp_production_date")).append("',");
+				sb1.append("CLYS='").append(bus.get("bus_color")).append("',");
+				sb1.append("Ltgg='").append(bus.get("tire_type")).append("',");
+				sb1.append("NOTE='").append(bus.get("note")).append("',");
+				sb1.append("SCD='").append(bus.get("scd_dp")).append("'");
+				sb1.append(" where VIN='").append(bus.get("vin")).append("'").append(" and DATATYPE='0'");;
+				stmt.addBatch(sb1.toString());
+			}
+			
+			for(Map<String,Object>bus:insertList){
+				StringBuffer sb=new StringBuffer("insert into PRINT_TABLE (VIN,CLXH,FDJH,Leavedate,CLYS,Ltgg,NOTE,SCD,DATATYPE) values(");
+				sb.append("'").append(bus.get("vin")).append("',");
+				sb.append("'").append(bus.get("vehicle_model")).append("',");
+				sb.append("'").append(bus.get("motor_model")).append(" ")
+				.append(bus.get("motor_number")).append("',");
+				sb.append("'").append(bus.get("productive_date")).append("',");
+				sb.append("'").append(bus.get("bus_color")).append("',");
+				sb.append("'").append(bus.get("tire_type")).append("',");
+				sb.append("'").append(bus.get("note")).append("',");
+				sb.append("'").append(bus.get("scd_zc")).append("',");
+				sb.append("'1')");
+				stmt.addBatch(sb.toString());
+				
+				StringBuffer sb1=new StringBuffer("insert into PRINT_TABLE (VIN,CLXH,FDJH,Leavedate,CLYS,Ltgg,NOTE,SCD,DATATYPE) values(");
+				sb1.append("'").append(bus.get("vin")).append("',");
+				sb1.append("'").append(bus.get("chassis_model")).append("',");
+				sb1.append("'").append(bus.get("motor_model")).append(" ")
+				.append(bus.get("motor_number")).append("',");
+				sb1.append("'").append(bus.get("dp_production_date")).append("',");
+				sb1.append("'").append(bus.get("bus_color")).append("',");
+				sb1.append("'").append(bus.get("tire_type")).append("',");
+				sb1.append("'").append(bus.get("note")).append("',");
+				sb1.append("'").append(bus.get("scd_dp")).append("',");
+				sb1.append("'0')");
+				stmt.addBatch(sb1.toString());
+			}
+			
+			stmt.executeBatch();
+			stmt.close();
+			con.commit();
+			con.close();
+		}catch(Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+		return SUCCESS;
+	}
+
 }

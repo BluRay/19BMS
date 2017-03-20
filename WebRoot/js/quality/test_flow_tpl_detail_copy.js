@@ -1,6 +1,9 @@
 var detaillist;
 var maxProcessNo=0;
 var maxItemNo=0;
+var workshop='';
+var busType='';
+var tplType='';
 $(document).ready(
 		function() {
 			initPage();
@@ -172,7 +175,11 @@ $(document).ready(
 						success: function (response) {	
 							alert(response.message);
 								if(response.success){
-									window.open("testFlowTpl!index.action","_self");
+									if(tplType=='车型'){
+										window.open("testFlowTpl!carType.action","_self");
+									}else
+										window.open("testFlowTpl!index.action","_self");
+									
 								}
 						}
 					})
@@ -329,12 +336,26 @@ $(document).ready(
 			}
 			// 页面初始化
 			function initPage() {
+				busType=getQueryString("tplHeader.busType")||"";
+				tplType=getQueryString("tplHeader.tplType")||"";
+				workshop=getQueryString("tplHeader.workshop")||"";
 				getDetail();
-				getBusTypeSelect("#input_busType","","");
+				getBusTypeSelect("#input_busType",busType,"");
 				//getOrderConfigSelect("#input_config","");
 				//getOrderSelect("#input_order","");
-				getWorkshopSelect_Key("#input_workshop","");
+				getWorkshopSelect_Key("#input_workshop",workshop);
 				//modalMove("#editModal");
+				if(tplType=='车型'){
+					$("#input_config").parent("td").hide();
+					$("#input_order").parent("td").hide();
+					$("#th_order").hide();
+					$("#th_config").hide();
+				}else{
+					$("#input_busType").attr("disabled",true);
+					getOrderSelect("#input_order",$("#input_busType").val(),"");
+					$("#input_workshop").attr("disabled",true);
+				}
+				
 				$("#qc_tmpl_in").addClass("in");
 			}
 		})

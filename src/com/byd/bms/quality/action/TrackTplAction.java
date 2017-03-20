@@ -79,6 +79,7 @@ public class TrackTplAction extends BaseAction<Object> {
 		conditionMap.put("order", tplHeader.getOrder());
 		conditionMap.put("config", tplHeader.getConfig());
 		conditionMap.put("workshop", tplHeader.getWorkshop());
+		conditionMap.put("tpl_type", tplHeader.getTplType());
 		conditionMap.put("offset",(pager.getCurPage() - 1) * pager.getPageSize());
 		conditionMap.put("pageSize", pager.getPageSize());
 		result.put("dataList", qualityDao.getTrackTplHeaderList(conditionMap));
@@ -120,13 +121,16 @@ public class TrackTplAction extends BaseAction<Object> {
 		result = new HashMap<String, Object>();
 		JSONArray jsonArray=JSONArray.fromObject(detailList);	
 		tplDetailList=new ArrayList<TrackTplDetailBean>();
+		Map<String,Object> conditionMap=new HashMap<String,Object>();
 		for(int i=0;i<jsonArray.size();i++){
 			 JSONObject object = (JSONObject)jsonArray.get(i);
 			 TrackTplDetailBean detail=(TrackTplDetailBean) JSONObject.toBean(object, TrackTplDetailBean.class);
 			 tplDetailList.add(detail);
 		}
-		
-		int i=qualityDao.updateTrackTplDetail(tplDetailList);
+		conditionMap.put("tplRecordId", tplDetailList.get(0).getTplRecordId());
+		int i=qualityDao.deleteTrackTplDetail(conditionMap);
+		i=qualityDao.insertTrackTplDetail(tplDetailList);
+		//int i=qualityDao.updateTrackTplDetail(tplDetailList);
 		if(i>0){
 			result.put("success", true);
 			result.put("message", "保存成功");
@@ -180,5 +184,13 @@ public class TrackTplAction extends BaseAction<Object> {
 		}
 		
 		return SUCCESS;
+	}
+	/**
+	 * 车型产品追踪卡模板首页
+	 * @return
+	 */
+	public String carType(){
+		
+		return "car_type";
 	}
 }

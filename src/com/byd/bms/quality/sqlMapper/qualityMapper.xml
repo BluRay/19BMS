@@ -333,6 +333,9 @@
 		<if test="parts!=null and parts!=''">
 			and p.parts_name=#{parts}
 		</if>
+		<if test="tpl_type=='车型'">
+			and (t.order_id is null or t.order_id=0)
+		</if>
 		order by t.version desc,t.order_config_id desc
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
@@ -403,6 +406,9 @@
 		</if>
 		<if test="parts!=null and parts!=''">
 			and p.parts_name=#{parts}
+		</if>
+		<if test="tpl_type=='车型'">
+			and (t.order_id is null or t.order_id=0) 
 		</if>
 	</select>
 	<select id="getTestTplDetailList" parameterType="int"
@@ -509,6 +515,9 @@
 		<if test="workshopId!=null and workshopId!=0">
 			and k.id=#{workshopId}
 		</if>
+		<if test="tpl_type=='车型'">
+			and (t.order_id is null or t.order_id=0)
+		</if>
 		order by t.version desc
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
@@ -537,6 +546,9 @@
 		</if>
 		<if test="workshopId!=null and workshopId!=0">
 			and k.id=#{workshopId}
+		</if>
+		<if test="tpl_type=='车型'">
+			and (t.order_id is null or t.order_id=0)
 		</if>
 	</select>
 	<select id="getTestFlowTplDetailList" parameterType="int"
@@ -649,6 +661,9 @@
 		<if test="workshop !=null and  workshop !=''">
 			and find_in_set(k.key_name,#{workshop})>0
 		</if>
+		<if test="tpl_type=='车型'">
+			and (t.order_id is null or t.order_id=0)
+		</if>
 		order by t.creat_date desc
 		<if test="offset!=null">
 			LIMIT #{offset} ,#{pageSize}
@@ -683,6 +698,9 @@
 		<if test="workshop !=null and  workshop !=''">
 			and find_in_set(k.key_name,#{workshop})>0
 		</if>
+		<if test="tpl_type=='车型'">
+			and (t.order_id is null or t.order_id=0)
+		</if>
 	</select>
 	<select id="getTrackTplDetailList" parameterType="Map"
 		resultMap="trackTplDetailMap">
@@ -702,6 +720,9 @@
 		</if>
 		order by t.workshop,t.sequence
 	</select>
+	<update id="deleteTrackTplDetail" parameterType="Map">
+		delete from BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS where template_tracking_card_id=#{tplRecordId}
+	</update>
 	<update id="updateTrackTplDetail" parameterType="java.util.List">
 		<foreach collection="list" item="detail" index="index"
 			separator=";">

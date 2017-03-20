@@ -14,6 +14,7 @@ public class TrackTplHeaderBean {
 	private int editorId;
 	private String editor;
 	private String editDate;
+	private String tplType;
 	public int getId() {
 		return id;
 	}
@@ -91,6 +92,12 @@ public class TrackTplHeaderBean {
 	}
 	public void setEditDate(String editDate) {
 		this.editDate = editDate;
+	}
+	public String getTplType() {
+		return tplType;
+	}
+	public void setTplType(String tplType) {
+		this.tplType = tplType;
 	}
 	
 }

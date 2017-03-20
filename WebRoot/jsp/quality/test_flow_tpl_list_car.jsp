@@ -14,25 +14,25 @@
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
-<script type="text/javascript" src="js/quality/track_tpl_list.js"></script>
+<script type="text/javascript" src="js/quality/test_flow_tpl_list_car.js"></script>
 </head>
-<body>
+<body >
 	<%@ include file="/jsp/common/head.jsp"%>
-	<%@ include file="../common/general_quality_left.jsp"%>
+	<%@ include file="/jsp/common/general_quality_left.jsp"%>
 	<div class="content-wrapper ">
 	<div id="bodymain" class="offhead">
 		
 		<div id="bodyright" class="offset2">
 			<!-- Main -->
-			<legend style="margin: 0 auto;">订单产品追踪卡模板</legend>
+			<legend style="margin: 0 auto;">车型检验流程卡模板</legend>
 			<div style=" margin: 0 auto;">
 				<br />
 				<form id="form" class="well form-search">
 					<table>
 						<tr>
 							<td>车型</td>
-							<td>订单</td>
-							<td>配置</td>
+							<!-- <td>订单</td>
+							<td>配置</td> -->
 							<td>车间</td>
 							<td></td>
 						</tr>
@@ -40,15 +40,14 @@
 							<td><select name="" id="input_busType"
 								class="input-medium carType">
 							</select></td>
-							<td><input type="text" class="input-medium revise"
+							<%-- <td><input type="text" class="input-medium revise"
 								id="input_order" /></td>
 							<td><select name="" id="input_config"
 								class="input-medium carType">
+							</select></td> --%>
+							<td><select name="" id="input_workshop"
+								class="input-medium carType">
 							</select></td>
-							<td>
-								<select name="" id="input_workshop" class="input-medium carType">
-								</select>
-							</td>
 							<td><input type="button" class="btn btn-primary"
 								id="btnQuery" value="查询" style="margin-left: 2px;"></input></td>							
 						</tr>
@@ -60,8 +59,8 @@
 					<thead>
 						<tr>
 							<th>车型</th>
-							<th>订单</th>
-							<th>配置</th>
+							<!-- <th>订单</th>
+							<th>配置</th> -->
 							<th>车间</th>
 							<th>版本号</th>
 							<th>备注</th>

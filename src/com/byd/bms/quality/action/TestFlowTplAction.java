@@ -105,6 +105,7 @@ public class TestFlowTplAction extends BaseAction<Object>{
 		conditionMap.put("order", tplHeader.getOrder());
 		conditionMap.put("config", tplHeader.getConfig());
 		conditionMap.put("workshopId", tplHeader.getWorkshopId());
+		conditionMap.put("tpl_type", tplHeader.getTplType());
 		conditionMap.put("offset",(pager.getCurPage() - 1) * pager.getPageSize());
 		conditionMap.put("pageSize", pager.getPageSize());
 		result.put("dataList", qualityDao.getTestFlowTplHeaderList(conditionMap));
@@ -269,5 +270,12 @@ public class TestFlowTplAction extends BaseAction<Object>{
 			result.put("message", "保存失败");
 		}
 		return SUCCESS;
+	}
+	/**
+	 * 车型检验流程卡模板首页
+	 * @return
+	 */
+	public String carType(){
+		return "car_type";
 	}
 }

@@ -805,7 +805,7 @@
 	LEFT JOIN BMS_ORDER o on p.order_id=o.id
 	LEFT JOIN BMS_BASE_BUS_TYPE t on o.bus_type_id=t.id 
 	WHERE work_date >= #{date_start} AND  work_date <= #{date_end} and p.status in('1','3')
-	AND factory = #{factory}
+	AND p.factory = #{factory}
 	]]>
 	<if test="list.size !=0">
 		AND bus_number IN
