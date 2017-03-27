@@ -86,6 +86,9 @@ function ajaxEditConfirm(){
 			"new_bus_number":$("#edit_bus_number").val(),
 			"new_dp_production_date":$("#edit_dp_production_date").val(),
 			"new_zc_production_date":$("#edit_zc_production_date").val(),
+			"new_dp_zzd":$("#edit_dp_zzd").val(),
+			"new_zc_zzd":$("#edit_zc_zzd").val(),
+			"new_note":$("#edit_note").val()
 			},
 		async: false,
 		error: function () {alertError();},
@@ -101,7 +104,7 @@ function ajaxEditConfirm(){
 	})
 }
 
-function ajaxEdit(factory_id,bus_number,order_no,dp_production_date,zc_production_date,dpgg_date,zcgg_date,ccczs_date){
+function ajaxEdit(factory_id,bus_number,order_no,dp_production_date,zc_production_date,dpgg_date,zcgg_date,ccczs_date,dp_zzd,zc_zzd,note){
 	//alert("-->" + bus_number + order_no);
 	$("#edit_factory").val(factory_id);
 	$("#edit_order_no").val(order_no);
@@ -111,6 +114,9 @@ function ajaxEdit(factory_id,bus_number,order_no,dp_production_date,zc_productio
 	$("#edit_dpgg_date").val(dpgg_date=="undefined"?"":dpgg_date);
 	$("#edit_zcgg_date").val(zcgg_date=="undefined"?"":zcgg_date);
 	$("#edit_ccczs_date").val(ccczs_date=="undefined"?"":ccczs_date);
+	$("#edit_dp_zzd").val(dp_zzd=="undefined"?"":dp_zzd);
+	$("#edit_zc_zzd").val(zc_zzd=="undefined"?"":zc_zzd);
+	$("#edit_note").val(note=="undefined"?"":note);
 	$("#editModal").modal("show");
 }
 
@@ -202,7 +208,16 @@ function ajaxAdd (argument) {
 		if(max_ccczs_date!=""&&compareTime(max_ccczs_date,$("#new_zc_production_date").val())>=0){
 			validmsg+="整车生产日期必须在CCC证书签发日期之后！\n";
 		}
-		
+		//alert($("#new_dp_zzd").val());
+		var dp_zzd=$("#new_dp_zzd").val();
+		var zc_zzd=$("#new_zc_zzd").val();
+		//alert(zc_zzd);
+		if(dp_zzd.trim().length==0){
+			validmsg+="请输入底盘资质地！\n";
+		}
+		if(zc_zzd.trim().length==0){
+			validmsg+="请输入整车资质地！\n";
+		}
 		if(validmsg!=""){
 			alert(validmsg);
 			return false;
@@ -219,6 +234,9 @@ function ajaxAdd (argument) {
 				"new_bus_number":$("#new_bus_number").val(),
 				"new_dp_production_date":$("#new_dp_production_date").val(),
 				"new_zc_production_date":$("#new_zc_production_date").val(),
+				"new_dp_zzd":$("#new_dp_zzd").val(),
+				"new_zc_zzd":$("#new_zc_zzd").val(),
+				"new_note":$("#new_note").val()
 			},
 			async: false,
 		    success:function (response) {
@@ -260,7 +278,14 @@ function ajaxQuery(targetPage){
     			$("<td style=\"text-align:center;padding:3px\" />").html(value.bus_number).appendTo(tr);
     			$("<td style=\"text-align:center;padding:3px\" />").html(value.dp_production_date).appendTo(tr);
     			$("<td style=\"text-align:center;padding:3px\" />").html(value.zc_production_date).appendTo(tr);
-    			$("<td style=\"text-align:center;padding:3px\" />").html("<button onclick = 'ajaxEdit(\"" + value.factory_id + "\",\"" + value.bus_number + "\",\"" + value.order_no.split("\n")[0] + "\",\"" + value.dp_production_date + "\",\"" + value.zc_production_date + "\",\"" + value.dpgg_date +"\",\"" + value.zcgg_date +"\",\"" + value.ccczs_date + "\");' class='btn-link'>编辑</>").appendTo(tr);
+    			$("<td style=\"text-align:center;padding:3px\" />").html(value.dp_zzd).appendTo(tr);
+    			$("<td style=\"text-align:center;padding:3px\" />").html(value.zc_zzd).appendTo(tr);
+    			$("<td style=\"text-align:center;padding:3px\" />").html(value.hgz_note).appendTo(tr);
+    			$("<td style=\"text-align:center;padding:3px\" />").html("<button onclick = 'ajaxEdit(\"" + value.factory_id + "\",\"" 
+    					+ value.bus_number + "\",\"" + value.order_no.split("\n")[0] + "\",\"" 
+    					+ value.dp_production_date + "\",\"" + value.zc_production_date + "\",\"" 
+    					+ value.dpgg_date +"\",\"" + value.zcgg_date +"\",\"" + value.ccczs_date+"\",\"" 
+    					+ value.dp_zzd+"\",\""+value.zc_zzd+"\",\""+value.hgz_note+"\");' class='btn-link'>编辑</>").appendTo(tr);
     			$("#tableProductionDate tbody").append(tr);	    			
     		});
     		$("#total").html(response.pager.totalCount);

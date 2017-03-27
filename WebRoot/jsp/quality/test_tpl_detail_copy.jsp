@@ -3,6 +3,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<%long _systime= new java.util.Date().getTime();%>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
 <meta http-equiv="expires" content="0" />
@@ -16,7 +17,7 @@
 <script type="text/javascript" src="js/json2.js"></script>
 <script type="text/javascript" src="js/head.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
-<script type="text/javascript" src="js/quality/test_tpl_detail_copy.js"></script>
+<script type="text/javascript" src="js/quality/test_tpl_detail_copy.js?timestamp=<%=_systime%>"></script>
 </head>
 <body >
 	<%@ include file="/jsp/common/head.jsp"%>

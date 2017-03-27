@@ -16,6 +16,11 @@
 	<script type="text/javascript" src="js/datePicker/WdatePicker.js"></script>
 	<script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/production/productionDate.js"></script>
+	<style type="text/css" media="screen">
+	.form-horizontal .control-group {
+    	margin-bottom: 10px;  
+	}
+	</style>
 </head>
 <body>
 	<%@ include file="../common/head.jsp"%>
@@ -60,6 +65,9 @@
 						<th style="text-align:center;">车号</th>
 						<th style="text-align:center;">底盘生产日期</th>
 						<th style="text-align:center;">整车生产日期</th>
+						<th style="text-align:center;">底盘资质地</th>
+						<th style="text-align:center;">整车资质地</th>
+						<th style="text-align:center;">合格证备注</th>
 						<th style="text-align:center;">操作</th>
 					</tr>
 				</thead>
@@ -90,7 +98,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3>新增</h3>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style='max-height: 425px;'>
         <form id="  " class="form-horizontal">
             <div class="control-group">
                 <label class="control-label" for="newFactory">*&nbsp;生产工厂</label>
@@ -103,18 +111,14 @@
                 <label class="control-label" for="">*&nbsp;订单编号</label>
                 <div class="controls">
                     <input type="text" id="new_order_no" placeholder="订单编号..." class="input-medium" />
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="newOrderCode">*&nbsp;全部</label>
-                <div class="controls">
-					<input style="height: 30px;" type="checkbox" class="input-medium revise"  id="new_all_bus" />
+                	全部
+                	<input style="height: 30px;" type="checkbox" class="input-medium revise"  id="new_all_bus" />
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="newOrderCode">*&nbsp;车号</label>
                 <div class="controls">
-					<textarea style="width: 180px;" class="input-xlarge" onkeyup="this.value = this.value.slice(0, 1000)" id="new_bus_number" rows="3"></textarea>
+					<textarea style="width: 220px;" class="input-xlarge" onkeyup="this.value = this.value.slice(0, 1000)" id="new_bus_number" rows="2"></textarea>
 					每行一个车号
                 </div>
             </div>
@@ -128,11 +132,41 @@
                 </div>
             </div>
             <div class="control-group">
+                <label class="control-label" for="newOrderCode">*&nbsp;底盘资质地</label>
+                <div class="controls">
+					<!-- <input type="text" id="new_dp_zzd" class="input-medium" /> -->
+					<select id="new_dp_zzd" class="input-medium" autocomplete="off">
+						<option value='无'>无</option>
+						<option value='比亚迪深圳' selected="selected">比亚迪深圳</option>
+						<option value='比亚迪西安'>比亚迪西安</option>
+						<option value='比亚迪长沙'>比亚迪长沙</option>						
+					</select>
+                </div>
+            </div>
+            <div class="control-group">
                 <label class="control-label" for="newOrderCode">*&nbsp;整车生产日期</label>
                 <div class="controls">
-					<input type="text" id="new_zc_production_date"
-									class="input-medium"
+					<input type="text" id="new_zc_production_date" class="input-medium"
 									onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" />
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" for="newOrderCode">*&nbsp;整车资质地</label>
+                <div class="controls">
+					<!-- <input type="text" id="new_zc_zzd" class="input-medium" /> -->
+					<select id="new_zc_zzd" class="input-medium" >
+						<option value='比亚迪深圳'>比亚迪深圳</option>
+						<option value='比亚迪西安'>比亚迪西安</option>
+						<option value='比亚迪长沙'>比亚迪长沙</option>
+						<option value='比亚迪南京'>比亚迪南京</option>
+						<option value='比亚迪杭州'>比亚迪杭州</option>
+					</select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="newOrderCode">*&nbsp;合格证备注</label>
+                <div class="controls">
+					<textarea style="width: 220px;" class="input-xlarge" onkeyup="this.value = this.value.slice(0, 1000)" id="new_note" rows="2"></textarea>
                 </div>
             </div>
         </form>
@@ -151,7 +185,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3>编辑</h3>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style='max-height: 425px;'>
         <form id="  " class="form-horizontal">
            <div class="control-group">
                 <label class="control-label" for="editFactory">*&nbsp;生产工厂</label>
@@ -182,11 +216,42 @@
                 </div>
             </div>
             <div class="control-group">
+                <label class="control-label" for="newOrderCode">*&nbsp;底盘资质地</label>
+                <div class="controls">
+					<!-- <input type="text" id="edit_dp_zzd" class="input-medium" /> -->
+					<select id="edit_dp_zzd" class="input-medium" >
+						<option value='无'>无</option>
+						<option value='比亚迪深圳'>比亚迪深圳</option>
+						<option value='比亚迪西安'>比亚迪西安</option>
+						<option value='比亚迪长沙'>比亚迪长沙</option>						
+					</select>
+                </div>
+            </div>
+            <div class="control-group">
                 <label class="control-label" for="newOrderCode">*&nbsp;整车生产日期</label>
                 <div class="controls">
 					<input type="text" id="edit_zc_production_date"
 									class="input-medium"
 									onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="newOrderCode">*&nbsp;整车资质地</label>
+                <div class="controls">
+					<!-- <input type="text" id="edit_zc_zzd" class="input-medium" /> -->
+					<select id="edit_zc_zzd" class="input-medium" >
+						<option value='比亚迪深圳'>比亚迪深圳</option>
+						<option value='比亚迪西安'>比亚迪西安</option>
+						<option value='比亚迪长沙'>比亚迪长沙</option>
+						<option value='比亚迪南京'>比亚迪南京</option>
+						<option value='比亚迪杭州'>比亚迪杭州</option>
+					</select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="newOrderCode">*&nbsp;合格证备注</label>
+                <div class="controls">
+					<textarea style="width: 220px;" class="input-xlarge" onkeyup="this.value = this.value.slice(0, 1000)" id="edit_note" rows="2"></textarea>
                 </div>
             </div>
             <input type="hidden" id="edit_dpgg_date" />

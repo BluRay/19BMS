@@ -1888,7 +1888,8 @@
 		b.ccczs_date,
 		b.factory_id,f.factory_name,CONCAT(o.order_no,'
 		',o.order_name,t.internal_name,' ',o.order_qty) as
-		order_no,p.bus_type_code
+		order_no,p.bus_type_code,
+		b.dp_zzd,b.zc_zzd,b.hgz_note
 		FROM BMS_PLAN_BUS b
 		LEFT OUTER JOIN
 		BMS_BASE_FACTORY f ON b.factory_id
@@ -1943,13 +1944,15 @@
 	</select>
 	<update id="updateProductionDateByOrder" parameterType="Map">
 		<![CDATA[
-		update BMS_PLAN_BUS SET dp_production_date = #{dp_production_date},zc_production_date = #{zc_production_date}	
+		update BMS_PLAN_BUS SET dp_production_date = #{dp_production_date},zc_production_date = #{zc_production_date},	
+		dp_zzd=#{dp_zzd},zc_zzd=#{zc_zzd},hgz_note=#{note}
 		where factory_id=#{factory_id} and order_id = (SELECT id FROM BMS_ORDER WHERE order_no=#{order_no})
 		]]>
 	</update>
 	<update id="updateProductionDateByBusNumber" parameterType="Map">
 		update BMS_PLAN_BUS SET dp_production_date =
-		#{dp_production_date},zc_production_date = #{zc_production_date}
+		#{dp_production_date},zc_production_date = #{zc_production_date},
+		dp_zzd=#{dp_zzd},zc_zzd=#{zc_zzd},hgz_note=#{note}
 		where
 		factory_id=#{factory_id} and order_id = (SELECT id FROM BMS_ORDER
 		WHERE order_no=#{order_no})
@@ -1965,7 +1968,7 @@
 		resultType="Map">
 		SELECT b.id,b.bus_number,b.vin,b.bus_color,b.bus_seats,concat(b.left_motor_number,'/',b.right_motor_number) motor_number,f.factory_name, 
 		t.vehicle_model,t.chassis_model,t.motor_model,b.zc_production_date as productive_date,b.dp_production_date,
-		c.tire_type,o.order_no,concat(t.passengers,'/',b.bus_seats) passengers,b.spring_num
+		c.tire_type,o.order_no,concat(t.passengers,'/',b.bus_seats) passengers,b.spring_num,b.dp_zzd,b.zc_zzd,b.hgz_note
 		FROM BMS_PLAN_BUS b
 		LEFT JOIN BMS_ORDER o ON b.order_id = o.id
 		LEFT JOIN BMS_ORDER_CONFIG c on c.id=b.order_cofig_id

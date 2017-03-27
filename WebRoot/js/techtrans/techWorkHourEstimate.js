@@ -26,7 +26,8 @@ $(document).ready(function() {
 	});
 
 	function initPage() {
-		getAuthorityFactorySelect("#factory", "", "noall");
+		//getAuthorityFactorySelect("#factory", "", "noall");
+		getFactorySelect("#factory", "", "");
 		getOrderNoSelect("#order_no","#orderId");
 		ajaxQuery(1);
 	}

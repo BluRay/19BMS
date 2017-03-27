@@ -155,6 +155,10 @@ $(document).ready(
 					alert("必须选择车间！");
 					flag=false;
 				}
+				if(tplType=='订单'&&orderId==0){
+					alert("请选择订单！");
+					flag=false;
+				}
 				//alert(configId)
 				if(flag){
 					$.ajax({

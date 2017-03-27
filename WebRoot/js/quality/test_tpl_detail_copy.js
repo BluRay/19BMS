@@ -140,6 +140,10 @@ $(document).ready(
 					alert("必须输入正确零部件！");
 					flag=false;
 				}
+				if(tplType=='订单'&&orderId==0){
+					alert("请选择订单！");
+					flag=false;
+				}
 				if(flag){
 					$.ajax({
 						url: "testTpl!addTestTplDetailCopy.action",

@@ -1441,7 +1441,7 @@
 			BMS_TECH_TASK_DETAIL AS d
 		LEFT JOIN BMS_TECH_TASK AS t ON t.id = d.tech_task_id
 		WHERE 1=1
-		<if test="factory !=null and factory !=''">
+		<if test="factory !=null and factory !='全部'">
 			and d.factory = #{factory}
 		</if>
 		<if test="order_no !=null and order_no !=''">

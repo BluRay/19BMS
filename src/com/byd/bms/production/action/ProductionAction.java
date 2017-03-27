@@ -628,6 +628,9 @@ public class ProductionAction extends BaseAction<Object>{
 		String new_bus_number = request.getParameter("new_bus_number");
 		String new_dp_production_date = request.getParameter("new_dp_production_date");
 		String new_zc_production_date = request.getParameter("new_zc_production_date");
+		String new_dp_zzd = request.getParameter("new_dp_zzd");
+		String new_zc_zzd = request.getParameter("new_zc_zzd");
+		String new_note = request.getParameter("new_note");
 		
 		logger.info("---->new_bus_number = " + new_bus_number);
 		Map<String,Object> queryMap=new HashMap<String,Object>();
@@ -637,6 +640,9 @@ public class ProductionAction extends BaseAction<Object>{
 			queryMap.put("order_no", order_no);
 			queryMap.put("dp_production_date", new_dp_production_date);
 			queryMap.put("zc_production_date", new_zc_production_date);
+			queryMap.put("dp_zzd", new_dp_zzd);
+			queryMap.put("zc_zzd", new_zc_zzd);
+			queryMap.put("note", new_note);
 			productionDao.updateProductionDateByOrder(queryMap);
 		}else{
 			String[] busNumberList = new_bus_number.split("\n");
@@ -645,6 +651,9 @@ public class ProductionAction extends BaseAction<Object>{
 			queryMap.put("order_no", order_no);
 			queryMap.put("dp_production_date", new_dp_production_date);
 			queryMap.put("zc_production_date", new_zc_production_date);
+			queryMap.put("dp_zzd", new_dp_zzd);
+			queryMap.put("zc_zzd", new_zc_zzd);
+			queryMap.put("note", new_note);
 			productionDao.updateProductionDateByBusNumber(queryMap);
 		}
 		
@@ -2864,8 +2873,8 @@ public class ProductionAction extends BaseAction<Object>{
 				sb.append("Leavedate='").append(bus.get("productive_date")).append("',");
 				sb.append("CLYS='").append(bus.get("bus_color")).append("',");
 				sb.append("Ltgg='").append(bus.get("tire_type")).append("',");
-				sb.append("NOTE='").append(bus.get("note")).append("',");
-				sb.append("SCD='").append(bus.get("scd_zc")).append("'");
+				sb.append("NOTE='").append(bus.get("hgz_note")).append("',");
+				sb.append("SCD='").append(bus.get("zc_zzd")).append("'");
 				sb.append(" where VIN='").append(bus.get("vin")).append("'").append(" and DATATYPE='1'");
 				stmt.addBatch(sb.toString());
 				
@@ -2876,8 +2885,8 @@ public class ProductionAction extends BaseAction<Object>{
 				sb1.append("Leavedate='").append(bus.get("dp_production_date")).append("',");
 				sb1.append("CLYS='").append(bus.get("bus_color")).append("',");
 				sb1.append("Ltgg='").append(bus.get("tire_type")).append("',");
-				sb1.append("NOTE='").append(bus.get("note")).append("',");
-				sb1.append("SCD='").append(bus.get("scd_dp")).append("'");
+				sb1.append("NOTE='").append(bus.get("hgz_note")).append("',");
+				sb1.append("SCD='").append(bus.get("dp_zzd")).append("'");
 				sb1.append(" where VIN='").append(bus.get("vin")).append("'").append(" and DATATYPE='0'");;
 				stmt.addBatch(sb1.toString());
 			}
@@ -2891,8 +2900,8 @@ public class ProductionAction extends BaseAction<Object>{
 				sb.append("'").append(bus.get("productive_date")).append("',");
 				sb.append("'").append(bus.get("bus_color")).append("',");
 				sb.append("'").append(bus.get("tire_type")).append("',");
-				sb.append("'").append(bus.get("note")).append("',");
-				sb.append("'").append(bus.get("scd_zc")).append("',");
+				sb.append("'").append(bus.get("hgz_note")).append("',");
+				sb.append("'").append(bus.get("zc_zzd")).append("',");
 				sb.append("'1')");
 				stmt.addBatch(sb.toString());
 				
@@ -2904,8 +2913,8 @@ public class ProductionAction extends BaseAction<Object>{
 				sb1.append("'").append(bus.get("dp_production_date")).append("',");
 				sb1.append("'").append(bus.get("bus_color")).append("',");
 				sb1.append("'").append(bus.get("tire_type")).append("',");
-				sb1.append("'").append(bus.get("note")).append("',");
-				sb1.append("'").append(bus.get("scd_dp")).append("',");
+				sb1.append("'").append(bus.get("hgz_note")).append("',");
+				sb1.append("'").append(bus.get("dp_zzd")).append("',");
 				sb1.append("'0')");
 				stmt.addBatch(sb1.toString());
 			}

@@ -124,16 +124,16 @@ function ajaxQuery(targetPage){
     			$("<td style=\"text-align:center;padding-left: 0px;\" />").html(value.passengers).appendTo(tr);
     			$("<td style=\"text-align:center;padding-left: 0px;\" />").html(value.spring_num).appendTo(tr);
     			
-    			$("<td style=\"text-align:center;padding-left: 0px;\" />").html("<input style='border:0;width:100%' class='note'>").appendTo(tr);
-    			var zzd_dp="<select style='border:0;width:100%' class='zzd_dp'><option value='比亚迪深圳'>比亚迪深圳</option>" +
+    			$("<td style=\"text-align:center;padding-left: 0px;\" />").html(value.hgz_note/*"<input style='border:0;width:100%' class='note'>"*/).appendTo(tr);
+    			/*var zzd_dp="<select style='border:0;width:100%' class='zzd_dp'><option value='无'>无</option><option value='比亚迪深圳'selected>比亚迪深圳</option>" +
     					"<option value='比亚迪西安'>比亚迪西安</option>" +"<option value='比亚迪长沙'>比亚迪长沙</option>"+
     					"</select>";
     			var zzd_zc="<select style='border:0;width:100%' class='zzd_zc'><option value='比亚迪深圳'>比亚迪深圳</option>" +
 				"<option value='比亚迪西安'>比亚迪西安</option>" +"<option value='比亚迪长沙'>比亚迪长沙</option>"+
 				"<option value='比亚迪南京'>比亚迪南京</option>" +"<option value='比亚迪杭州'>比亚迪杭州</option>"+
-				"</select>";
-    			$("<td style=\"text-align:center;padding-left: 0px;\" />").html(zzd_zc).appendTo(tr);
-    			$("<td style=\"text-align:center;padding-left: 0px;\" />").html(zzd_dp).appendTo(tr);
+				"</select>";*/
+    			$("<td style=\"text-align:center;padding-left: 0px;\" />").html(value.zc_zzd).appendTo(tr);
+    			$("<td style=\"text-align:center;padding-left: 0px;\" />").html(value.dp_zzd).appendTo(tr);
     			
     			$(tr).data("bus_obj",value);
     			$("#tableCertification tbody").append(tr);	    			
@@ -189,9 +189,10 @@ function getCheckedBus(){
     $(arrChk).each(function(){
     	var tr=$(this).parent("td").parent("tr");
     	var bus_obj=$(tr).data("bus_obj");
-    	bus_obj['note']=$(tr).find(".note").val();
+    	/*bus_obj['note']=$(tr).find(".note").val();
     	bus_obj['scd_zc']=$(tr).find(".zzd_zc").val();
-    	bus_obj['scd_dp']=$(tr).find(".zzd_dp").val();
+    	bus_obj['scd_dp']=$(tr).find(".zzd_dp").val();*/
+    	
     	checked_buslist.push(bus_obj); 
     	
     }); 
