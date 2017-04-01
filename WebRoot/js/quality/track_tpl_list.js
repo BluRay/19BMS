@@ -22,7 +22,7 @@ $(document).ready(function() {
 		var tr=$(e.target).parent("td").parent("tr");
 		var headerId=$(tr).data("id");
 		var workshop=$(tr).find("td").eq(3).html();
-		window.open("trackTpl!showTplDetailEditPage.action?tplHeader.id="+headerId+"&tplHeader.workshop="+workshop,"_self");
+		window.open("trackTpl!showTplDetailEditPage.action?tplHeader.id="+headerId+"&tplHeader.workshop="+workshop+"&tplHeader.tplType=订单","_self");
 	});
 })
 function initPage(){

@@ -61,6 +61,7 @@
 										<th width="150px">工序名称</th>
 										<!-- <th width="100px">工序编号</th> -->
 										<th width="220px">零部件名称</th>
+										<th width="100px">关键零部件</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -75,6 +76,7 @@
 										<th width="150px">工序名称</th>
 										<!-- <th width="100px">工序编号</th> -->
 										<th width="220px">零部件名称</th>
+										<th width="100px">关键零部件</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -89,6 +91,7 @@
 										<th width="150px">工序名称</th>
 										<!-- <th width="100px">工序编号</th> -->
 										<th width="220px">零部件名称</th>
+										<th width="100px">关键零部件</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -103,6 +106,7 @@
 										<th width="150px">工序名称</th>
 										<!-- <th width="100px">工序编号</th> -->
 										<th width="220px">零部件名称</th>
+										<th width="100px">关键零部件</th>
 									</tr>
 								</thead>
 								<tbody>

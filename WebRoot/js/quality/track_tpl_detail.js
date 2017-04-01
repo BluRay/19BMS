@@ -30,6 +30,8 @@ function generateTable(workshop){
 				.html(value.processNo==null?"":value.processNo).appendTo(tr);*/
 				$("<td />").attr("recordId",index)
 				.html(value.parts==null?"":value.parts).appendTo(tr);
+				$("<td />").attr("recordId",index)
+				.html(value.keyParts==null?"否":value.keyParts).appendTo(tr);
 				tr.appendTo(tableId+" tbody");
 			}
 				

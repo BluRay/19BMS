@@ -344,7 +344,7 @@ public class ProductionAction extends BaseAction<Object>{
 		
 		List datalist=new ArrayList();
 		datalist = productionDao.getCertificationList(queryMap);
-		int totalCount = 0;//productionDao.getCertificationCount(queryMap);
+		int totalCount =productionDao.getCertificationCount(queryMap);
 		
 		Map<String, String> page_map = new HashMap<String, String>();  
 		if (pager != null){
@@ -2263,7 +2263,7 @@ public class ProductionAction extends BaseAction<Object>{
 		int tplid=(null==tmpid)?0:tmpid;
 		conditionMap.put("bus_number", request.getParameter("bus_number"));
 		conditionMap.put("tpl_id", tplid);
-		//conditionMap.put("process_name", request.getParameter("exec_process_name"));
+		conditionMap.put("process_name", request.getParameter("exec_process_name"));
 		conditionMap.put("workshop_name", request.getParameter("workshop_name"));
 		
 		List datalist=new ArrayList();	

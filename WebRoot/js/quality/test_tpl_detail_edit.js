@@ -1,6 +1,7 @@
 var detaillist;
 var maxProcessNo=0;
 var maxItemNo=0;
+var tplType='';
 $(document).ready(
 		function() {			
 			initPage();
@@ -200,7 +201,10 @@ $(document).ready(
 					success: function (response) {	
 						alert(response.message);
 							if(response.success){
-								window.open("testTpl!index.action","_self");
+								if(tplType=='车型'){
+									window.open("testTpl!carType.action","_self");
+								}else
+									window.open("testTpl!index.action","_self");
 							}
 					}
 				})
@@ -308,6 +312,7 @@ $(document).ready(
 			}
 			// 页面初始化
 			function initPage() {
+				tplType=getQueryString("testTplHeader.tplType")||"";
 				getDetail();
 				$("#qc_tmpl_in").addClass("in");
 				//modalMove("#editModal");

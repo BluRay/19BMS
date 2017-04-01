@@ -80,6 +80,7 @@
 		<result property="memo" column="memo" />
 		<result property="processNo" column="process_number" />
 		<result property="processName" column="process_name" />
+		<result property="keyParts" column="key_parts" />
 	</resultMap>
 	<resultMap type="orderConfigTplHeader" id="ocTplHeaderMap">
 		<id property="id" column="id" />
@@ -704,11 +705,8 @@
 	</select>
 	<select id="getTrackTplDetailList" parameterType="Map"
 		resultMap="trackTplDetailMap">
-		select t.id,t.template_tracking_card_id
-		template_recode_id,t.workshop
-		workshop_id,t.process_number,t.process_name,
-		k.key_name
-		workshop,t.sequence,t.parts_id,p.parts_name parts,t.memo
+		select t.id,t.template_tracking_card_id template_recode_id,t.workshop workshop_id,
+		t.process_number,t.process_name, k.key_name workshop,t.sequence,t.parts_id,p.parts_name parts,t.memo,t.key_parts
 		from
 		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS t left join
 		BMS_BASE_PARTS p on t.parts_id=p.id
@@ -752,11 +750,11 @@
 			LAST_INSERT_ID()
 		</selectKey>
 		insert into BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS
-		(template_tracking_card_id,workshop,process_number,process_name,sequence,parts_id,memo)
+		(template_tracking_card_id,workshop,process_number,process_name,sequence,parts_id,memo,key_parts)
 		values
 		<foreach collection="list" item="detail" index="index"
 			separator=",">
-			(#{detail.tplRecordId},#{detail.workshopId},#{detail.processNo},#{detail.processName},#{detail.sequence},#{detail.partsId},#{detail.memo})
+			(#{detail.tplRecordId},#{detail.workshopId},#{detail.processNo},#{detail.processName},#{detail.sequence},#{detail.partsId},#{detail.memo},#{detail.keyParts})
 		</foreach>
 	</insert>
 	<!-- 产品追踪卡模板 end -->
@@ -1558,7 +1556,7 @@
 		<if test="workshop !=null and workshop !=''">
 			and w.workshop_name=#{workshop}
 		</if>
-
+		order by c.workshop_id
 	</select>
 	<select id="getProdTrackHeaderList" parameterType="Map"
 		resultMap="prodTrackHeaderMap">

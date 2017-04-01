@@ -99,7 +99,20 @@
 			</tbody>
 		</table>
 		</div>
-		
+		<div id="pagination" class="pagination pagination-small pagination-right"
+			style="display: none">
+			<ul>
+				<li id="export"><a href="">总共<span total="" id="total"></span>条记录
+				</a></li>
+			</ul>
+			<ul>
+				<li id="first"><a href="#">«</a></li>
+				<li id="pre" class="prePage"><a href="#">&lt;</a></li>
+				<li id="cur" class="active curPage" page=""><a href="#"></a></li>
+				<li id="next" class="nextPage"><a href="#">&gt;</a></li>
+				<li id="last"><a href="#">»</a></li>
+			</ul>
+		</div>
 		</div>	
 		</div>
 		</div>

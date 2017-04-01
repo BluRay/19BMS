@@ -11,6 +11,7 @@ public class TrackTplDetailBean {
 	private int partsId;
 	private String parts;
 	private String memo;
+	private String keyParts;
 	public int getId() {
 		return id;
 	}
@@ -71,6 +72,11 @@ public class TrackTplDetailBean {
 	public void setProcessName(String processName) {
 		this.processName = processName;
 	}
-	
+	public String getKeyParts() {
+		return keyParts;
+	}
+	public void setKeyParts(String keyParts) {
+		this.keyParts = keyParts;
+	}
 	
 }

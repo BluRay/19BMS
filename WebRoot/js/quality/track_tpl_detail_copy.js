@@ -24,17 +24,21 @@ $(document).ready(function(){
 		var c_recordId=parseInt($(tds[1]).attr("recordId"));
 		var c_processNo=""/*$(tds[2]).html()*/;
 		var c_processName=$("#processName_"+index).val();
-		//alert(c_recordId);
+		
+		var c_key_parts=$(tds[3]).find("select").val();
+		//alert(c_key_parts);
 		if(c_sequence>1){
 			detaillist[c_recordId].partsId=detaillist[c_recordId-1].partsId;
 			detaillist[c_recordId].parts=detaillist[c_recordId-1].parts;
 			detaillist[c_recordId].processNo=""/*detaillist[c_recordId-1].processNo*/;
 			detaillist[c_recordId].processName=detaillist[c_recordId-1].processName;
+			detaillist[c_recordId].keyParts=detaillist[c_recordId-1].keyParts;
 			//detaillist[c_recordId].sequence=detaillist[c_recordId-1].sequence;
 			detaillist[c_recordId-1].partsId=c_partsId;
 			detaillist[c_recordId-1].parts=c_parts;
 			detaillist[c_recordId-1].processNo=c_processNo;
 			detaillist[c_recordId-1].processName=c_processName;
+			detaillist[c_recordId-1].keyParts=c_key_parts;
 			//detaillist[c_recordId-1].sequence=c_sequence;
 			//generateTable(cworkshop);
 			var index_last=index-1;
@@ -42,14 +46,17 @@ $(document).ready(function(){
 			var parts_last=$("#parts_"+index_last).val();
 			var processNo_last=""/*$("#td2_"+index_last).html()*/;
 			var processName_last=$("#processName_"+index_last).val();
+			var trId_cur="tr_"+index;
+			var key_parts_last=$("#"+trId_last).find(".key_parts").val();
 			//alert(processNo_last);
 			$("#parts_"+index).val(parts_last);
 			$("#processName_"+index).val(processName_last);
+			$("#"+trId_cur).find(".key_parts").val(key_parts_last);
 			/*$("#td2_"+index).html(processNo_last);*/
 			$("#parts_"+index_last).val(c_parts);
 			/*$("#td2_"+index_last).html(c_processNo);*/
 			$("#processName_"+index_last).val(c_processName);
-			
+			$("#"+trId_last).find(".key_parts").val(c_key_parts);
 		}		
 	});
 	$(".fa-arrow-down").live("click",function(e){
@@ -62,6 +69,9 @@ $(document).ready(function(){
 		var c_recordId=parseInt($(tds[1]).attr("recordId"));
 		var c_processNo=""/*$(tds[2]).html()*/;
 		var c_processName=$("#processName_"+index).val();
+		
+		var c_key_parts=$(tds[3]).find("select").val();
+		
 		var next_sequence=detaillist[c_recordId+1].sequence;
 		//alert(next_sequence);
 		if(next_sequence!=1){
@@ -69,11 +79,13 @@ $(document).ready(function(){
 			detaillist[c_recordId].parts=detaillist[c_recordId+1].parts;
 			detaillist[c_recordId].processNo=""/*detaillist[c_recordId+1].processNo*/;
 			detaillist[c_recordId].processName=detaillist[c_recordId+1].processName;
+			detaillist[c_recordId].keyParts=detaillist[c_recordId+1].keyParts;
 			//detaillist[c_recordId].sequence=detaillist[c_recordId-1].sequence;
 			detaillist[c_recordId+1].partsId=c_partsId;
 			detaillist[c_recordId+1].parts=c_parts;
 			detaillist[c_recordId+1].processNo=c_processNo;
 			detaillist[c_recordId+1].processName=c_processName;
+			detaillist[c_recordId+1].keyParts=c_key_parts;
 			//detaillist[c_recordId-1].sequence=c_sequence;
 			//generateTable(cworkshop);
 			var index_next=index+1;
@@ -82,13 +94,17 @@ $(document).ready(function(){
 			var parts_next=$("#parts_"+index_next).val();
 			var processNo_next=""/*$("#td2_"+index_next).html()*/;
 			var processName_next=$("#processName_"+index_next).val();
+			var key_parts_next=$("#"+trId_next).find(".key_parts").val();
 			//alert(processNo_next);
 			$("#parts_"+index).val(parts_next);
 			$("#processName_"+index).val(processName_next);
+			var trId_cur="tr_"+index;
+			$("#"+trId_cur).find(".key_parts").val(key_parts_next);
 			/*$("#td2_"+index).html(processNo_next);*/
 			$("#parts_"+index_next).val(c_parts);
 			/*$("#td2_"+index_next).html(c_processNo);*/
 			$("#processName_"+index_next).val(c_processName);
+			$("#"+trId_next).find(".key_parts").val(c_key_parts);
 		}		
 	});
 	/*//弹出新增窗口
@@ -132,7 +148,8 @@ $(document).ready(function(){
 				sequence:detaillist[c_recordId].sequence+1,
 				tplRecordId:detaillist[c_recordId].tplRecordId,
 				workshop:cworkshop,
-				workshopId:cworkshopId
+				workshopId:cworkshopId,
+				keyParts:'否'
 		};
 		detaillist.splice(c_recordId+1,0,insertData);
 		$.each(detaillist,function(index,value){
@@ -196,6 +213,12 @@ $(document).ready(function(){
 			detaillist[c_recordId].processName=obj.process_name;	
 		});
 	});
+	
+	$(".key_parts").live("change",function(e){
+		//alert($(e.target).val());
+		var recordId=$(this).parent("td").attr("recordid");
+		detaillist[recordId].keyParts=$(this).val();
+	});
 	//保存模板更改
 	$("#btnSaveTplDetail").live("click",function(){
 		var flag=true;
@@ -238,7 +261,11 @@ $(document).ready(function(){
 				success: function (response) {	
 					alert(response.message);
 						if(response.success){
-							window.open("trackTpl!index.action","_self");
+							if(tplType=='车型'){
+								window.open("trackTpl!carType.action","_self");
+							}else
+								window.open("trackTpl!index.action","_self");
+							
 						}
 				}
 			})
@@ -280,6 +307,14 @@ function generateTable(workshop){
 				$("<td />").attr("recordId",index)
 				.attr("partsId",value.partsId)
 				.html("<input style='border:0;width:100%;text-align:center'class='parts' value='"+value.parts+"' id='parts_"+index+"'>").appendTo(tr);
+				
+				var key_readonly="";
+				if(tplType=='订单'){
+					key_readonly="disabled";
+				}
+				var key_parts_select="<select class='key_parts' style='border:0;width:100%;text-align:center;margin-bottom:0px;' "+key_readonly+"><option value='否' "
+				+(value.keyParts=='否'?"selected":"")+">否</option><option value='是'"+(value.keyParts=='是'?"selected":"")+">是</option></select>";
+				$("<td />").attr("recordId",index).html(key_parts_select).appendTo(tr);
 				
 				$("<td />").html("<i name='edit' class=\"fa fa-arrow-up\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;"+
 						"<i name='edit' class=\"fa fa-arrow-down\" style=\"cursor: pointer\"></i>&nbsp;&nbsp;"+

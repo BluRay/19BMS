@@ -70,7 +70,7 @@ $(document).ready(function () {
 			//alert(cur_key_name);
 			var conditions={};
 			conditions.vin=$('#vinText').data("vin");
-			conditions.flag=$('#clientFlag').val();
+			//conditions.flag=Number($('#clientFlag').val());
 			$("#gpsModal").modal("hide");
 			 $.ajax({
 				 type:"post",
@@ -100,6 +100,23 @@ $(document).ready(function () {
 		}
 		
 		if(cur_key_name.indexOf("下线")>=0&&$('#exec_workshop :selected').text()=='底盘'){
+			//alert(cur_key_name);
+			$.each(parts_list,function(i,parts){
+				if(parts.id !==0){
+					if(parts.parts_num==undefined||parts.parts_num.trim().length==0){
+						enterflag=false;
+						return false;
+					}
+				}
+			});
+			if(!enterflag){
+				alert(cur_key_name+"扫描前，请将零部件信息录入完整！");
+				$("#btnSubmit").attr("disabled",false);
+				 return false;
+			 }
+		}
+		
+		if(cur_key_name.indexOf("下线")>=0&&$('#exec_workshop :selected').text()=='检测线'){
 			//alert(cur_key_name);
 			$.each(parts_list,function(i,parts){
 				if(parts.id !==0){
@@ -253,7 +270,7 @@ $(document).ready(function () {
             	parts_list=response.data;
             	$.each(response.data,function(index,parts){
             		//if(parts.id !== 0){
-            			if(parts.process_name==$("#exec_processname").val()&&parts.parts){
+            			if(/*parts.process_name==$("#exec_processname").val()&&*/parts.parts){
 	            			var tr=$("<tr />");
 	            			if(parts.parts==''||parts.parts==null){
 	            				$(tr).css('display','none');

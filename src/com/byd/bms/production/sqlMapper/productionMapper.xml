@@ -119,9 +119,15 @@
 	</select>
 
 	<select id="queryPartsList" parameterType="Map" resultType="Map">
+		<if test="process_name=='检测线下线'">
+		select c.*,p.parts_name parts
+		from BMS_QM_PRODUCT_TRACKING_CARD c 
+		left join BMS_BASE_PARTS p on c.parts_id=p.id
+		where c.bus_number=#{bus_number} and c.key_parts='是'
+		</if>
+		<if test="process_name!='检测线下线'">
 		select ifnull(tmp.id,0) id,t.process_number,t.process_name,
-		k.key_name
-		workshop,t.parts_id,p.parts_name parts,tmp.parts_num,tmp.batch
+		k.key_name workshop,t.parts_id,p.parts_name parts,tmp.parts_num,tmp.batch,t.key_parts
 		from BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS t
 		left join
 		BMS_BASE_PARTS p on t.parts_id=p.id
@@ -142,6 +148,8 @@
 			and t.process_name=#{process_name}
 		</if>
 		order by t.workshop,t.sequence
+		</if>
+		
 	</select>
 
 	<insert id="savePartsInfo" parameterType="java.util.List">
@@ -149,14 +157,14 @@
 			separator=";">
 			<if test="detail.id !=null and detail.id !=0">
 				update BMS_QM_PRODUCT_TRACKING_CARD set
-				parts_num=#{detail.parts_num},batch=#{detail.batch},editor_id=#{detail.editor_id},edit_date=#{detail.edit_date}
+				parts_num=#{detail.parts_num},key_parts=#{detail.key_parts},batch=#{detail.batch},editor_id=#{detail.editor_id},edit_date=#{detail.edit_date}
 				where id=#{detail.id}
 			</if>
 			<if test="detail.id ==null or detail.id ==0">
 				insert into BMS_QM_PRODUCT_TRACKING_CARD
-				(bus_number,factory_id,workshop_id,process_number,process_name,parts_id,parts_num,batch,editor_id,edit_date)
+				(bus_number,factory_id,workshop_id,process_number,process_name,parts_id,parts_num,key_parts,batch,editor_id,edit_date)
 				values(#{detail.bus_number},#{detail.factory_id},#{detail.workshop_id},#{detail.process_number},
-				#{detail.process_name},#{detail.parts_id},#{detail.parts_num},#{detail.batch},#{detail.editor_id},#{detail.edit_date})
+				#{detail.process_name},#{detail.parts_id},#{detail.parts_num},#{detail.key_parts},#{detail.batch},#{detail.editor_id},#{detail.edit_date})
 			</if>
 
 		</foreach>

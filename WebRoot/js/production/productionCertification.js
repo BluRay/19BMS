@@ -138,11 +138,11 @@ function ajaxQuery(targetPage){
     			$(tr).data("bus_obj",value);
     			$("#tableCertification tbody").append(tr);	    			
     		});
-    		/*$("#total").html(response.pager.totalCount);
+    		$("#total").html(response.pager.totalCount);
     		$("#total").attr("total",response.pager.totalCount);
     		$("#cur").attr("page",response.pager.curPage);
     		$("#cur").html("<a href=\"#\">"+response.pager.curPage+"</a>");
-    		$("#pagination").show();*/
+    		$("#pagination").show();
     		$("#btnExport").removeAttr("disabled");
 	    }
 	});
