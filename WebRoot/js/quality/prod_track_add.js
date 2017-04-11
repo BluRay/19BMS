@@ -97,10 +97,11 @@ $(document).ready(function() {
 										.appendTo(tr);
 									}else
 										$("<td />").html("<input style='border:0;width:97%;' name='prodTrackList["+index+"].partsNo' />")
-											.appendTo(tr);
+											.appendTo(tr);					
 									
 									$("<td />").html("<input style='border:0;width:97%;' name='prodTrackList["+index+"].batch' />")
 									.appendTo(tr);
+									$("<td />").html(value.keyParts).appendTo(tr);
 									$("<td style='display:none'/>").html("<input  style='border:0;' name='prodTrackList["+index+"].processNo' value='"+value.processNo+ "'/>")
 									.appendTo(tr);
 									$("<td style='display:none'/>").html("<input  style='border:0;' name='prodTrackList["+index+"].processName' value='"+value.processName+ "'/>")
@@ -113,7 +114,8 @@ $(document).ready(function() {
 									.appendTo(tr);
 									$("<td style='display:none'/>").html("<input  style='border:0;' name='prodTrackList["+index+"].factoryId' value='"+factoryId+ "'/>")
 									.appendTo(tr);
-
+									$("<td style='display:none'/>").html("<input  style='border:0;' name='prodTrackList["+index+"].keyParts' value='"+value.keyParts+ "'/>")
+									.appendTo(tr);
 									$("#tableResult tbody").append(tr);
 								});
 				$("#tableResult").show();

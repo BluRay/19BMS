@@ -1103,6 +1103,7 @@
 		<if test="group_by_flg =='订单维度'">
 			GROUP BY d.tech_task_id,d.order_no
 		</if>
+		order by d.order_no
 	</select>
 <!--  ###################  by xjw  end  ###############  -->
 	

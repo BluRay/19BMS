@@ -111,6 +111,7 @@ function generateTable(workshop){
 						.appendTo(tr);
 				$("<td />").html("<input style='border:0;width:97%;' name='prodTrackList["+index+"].batch' value='"+(value.batch||"")+"'/>").appendTo(tr);
 				$("<td style='display:none'/>").html("<input style='border:0;width:97%;' name='prodTrackList["+index+"].id' value='"+value.id+"'/>").appendTo(tr);
+				$("<td />").html((value.keyParts=='null'?'否':value.keyParts)).appendTo(tr);
 				tr.appendTo(tableId+" tbody");
 				i++;
 			}

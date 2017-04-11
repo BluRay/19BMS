@@ -163,7 +163,7 @@ public class TrackTplAction extends BaseAction<Object> {
 		int user_id=getUser().getId();
 		tplHeader.setEditDate(createTime);
 		tplHeader.setEditorId(user_id);
-		String version=Util.format(new Date(), "yyyyMMddHms");
+		String version=Util.format(new Date(), "yyyyMMddHHmmss");
 		tplHeader.setVersion(version);
 		qualityDao.insertTrackTplHeader(tplHeader);
 		int insertHeaderId=tplHeader.getId();

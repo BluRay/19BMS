@@ -72,6 +72,7 @@
 							<th>零部件名称</th>
 							<th>零部件编号</th>
 							<th>批次</th>
+							<th>关键零部件</th>
 						</tr>
 					</thead>
 					<tbody>

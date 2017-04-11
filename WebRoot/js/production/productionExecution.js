@@ -83,10 +83,23 @@ $(document).ready(function () {
 				 success: function(response){
 					 //alert(JSON.parse(response.data).rebackResut);
 					 var reback_data=JSON.parse(response.data);
-					 if(!reback_data.rebackResult){
-						 enterflag=false;						 
-						 alert(reback_data.rebackDesc);
+					 var reabck_msg="";
+					 reabck_msg+="企标绑定结果："+reback_data.rebackDesc+"\n";
+					 reabck_msg+="国标绑定结果："+reback_data.rebackDesc_gb+"\n";
+					 if(!reback_data.rebackResut){
+						 enterflag=false;
+						// reabck_msg+=reback_data.rebackDesc+"\n";
+						 //alert(reback_data.rebackDesc);
 					 }
+					 if(!reback_data.rebackResut_gb){
+						 enterflag=false;						 
+						 //alert(reback_data.rebackDesc);
+						 //reabck_msg+=reback_data.rebackDesc_gb+"\n";
+					 }
+					 if(enterflag){
+						 reabck_msg="成功！";
+					 }
+					 alert(reabck_msg);
 					 
 				 },
 				 error:function(){

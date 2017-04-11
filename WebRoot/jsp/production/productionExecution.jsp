@@ -184,7 +184,7 @@
 			                    <input type="text" id="clientVin" placeholder="vin号..." class="input-medium" disabled/>
 			                </div>
 			            </div>
-			            <div class="control-group">
+			            <%-- <div class="control-group">
 			                <label class="control-label" for="left_motor_number">*&nbsp;车载版本</label>
 			                <div class="controls">
 			                    <select id="clientFlag">
@@ -192,7 +192,7 @@
 			                    	<option value='2'>2代</option>
 			                    </select>
 			                </div>
-			            </div>
+			            </div> --%>
 			        </form>
 			    </div>
 			    <div class="modal-footer">

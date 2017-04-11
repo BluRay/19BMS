@@ -240,6 +240,7 @@
 		<result property="parts" column="parts_name" />
 		<result property="partsNo" column="parts_num" />
 		<result property="batch" column="batch" />
+		<result property="keyParts" column="key_parts" />
 		<result property="editorId" column="editor_id" />
 		<result property="editor" column="username" />
 		<result property="editDate" column="edit_date" />
@@ -1505,7 +1506,7 @@
 		resultMap="trackTplDetailMap">
 		select t.id,t.template_tracking_card_id
 		template_recode_id,t.workshop workshop_id,t.process_number,t.process_name,
-		k.key_name workshop,t.sequence,t.parts_id,p.parts_name parts,t.memo
+		k.key_name workshop,t.sequence,t.parts_id,p.parts_name parts,t.memo,ifnull(t.key_parts,'否') key_parts
 		from
 		BMS_QM_PRODUCT_TRACKING_CARD_TEMPLATE_DETAILS t
 		left join
@@ -1620,11 +1621,11 @@
 			LAST_INSERT_ID()
 		</selectKey>
 		insert into BMS_QM_PRODUCT_TRACKING_CARD
-		(bus_number,factory_id,workshop_id,process_number,process_name,parts_id,parts_num,batch,editor_id,edit_date)
+		(bus_number,factory_id,workshop_id,process_number,process_name,parts_id,parts_num,batch,editor_id,edit_date,key_parts)
 		values
 		<foreach collection="list" item="detail" index="index"
 			separator=",">
-			(#{detail.busNo},#{detail.factoryId},#{detail.workshopId},#{detail.processNo},#{detail.processName},#{detail.partsId},#{detail.partsNo},#{detail.batch},#{detail.editorId},#{detail.editDate})
+			(#{detail.busNo},#{detail.factoryId},#{detail.workshopId},#{detail.processNo},#{detail.processName},#{detail.partsId},#{detail.partsNo},#{detail.batch},#{detail.editorId},#{detail.editDate},#{detail.keyParts})
 		</foreach>
 	</insert>
 	<update id="updateProdTrack" parameterType="prodTrackDetail">

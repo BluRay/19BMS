@@ -41,6 +41,7 @@ function generateTable(workshop){
 				$("<td />").html(value.parts).appendTo(tr);
 				$("<td />").html(value.partsNo).appendTo(tr);
 				$("<td />").html(value.batch).appendTo(tr);
+				$("<td />").html((value.keyParts=='null'?'否':value.keyParts)).appendTo(tr);
 				$("<td />").html(value.editor).appendTo(tr);
 				$("<td />").html(value.editDate).appendTo(tr);
 				tr.appendTo(tableId+" tbody");

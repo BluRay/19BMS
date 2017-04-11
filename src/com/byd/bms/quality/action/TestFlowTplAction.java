@@ -156,7 +156,7 @@ public class TestFlowTplAction extends BaseAction<Object>{
 		int user_id=getUser().getId();
 		tplHeader.setEditDate(createTime);
 		tplHeader.setEditorId(user_id);
-		String version=Util.format(new Date(), "yyyyMMddHms");
+		String version=Util.format(new Date(), "yyyyMMddHHmmss");
 		tplHeader.setVersion(version);
 		transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
 		transactionTemplate.execute(new TransactionCallbackWithoutResult(){

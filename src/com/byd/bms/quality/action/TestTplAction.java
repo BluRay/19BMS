@@ -152,7 +152,7 @@ public class TestTplAction extends BaseAction<Object> {
 		int user_id=getUser().getId();
 		testTplHeader.setEditDate(createTime);
 		testTplHeader.setEditorId(user_id);
-		String version=Util.format(new Date(), "yyyyMMddHms");
+		String version=Util.format(new Date(), "yyyyMMddHHmmss");
 		testTplHeader.setVersion(version);
 		qualityDao.insertTestTplHeader(testTplHeader);
 		int insertHeaderId=testTplHeader.getId();

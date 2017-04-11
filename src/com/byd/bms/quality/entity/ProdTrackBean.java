@@ -19,6 +19,7 @@ public class ProdTrackBean {
 	private int editorId;
 	private String editor;
 	private String editDate;
+	private String keyParts;
 	public int getId() {
 		return id;
 	}
@@ -126,6 +127,12 @@ public class ProdTrackBean {
 	}
 	public void setProcessName(String processName) {
 		this.processName = processName;
+	}
+	public String getKeyParts() {
+		return keyParts;
+	}
+	public void setKeyParts(String keyParts) {
+		this.keyParts = keyParts;
 	}
 	
 }

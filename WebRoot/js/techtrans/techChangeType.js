@@ -79,7 +79,7 @@ function initTable() {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
 		    	        	}
 		            },{
-		            	field: 'total_time',title: '工厂总<br/>计改工时',align: 'center',width:'80',valign: 'middle',align: 'center',
+		            	field: 'total_time',title: '工厂总<br/>技改工时',align: 'center',width:'80',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};
@@ -122,7 +122,7 @@ function initTable() {
 		    	        	},
 		    	      
 		            },{
-		            	field: 'total_time',title: '订单总<br/>计改工时',align: 'center',width:'10%',valign: 'middle',align: 'center',
+		            	field: 'total_time',title: '订单总<br/>技改工时',align: 'center',width:'10%',valign: 'middle',align: 'center',
 		                sortable: false,visible: true,footerFormatter: totalTextFormatter,
 		                cellStyle:function cellStyle(value, row, index, field) {
 		    	        	return {css: {"padding-left": "2px", "padding-right": "2px","font-size":"12px"}};

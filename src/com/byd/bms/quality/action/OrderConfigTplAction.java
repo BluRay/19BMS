@@ -159,7 +159,7 @@ public class OrderConfigTplAction extends BaseAction<Object> {
 		int user_id=getUser().getId();
 		tplHeader.setEditDate(createTime);
 		tplHeader.setEditorId(user_id);
-		String version=Util.format(new Date(), "yyyyMMddHms");
+		String version=Util.format(new Date(), "yyyyMMddHHmmss");
 		tplHeader.setVersion(version);
 		qualityDao.insertOrderConfigTplHeader(tplHeader);
 		int insertHeaderId=tplHeader.getId();
