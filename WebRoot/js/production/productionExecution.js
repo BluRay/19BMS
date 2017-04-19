@@ -96,9 +96,9 @@ $(document).ready(function () {
 						 //alert(reback_data.rebackDesc);
 						 //reabck_msg+=reback_data.rebackDesc_gb+"\n";
 					 }
-					 if(enterflag){
+				/*	 if(enterflag){
 						 reabck_msg="成功！";
-					 }
+					 }*/
 					 alert(reabck_msg);
 					 
 				 },
@@ -115,7 +115,7 @@ $(document).ready(function () {
 		if(cur_key_name.indexOf("下线")>=0&&$('#exec_workshop :selected').text()=='底盘'){
 			//alert(cur_key_name);
 			$.each(parts_list,function(i,parts){
-				if(parts.id !==0){
+				if(parts.id !==0&&parts.process_name==$("#exec_processname").val()){
 					if(parts.parts_num==undefined||parts.parts_num.trim().length==0){
 						enterflag=false;
 						return false;
@@ -280,10 +280,11 @@ $(document).ready(function () {
             },
             success: function(response){
             	$("#partsListTable tbody").html("");
+            	parts_update_list=[];
             	parts_list=response.data;
             	$.each(response.data,function(index,parts){
             		//if(parts.id !== 0){
-            			if(/*parts.process_name==$("#exec_processname").val()&&*/parts.parts){
+            			if((parts.process_name==$("#exec_processname").val()||$("#exec_processname").val()=='检测线下线')&&parts.parts){
 	            			var tr=$("<tr />");
 	            			if(parts.parts==''||parts.parts==null){
 	            				$(tr).css('display','none');

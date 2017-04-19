@@ -110,9 +110,9 @@
     <div class="modal-body">
         <form id="  " class="form-horizontal">
             <div class="control-group">
-                <label class="control-label" for="newOrderName">*&nbsp;订单名称</label>
+                <label class="control-label" for="newOrderName">*&nbsp;订单状态</label>
                 <div class="controls">
-                    <input type="text" class="input-medium" placeholder="订单名称..." id="order_name"/> *城市名称（如：长沙）
+                    <input type="text" class="input-medium"  id="order_name"/> *城市名称（如：长沙）
                 </div>
             </div>
             <div class="control-group">

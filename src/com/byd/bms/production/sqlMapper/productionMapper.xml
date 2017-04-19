@@ -137,16 +137,16 @@
 		(select id,process_name,parts_id,parts_num,batch from
 		BMS_QM_PRODUCT_TRACKING_CARD
 		where 1=1
-		<if test="process_name !=null and process_name !=''">
+		<!-- <if test="process_name !=null and process_name !=''">
 			and process_name=#{process_name}
-		</if>
+		</if> -->
 		and bus_number=#{bus_number}) tmp
 		on tmp.process_name=t.process_name and t.parts_id=tmp.parts_id
 		where
 		t.template_tracking_card_id=#{tpl_id} and k.key_name=#{workshop_name}
-		<if test="process_name !=null and process_name !=''">
+		<!-- <if test="process_name !=null and process_name !=''">
 			and t.process_name=#{process_name}
-		</if>
+		</if> -->
 		order by t.workshop,t.sequence
 		</if>
 		

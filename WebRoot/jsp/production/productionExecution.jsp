@@ -181,7 +181,7 @@
 			            <div class="control-group">
 			                <label class="control-label" for="vin">*&nbsp;vin号</label>
 			                <div class="controls">
-			                    <input type="text" id="clientVin" placeholder="vin号..." class="input-medium" disabled/>
+			                    <input type="text" id="clientVin" placeholder="vin号..." class="input-large" disabled/>
 			                </div>
 			            </div>
 			            <%-- <div class="control-group">
