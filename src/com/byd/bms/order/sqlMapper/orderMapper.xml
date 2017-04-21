@@ -639,7 +639,7 @@
 		where o.productive_year = #{productive_year} and o.order_type='标准订单')
 	</select>
 	
-	<select id="getBusNumberByOrder" parameterType="int" resultType="Map">
+	<select id="getBusNumberByOrder" parameterType="Map" resultType="Map">
 		SELECT b.id,b.factory_id,f.factory_name,b.order_id,b.bus_number,b.vin,b.latest_process_id,p.process_name,
 		o.order_no,o.order_name,o.order_qty FROM BMS_PLAN_BUS b
 		LEFT OUTER JOIN BMS_BASE_FACTORY f ON b.factory_id = f.id
