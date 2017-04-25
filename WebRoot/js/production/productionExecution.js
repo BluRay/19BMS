@@ -294,9 +294,11 @@ $(document).ready(function () {
 	                		if(parts.parts_num){
 	                			$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' style=\"border:0px;width:90%;font-size:14px\" disabled value='"+parts.parts_num+"' /></td>").appendTo(tr);
 	                		}else
-	                		$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' placeholder=\"请扫描零部件编号\" style=\"border:0px;width:90%;font-size:14px\" /></td>").appendTo(tr);
+	                		$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' placeholder=\"请扫描零部件编号\" style=\"border:0px;width:90%;font-size:14px\" /><input class='partsHide' style='width:0px;margin-top:-10000px;' /></td>").appendTo(tr);
 	                		if(parts.batch){
 	                			$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='batch' style=\"border:0px;width:90%;font-size:14px\" disabled value='"+parts.batch+"' /></td>").appendTo(tr);
+	                		}else if(parts.parts=='VIN编码'||parts.parts=='左电机号'||parts.parts=='右电机号'){
+	                			$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='batch' placeholder=\"请填写厂商零部件批次\" style=\"border:0px;width:90%;font-size:14px\" disabled /></td>").appendTo(tr);
 	                		}else
 	                		$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='batch' placeholder=\"请填写厂商零部件批次\" style=\"border:0px;width:90%;font-size:14px\" /></td>").appendTo(tr);
 	                		if(parts.parts_num||parts.batch){
@@ -335,8 +337,22 @@ $(document).ready(function () {
 		parts_update_list.push(parts_list[parts_index]);
 		
 	});
+	$(".partsNum").live("focus",function(event){
+		var tds=$(this).parent("td").siblings();
+		var parts_name=$(tds[0]).html();
+		if(parts_name=='VIN编码'||parts_name=='左电机号'||parts_name=='右电机号'){
+			 //alert("aaa")
+			$(this).val("");
+			$(this).parent("td").find(".partsHide").val("");
+			$(this).css("border","1px solid");
+			$(this).blur();
+			$(this).parent("td").find(".partsHide").focus();
+		}
+		
+	});
 	
-	$(".partsNum").live("keydown",function(event){
+	
+	$(".partsNum").live("keydown",function(event){	
 		if (event.keyCode == "13") {
 			var nxinput=$(event.target).parent("td").parent("tr").find(".batch");
 			//alert($(nxinput).attr("class"));
@@ -344,6 +360,17 @@ $(document).ready(function () {
 		}
 		
 	});
+	
+	$(".partsHide").live("keydown",function(event){
+		if (event.keyCode == "13") {
+			$(this).parent("td").find(".partsNum").css("border","0px").val($(this).val());
+			var nxinput=$(event.target).parent("td").parent("tr").find(".batch");
+			//$(nxinput).focus();
+			$(event.target).parent("td").parent("tr").find("td").eq(3).html("<i class=\"fa fa-2x fa-check-circle-o\" style=\"color:green\" aria-hidden=\"true\"></i>");
+		}
+		
+	});
+	
 	
 	$("#btnAddConfirm").click( function (argument) {
 		if(vin===$("#vin").val() && left_motor_number===$("#left_motor_number").val() && right_motor_number===$("#right_motor_number").val()){
