@@ -112,14 +112,29 @@ $(document).ready(function () {
 			 }
 		}
 		
-		if(cur_key_name.indexOf("下线")>=0&&$('#exec_workshop :selected').text()=='底盘'){
+		if(/*cur_key_name.indexOf("下线")>=0&&*/$('#exec_workshop :selected').text()=='底盘'){
 			//alert(cur_key_name);
 			$.each(parts_list,function(i,parts){
-				if(parts.id !==0&&parts.process_name==$("#exec_processname").val()&&(parts.name=='VIN编码'||parts.name=='左电机号'||parts.name=='右电机号')){
+				if(parts.id !==0&&parts.process_name==$("#exec_processname").val()&&(parts.parts=='VIN编码'||parts.parts=='左电机号'||parts.parts=='右电机号')){
 					if((parts.parts_num==undefined||parts.parts_num.trim().length==0)&&(parts.batch==undefined||parts.batch.trim().length==0)){
 						enterflag=false;
 						return false;
 					}
+				}
+				if(parts.parts=='VIN编码'&&parts.parts_num!=vin){
+					alert("VIN编码校验失败，请核对该车的VIN编码！");
+					enterflag=false;
+					return false;
+				}
+				if(parts.parts=='左电机号'&&parts.parts_num!=left_motor_number){
+					alert("左电机号校验失败，请核对该车的左电机号！");
+					enterflag=false;
+					return false;
+				}
+				if(parts.parts=='右电机号'&&parts.parts_num!=right_motor_number){
+					alert("右电机号校验失败，请核对该车的右电机号！");
+					enterflag=false;
+					return false;
 				}
 			});
 			if(!enterflag){
@@ -217,13 +232,11 @@ $(document).ready(function () {
                     	$('#vinText').data("vin",bus.vin);
                     	bus_production_status=bus.production_status;
                     	orderType=bus.order_type;
+                    	vin=bus.vin;
+                		left_motor_number=bus.left_motor_number;
+                		right_motor_number=bus.right_motor_number;
                     	
                     	if('检测线上线'==$("#exec_processname").val()){
-                    		
-                    		vin=bus.vin;
-                    		left_motor_number=bus.left_motor_number;
-                    		right_motor_number=bus.right_motor_number;
-                    		
                     		bus_color=bus.bus_color;
                     		bus_seats=bus.bus_seats;
                     		workshop_name=bus.workshop_name;
@@ -327,7 +340,7 @@ $(document).ready(function () {
 		
 	});
 	
-	$(".partsNum,.batch").live("change",function(e){
+	$(".partsNum,.partsHide,.batch").live("change",function(e){
 		var tr=$(e.target).parent("td").parent("tr");
 		var patsNumInput=$(tr).find(".partsNum");
 		var batchInput=$(tr).find(".batch");
@@ -337,6 +350,8 @@ $(document).ready(function () {
 		parts_update_list.push(parts_list[parts_index]);
 		
 	});
+	
+	
 	$(".partsNum").live("focus",function(event){
 		var tds=$(this).parent("td").siblings();
 		var parts_name=$(tds[0]).html();
