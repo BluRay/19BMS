@@ -121,17 +121,17 @@ $(document).ready(function () {
 						return false;
 					}
 				}
-				if(parts.parts=='VIN编码'&&parts.parts_num!=vin){
+				if(parts.parts=='VIN编码'&&parts.parts_num!=vin&&parts.process_name==$("#exec_processname").val()){
 					alert("VIN编码校验失败，请核对该车的VIN编码！");
 					enterflag=false;
 					return false;
 				}
-				if(parts.parts=='左电机号'&&parts.parts_num!=left_motor_number){
+				if(parts.parts=='左电机号'&&parts.parts_num!=left_motor_number&&parts.process_name==$("#exec_processname").val()){
 					alert("左电机号校验失败，请核对该车的左电机号！");
 					enterflag=false;
 					return false;
 				}
-				if(parts.parts=='右电机号'&&parts.parts_num!=right_motor_number){
+				if(parts.parts=='右电机号'&&parts.parts_num!=right_motor_number&&parts.process_name==$("#exec_processname").val()){
 					alert("右电机号校验失败，请核对该车的右电机号！");
 					enterflag=false;
 					return false;
@@ -307,7 +307,7 @@ $(document).ready(function () {
 	                		if(parts.parts_num){
 	                			$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' style=\"border:0px;width:90%;font-size:14px\" disabled value='"+parts.parts_num+"' /></td>").appendTo(tr);
 	                		}else
-	                		$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' placeholder=\"请扫描零部件编号\" style=\"border:0px;width:90%;font-size:14px\" /><input class='partsHide' style='width:0px;margin-top:-10000px;' /></td>").appendTo(tr);
+	                		$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='partsNum' placeholder=\"请扫描零部件编号\" style=\"border:0px;width:90%;font-size:14px\" /></td>").appendTo(tr);
 	                		if(parts.batch){
 	                			$("<td align=\"left\" height=36px style=\"padding-left:5px\"><input class='batch' style=\"border:0px;width:90%;font-size:14px\" disabled value='"+parts.batch+"' /></td>").appendTo(tr);
 	                		}else if(parts.parts=='VIN编码'||parts.parts=='左电机号'||parts.parts=='右电机号'){
@@ -352,7 +352,7 @@ $(document).ready(function () {
 	});
 	
 	
-	$(".partsNum").live("focus",function(event){
+/*	$(".partsNum").live("focus",function(event){
 		var tds=$(this).parent("td").siblings();
 		var parts_name=$(tds[0]).html();
 		if(parts_name=='VIN编码'||parts_name=='左电机号'||parts_name=='右电机号'){
@@ -364,7 +364,7 @@ $(document).ready(function () {
 			$(this).parent("td").find(".partsHide").focus();
 		}
 		
-	});
+	});*/
 	
 	
 	$(".partsNum").live("keydown",function(event){	
@@ -376,7 +376,7 @@ $(document).ready(function () {
 		
 	});
 	
-	$(".partsHide").live("keydown",function(event){
+/*	$(".partsHide").live("keydown",function(event){
 		if (event.keyCode == "13") {
 			$(this).parent("td").find(".partsNum").css("border","0px").val($(this).val());
 			var nxinput=$(event.target).parent("td").parent("tr").find(".batch");
@@ -384,7 +384,7 @@ $(document).ready(function () {
 			$(event.target).parent("td").parent("tr").find("td").eq(3).html("<i class=\"fa fa-2x fa-check-circle-o\" style=\"color:green\" aria-hidden=\"true\"></i>");
 		}
 		
-	});
+	});*/
 	
 	
 	$("#btnAddConfirm").click( function (argument) {

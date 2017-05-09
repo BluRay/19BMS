@@ -18,6 +18,52 @@ $(document).ready(function(){
 		}
 
 	});
+	
+	$(".vin,.leftMotor,.rightMotor").live("focus",function(event){
+		var tds=$(this).parent("td").siblings();
+		var className=$(this).attr("class");
+		var classHide="."+className+"Hide";
+		//alert(classHide);
+		var placeHolder=className=="vin"?"请扫描VIN编码！":(className=='leftMotor'?"请扫描做电机号！":"请扫描右电机号！");
+		
+		$(this).parent("td").find(classHide).val("");
+		if(!$(this).attr("readonly")){
+			$(this).val("");
+			$(this).css("border","1px solid").attr("placeHolder",placeHolder);
+		}
+		$(this).blur();
+		$(this).parent("td").find(classHide).focus();
+		
+	});
+	
+	$(".vinHide,.leftMotorHide,.rightMotorHide").live("keydown",function(event){
+		var classHide=$(this).attr("class");
+		//alert(classHide);
+		var className="."+classHide.substring(0,classHide.indexOf('Hide'));
+		
+		if (event.keyCode == "13") {
+			if(className==".vin"){
+				if($(this).val().trim().length==17){
+					$(this).parent("td").find(className).css("border","0px").val($(this).val());	
+				}else{
+					$(this).parent("td").find(className).css("border","0px").val("");
+					alert("请扫描VIN编码！");	
+				}				
+				
+			}else{
+				if($(this).val().trim().length>9){
+					$(this).parent("td").find(className).css("border","0px").val($(this).val().substr(-9));	
+				}else{
+					$(this).parent("td").find(className).css("border","0px").val("");
+					alert("请扫描电机号！");	
+				}				
+				
+			}
+				
+		}
+		
+	});
+	
 	//左右电机号扫描后光标自动移动到另外一个电机号输入框
 	$(".leftMotor,.rightMotor").live("keydown",function(event){
 		if (event.keyCode == "13") {
@@ -210,16 +256,16 @@ function ajaxQuery(targetPage){
 								var busNoInput="<input style='border:0;width:100%;text-align:center;background-color:white;' class='busNumber' name='buslist["+index+"].bus_number' value='"
 								+busNo+"' readonly>";
 								var vinInput="<input style='border:0;width:100%;text-align:center;background-color:white;' class='vin' name='buslist["+index+"].vin' value='"
-								+vin+"' >";
+								+vin+"' ><input class='vinHide' style='width:0px;position:absolute;margin-top:-1000px' />";
 								if(vin!=''){
 									vinInput="<input style='border:0;width:100%;text-align:center;background-color:white;' class='vin' name='buslist["+index+"].vin' value='"
-									+vin+"' readonly>";
+									+vin+"' readonly='true'>";
 								}
 								
 								var leftmotorinput="<input id='leftMotor_"+index+"' old_val='"+leftmotor+"' class='leftMotor' style='border:0;width:100%;text-align:center;background-color:white;' name='buslist["+index+"].left_motor_number' value='"
-								+leftmotor+"'>";
+								+leftmotor+"'><input class='leftMotorHide' style='width:0px;position:absolute;margin-top:-1000px' />";
 								var rightmotorinput="<input id='rightMotor_"+index+"' old_val='"+rightmotor+"' class='rightMotor' style='border:0;width:100%;text-align:center;background-color:white;' name='buslist["+index+"].right_motor_number' value='"
-								+rightmotor+"'>";
+								+rightmotor+"'><input class='rightMotorHide' style='width:0px;position:absolute;margin-top:-1000px' />";
 								//alert(busNoInput);
 								$("<td />").html(busNoInput).appendTo(tr);					
 								$("<td />").html(vinInput).appendTo(tr);															

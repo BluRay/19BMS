@@ -58,8 +58,7 @@
 					</table>
 				</form>
 				<form id="busForm" method="post" action="">
-				<table id="tableResult" class="table table-condensed"
-					style="display: none" style="font-size: 12px;">
+				<table id="tableResult" class="table table-condensed" style="display: none;font-size: 12px;width:1300px">
 					<thead>
 						<tr>
 						<!-- 	<th><input type="checkbox" id="checkall"></th> -->
